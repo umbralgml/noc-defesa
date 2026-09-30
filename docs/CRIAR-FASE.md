@@ -1,0 +1,267 @@
+# Como criar uma fase
+
+As fases ficam em `src/levels/`, um arquivo JSON por ato. Na maioria dos casos você só mexe nesses arquivos, sem tocar em JavaScript.
+
+```
+src/levels/
+  index.json    lista dos atos, na ordem do mapa
+  ato1.json     { "tag": "ATO 1", "name": "Camada física e endereçamento", "levels": [ ... ] }
+  ato2.json
+  ...
+```
+
+- A **ordem no mapa** é a ordem dos arquivos no `index.json` e, dentro de cada arquivo, a ordem do array `levels`.
+- Uma fase só é **desbloqueada** quando a anterior, na ordem geral, tem pelo menos 1 estrela.
+- Para criar um **ato novo**, crie `atoN.json` com `tag`, `name` e `levels` e acrescente o nome do arquivo em `index.json`.
+
+Depois de editar, rode o validador e jogue a fase:
+
+```bash
+node tools/validar-fases.mjs
+python3 -m http.server 8000   # e abra http://localhost:8000
+```
+
+## Campos comuns a todos os tipos
+
+| Campo | Obrigatório | Formato | Para que serve |
+|-------|:-:|---------|----------------|
+| `title` | sim | texto | Nome da fase. **Precisa ser único e não pode mudar depois de publicado**: o progresso salvo usa o título como chave. |
+| `tag` | sim | texto | Rótulo curto em maiúsculas no mapa (`SUB-REDES`, `BGP`, `QUIZ`). |
+| `type` | sim | `wire`, `drop` ou `quiz` | Tipo de fase (veja abaixo). |
+| `mode` | só em `drop` | `buckets` ou `slots` | Variante da fase `drop`. |
+| `loc` | sim | `rack`, `desk`, `firewall`, `war`, `server` | Cenário animado e texto do botão "IR PARA...". |
+| `cap` | sim | texto | Legenda digitada enquanto o analista anda até o local. |
+| `goal` | sim | HTML | Missão, mostrada no briefing (e no topo da fase `wire`). |
+| `intro` | não | HTML | Enunciado no topo da fase `drop`. |
+| `z` | sim | HTML | Fala do Z3R0 no briefing. |
+| `me` | sim | HTML | Resposta do analista no briefing. |
+| `lesson` | recomendado | lista de HTML | **Aula rápida**: 3 a 6 tópicos com o conceito necessário para a fase. Aparece no briefing e no botão **?**. |
+| `tip` | sim | texto | Dica técnica do botão **?** e da tela de derrota. |
+| `learn` | sim | texto | Resumo "O QUE VOCÊ DEFENDEU" na tela de vitória. |
+
+Em campos HTML use só marcação simples, como `<b>`. Em `tip` e `learn` não use `<b>`, porque ele vira título dentro da caixa. Os campos `t`, `s`, `why`, `q` e as opções do quiz são exibidos como texto puro.
+
+### O campo `why`: ensinar em cada jogada
+
+Quase todo item jogável aceita um `why`, que aparece no painel de explicação logo depois da jogada. Os erros também vão para a lista **PARA REVISAR** no fim da fase. Escreva o `why` como explicação do próprio item: diga **o que ele é** e **por que vai onde vai**. Assim o mesmo texto serve tanto para o acerto quanto para o erro.
+
+- Bom: `"172.32 passou do fim do /12, que termina em 172.31: é público."`
+- Ruim: `"Errado!"`, `"Esse é público."`
+
+O validador avisa quando falta `why` ou `lesson`.
+
+---
+
+## Tipo `wire`: ligar pares
+
+O jogador liga cada item da esquerda ao par da direita, arrastando o cabo ou tocando nos dois lados. O par certo é o que tem o **mesmo `id`**. A coluna da direita é embaralhada.
+
+| Campo | Formato |
+|-------|---------|
+| `left` | lista de `{ "id", "t", "s", "m"?, "why" }` |
+| `right` | lista de `{ "id", "t", "s", "ico"?, "why" }` |
+| `heads` | opcional, `["TÍTULO ESQUERDA", "TÍTULO DIREITA"]` |
+| `legend` | opcional, `true` mostra a legenda de cores dos cabos |
+| `loose` | opcional, `true` desenha cabos soltos no rack da cena |
+
+- `t` é o nome e `s` o subtítulo (pode ser `""`).
+- `m` é o tipo de cabo, que define a cor: `sm` (monomodo), `mm` (multimodo), `dac`, `cu` (Cat6), `pon` (GPON). Sem `m`, o cabo fica verde.
+- `ico` é o ícone da porta de destino: `sfp`, `rj45` ou `sc`.
+- O `why` da **esquerda** aparece no acerto. O `why` da **direita** aparece quando alguém liga um item errado nela, então ele deve explicar o que aquela porta espera.
+
+```json
+{
+  "title": "Protocolos de roteamento",
+  "tag": "ROTEAMENTO",
+  "type": "wire",
+  "loc": "desk",
+  "cap": "Abrindo a tabela de rotas...",
+  "heads": ["PROTOCOLO", "COMO ESCOLHE O CAMINHO"],
+  "goal": "Ligue cada protocolo ao critério que ele usa para escolher o caminho.",
+  "z": "Misturei seus protocolos. Boa sorte com a convergência.",
+  "me": "Cada um tem seu jeito de escolher caminho.",
+  "lesson": [
+    "<b>IGP</b> roteia dentro da sua rede. <b>EGP</b> roteia entre redes de donos diferentes.",
+    "<b>Estado de enlace</b> (OSPF, IS-IS): cada roteador conhece o mapa inteiro e calcula o menor caminho.",
+    "<b>Vetor de distância</b> (RIP): cada roteador só sabe o que o vizinho contou e conta saltos."
+  ],
+  "tip": "OSPF usa custo. BGP usa atributos como o AS-path. RIP conta saltos.",
+  "learn": "OSPF é IGP de estado de enlace, RIP é vetor de distância e BGP é o protocolo entre redes da internet.",
+  "left": [
+    { "id": "a", "t": "OSPF", "s": "IGP", "why": "OSPF é estado de enlace: escolhe o caminho de menor custo." },
+    { "id": "b", "t": "BGP", "s": "EGP", "why": "BGP troca rotas entre AS e decide por atributos como o AS-path." },
+    { "id": "c", "t": "RIP", "s": "IGP", "why": "RIP é vetor de distância: escolhe o caminho com menos saltos, no máximo 15." }
+  ],
+  "right": [
+    { "id": "a", "t": "Menor custo", "s": "Dijkstra", "why": "Menor custo calculado com Dijkstra é o critério do OSPF." },
+    { "id": "b", "t": "Menor AS-path", "s": "Entre AS", "why": "AS-path é um atributo do BGP." },
+    { "id": "c", "t": "Menos saltos", "s": "Contagem de hops", "why": "Contar saltos é o critério do RIP." }
+  ]
+}
+```
+
+---
+
+## Tipo `drop` + `buckets`: classificar
+
+As fichas aparecem no banco de baixo, e o jogador arrasta cada uma para a categoria certa.
+
+| Campo | Formato |
+|-------|---------|
+| `buckets` | lista de `{ "label", "c", "a" }` |
+| `label` | nome da categoria (HTML) |
+| `c` | cor da categoria (`#00e0a8` verde, `#ff4d6d` vermelho, `#ffd166` amarelo, `#4dd2ff` azul, `#ff7ad9` rosa) |
+| `a` | itens da categoria: `"texto"` ou `{ "t": "texto", "why": "explicação" }` |
+
+Os itens de todas as categorias são embaralhados juntos. Um texto não pode aparecer em duas categorias.
+
+```json
+{
+  "title": "Camadas do OSI",
+  "tag": "CLASSIFICAÇÃO",
+  "type": "drop",
+  "mode": "buckets",
+  "loc": "desk",
+  "cap": "Revisando o modelo OSI...",
+  "goal": "Arraste cada equipamento ou protocolo para a camada em que ele atua.",
+  "intro": "Separe o que trabalha na <b>camada 2</b> do que trabalha na <b>camada 3</b>.",
+  "z": "Aposto que você nem lembra o que é camada 2.",
+  "me": "MAC é 2, IP é 3.",
+  "lesson": [
+    "<b>Camada 2</b> (enlace) entrega quadros dentro do mesmo segmento, usando endereço MAC.",
+    "<b>Camada 3</b> (rede) leva pacotes entre redes diferentes, usando endereço IP."
+  ],
+  "tip": "Se decide por MAC, é camada 2. Se decide por IP, é camada 3.",
+  "learn": "Switch L2 e ARP são camada 2. Roteador e ICMP são camada 3.",
+  "buckets": [
+    { "label": "CAMADA 2", "c": "#4dd2ff", "a": [
+      { "t": "Switch L2", "why": "Encaminha quadros pela tabela de endereços MAC." },
+      { "t": "ARP", "why": "Descobre o MAC de um IP dentro do segmento local." }
+    ] },
+    { "label": "CAMADA 3", "c": "#ffd166", "a": [
+      { "t": "Roteador", "why": "Encaminha pacotes entre redes pela tabela de rotas IP." },
+      { "t": "ICMP", "why": "Mensagens de controle do IP, como o ping." }
+    ] }
+  ]
+}
+```
+
+---
+
+## Tipo `drop` + `slots`: preencher lacunas
+
+O jogador arrasta fichas para lacunas dentro de um template HTML. Serve para CLI, tabelas e ordenação.
+
+| Campo | Formato |
+|-------|---------|
+| `html` | template HTML; cada lacuna é escrita como `[id]` |
+| `zones` | `{ "id": ["valor aceito", ...] }`, uma entrada por lacuna |
+| `chips` | fichas do banco: `"texto"` ou `{ "t": "texto", "v": "valor", "why": "explicação" }` |
+| `explain` | opcional, `{ "id": "explicação" }` mostrada ao acertar aquela lacuna |
+| `wide` | opcional, `true` deixa as lacunas largas (bom para frases, como nas fases de ordenação) |
+
+- O valor de uma ficha é `v`. Sem `v`, o valor é o próprio `t`. Use `v` quando o texto for longo (regras de ACL, fases de um processo).
+- Uma lacuna pode aceitar mais de um valor. Quando dois itens podem ficar em qualquer ordem, as duas lacunas aceitam os dois (veja "Primeiro match" no `ato2.json`).
+- Fichas que não entram em nenhuma lacuna são **distratoras**. Toda distratora precisa de `why` explicando por que está errada.
+- No acerto aparece `explain[lacuna]` e, se não existir, o `why` da ficha. No erro aparece o `why` da ficha.
+- Os textos das fichas precisam ser únicos.
+
+Classes CSS prontas para o template: `cli` (terminal; `<span class="c">!</span>` para comentário), `kv` (linha rótulo/valor), `grid3` (tabela de 3 colunas; use `<div class="h">` nos cabeçalhos) e `ord` (lista numerada, com `<span class="n">1</span>`).
+
+```json
+{
+  "title": "Endereço na interface",
+  "tag": "CLI",
+  "type": "drop",
+  "mode": "slots",
+  "loc": "rack",
+  "cap": "Conectando no console do roteador...",
+  "goal": "Configure o gateway da LAN 192.168.1.0/24 na interface Gi0/0 e ligue a porta.",
+  "intro": "O gateway da LAN <b>192.168.1.0/24</b> deve ser o <b>primeiro endereço útil</b>.",
+  "z": "Desliguei a interface da LAN. Ninguém sai para a internet.",
+  "me": "IP, máscara e no shutdown.",
+  "lesson": [
+    "Sintaxe Cisco: <b>ip address endereço máscara</b>. A máscara vai por extenso, não em /24.",
+    "O primeiro endereço de uma /24 (.0) é a rede e o último (.255) é o broadcast. Nenhum dos dois pode ir numa interface.",
+    "Interface de roteador Cisco vem desligada: <b>no shutdown</b> liga a porta."
+  ],
+  "tip": "Primeiro endereço útil da 192.168.1.0/24 é o .1. /24 = 255.255.255.0.",
+  "learn": "ip address 192.168.1.1 255.255.255.0 e no shutdown deixam o gateway da LAN no ar.",
+  "html": "<div class=\"cli\">interface Gi0/0<br>&nbsp;ip address [a] [b]<br>&nbsp;[c]</div>",
+  "zones": { "a": ["192.168.1.1"], "b": ["255.255.255.0"], "c": ["no shutdown"] },
+  "explain": {
+    "a": ".1 é o primeiro endereço útil da /24, escolha comum para o gateway.",
+    "b": "/24 por extenso é 255.255.255.0.",
+    "c": "no shutdown liga a interface."
+  },
+  "chips": [
+    { "t": "192.168.1.1", "why": "Primeiro endereço útil da 192.168.1.0/24." },
+    { "t": "192.168.1.0", "why": "É o endereço de rede. Não pode ser usado em interface." },
+    { "t": "255.255.255.0", "why": "Máscara da /24." },
+    { "t": "255.255.255.255", "why": "Máscara /32: a interface ficaria sem rede, só com o próprio IP." },
+    { "t": "no shutdown", "why": "Liga a interface." },
+    { "t": "shutdown", "why": "shutdown desliga a interface, o contrário do que você quer." }
+  ]
+}
+```
+
+---
+
+## Tipo `quiz`: perguntas
+
+Perguntas de múltipla escolha. As opções são embaralhadas na tela.
+
+| Campo | Formato |
+|-------|---------|
+| `qs` | lista de `{ "q", "o", "a", "why" }` |
+| `q` | a pergunta |
+| `o` | opções: `"texto"` ou `{ "t": "texto", "why": "por que está errada" }` |
+| `a` | índice da opção correta em `o` (começa em 0) |
+| `why` | explicação da resposta certa, mostrada sempre |
+| `boss` | opcional, `true` transforma em chefe: barra de vida do Z3R0, precisa acertar 70% e cada erro custa 20% |
+| `time` | obrigatório com `boss`: segundos por pergunta |
+
+Quando o jogador erra, aparece o `why` da pergunta e, embaixo, **"Sobre a sua resposta"** com o `why` da opção escolhida. Toda opção errada deve ter um `why`.
+
+```json
+{
+  "title": "Protocolos seguros",
+  "tag": "QUIZ",
+  "type": "quiz",
+  "loc": "war",
+  "cap": "Auditoria de protocolos inseguros...",
+  "goal": "Troque cada protocolo inseguro pela versão segura.",
+  "z": "Adoro senha passando em texto puro.",
+  "me": "Tudo criptografado a partir de hoje.",
+  "lesson": [
+    "Protocolos antigos (Telnet, FTP, HTTP) mandam tudo em <b>texto puro</b>, inclusive senhas.",
+    "Cada um tem um substituto com criptografia: SSH, SFTP, HTTPS."
+  ],
+  "tip": "Procure a versão que roda sobre SSH ou TLS.",
+  "learn": "Telnet vira SSH, FTP vira SFTP, HTTP vira HTTPS, SNMPv1/v2c vira SNMPv3.",
+  "qs": [
+    {
+      "q": "Qual protocolo substitui o Telnet para acesso remoto?",
+      "o": [
+        "SSH",
+        { "t": "FTP", "why": "FTP transfere arquivos e também manda a senha em texto puro." },
+        { "t": "RDP", "why": "RDP é área de trabalho gráfica do Windows, não substituto do Telnet em equipamentos de rede." },
+        { "t": "SNMP", "why": "SNMP serve para monitoramento, não para acesso interativo." }
+      ],
+      "a": 0,
+      "why": "SSH criptografa a sessão inteira, incluindo a autenticação."
+    }
+  ]
+}
+```
+
+---
+
+## Checklist antes do pull request
+
+- [ ] `node tools/validar-fases.mjs` sem erros nem avisos.
+- [ ] Título novo e único. Nenhum título existente foi renomeado.
+- [ ] `lesson` ensina o necessário para jogar sem precisar pesquisar.
+- [ ] Todo item tem `why`, e todo `why` explica o item em vez de só dizer "certo" ou "errado".
+- [ ] Joguei a fase inteira, errei de propósito e li as explicações e a revisão.
+- [ ] Conteúdo técnico conferido numa fonte (RFC, fabricante, NIST).
