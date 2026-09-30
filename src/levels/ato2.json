@@ -1,0 +1,366 @@
+{
+  "tag": "ATO 2",
+  "name": "Firewall e DDoS",
+  "levels": [
+    {
+      "title": "Triagem de tráfego",
+      "tag": "TRIAGEM",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "firewall",
+      "cap": "Conectando no console do firewall...",
+      "goal": "Aplique a política: decida o que passa e o que é bloqueado.",
+      "intro": "Política do servidor web <b>10.0.0.10</b>: aceitar só <b>HTTPS</b> da internet. <b>SSH</b> só da gerência <b>10.99.0.0/24</b>. Todo o resto: bloquear.",
+      "z": "Estou mandando pacotes de todo lado. Qual deles é meu? Adivinha.",
+      "me": "Não preciso adivinhar. A política decide.",
+      "lesson": [
+        "Uma regra de firewall olha <b>origem</b>, <b>destino</b>, <b>protocolo</b> e <b>porta de destino</b>. O pacote só passa se tudo bater com a política.",
+        "Leia cada linha assim: <b>quem → para quem, protocolo/porta</b>. Por exemplo, 203.0.113.7 → 10.0.0.10 TCP/443 é alguém da internet abrindo HTTPS no servidor.",
+        "Uma <b>/24</b> fixa os três primeiros octetos: tudo que começa com <b>10.99.0.</b> está dentro de 10.99.0.0/24. Já 10.98.0.x está fora.",
+        "Política boa é uma <b>lista de permissões</b>: o que não está escrito é negado. Na dúvida, bloqueie."
+      ],
+      "tip": "Confira destino, porta e, no caso do SSH, se a origem está dentro de 10.99.0.0/24 (10.99.0.0 a 10.99.0.255).",
+      "learn": "Firewall bom é política escrita antes de regra. Cuidado com vizinhos parecidos: 10.98.0.15 não está em 10.99.0.0/24, e HTTPS para 10.0.0.11 não é o servidor autorizado. Porta 80 também fica fechada se a política diz só HTTPS.",
+      "buckets": [
+        {
+          "label": "PERMITIR",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "203.0.113.7 → 10.0.0.10 TCP/443",
+              "why": "HTTPS da internet para o servidor web: exatamente o que a política libera."
+            },
+            {
+              "t": "10.99.0.15 → 10.0.0.10 TCP/22",
+              "why": "SSH vindo de 10.99.0.15, que está dentro da gerência 10.99.0.0/24."
+            },
+            {
+              "t": "192.0.2.44 → 10.0.0.10 TCP/443",
+              "why": "Qualquer origem pode acessar o HTTPS do 10.0.0.10."
+            }
+          ]
+        },
+        {
+          "label": "BLOQUEAR",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "203.0.113.7 → 10.0.0.10 TCP/22",
+              "why": "SSH vindo da internet. Só a gerência 10.99.0.0/24 pode usar SSH."
+            },
+            {
+              "t": "10.98.0.15 → 10.0.0.10 TCP/22",
+              "why": "10.98 não é 10.99: essa origem está fora da rede de gerência."
+            },
+            {
+              "t": "198.51.100.9 → 10.0.0.10 TCP/80",
+              "why": "Porta 80 é HTTP sem criptografia. A política libera só HTTPS (443)."
+            },
+            {
+              "t": "198.51.100.9 → 10.0.0.11 TCP/443",
+              "why": "O destino é o 10.0.0.11, não o servidor autorizado 10.0.0.10."
+            },
+            {
+              "t": "10.99.0.200 → 10.0.0.10 TCP/3389",
+              "why": "A origem é da gerência, mas RDP (3389) não está na política. Só SSH."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Primeiro match",
+      "tag": "ORDENAÇÃO",
+      "type": "drop",
+      "mode": "slots",
+      "wide": true,
+      "loc": "firewall",
+      "cap": "Auditando a ordem das regras...",
+      "goal": "Coloque as regras na ordem certa. O firewall para na primeira que casar.",
+      "intro": "O firewall lê <b>de cima para baixo</b> e para no primeiro match. Objetivos: bloquear o atacante <b>45.67.89.10</b> em tudo, HTTPS público para <b>10.0.0.10</b>, SSH só da gerência <b>10.99.0.0/24</b> e negar o resto.",
+      "z": "Minhas regras estão no seu firewall, só embaralhei a ordem. Divirta-se.",
+      "me": "Ordem de regra é tudo. Deny específico primeiro.",
+      "lesson": [
+        "Uma ACL é lida <b>de cima para baixo</b>. Na primeira regra que casar, o firewall decide e <b>para de ler</b>.",
+        "Por isso a regra <b>mais específica</b> vem antes da mais genérica. O bloqueio de um host precisa vir antes de qualquer permit que também o incluiria.",
+        "No fim fica o <b>deny ip any any</b>: tudo que não foi liberado antes cai nele.",
+        "Vocabulário: <b>any</b> = qualquer endereço, <b>host X</b> = só aquele IP, <b>eq 443</b> = porta de destino igual a 443."
+      ],
+      "tip": "Se o permit de 443 vier antes do bloqueio do atacante, ele entra pela 443. O deny any any sempre fecha a lista. Duas regras ali não fazem parte da política.",
+      "learn": "Regra mais específica primeiro, deny implícito ou explícito no final. \"permit ip any any\" anula tudo abaixo dela, e SSH liberado para any quebra a exigência de só gerência.",
+      "html": "<div class=\"ord\"><span class=\"n\">1</span>[r1]</div><div class=\"ord\"><span class=\"n\">2</span>[r2]</div><div class=\"ord\"><span class=\"n\">3</span>[r3]</div><div class=\"ord\"><span class=\"n\">4</span>[r4]</div>",
+      "zones": {
+        "r1": [
+          "att"
+        ],
+        "r2": [
+          "web",
+          "ssh"
+        ],
+        "r3": [
+          "web",
+          "ssh"
+        ],
+        "r4": [
+          "deny"
+        ]
+      },
+      "explain": {
+        "r1": "O bloqueio do atacante vem primeiro. Abaixo do permit 443, ele entraria pelo HTTPS.",
+        "r2": "HTTPS público e SSH da gerência não se sobrepõem, então a ordem entre os dois tanto faz.",
+        "r3": "HTTPS público e SSH da gerência não se sobrepõem, então a ordem entre os dois tanto faz.",
+        "r4": "O deny any any fecha a lista: o que não casou com nada acima é negado."
+      },
+      "chips": [
+        {
+          "t": "deny ip host 45.67.89.10 any",
+          "v": "att",
+          "why": "Bloqueia tudo do atacante. Precisa ser a primeira regra."
+        },
+        {
+          "t": "permit tcp any host 10.0.0.10 eq 443",
+          "v": "web",
+          "why": "Libera HTTPS de qualquer origem para o servidor web. Vem depois do bloqueio do atacante."
+        },
+        {
+          "t": "permit tcp 10.99.0.0/24 host 10.0.0.10 eq 22",
+          "v": "ssh",
+          "why": "Libera SSH só da rede de gerência. Vem depois do bloqueio do atacante."
+        },
+        {
+          "t": "deny ip any any",
+          "v": "deny",
+          "why": "Nega todo o resto. É sempre a última regra."
+        },
+        {
+          "t": "permit ip any any",
+          "v": "x1",
+          "why": "permit ip any any libera tudo e anula as regras abaixo dela. Não faz parte da política."
+        },
+        {
+          "t": "permit tcp any host 10.0.0.10 eq 22",
+          "v": "x2",
+          "why": "Libera SSH de qualquer origem, mas a política exige que venha só da gerência."
+        }
+      ]
+    },
+    {
+      "title": "Monte a ACL",
+      "tag": "CLI",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "rack",
+      "cap": "Plugando o cabo console no roteador de borda...",
+      "goal": "Complete a ACL que bloqueia a reflexão NTP e aplique na interface certa.",
+      "intro": "Ataque de <b>reflexão NTP</b> chegando pelo trânsito contra o bloco <b>177.10.0.0/22</b>. Bloqueie o UDP com <b>origem 123</b>, libere o resto e aplique na entrada do uplink.",
+      "z": "Milhares de servidores NTP respondendo pra você ao mesmo tempo. Monlist é lindo.",
+      "me": "Porta de origem 123, wildcard certa e ACL na entrada. Vamos lá.",
+      "lesson": [
+        "<b>Reflexão</b>: o atacante manda consultas pequenas para servidores abertos, forjando o SEU IP como origem. Os servidores respondem para você, com respostas muito maiores.",
+        "No NTP, o comando <b>monlist</b> devolve até 600 endereços por consulta. As respostas saem da <b>porta 123</b> do servidor, então chegam em você com <b>porta de origem 123</b>.",
+        "ACL estendida Cisco: <b>access-list N ação protocolo origem [porta] destino [porta]</b>. Um <b>eq</b> logo depois da origem filtra a porta de origem.",
+        "Cisco usa <b>wildcard</b>, o inverso da máscara: 255 menos cada octeto. 255.255.252.0 vira <b>0.0.3.255</b>.",
+        "Toda ACL termina com um <b>deny implícito</b>. Sem um <b>permit</b> no final, você bloqueia todo o resto.",
+        "<b>in</b> filtra o que entra na interface e <b>out</b> o que sai. O ataque vem da internet, então entra pelo uplink."
+      ],
+      "tip": "Em ACL Cisco se usa wildcard, não máscara: /22 = 0.0.3.255. A porta 123 é a de ORIGEM, então o \"eq\" vem logo depois do \"any\". Tráfego que vem da internet entra pelo uplink.",
+      "learn": "Wildcard é o inverso da máscara: 255.255.252.0 vira 0.0.3.255. Em reflexão, a vítima recebe respostas vindas da porta do serviço abusado, por isso o filtro é na porta de origem. O ideal é ainda pedir ao upstream para filtrar antes do seu link.",
+      "html": "<div class=\"cli\">access-list 110 [a] [b] any [c] 177.10.0.0 [d]<br>access-list 110 [e] ip any any<br><span class=\"c\">!</span><br>interface TenGigE0/0/0<br>&nbsp;description UPLINK-TRANSITO<br>&nbsp;ip access-group 110 [f]</div>",
+      "zones": {
+        "a": [
+          "deny"
+        ],
+        "b": [
+          "udp"
+        ],
+        "c": [
+          "eq 123"
+        ],
+        "d": [
+          "0.0.3.255"
+        ],
+        "e": [
+          "permit"
+        ],
+        "f": [
+          "in"
+        ]
+      },
+      "explain": {
+        "a": "deny: a primeira linha descarta o tráfego do ataque.",
+        "b": "NTP roda sobre UDP.",
+        "c": "eq 123 logo depois do any de origem filtra a porta de ORIGEM 123, de onde saem as respostas refletidas.",
+        "d": "/22 = 255.255.252.0. Invertendo, a wildcard é 0.0.3.255.",
+        "e": "Sem este permit, o deny implícito do fim da ACL bloquearia toda a internet.",
+        "f": "O ataque chega da internet, então o filtro vai na entrada (in) do uplink."
+      },
+      "chips": [
+        {
+          "t": "deny",
+          "why": "Descarta o pacote que casar com a linha."
+        },
+        {
+          "t": "permit",
+          "why": "Libera o pacote que casar com a linha."
+        },
+        {
+          "t": "udp",
+          "why": "NTP, DNS e SNMP rodam sobre UDP."
+        },
+        {
+          "t": "tcp",
+          "why": "NTP não usa TCP. Ataque de reflexão é UDP, que aceita origem forjada sem handshake."
+        },
+        {
+          "t": "eq 123",
+          "why": "123 é a porta do NTP."
+        },
+        {
+          "t": "eq 53",
+          "why": "53 é DNS. Aqui o serviço abusado é o NTP."
+        },
+        {
+          "t": "0.0.3.255",
+          "why": "Wildcard de uma /22."
+        },
+        {
+          "t": "255.255.252.0",
+          "why": "Isso é a máscara. A ACL Cisco pede a wildcard, que é o inverso."
+        },
+        {
+          "t": "0.0.1.255",
+          "why": "Wildcard de uma /23: cobriria só metade do bloco /22."
+        },
+        {
+          "t": "in",
+          "why": "Filtra o tráfego que entra na interface."
+        },
+        {
+          "t": "out",
+          "why": "out filtra o que sai pelo uplink, e o ataque está entrando."
+        }
+      ]
+    },
+    {
+      "title": "Mitigação DDoS",
+      "tag": "QUIZ",
+      "type": "quiz",
+      "loc": "war",
+      "cap": "Correndo para o painel de tráfego...",
+      "goal": "Responda as questões de mitigação para segurar o ataque volumétrico.",
+      "z": "Agora é pra valer. Vou encher seus links até não caber mais nada.",
+      "me": "Volumétrico não se resolve na minha borda. Se resolve antes dela.",
+      "lesson": [
+        "<b>DDoS volumétrico</b> enche o link. Se chegam 80 Gbps num link de 10G, nada no seu roteador ajuda: o cano já está cheio antes dele.",
+        "<b>DDoS de protocolo</b>, como o SYN flood, esgota recursos do servidor (a tabela de conexões). Esse se trata no próprio host ou no firewall.",
+        "<b>RTBH</b> (Remote Triggered Black Hole): você anuncia por BGP o IP atacado com uma community de blackhole, e o upstream descarta o tráfego antes que ele chegue em você.",
+        "<b>Amplificação</b> usa servidores abertos (DNS, NTP) para multiplicar o tráfego. A resposta chega com a porta do serviço abusado como origem.",
+        "<b>Spoofing</b> é forjar o IP de origem. Filtrar isso na borda (<b>BCP 38</b>, com uRPF) impede que sua rede seja usada em ataques."
+      ],
+      "tip": "Pense em onde o tráfego é descartado. Se já chegou no seu uplink, o link já está cheio.",
+      "learn": "Camadas de defesa contra DDoS: SYN cookies no host, uRPF contra spoofing (BCP 38), ACL para reflexão, RTBH ou scrubbing no upstream para volumétrico.",
+      "qs": [
+        {
+          "q": "O servidor recebe milhões de SYN sem completar o handshake e a tabela de conexões lotou. Mitigação mais direta no host?",
+          "o": [
+            "Habilitar SYN cookies",
+            {
+              "t": "Aumentar o MTU da interface",
+              "why": "MTU é o tamanho máximo do pacote. Não tem relação com conexões pendentes."
+            },
+            {
+              "t": "Trocar TCP por UDP",
+              "why": "O serviço é TCP. Trocar o protocolo quebra a aplicação e não resolve o ataque."
+            },
+            {
+              "t": "Colocar o servidor atrás de NAT",
+              "why": "NAT só traduz endereços. Os SYN continuam chegando e lotando a tabela."
+            }
+          ],
+          "a": 0,
+          "why": "SYN cookies evitam guardar estado até o ACK final chegar, então a tabela não enche."
+        },
+        {
+          "q": "Chegam 80 Gbps de lixo contra um único IP de cliente num uplink de 10G. O que salva o resto da rede?",
+          "o": [
+            "RTBH: anunciar o /32 com community de blackhole pro upstream",
+            {
+              "t": "Criar uma ACL no roteador de borda",
+              "why": "A ACL descarta no seu roteador, mas o tráfego já atravessou e lotou o uplink de 10G."
+            },
+            {
+              "t": "Reiniciar o roteador de borda",
+              "why": "Reiniciar derruba tudo por minutos, e o ataque continua quando ele volta."
+            },
+            {
+              "t": "Aumentar o buffer da interface",
+              "why": "Buffer maior só aumenta o atraso. 80 Gbps não cabem em 10G, com ou sem buffer."
+            }
+          ],
+          "a": 0,
+          "why": "Se o tráfego chegou no seu uplink, o link já saturou. Só o upstream descartando antes resolve. O RTBH sacrifica o IP alvo pra salvar o resto."
+        },
+        {
+          "q": "Qual community BGP padronizada pela RFC 7999 sinaliza blackhole?",
+          "o": [
+            "65535:666",
+            {
+              "t": "65535:65281",
+              "why": "65535:65281 é a NO_EXPORT (RFC 1997): não repassar a rota para fora do AS."
+            },
+            {
+              "t": "0:0",
+              "why": "0:0 não é community padronizada para blackhole."
+            },
+            {
+              "t": "64512:100",
+              "why": "64512 é de ASN privado. Communities assim são locais: cada rede define o que significam."
+            }
+          ],
+          "a": 0,
+          "why": "BLACKHOLE é 65535:666. A 65535:65281 é a no-export."
+        },
+        {
+          "q": "Numa amplificação DNS, qual a porta de ORIGEM do tráfego que chega na vítima?",
+          "o": [
+            "UDP 53",
+            {
+              "t": "TCP 53",
+              "why": "Amplificação usa UDP, que não tem handshake e aceita IP de origem forjado."
+            },
+            {
+              "t": "UDP 123",
+              "why": "123 é NTP. Aqui o serviço abusado é o DNS."
+            },
+            {
+              "t": "Aleatória acima de 1024",
+              "why": "Essa é a porta de DESTINO na vítima, a porta que o atacante colocou na consulta forjada."
+            }
+          ],
+          "a": 0,
+          "why": "As respostas saem dos resolvers abertos, então a origem é 53/UDP. Se fosse NTP, seria 123."
+        },
+        {
+          "q": "Que recurso descarta pacotes com IP de origem forjado, sem rota de volta pela interface de entrada?",
+          "o": [
+            "uRPF",
+            {
+              "t": "Spanning Tree",
+              "why": "STP evita loops na camada 2. Não olha IP de origem."
+            },
+            {
+              "t": "LACP",
+              "why": "LACP agrega vários links físicos num só. Não filtra tráfego."
+            },
+            {
+              "t": "VRRP",
+              "why": "VRRP dá redundância de gateway entre roteadores."
+            }
+          ],
+          "a": 0,
+          "why": "uRPF strict confere se a rota para o IP de origem sai pela mesma interface. É a base do BCP 38 contra spoofing."
+        }
+      ]
+    }
+  ]
+}

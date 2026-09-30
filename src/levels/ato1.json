@@ -1,0 +1,427 @@
+{
+  "tag": "ATO 1",
+  "name": "Camada física e endereçamento",
+  "levels": [
+    {
+      "title": "Rack derrubado",
+      "tag": "CABEAMENTO",
+      "type": "wire",
+      "loc": "rack",
+      "cap": "Correndo até o rack do datacenter...",
+      "heads": [
+        "SEU EQUIPAMENTO",
+        "ONDE LIGAR"
+      ],
+      "loose": true,
+      "legend": true,
+      "goal": "Cada cabo tem um tipo. Ligue cada equipamento da esquerda na porta compatível da direita.",
+      "z": "Entrei no datacenter e arranquei todos os cabos do seu rack. Quero ver religar isso às 3 da manhã.",
+      "me": "Cada porta tem seu transceiver. É só ler o que está escrito nele.",
+      "lesson": [
+        "<b>Transceiver</b> é o módulo (SFP, SFP+, SFP28) que converte sinal elétrico em luz. O nome diz o alcance: <b>SR</b> = curta distância, <b>LR</b> = longa (até 10 km).",
+        "<b>Fibra monomodo</b> (OS2, capa amarela): núcleo fino de 9 µm, a luz segue um caminho só e vai longe, por quilômetros. É o par do <b>LR</b>.",
+        "<b>Fibra multimodo</b> (OM3/OM4, capa aqua): núcleo de 50 µm, a luz segue vários caminhos e se espalha, então alcança só centenas de metros. É o par do <b>SR</b>.",
+        "<b>DAC</b>: cabo twinax de cobre com os módulos já presos nas pontas. Barato e sem óptica, mas só serve para poucos metros, dentro do mesmo rack.",
+        "<b>RJ45 + Cat6</b>: cobre de par trançado, até 100 m. A rede <b>GPON</b> usa conector <b>SC/APC</b> (verde), com ponta polida em ângulo."
+      ],
+      "tip": "LR = longa distância em fibra monomodo (amarela). SR = curta distância em multimodo (aqua). SFP28 no mesmo rack = DAC. RJ45 = cobre. PON da OLT vai para o splitter óptico.",
+      "learn": "Monomodo OS2 (amarela) atende LR/ER, quilômetros. Multimodo OM4 (aqua) atende SR, até uns 400 m em 10G. DAC é twinax de cobre com transceiver embutido, ideal até ~5 m. GPON usa SC/APC (verde) pelo polimento angular que reduz reflexão.",
+      "left": [
+        {
+          "id": "a",
+          "t": "RT-BORDA xe-0/0/0",
+          "s": "SFP+ 10GBASE-LR · POP a 8 km",
+          "m": "sm",
+          "why": "LR (long reach) usa laser de 1310 nm em fibra monomodo e alcança 10 km. Para 8 km até o POP, só OS2 serve."
+        },
+        {
+          "id": "b",
+          "t": "PVE01 enp65s0f0",
+          "s": "SFP28 25G · mesmo rack, 1 m",
+          "m": "dac",
+          "why": "Dois equipamentos no mesmo rack, a 1 m: o DAC resolve sem gastar com transceivers ópticos."
+        },
+        {
+          "id": "c",
+          "t": "SW-ANDAR2 Te1/0/49",
+          "s": "SFP+ 10GBASE-SR · 150 m",
+          "m": "mm",
+          "why": "SR (short reach) usa laser de 850 nm em multimodo. OM4 leva 10G até uns 400 m, então 150 m está folgado."
+        },
+        {
+          "id": "d",
+          "t": "Estação NOC",
+          "s": "Placa RJ45 1000BASE-T",
+          "m": "cu",
+          "why": "1000BASE-T é Gigabit em cobre: cabo Cat6 com RJ45, até 100 m."
+        },
+        {
+          "id": "e",
+          "t": "OLT GPON 0/1/0",
+          "s": "Módulo PON classe C+",
+          "m": "pon",
+          "why": "A porta PON da OLT sai em fibra monomodo com conector SC/APC e vai até o splitter, que divide o sinal para até 16 clientes."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "POP remoto",
+          "s": "DIO com fibra monomodo OS2",
+          "ico": "sfp",
+          "why": "O POP remoto fica a 8 km e o DIO é de monomodo: só um transceiver LR chega lá."
+        },
+        {
+          "id": "b",
+          "t": "SW-TOR 25GE1/0/1",
+          "s": "Gaiola SFP28 no mesmo rack",
+          "ico": "sfp",
+          "why": "Porta SFP28 de 25G no mesmo rack: pede um DAC de 25G, não fibra nem RJ45."
+        },
+        {
+          "id": "c",
+          "t": "SW-CORE 10GE1/0/12",
+          "s": "SFP+ SR · fibra OM4",
+          "ico": "sfp",
+          "why": "Porta SFP+ SR com fibra OM4: pede um transceiver SR, de curta distância, a no máximo algumas centenas de metros."
+        },
+        {
+          "id": "d",
+          "t": "SW-ACESSO Gi1/0/24",
+          "s": "Patch panel Cat6",
+          "ico": "rj45",
+          "why": "Patch panel Cat6 é cobre: só recebe cabo com RJ45."
+        },
+        {
+          "id": "e",
+          "t": "Splitter 1:16",
+          "s": "Adaptador SC/APC verde",
+          "ico": "sc",
+          "why": "Splitter óptico com SC/APC verde é a ponta de uma rede GPON: só a OLT liga aqui."
+        }
+      ]
+    },
+    {
+      "title": "Quem é quem",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Abrindo os logs no terminal...",
+      "goal": "Arraste cada IP para a categoria certa: privado, CGNAT ou público.",
+      "intro": "Os logs estão cheios de IPs. Separe o que é <b>interno</b>, o que é <b>CGNAT</b> e o que vem da <b>internet</b>.",
+      "z": "Enchi seus logs de IPs. Aposto que você nem sabe o que é interno e o que é da internet.",
+      "me": "RFC 1918 e RFC 6598 eu sei de cor.",
+      "lesson": [
+        "A <b>RFC 1918</b> reserva três faixas privadas, que não são roteadas na internet: <b>10.0.0.0/8</b>, <b>172.16.0.0/12</b> e <b>192.168.0.0/16</b>.",
+        "Como ler o prefixo: <b>/8</b> fixa o 1º octeto, <b>/16</b> fixa os dois primeiros. Já <b>/12</b> e <b>/10</b> fixam só parte do 2º octeto, então é preciso conferir onde a faixa termina.",
+        "O <b>/12</b> do 172 vai de <b>172.16</b> até <b>172.31</b>. O 172.15 e o 172.32 já são públicos.",
+        "A <b>RFC 6598</b> reserva <b>100.64.0.0/10</b> para <b>CGNAT</b>: o provedor dá esse IP ao cliente e faz NAT para um IP público compartilhado. Vai de <b>100.64</b> até <b>100.127</b>.",
+        "Qualquer endereço fora das faixas reservadas é <b>público</b>: roteado na internet e com dono registrado."
+      ],
+      "tip": "Privado: 10.0.0.0/8, 172.16.0.0/12 (172.16 a 172.31), 192.168.0.0/16. CGNAT: 100.64.0.0/10 (100.64 a 100.127). O resto aqui é público.",
+      "learn": "Pegadinhas clássicas: 172.32.x.x já é público porque o /12 vai só até 172.31. 100.128.x.x é público porque o /10 do CGNAT termina em 100.127. 192.169.x.x também é público.",
+      "buckets": [
+        {
+          "label": "PRIVADO · RFC 1918",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "10.20.30.40",
+              "why": "Começa com 10: está em 10.0.0.0/8, privado."
+            },
+            {
+              "t": "172.16.5.1",
+              "why": "172.16 é o começo de 172.16.0.0/12, privado."
+            },
+            {
+              "t": "192.168.100.254",
+              "why": "Todo 192.168.x.x é privado (192.168.0.0/16)."
+            },
+            {
+              "t": "172.31.255.1",
+              "why": "172.31 é o último trecho do /12 (172.16 a 172.31): ainda privado."
+            }
+          ]
+        },
+        {
+          "label": "CGNAT · RFC 6598",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "100.64.0.1",
+              "why": "100.64 é o começo de 100.64.0.0/10, a faixa de CGNAT."
+            },
+            {
+              "t": "100.100.50.5",
+              "why": "100.100 está entre 100.64 e 100.127: CGNAT."
+            },
+            {
+              "t": "100.127.255.254",
+              "why": "100.127 é o último trecho do /10: ainda CGNAT."
+            }
+          ]
+        },
+        {
+          "label": "PÚBLICO",
+          "c": "#ff7ad9",
+          "a": [
+            {
+              "t": "8.8.8.8",
+              "why": "DNS público do Google, roteado na internet."
+            },
+            {
+              "t": "172.32.0.1",
+              "why": "172.32 passou do fim do /12, que termina em 172.31: é público."
+            },
+            {
+              "t": "100.128.0.1",
+              "why": "100.128 passou do fim do /10 do CGNAT, que termina em 100.127: é público."
+            },
+            {
+              "t": "177.23.10.5",
+              "why": "177.x não cai em nenhuma faixa reservada: é público."
+            },
+            {
+              "t": "192.169.1.1",
+              "why": "Só 192.168 é privado. 192.169 já é público."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Dividir para conquistar",
+      "tag": "SUB-REDES",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "cap": "Planejando a segmentação da rede...",
+      "goal": "Divida 192.168.10.0/24 em 4 sub-redes iguais arrastando os valores certos.",
+      "intro": "Isole os segmentos: divida <b>192.168.10.0/24</b> em <b>4 sub-redes iguais</b>.",
+      "z": "Coloquei tudo numa /24 só. Um broadcast e eu chego em todo mundo.",
+      "me": "Então vou segmentar. 4 sub-redes, 2 bits emprestados.",
+      "lesson": [
+        "Uma <b>/24</b> tem 256 endereços: sobram 8 bits para hosts. Para dividir, você <b>empresta bits</b> da parte de host para a parte de rede.",
+        "Cada bit emprestado dobra o número de sub-redes: 1 bit = 2, <b>2 bits = 4</b>, 3 bits = 8. Então 4 sub-redes = /24 + 2 = <b>/26</b>.",
+        "Tamanho do bloco = <b>256 − último octeto da máscara</b>. A /26 é 255.255.255.<b>192</b>, então os blocos têm <b>64</b> endereços: .0, .64, .128, .192.",
+        "Em cada bloco, o <b>primeiro</b> endereço é a rede e o <b>último</b> é o broadcast. Hosts úteis = tamanho − 2."
+      ],
+      "tip": "4 sub-redes = 2 bits a mais: /24 vira /26. Cada /26 tem 64 endereços (62 úteis). Os blocos andam de 64 em 64.",
+      "learn": "/26 = 255.255.255.192, blocos de 64 endereços. Rede é o primeiro, broadcast é o último: .0-.63, .64-.127, .128-.191, .192-.255. Úteis = 2^6 - 2 = 62.",
+      "html": "<div class=\"kv\">Máscara<span class=\"grow\"></span>[m]</div>\n<div class=\"kv\">Hosts úteis por sub-rede<span class=\"grow\"></span>[h]</div>\n<div class=\"grid3\"><div class=\"h\">SUB</div><div class=\"h\">REDE 192.168.10.x</div><div class=\"h\">BROADCAST</div>\n<div class=\"h\">A</div>[a1][a2]<div class=\"h\">B</div>[b1][b2]<div class=\"h\">C</div>[c1][c2]<div class=\"h\">D</div>[d1][d2]</div>",
+      "zones": {
+        "m": [
+          "255.255.255.192"
+        ],
+        "h": [
+          "62"
+        ],
+        "a1": [
+          ".0"
+        ],
+        "a2": [
+          ".63"
+        ],
+        "b1": [
+          ".64"
+        ],
+        "b2": [
+          ".127"
+        ],
+        "c1": [
+          ".128"
+        ],
+        "c2": [
+          ".191"
+        ],
+        "d1": [
+          ".192"
+        ],
+        "d2": [
+          ".255"
+        ]
+      },
+      "explain": {
+        "m": "4 sub-redes pedem 2 bits emprestados: /26, que é 255.255.255.192.",
+        "h": "A /26 deixa 6 bits de host: 2^6 = 64 endereços, menos rede e broadcast = 62.",
+        "a1": "A primeira sub-rede começa no início do bloco: .0.",
+        "a2": "O broadcast é o último endereço antes da próxima rede: 64 − 1 = .63.",
+        "b1": "Os blocos andam de 64 em 64: 0 + 64 = .64.",
+        "b2": "A próxima rede começa em .128, então o broadcast desta é .127.",
+        "c1": "64 + 64 = .128.",
+        "c2": "A próxima rede começa em .192, então o broadcast é .191.",
+        "d1": "128 + 64 = .192, a última sub-rede.",
+        "d2": "O último endereço da /24 é sempre o broadcast da última sub-rede: .255."
+      },
+      "chips": [
+        {
+          "t": "255.255.255.192",
+          "why": "Máscara /26: blocos de 64 endereços."
+        },
+        {
+          "t": "255.255.255.224",
+          "why": "Essa é a /27: blocos de 32, o que daria 8 sub-redes. Aqui são 4."
+        },
+        {
+          "t": "255.255.255.128",
+          "why": "Essa é a /25: blocos de 128, o que daria só 2 sub-redes."
+        },
+        {
+          "t": "62",
+          "why": "2^6 − 2 = 62 hosts úteis numa /26."
+        },
+        {
+          "t": "64",
+          "why": "64 é o total de endereços da /26. Tire a rede e o broadcast."
+        },
+        {
+          "t": "30",
+          "why": "30 hosts úteis é o tamanho de uma /27, não de uma /26."
+        },
+        {
+          "t": ".0",
+          "why": ".0 é o endereço de rede da sub-rede A."
+        },
+        {
+          "t": ".63",
+          "why": ".63 é o broadcast da sub-rede A (.0 a .63)."
+        },
+        {
+          "t": ".64",
+          "why": ".64 é o endereço de rede da sub-rede B."
+        },
+        {
+          "t": ".127",
+          "why": ".127 é o broadcast da sub-rede B (.64 a .127)."
+        },
+        {
+          "t": ".128",
+          "why": ".128 é o endereço de rede da sub-rede C."
+        },
+        {
+          "t": ".191",
+          "why": ".191 é o broadcast da sub-rede C (.128 a .191)."
+        },
+        {
+          "t": ".192",
+          "why": ".192 é o endereço de rede da sub-rede D."
+        },
+        {
+          "t": ".255",
+          "why": ".255 é o broadcast da sub-rede D (.192 a .255)."
+        },
+        {
+          "t": ".32",
+          "why": ".32 é fronteira de /27, que anda de 32 em 32. Aqui os blocos são de 64."
+        },
+        {
+          "t": ".96",
+          "why": ".96 é múltiplo de 32 mas não de 64: fronteira de /27, não de /26."
+        },
+        {
+          "t": ".224",
+          "why": ".224 é fronteira de /27. Na /26 os blocos começam em .0, .64, .128 e .192."
+        }
+      ]
+    },
+    {
+      "title": "Portas e serviços",
+      "tag": "CONEXÃO",
+      "type": "wire",
+      "loc": "firewall",
+      "cap": "Revisando os serviços expostos...",
+      "heads": [
+        "SERVIÇO",
+        "PORTA PADRÃO"
+      ],
+      "goal": "Ligue cada serviço à sua porta padrão.",
+      "z": "Mudei todas as regras de porta. Você não vai saber o que liberar.",
+      "me": "Porta padrão é tatuagem de analista.",
+      "lesson": [
+        "O <b>IP</b> leva o pacote até a máquina. A <b>porta</b> entrega o pacote ao programa certo dentro dela.",
+        "<b>TCP</b> abre conexão (handshake) e garante a entrega. <b>UDP</b> manda sem conexão: é mais leve e serve bem para consultas curtas como DNS e SNMP.",
+        "As portas de <b>0 a 1023</b> são as bem conhecidas, reservadas pela IANA para serviços padrão.",
+        "No firewall, saber a porta é saber o que você está expondo. Porta aberta sem necessidade é porta de entrada."
+      ],
+      "tip": "SSH 22, DNS 53, BGP 179, SNMP 161, HTTPS 443, RDP 3389.",
+      "learn": "BGP roda sobre TCP 179. SNMP usa UDP 161 (traps na 162). DNS usa UDP 53 e cai pra TCP 53 em respostas grandes e transferência de zona. RDP exposto na 3389 é um dos alvos favoritos de ransomware.",
+      "left": [
+        {
+          "id": "a",
+          "t": "SSH",
+          "s": "Acesso remoto seguro",
+          "why": "SSH usa TCP 22. Substituiu o Telnet (23), que manda até a senha em texto puro."
+        },
+        {
+          "id": "b",
+          "t": "DNS",
+          "s": "Resolução de nomes",
+          "why": "DNS responde em UDP 53. Respostas grandes e transferência de zona usam TCP 53."
+        },
+        {
+          "id": "c",
+          "t": "BGP",
+          "s": "Roteamento entre AS",
+          "why": "BGP abre uma sessão TCP na porta 179 entre roteadores vizinhos."
+        },
+        {
+          "id": "d",
+          "t": "SNMP",
+          "s": "Monitoramento",
+          "why": "SNMP consulta os equipamentos em UDP 161. Os alertas (traps) chegam na UDP 162."
+        },
+        {
+          "id": "e",
+          "t": "HTTPS",
+          "s": "Web criptografada",
+          "why": "HTTPS é HTTP sobre TLS na TCP 443. O HTTP sem criptografia usa a 80."
+        },
+        {
+          "id": "f",
+          "t": "RDP",
+          "s": "Área de trabalho remota",
+          "why": "RDP usa TCP 3389. Exposto na internet, é alvo de força bruta e ransomware."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "TCP 22",
+          "s": "",
+          "why": "TCP 22 é a porta do SSH."
+        },
+        {
+          "id": "b",
+          "t": "UDP/TCP 53",
+          "s": "",
+          "why": "53 é a porta do DNS."
+        },
+        {
+          "id": "c",
+          "t": "TCP 179",
+          "s": "",
+          "why": "TCP 179 é a porta do BGP."
+        },
+        {
+          "id": "d",
+          "t": "UDP 161",
+          "s": "",
+          "why": "UDP 161 é a porta do SNMP."
+        },
+        {
+          "id": "e",
+          "t": "TCP 443",
+          "s": "",
+          "why": "TCP 443 é a porta do HTTPS."
+        },
+        {
+          "id": "f",
+          "t": "TCP 3389",
+          "s": "",
+          "why": "TCP 3389 é a porta do RDP."
+        }
+      ]
+    }
+  ]
+}

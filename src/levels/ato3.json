@@ -1,0 +1,278 @@
+{
+  "tag": "ATO 3",
+  "name": "Switching e BGP",
+  "levels": [
+    {
+      "title": "VLAN hopping",
+      "tag": "SWITCHING",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "rack",
+      "cap": "Indo até o switch de acesso...",
+      "goal": "Configure a porta da câmera como access e o uplink como trunk blindado contra VLAN hopping.",
+      "intro": "Câmera na <b>VLAN 30</b> na Gi1/0/10. Uplink para o core só com as VLANs <b>10, 20 e 30</b>. Native VLAN numa VLAN sem uso e nada de negociação automática.",
+      "z": "Seu switch negocia trunk com qualquer um. Vou pular direto pra VLAN de gerência.",
+      "me": "Access é access, trunk é trunk. E DTP desligado.",
+      "lesson": [
+        "<b>VLAN</b> divide um switch físico em várias redes lógicas. Uma câmera na VLAN 30 não enxerga quem está na VLAN 10 sem passar por um roteador.",
+        "Porta <b>access</b> pertence a uma única VLAN: é onde se ligam hosts (PC, câmera, impressora). Porta <b>trunk</b> carrega várias VLANs marcadas com tag <b>802.1Q</b>: é a ligação entre switches.",
+        "O <b>DTP</b> negocia trunk sozinho. Se a porta aceita negociar, um atacante finge ser switch, forma um trunk e ganha acesso a todas as VLANs. <b>switchport nonegotiate</b> desliga isso.",
+        "A <b>native VLAN</b> trafega sem tag no trunk. Colocá-la numa VLAN sem usuários (ex.: 999) evita o ataque de <b>double tagging</b>.",
+        "<b>allowed vlan</b> limita o trunk às VLANs que realmente precisam passar por ele."
+      ],
+      "tip": "Porta de host é access. Uplink é trunk com lista explícita de VLANs. Native VLAN fora de uso (ex.: 999) e nonegotiate desligam o DTP.",
+      "learn": "VLAN hopping acontece por switch spoofing (DTP formando trunk com o atacante) ou double tagging (usando a native VLAN). Defesa: portas de host em access fixo, switchport nonegotiate, trunk com allowed vlan explícito e native VLAN que não carrega usuário.",
+      "html": "<div class=\"cli\">interface Gi1/0/10<br>&nbsp;description CAMERA-PORTARIA<br>&nbsp;switchport mode [a]<br>&nbsp;switchport access vlan [b]<br><span class=\"c\">!</span><br>interface Te1/0/1<br>&nbsp;description UPLINK-CORE<br>&nbsp;switchport mode [c]<br>&nbsp;switchport trunk allowed vlan [d]<br>&nbsp;switchport trunk native vlan [e]<br>&nbsp;switchport [f]</div>",
+      "zones": {
+        "a": [
+          "access"
+        ],
+        "b": [
+          "30"
+        ],
+        "c": [
+          "trunk"
+        ],
+        "d": [
+          "10,20,30"
+        ],
+        "e": [
+          "999"
+        ],
+        "f": [
+          "nonegotiate"
+        ]
+      },
+      "explain": {
+        "a": "A câmera é um host: porta access, fixa numa VLAN.",
+        "b": "A câmera fica na VLAN 30, como pede a missão.",
+        "c": "O uplink entre switches carrega várias VLANs: trunk.",
+        "d": "Só as VLANs 10, 20 e 30 passam. As outras ficam fora do trunk.",
+        "e": "Native VLAN numa VLAN sem uso (999) evita o double tagging.",
+        "f": "nonegotiate desliga o DTP: ninguém forma trunk com essa porta por negociação."
+      },
+      "chips": [
+        {
+          "t": "access",
+          "why": "Modo de porta de host: uma VLAN só."
+        },
+        {
+          "t": "trunk",
+          "why": "Modo de porta entre switches: várias VLANs com tag."
+        },
+        {
+          "t": "dynamic desirable",
+          "why": "Tenta formar trunk via DTP com quem estiver do outro lado. É justamente o que permite o switch spoofing."
+        },
+        {
+          "t": "30",
+          "why": "30 é a VLAN da câmera."
+        },
+        {
+          "t": "1",
+          "why": "VLAN 1 é a padrão de fábrica. Usá-la como native ou para hosts é o erro clássico."
+        },
+        {
+          "t": "10,20,30",
+          "why": "Lista explícita das VLANs que podem passar no trunk."
+        },
+        {
+          "t": "all",
+          "why": "Liberar todas leva ao core até VLANs que não deveriam sair desse switch."
+        },
+        {
+          "t": "999",
+          "why": "VLAN sem usuários: boa escolha para native VLAN."
+        },
+        {
+          "t": "nonegotiate",
+          "why": "Desliga o DTP na porta."
+        },
+        {
+          "t": "port-security",
+          "why": "Port-security limita os MACs aceitos na porta. É útil, mas não desliga o DTP."
+        }
+      ]
+    },
+    {
+      "title": "Filtro de cliente BGP",
+      "tag": "BGP",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Abrindo a sessão BGP do cliente AS65010...",
+      "goal": "Decida o que aceitar do cliente BGP AS65010, dono do bloco 45.160.0.0/22.",
+      "intro": "Cliente <b>AS65010</b> tem o bloco <b>45.160.0.0/22</b> com ROA até <b>/24</b>. Aceite só o que é dele. O resto é leak ou sequestro.",
+      "z": "Vou anunciar pelo seu cliente o que eu quiser. Você aceita tudo mesmo.",
+      "me": "Cliente BGP só anuncia o que é dele. Prefix-list estrita.",
+      "lesson": [
+        "<b>BGP</b> é o protocolo que as redes da internet (cada uma com seu número de <b>AS</b>) usam para trocar rotas. Cada AS anuncia os blocos que possui.",
+        "O BGP confia no que o vizinho anuncia. Se você aceita tudo do cliente, um erro ou ataque dele vira problema da internet inteira.",
+        "Uma <b>prefix-list</b> diz exatamente o que aceitar. <b>45.160.0.0/22 le 24</b> = o /22 e qualquer pedaço dele até /24.",
+        "O /22 vai de <b>45.160.0.0</b> a <b>45.160.3.255</b>. A maior parte da internet descarta prefixos mais específicos que <b>/24</b>, e o <b>ROA</b> (RPKI) registra quem pode anunciar o bloco e até qual tamanho.",
+        "Nunca aceite de cliente: rota <b>default</b>, faixas privadas ou reservadas (<b>bogons</b>), os <b>seus</b> blocos ou blocos de terceiros."
+      ],
+      "tip": "45.160.0.0/22 cobre de 45.160.0.0 a 45.160.3.255. Aceite só prefixos dentro disso entre /22 e /24. Default route, bogons, seus próprios prefixos e blocos de terceiros são rejeitados.",
+      "learn": "Filtro de cliente = prefix-list 45.160.0.0/22 le 24. Rejeite default, RFC 1918, CGNAT, seus próprios blocos e qualquer coisa mais específica que /24, que a internet descarta. Some max-prefix e validação RPKI para fechar o cerco. É o que pede o MANRS.",
+      "buckets": [
+        {
+          "label": "ACEITAR",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "45.160.0.0/22",
+              "why": "O bloco inteiro do cliente, exatamente como registrado."
+            },
+            {
+              "t": "45.160.0.0/23",
+              "why": "Metade do /22 (45.160.0 e 45.160.1): dentro do bloco e não passa de /24."
+            },
+            {
+              "t": "45.160.2.0/24",
+              "why": "Um /24 dentro do /22 (45.160.0 a 45.160.3), permitido pelo ROA."
+            },
+            {
+              "t": "45.160.3.0/24",
+              "why": "O último /24 do bloco, ainda dentro de 45.160.0.0/22."
+            }
+          ]
+        },
+        {
+          "label": "REJEITAR",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "0.0.0.0/0",
+              "why": "Rota default. Um cliente nunca deve anunciar default para o provedor."
+            },
+            {
+              "t": "10.0.0.0/8",
+              "why": "Faixa privada da RFC 1918 (bogon). Não circula na internet."
+            },
+            {
+              "t": "100.64.0.0/10",
+              "why": "Faixa de CGNAT (RFC 6598). Também é bogon."
+            },
+            {
+              "t": "177.10.0.0/22 (seu bloco)",
+              "why": "É o SEU bloco. Aceitar do cliente desviaria o seu próprio tráfego para ele."
+            },
+            {
+              "t": "8.8.8.0/24",
+              "why": "Bloco do Google. O cliente não é dono: seria sequestro de prefixo."
+            },
+            {
+              "t": "45.160.4.0/24",
+              "why": "O /22 termina em 45.160.3.255. 45.160.4 já está fora do bloco do cliente."
+            },
+            {
+              "t": "45.160.1.0/25",
+              "why": "/25 é mais específico que o /24 permitido pelo ROA: seria RPKI invalid."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Sequestro de prefixo",
+      "tag": "QUIZ",
+      "type": "quiz",
+      "loc": "war",
+      "cap": "Alerta de rota no painel de BGP...",
+      "goal": "Z3R0 está anunciando seus prefixos na internet. Descubra como ele faz e como se defender.",
+      "z": "Anunciei um /24 do seu /22 lá fora. Todo o seu tráfego agora passa por mim.",
+      "me": "Longest match. Vou fechar essa brecha.",
+      "lesson": [
+        "Na tabela de rotas ganha sempre o <b>prefixo mais específico</b> (longest prefix match). Um /24 vence um /22, seja qual for o AS-path.",
+        "<b>Hijack</b> (sequestro): alguém anuncia um prefixo que não é dele. Se o anúncio for mais específico que o seu, o tráfego vai para ele.",
+        "<b>RPKI</b>: o dono do bloco publica um <b>ROA</b> dizendo qual AS pode anunciar e o tamanho máximo (<b>maxLength</b>). Quem faz <b>ROV</b> descarta anúncios inválidos.",
+        "O ROV confere só a <b>origem</b> e o <b>tamanho</b>. Não confere o caminho: quem forja o seu AS como origem passa. Para isso existe o <b>ASPA</b>.",
+        "<b>Route leak</b>: um cliente repassa rotas que recebeu de outros. <b>maximum-prefix</b> derruba a sessão se ele anunciar mais do que o combinado."
+      ],
+      "tip": "O roteador sempre prefere o prefixo mais específico. RPKI valida origem e tamanho máximo, mas não o caminho.",
+      "learn": "Hijack por mais específico ganha pelo longest prefix match. ROA com maxLength igual ao anúncio real faz o /24 falso virar RPKI invalid, e quem faz ROV descarta. Origem forjada passa no RPKI; aí entram ASPA e filtros de trânsito. Max-prefix protege contra route leak de cliente.",
+      "qs": [
+        {
+          "q": "Você anuncia 177.10.0.0/22. O Z3R0 anuncia 177.10.1.0/24 de outro AS. Para onde vai o tráfego destinado a 177.10.1.5?",
+          "o": [
+            "Para o Z3R0, porque o /24 é mais específico",
+            {
+              "t": "Para você, porque anunciou primeiro",
+              "why": "Ordem de anúncio não importa entre prefixos diferentes. O mais específico ganha."
+            },
+            {
+              "t": "Para quem tiver AS-path menor",
+              "why": "AS-path só desempata rotas para o MESMO prefixo. /24 e /22 são rotas diferentes."
+            },
+            {
+              "t": "Divide meio a meio",
+              "why": "Não há divisão: para cada destino, a tabela escolhe o prefixo mais específico."
+            }
+          ],
+          "a": 0,
+          "why": "Longest prefix match vem antes de qualquer atributo do BGP. O /24 ganha do /22."
+        },
+        {
+          "q": "O Z3R0 pode forjar o seu AS como origem. Qual ROA faz um /24 dentro do seu /22 ser marcado como inválido mesmo assim?",
+          "o": [
+            "ROA 177.10.0.0/22 com maxLength /22",
+            {
+              "t": "ROA 177.10.0.0/22 com maxLength /24",
+              "why": "maxLength /24 autoriza anúncios até /24. Um /24 com a sua origem forjada seria válido."
+            },
+            {
+              "t": "Sem ROA nenhum",
+              "why": "Sem ROA o estado é \"not found\", e quase ninguém descarta rota not found."
+            },
+            {
+              "t": "ROA com maxLength /32",
+              "why": "Autoriza qualquer pedaço do bloco, até /32. É o contrário do que você quer."
+            }
+          ],
+          "a": 0,
+          "why": "Com maxLength /22, qualquer anúncio mais específico que /22 é invalid, mesmo com origem certa."
+        },
+        {
+          "q": "Se o Z3R0 anunciar o /22 forjando o SEU AS como origem, o RPKI ROV detecta?",
+          "o": [
+            "Não. ROV só valida origem e tamanho, não o caminho",
+            {
+              "t": "Sim, sempre",
+              "why": "O ROV compara só o AS de origem e o tamanho com o ROA. Se a origem forjada bate, a rota é válida."
+            },
+            {
+              "t": "Sim, se tiver community",
+              "why": "Community é só uma etiqueta na rota. Não entra na validação RPKI."
+            },
+            {
+              "t": "Só se for IPv6",
+              "why": "O RPKI funciona do mesmo jeito para IPv4 e IPv6."
+            }
+          ],
+          "a": 0,
+          "why": "Origem forjada passa no ROV. Para isso existem ASPA, BGPsec e filtros nos trânsitos."
+        },
+        {
+          "q": "Seu cliente BGP vazou a tabela completa (900 mil rotas) pra você. O que teria derrubado a sessão antes do estrago?",
+          "o": [
+            "maximum-prefix na sessão do cliente",
+            {
+              "t": "Aumentar a memória do roteador",
+              "why": "Ajuda o roteador a sobreviver, mas o tráfego continuaria sendo desviado pelas rotas vazadas."
+            },
+            {
+              "t": "Community no-export",
+              "why": "no-export limita até onde as rotas são repassadas. Não impede de recebê-las."
+            },
+            {
+              "t": "Local-preference alta",
+              "why": "Local-preference alta faria você PREFERIR as rotas vazadas. Só pioraria."
+            }
+          ],
+          "a": 0,
+          "why": "Max-prefix derruba a sessão quando o cliente passa do limite combinado. Proteção básica contra route leak."
+        }
+      ]
+    }
+  ]
+}
