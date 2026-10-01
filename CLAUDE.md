@@ -27,9 +27,10 @@ O validador sai com código 1 se houver erro estrutural e lista avisos de conte�
 ## Arquitetura
 
 ```
-index.html            marcação das 3 telas (#title, #map, #game), modal, #fx; carrega src/style.css e src/main.js
+index.html            marcação das 3 telas (#title com aside de novidades, #map, #game), modal, #fx; carrega src/style.css e src/main.js
 src/style.css         todo o CSS (tokens em :root; seções por tela/componente)
-src/main.js           entrada: cena do título, botões do título, init dos motores, loadLevels()
+src/main.js           entrada: cena do título, botões do título, init dos motores, loadLevels(), loadNews()
+src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mais recente primeiro
 src/levels/
   index.json          { "acts": ["ato1.json", ...] } na ordem do mapa
   atoN.json           { "tag", "name", "levels": [ ... ] }
@@ -41,7 +42,8 @@ src/engine/
   audio.js            Web Audio: au() (desbloqueia no 1º gesto), sfx, music(), setMute()
   ui.js               telas, modal, toast, partículas, HP/pontos, good()/damage(),
                       explain() (painel #coach), lessonHTML(), reviewHTML(), flow
-  game.js             mapa, briefing, startLevel/intro, win/fail, botão de dica; ENGINES por type
+  game.js             mapa, briefing, startLevel/intro, win/fail, botão de dica, progress(), askReset(); ENGINES por type
+  news.js             linha do tempo de atualizações da tela inicial; selo NOVO até o jogador iniciar o turno
   wire.js             tipo "wire" (ligar pares)
   drop.js             tipo "drop" (modes "buckets" e "slots")
   quiz.js             tipo "quiz" (e chefe com "boss")
@@ -51,7 +53,7 @@ docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 
 ### Grafo de dependências (sem ciclos)
 
-`util` ← `scene`, `audio`, `state` ← `ui` ← `wire`, `drop`, `quiz` ← `game` ← `main`
+`util` ← `scene`, `audio`, `state` ← `ui` ← `wire`, `drop`, `quiz` ← `game` ← `main` (e `util` ← `news` ← `main`)
 
 Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Mantenha assim para não criar import circular.
 
@@ -77,4 +79,5 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Precisão técnica:** o jogo ensina, então o conteúdo precisa estar certo. Confira em RFC, documentação de fabricante ou NIST. Cuidado com pegadinhas de faixa (/12, /10), porta de origem x destino e maxLength de ROA.
 - **Mobile primeiro:** layout máximo de 720px, toque e arrasto com Pointer Events, sem hover obrigatório. Teste em ~390px de largura.
 - **Fases novas** entram só pelo JSON sempre que possível. Rode o validador sem erros nem avisos antes de commitar.
+- **Changelog:** toda mudança que o jogador percebe ganha uma entrada no topo de `src/changelog.json` (versão `1.x`, data `AAAA-MM-DD`, título divertido curto e 3 a 5 itens em linguagem de jogador). Ela aparece na tela inicial com o selo NOVO (`localStorage` `noc_seen_ver`).
 - **CSS:** cores pelos tokens de `:root` (`--acc`, `--bad`, `--warn`, `--z`, `--panel`...). Fontes: Orbitron para rótulos, JetBrains Mono para dados técnicos, system-ui para texto corrido.

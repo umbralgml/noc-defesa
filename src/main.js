@@ -2,10 +2,10 @@
 import { $ } from './engine/util.js';
 import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
 import { AV_ME, HX, sceneSVG, heroTo } from './engine/scene.js';
-import { resetProgress } from './engine/state.js';
 import { loadLevels } from './engine/levels.js';
-import { show, modal, closeModal } from './engine/ui.js';
-import { initGame, renderMap } from './engine/game.js';
+import { show } from './engine/ui.js';
+import { initGame, renderMap, askReset, progress } from './engine/game.js';
+import { loadNews, markNewsSeen } from './engine/news.js';
 import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
 
@@ -16,20 +16,25 @@ heroTo($('tScene'), HX.war, true); $('tScene').querySelector('.hero').classList.
 $('sndT').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(MUS.cur || 'menu'); };
 $('sndM').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music('menu'); };
 setMute(isMuted());
-$('resetBtn').onclick = () => {
-  modal(`<h2>Zerar progresso?</h2><div class="learn">Todas as estrelas, pontos e fases desbloqueadas serão apagados.</div><div class="row"><button class="btn ghostb" id="mNo">CANCELAR</button><button class="btn" id="mYes">ZERAR</button></div>`);
-  $('mNo').onclick = closeModal;
-  $('mYes').onclick = () => { resetProgress(); closeModal(); };
-};
+$('resetBtn').onclick = () => askReset(showProgress);
+
+// Resumo na tela inicial, só para quem já concluiu alguma fase.
+function showProgress() {
+  const p = progress(), el = $('tProg');
+  el.classList.toggle('on', p.done > 0);
+  el.innerHTML = p.done ? `Seu plantão: <b>★ ${p.stars}/${p.max}</b> · ${p.done}/${p.max / 3} fases` : '';
+}
 
 initGame(); initDrop(); initWire();
+loadNews().catch(e => { console.error(e); $('news').hidden = true; $('newsBtn').style.display = 'none'; });
 
 const go = $('goMap');
 go.disabled = true;
 try {
   await loadLevels();
   go.disabled = false;
-  go.onclick = () => { au(); renderMap(); show('map'); music('menu'); };
+  showProgress();
+  go.onclick = () => { au(); markNewsSeen(); renderMap(); show('map'); music('menu'); };
 } catch (e) {
   console.error(e);
   go.textContent = 'ERRO AO CARREGAR';

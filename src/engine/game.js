@@ -2,7 +2,7 @@
 import { $, fmt, center, buzz } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
-import { S, LEVELS, ACTS, K, unlocked, save } from './state.js';
+import { S, LEVELS, ACTS, K, unlocked, save, resetProgress } from './state.js';
 import { flow, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML } from './ui.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
@@ -26,8 +26,27 @@ export function renderMap() {
     });
     html += '</div>';
   });
+  html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
   $('mapList').innerHTML = html;
+  $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
+}
+
+// Resumo do progresso salvo: estrelas, pontos e fases concluídas.
+export function progress() {
+  let stars = 0, pts = 0, done = 0;
+  LEVELS.forEach((L, i) => { const st = S.prog[K(i)] || 0; stars += st; pts += S.best[K(i)] || 0; if (st) done++; });
+  return { stars, pts, done, max: LEVELS.length * 3 };
+}
+
+// Confirma antes de apagar. "after" atualiza a tela que chamou.
+export function askReset(after) {
+  const p = progress();
+  modal(`<div class="tag">RECOMEÇAR O PLANTÃO</div><h2>Zerar progresso?</h2>
+    <div class="learn">${p.done ? `Você vai perder <b style="display:inline;font:inherit;color:var(--warn)">${p.stars} estrelas</b>, ${fmt(p.pts)} pontos e ${p.done} de ${LEVELS.length} fases concluídas.` : 'Você ainda não concluiu nenhuma fase.'} Só a fase 1 fica liberada. Não dá para desfazer.</div>
+    <div class="row"><button class="btn ghostb" id="mNo">CANCELAR</button><button class="btn" id="mYes" style="background:linear-gradient(135deg,#ff4d6d,#d93655);color:#fff">ZERAR</button></div>`);
+  $('mNo').onclick = closeModal;
+  $('mYes').onclick = () => { resetProgress(); closeModal(); if (after) after(); };
 }
 
 // Briefing: diálogo, aula rápida e missão.
