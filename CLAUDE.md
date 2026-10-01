@@ -29,6 +29,9 @@ O validador sai com código 1 se houver erro estrutural e lista avisos de conte�
 ```
 index.html            marcação das 3 telas (#title com aside de novidades, #map, #game), modal, #fx; carrega src/style.css e src/main.js
 src/style.css         todo o CSS (tokens em :root; seções por tela/componente)
+manifest.webmanifest  PWA (nome, ícones em src/icons/, cores); caminhos relativos para funcionar em /noc-defesa/ e na raiz
+sw.js                 service worker: rede primeiro com cache de reserva (offline); lista CORE com todos os módulos
+deploy/install.sh     instalador para Ubuntu/Debian (nginx ou Apache existente, Let's Encrypt, atualização a cada 15 min)
 src/main.js           entrada: cena do título, botões do título, init dos motores, loadLevels(), loadNews()
 src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mais recente primeiro
 src/config.json       { "ranking": { "url", "key" } } do Supabase; vazio = ranking desligado (botões .rankBtn escondidos)
@@ -46,6 +49,7 @@ src/engine/
   game.js             mapa, briefing, play(L)/intro, win/fail, botão de dica, askReset(); ENGINES por type
   daily.js            desafio diário: sorteio com a data como semente, geradores de pergunta, sequência, compartilhar
   rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura
+  pwa.js              registra o sw.js e controla o botão "INSTALAR APP" (pedido nativo ou instruções do iPhone)
   news.js             linha do tempo de atualizações da tela inicial; selo NOVO até o jogador iniciar o turno
   wire.js             tipo "wire" (ligar pares)
   drop.js             tipo "drop" (modes "buckets" e "slots")
@@ -89,4 +93,6 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Changelog:** toda mudança que o jogador percebe ganha uma entrada no topo de `src/changelog.json` (versão `1.x`, data `AAAA-MM-DD`, título divertido curto e 3 a 5 itens em linguagem de jogador). Ela aparece na tela inicial com o selo NOVO (`localStorage` `noc_seen_ver`).
 - **Desafio diário:** o sorteio depende da data (fuso de Brasília) e do conteúdo de `LEVELS` e `GEN`. Mudar os geradores ou os quizzes muda as perguntas do dia para todo mundo; evite no meio do dia. Todo gerador devolve `why` na pergunta e em cada opção errada.
 - **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. O perfil é pedido no primeiro turno (`ensureProfile`); sem nome, o jogador aparece como `Analista #XXXX` (`anonName()`). Nome e LinkedIn só saem do aparelho com consentimento marcado (`publicName()`/`publicLinkedin()`); sem ele, envia o apelido anônimo.
+- **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
+- **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`) puxa a `main` a cada 15 minutos. Não há outro passo de publicação.
 - **CSS:** cores pelos tokens de `:root` (`--acc`, `--bad`, `--warn`, `--z`, `--panel`...). Fontes: Orbitron para rótulos, JetBrains Mono para dados técnicos, system-ui para texto corrido.
