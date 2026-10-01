@@ -19,7 +19,7 @@ export async function loadRankConfig() {
   try {
     const r = await fetch(new URL('../config.json', import.meta.url));
     const c = (await r.json()).ranking;
-    if (c && c.url && c.key) CFG = { url: c.url.replace(/\/+$/, ''), key: c.key };
+    if (c && c.url && c.key) CFG = { url: c.url.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''), key: c.key.trim() };
   } catch (e) {}
   document.querySelectorAll('.rankBtn').forEach(b => { b.hidden = !CFG; });
   return !!CFG;

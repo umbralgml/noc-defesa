@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.6",
+      "date": "2026-10-01",
+      "title": "Quadro de plantão no ar",
+      "items": [
+        "Ranking ao vivo na tela inicial: top 10 da campanha e do desafio de hoje",
+        "Ranking completo no botão 🏆, com link para o LinkedIn de quem quiser mostrar",
+        "Anônimos também entram no quadro, como \"Analista #XXXX\"",
+        "Seus pontos sobem sozinhos quando você melhora"
+      ]
+    },
+    {
       "v": "1.5",
       "date": "2026-10-01",
       "title": "Crachá do plantão",
