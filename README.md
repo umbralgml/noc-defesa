@@ -4,7 +4,7 @@ Jogo educativo de redes e segurança no navegador. São 03:12 da madrugada, o gr
 
 **Jogue agora:** https://umbralgml.github.io/noc-defesa/
 
-Funciona no celular e no desktop, sem instalar nada e sem cadastro.
+Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (PWA): no Android e no PC pelo botão 📲 INSTALAR APP, no iPhone em Compartilhar → Adicionar à Tela de Início. Depois de instalado, roda até sem internet.
 
 ## O que você aprende
 
@@ -37,17 +37,30 @@ python3 -m http.server 8000
 
 Qualquer servidor estático serve (`npx serve`, extensão Live Server do VS Code etc.). Não há dependências nem etapa de build.
 
+## Publicar no seu servidor
+
+Um comando instala o jogo num Ubuntu/Debian com HTTPS e atualização automática a partir do GitHub:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/umbralgml/noc-defesa/main/deploy/install.sh \
+  | sudo bash -s -- noc.seudominio.com.br seu@email.com
+```
+
+Passo a passo, DNS e solução de problemas em [docs/SERVIDOR.md](docs/SERVIDOR.md).
+
 ## Estrutura
 
 ```
 index.html          telas do jogo (HTML) e carregamento do CSS/JS
+manifest.webmanifest, sw.js   PWA: instalação como app e modo offline
 src/style.css       todo o visual
 src/main.js         ponto de entrada
 src/changelog.json  histórico de atualizações mostrado na tela inicial
 src/config.json     configuração do ranking (opcional, veja docs/RANKING.md)
 src/engine/         motor do jogo em ES modules (cenas, áudio, tipos de fase, fluxo)
 src/levels/         fases em JSON, um arquivo por ato
-tools/              validador opcional das fases
+tools/              validador opcional das fases e SQL do ranking
+deploy/install.sh   instalador para servidor próprio (nginx/Apache + HTTPS)
 docs/CRIAR-FASE.md  guia do formato das fases
 docs/RANKING.md     como ligar o ranking público (Supabase)
 ```

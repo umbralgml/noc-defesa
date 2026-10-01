@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "v": "1.7",
+      "date": "2026-10-01",
+      "title": "Plantão de bolso",
+      "items": [
+        "Instale o NOC como app no celular ou no PC: botão 📲 INSTALAR APP na tela inicial",
+        "Funciona até sem internet: fases e desafio diário rodam offline",
+        "Ícone novo de app, com o escudo do NOC"
+      ]
+    },
+    {
       "v": "1.6",
       "date": "2026-10-01",
       "title": "Quadro de plantão no ar",

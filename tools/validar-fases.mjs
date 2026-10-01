@@ -2,7 +2,7 @@
 // Validador opcional das fases. Não é etapa de build: o jogo roda sem ele.
 // Uso: node tools/validar-fases.mjs
 // Erros (fase quebrada) fazem o script sair com código 1. Avisos apontam conteúdo didático faltando.
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const DIR = fileURLToPath(new URL('../src/levels/', import.meta.url));
@@ -60,6 +60,7 @@ function check(L, where) {
   } else err(`tipo "${L.type}"${L.mode ? '/' + L.mode : ''} desconhecido`);
 }
 
+const idxActs = () => read('index.json').acts;
 const titles = new Map();
 let total = 0;
 for (const f of read('index.json').acts) {
@@ -73,6 +74,13 @@ for (const f of read('index.json').acts) {
     check(L, where);
   });
 }
+
+// O service worker (sw.js) guarda os módulos para o jogo abrir offline: todo módulo novo precisa estar na lista.
+const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+readdirSync(new URL('../src/engine/', import.meta.url)).filter(f => f.endsWith('.js')).forEach(f => {
+  if (!sw.includes(`'${f.replace(/\.js$/, '')}'`)) errors.push(`sw.js: módulo src/engine/${f} fora da lista CORE (o jogo não abriria offline)`);
+});
+idxActs().forEach(f => { if (!sw.includes(`src/levels/${f}`)) errors.push(`sw.js: src/levels/${f} fora da lista CORE`); });
 
 warns.forEach(w => console.log('aviso  ' + w));
 errors.forEach(e => console.log('ERRO   ' + e));
