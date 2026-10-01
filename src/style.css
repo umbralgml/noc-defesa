@@ -8,6 +8,7 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#070d18}}
 :root[data-theme="dark"]{--bg:#070d18}
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
 body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
 #app{height:100%;max-width:720px;margin:0 auto;position:relative;display:flex;flex-direction:column}
@@ -311,3 +312,47 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .review div b{color:var(--text);font-family:'JetBrains Mono',monospace;font-weight:600}
 .why .whyno{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 .why .whyno b{color:var(--bad)}
+
+/* ---------- desafio diário ---------- */
+.tdaily{margin-top:10px;padding:12px 22px;font-size:12px;border-color:rgba(255,209,102,.45)!important;color:var(--warn)!important}
+.wideb{display:block;width:100%;margin-top:14px}
+.daily{display:flex;align-items:center;gap:12px;width:100%;margin:14px 0 4px;padding:12px;border-radius:14px;border:1px solid rgba(255,209,102,.5);background:linear-gradient(90deg,rgba(255,209,102,.12),var(--panel));color:var(--text);text-align:left}
+.daily .di{flex:0 0 40px;height:40px;border-radius:12px;background:var(--warn);color:#1a1300;display:flex;align-items:center;justify-content:center;font-size:20px}
+.daily .dt{flex:1;min-width:0}
+.daily .dt b{display:block;font-size:15px}
+.daily .dt small{font:600 11px 'JetBrains Mono',monospace;color:var(--muted)}
+.daily .dg{font:800 10px 'Orbitron',monospace;letter-spacing:1px;color:var(--warn)}
+.daily.done{border-color:var(--line);background:var(--panel)}
+.daily.done .di{background:#0d3a31;color:var(--acc)}
+.daily.done .dg{color:var(--muted)}
+.dgrid{font-size:30px;letter-spacing:4px;text-align:center;margin:12px 0 6px}
+.dstreak{text-align:center;font:800 13px 'Orbitron',monospace;color:var(--warn);margin-top:12px}
+.dnext{text-align:center;font-size:12px;color:var(--muted);margin-top:12px}
+.dnext b{font-family:'JetBrains Mono',monospace;color:var(--text)}
+
+/* ---------- ranking ---------- */
+.tabs{display:flex;gap:6px;margin-top:12px}
+.tabb{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 6px;color:var(--muted);font:800 10px 'Orbitron',monospace;letter-spacing:1px}
+.tabb.on{color:#03130d;background:var(--acc);border-color:var(--acc)}
+.rlist{margin-top:10px;max-height:46vh;overflow-y:auto;border-radius:12px;background:var(--panel2)}
+.rrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:14px}
+.rrow:last-child{border-bottom:none}
+.rrow.top{background:rgba(255,209,102,.06)}
+.rp{flex:0 0 28px;text-align:center;font:800 12px 'Orbitron',monospace;color:var(--muted)}
+.rn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rn a{color:var(--text);text-decoration:none}
+.rn .in{display:inline-block;font:700 9px system-ui;color:#fff;background:#0a66c2;border-radius:3px;padding:1px 3px;vertical-align:2px}
+.rs{font:700 12px 'JetBrains Mono',monospace;color:var(--warn);white-space:nowrap}
+.rs i{font-style:normal;color:var(--muted);margin-right:8px}
+.rmsg{padding:18px 12px;text-align:center;color:var(--muted);font-size:13px}
+.rme{margin-top:12px;font-size:12.5px;line-height:1.5;color:#c9d6ea}
+.lnk{background:none;border:none;padding:0;color:var(--acc);font:inherit;text-decoration:underline}
+.fl{display:block;margin-top:14px;font-size:13px;font-weight:600}
+.fl small{font-weight:400;color:var(--muted)}
+.fl input{display:block;width:100%;margin-top:6px;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font:500 15px system-ui;user-select:text;-webkit-user-select:text}
+.fl input:focus{outline:2px solid var(--acc);outline-offset:1px}
+.fc{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:13px;line-height:1.45;color:#c9d6ea}
+.fc input{flex:0 0 18px;width:18px;height:18px;margin-top:1px;accent-color:var(--acc)}
+.fnote{margin-top:10px;font-size:11.5px;line-height:1.5;color:var(--muted)}
+.fnote a{color:var(--muted)}
+.ferr{min-height:18px;margin-top:8px;font-size:12.5px;color:var(--bad)}

@@ -31,18 +31,21 @@ index.html            marcação das 3 telas (#title com aside de novidades, #ma
 src/style.css         todo o CSS (tokens em :root; seções por tela/componente)
 src/main.js           entrada: cena do título, botões do título, init dos motores, loadLevels(), loadNews()
 src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mais recente primeiro
+src/config.json       { "ranking": { "url", "key" } } do Supabase; vazio = ranking desligado (botões .rankBtn escondidos)
 src/levels/
   index.json          { "acts": ["ato1.json", ...] } na ordem do mapa
   atoN.json           { "tag", "name", "levels": [ ... ] }
 src/engine/
-  util.js             $, shuffle, fmt, center, buzz, esc (sem dependências)
-  state.js            S (estado da partida), LEVELS, ACTS, save, K, unlocked, resetProgress
+  util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON); sem dependências
+  state.js            S (estado da partida; S.lv = fase atual), LEVELS, ACTS, save, K, unlocked, resetProgress, progress
   levels.js           loadLevels(): fetch dos JSON; cada fase recebe .act = índice do ato
   scene.js            SVG das cenas por `loc`, herói animado, avatares, MEDIA (cabos) e ícones
   audio.js            Web Audio: au() (desbloqueia no 1º gesto), sfx, music(), setMute()
   ui.js               telas, modal, toast, partículas, HP/pontos, good()/damage(),
                       explain() (painel #coach), lessonHTML(), reviewHTML(), flow
-  game.js             mapa, briefing, startLevel/intro, win/fail, botão de dica, progress(), askReset(); ENGINES por type
+  game.js             mapa, briefing, play(L)/intro, win/fail, botão de dica, askReset(); ENGINES por type
+  daily.js            desafio diário: sorteio com a data como semente, geradores de pergunta, sequência, compartilhar
+  rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura
   news.js             linha do tempo de atualizações da tela inicial; selo NOVO até o jogador iniciar o turno
   wire.js             tipo "wire" (ligar pares)
   drop.js             tipo "drop" (modes "buckets" e "slots")
@@ -53,14 +56,18 @@ docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 
 ### Grafo de dependências (sem ciclos)
 
-`util` ← `scene`, `audio`, `state` ← `ui` ← `wire`, `drop`, `quiz` ← `game` ← `main` (e `util` ← `news` ← `main`)
+`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz` ← `game` ← `daily` ← `main` (e `util` ← `news` ← `main`)
 
-Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Mantenha assim para não criar import circular.
+Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
+
+### Fases fora do mapa
+
+`play(L, nome)` roda qualquer objeto de fase. Se `L` não está em `LEVELS` (`S.cur = -1`), nada é salvo em `noc_prog`. Com `L.onWin(res)`, a fase trata o próprio fim (`res = { score, hp, bonus, total }`). É assim que o desafio diário funciona. O quiz mostra cronômetro sempre que `L.time` existir e registra `S.qlog` (acerto por pergunta) e `S.left` (segundos que sobraram nos acertos).
 
 ### Ciclo de uma fase
 
 1. `brief(i)` abre o modal com Z3R0, analista, `lesson` e `goal`.
-2. `startLevel(i)` zera `S` (hp, err, score, combo, miss), monta a cena e anima o herói até `HX[loc]`.
+2. `startLevel(i)` → `play(L)` zera `S` (hp, err, score, combo, miss), monta a cena e anima o herói até `HX[loc]`.
 3. `finishIntro()` chama `ENGINES[L.type](L)`, que desenha `#stage` (e `#bank` em `drop`).
 4. Cada jogada chama `good()` ou `damage(n)` e `explain(ok, rótulo, why)`. Erros entram em `S.miss`.
 5. Quando `S.placed >= S.need` (ou o quiz termina), `flow.win()`: estrelas por `S.err` (0 = 3, até 2 = 2, senão 1), bônus = hp × 5, salva e mostra `learn` + `reviewHTML()`.
@@ -80,4 +87,6 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Mobile primeiro:** layout máximo de 720px, toque e arrasto com Pointer Events, sem hover obrigatório. Teste em ~390px de largura.
 - **Fases novas** entram só pelo JSON sempre que possível. Rode o validador sem erros nem avisos antes de commitar.
 - **Changelog:** toda mudança que o jogador percebe ganha uma entrada no topo de `src/changelog.json` (versão `1.x`, data `AAAA-MM-DD`, título divertido curto e 3 a 5 itens em linguagem de jogador). Ela aparece na tela inicial com o selo NOVO (`localStorage` `noc_seen_ver`).
+- **Desafio diário:** o sorteio depende da data (fuso de Brasília) e do conteúdo de `LEVELS` e `GEN`. Mudar os geradores ou os quizzes muda as perguntas do dia para todo mundo; evite no meio do dia. Todo gerador devolve `why` na pergunta e em cada opção errada.
+- **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. Nome e LinkedIn só saem do aparelho com consentimento marcado.
 - **CSS:** cores pelos tokens de `:root` (`--acc`, `--bad`, `--warn`, `--z`, `--panel`...). Fontes: Orbitron para rótulos, JetBrains Mono para dados técnicos, system-ui para texto corrido.

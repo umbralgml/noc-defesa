@@ -5,8 +5,8 @@ import { AV_ME, AV_Z, heroState, sceneFx } from './scene.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
 
-// Ganchos preenchidos por game.js. Os motores chamam flow.win()/flow.fail() sem importar game.js.
-export const flow = { win() {}, fail() {} };
+// Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
+export const flow = { win() {}, fail() {}, map() {} };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
@@ -71,6 +71,13 @@ export function good(at, color) {
 }
 export const stars = () => S.err === 0 ? 3 : S.err <= 2 ? 2 : 1;
 
+// Compartilha pelo menu nativo (celular) ou copia o texto e avisa no botão.
+export async function share(text, btn) {
+  try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); if (btn) btn.textContent = 'COPIADO ✓ É SÓ COLAR'; }
+  catch (e) { prompt('Copie o texto:', text); }
+}
+
 // ---------- ensino ----------
 const GENERIC = 'Não encaixa aqui. Toque em ? para rever a aula e a dica.';
 
@@ -91,5 +98,5 @@ export function hideCoach() { $('coach').className = 'coach'; }
 export function note(t, why) { if (!S.miss.some(m => m.t === t)) S.miss.push({ t, why }); }
 
 export const lessonHTML = L => L.lesson ? `<div class="lesson"><span class="lh">AULA RÁPIDA</span><ul>${L.lesson.map(x => `<li>${x}</li>`).join('')}</ul></div>` : '';
-export const reviewHTML = () => S.miss.length ? `<div class="review"><span class="lh">PARA REVISAR</span>${S.miss.slice(0, 6).map(m => `<div><b>${esc(m.t)}</b><br>${esc(m.why)}</div>`).join('')}</div>` : '';
+export const reviewHTML = (miss = S.miss) => miss.length ? `<div class="review"><span class="lh">PARA REVISAR</span>${miss.slice(0, 6).map(m => `<div><b>${esc(m.t)}</b><br>${esc(m.why)}</div>`).join('')}</div>` : '';
 
