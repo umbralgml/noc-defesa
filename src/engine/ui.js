@@ -6,7 +6,7 @@ import { sfx } from './audio.js';
 import { S } from './state.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
-export const flow = { win() {}, fail() {}, map() {} };
+export const flow = { win() {}, fail() {}, map() {}, room() {} };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
@@ -86,7 +86,7 @@ const GENERIC = 'Não encaixa aqui. Toque em ? para rever a aula e a dica.';
 
 // Mostra no painel acima da área de jogo o porquê do acerto ou do erro.
 // Erros também entram na revisão do fim da fase.
-export function explain(ok, label, why) {
+export function explain(ok, label, why, rec = true) {
   if (!ok && !why) why = GENERIC;
   const c = $('coach');
   if (!why) { hideCoach(); return; }
@@ -95,7 +95,14 @@ export function explain(ok, label, why) {
   c.querySelector('b').textContent = label + ':';
   c.querySelector('.ct span').textContent = why;
   c.scrollTop = 0;
-  if (!ok && why !== GENERIC) note(label, why);
+  if (rec && !ok && why !== GENERIC) note(label, why);
+}
+// Painel em modo informativo (o que um comando mostra): não conta como erro nem acerto.
+export function info(label, text) {
+  const c = $('coach');
+  c.className = 'coach'; void c.offsetWidth; c.className = 'coach on info';
+  c.innerHTML = '<span class="k">ℹ COMANDO</span><span class="ct"><b></b> <span></span></span>';
+  c.querySelector('b').textContent = label + ':'; c.querySelector('.ct span').textContent = text; c.scrollTop = 0;
 }
 export function hideCoach() { $('coach').className = 'coach'; }
 export function note(t, why) { if (!S.miss.some(m => m.t === t)) S.miss.push({ t, why }); }

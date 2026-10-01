@@ -8,8 +8,9 @@ import { submitCampaign, profile } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
 import { renderQuiz } from './quiz.js';
+import { renderTerm } from './term.js';
 
-const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz };
+const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm };
 
 // ---------- map ----------
 export function renderMap() {
@@ -29,7 +30,7 @@ export function renderMap() {
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
   $('mapList').innerHTML = '<div id="dailyBox"></div>' + html;
-  flow.map();
+  flow.map(); flow.room();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
   const p = profile(); $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
@@ -46,7 +47,7 @@ export function askReset(after) {
 }
 
 // Briefing: diálogo, aula rápida e missão.
-function brief(i) {
+export function brief(i) {
   const L = LEVELS[i];
   modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${i + 1}. ${L.title}</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${L.z}</div></div>

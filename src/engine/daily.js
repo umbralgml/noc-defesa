@@ -4,6 +4,7 @@
 import { $, fmt, store } from './util.js';
 import { S, LEVELS } from './state.js';
 import { AV_Z } from './scene.js';
+import { au } from './audio.js';
 import { flow, modal, closeModal, reviewHTML, share } from './ui.js';
 import { play, goMap } from './game.js';
 import { rankOn, submit, profile, openRanking, hooks } from './rank.js';
@@ -98,35 +99,42 @@ export function questions(d) {
 }
 
 // ---------- fluxo ----------
-export function startDaily() {
-  const d = today(), rec = store('noc_daily');
-  if (rec && rec.d === d) return result(rec);
-  modal(`<div class="tag">DESAFIO DIÁRIO #${dayNum(d)}</div><h2>Plantão relâmpago</h2>
-    <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>Cinco perguntas, vinte segundos cada, um placar por dia. Quero ver se você é rápido.</div></div>
+// ch = desafio de um colega ({ d, p, h, g, n }) ou nada (desafio do dia).
+// Vale como resultado oficial do dia só se for de hoje e o jogador ainda não tiver jogado.
+export function startDaily(ch) {
+  const d = ch ? ch.d : today(), rec = store('noc_daily'), playedToday = rec && rec.d === today();
+  if (!ch && playedToday) return result(rec);
+  const official = d === today() && !playedToday;
+  modal(`<div class="tag">${ch ? '⚔️ DESAFIO DE UM COLEGA' : 'DESAFIO DIÁRIO'} #${dayNum(d)}</div><h2>${ch ? 'Bate esse placar?' : 'Plantão relâmpago'}</h2>
+    ${ch ? `<div class="vs"><b class="vsn"></b> fez <span class="dgrid sm">${grid({ log: ch.g })}</span> <b>${ch.h}/${N} · ${fmt(ch.p)} pts</b></div>` : ''}
+    <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>Cinco perguntas, vinte segundos cada${ch ? ', as mesmas que o seu colega pegou' : ', um placar por dia'}. Quero ver se você é rápido.</div></div>
     <div class="lesson"><span class="lh">REGRAS</span><ul>
-      <li>As mesmas <b>${N} perguntas</b> para todo mundo hoje.</li>
+      <li>${ch ? `As mesmas <b>${N} perguntas</b> do desafio #${dayNum(d)}.` : `As mesmas <b>${N} perguntas</b> para todo mundo hoje.`}</li>
       <li><b>${TIME} segundos</b> por pergunta. O relógio para enquanto você lê a explicação.</li>
       <li>Acerto rápido vale <b>bônus</b>: 10 pontos por segundo que sobrou.</li>
-      <li>Vale o primeiro resultado que você terminar no dia. Amanhã tem outro.</li></ul></div>
-    <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="mGo">COMEÇAR</button></div>`);
+      <li>${official ? 'Vale o primeiro resultado que você terminar no dia. Amanhã tem outro.' : 'Este é um duelo: não muda seu desafio do dia nem o ranking.'}</li></ul></div>
+    <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="mGo">${ch ? 'ACEITAR' : 'COMEÇAR'}</button></div>`);
+  if (ch) $('mcard').querySelector('.vsn').textContent = ch.n;
   $('mCancel').onclick = closeModal;
   $('mGo').onclick = () => {
-    closeModal();
+    au(); closeModal();
     play({ title: 'Desafio diário', tag: 'DIÁRIO', type: 'quiz', loc: 'war', time: TIME, qs: questions(d),
-      cap: `Desafio diário #${dayNum(d)}: ${N} perguntas, ${TIME} segundos cada...`,
+      cap: `${ch ? 'Duelo' : 'Desafio diário'} #${dayNum(d)}: ${N} perguntas, ${TIME} segundos cada...`,
       tip: 'Leia a pergunta inteira antes de responder: o bônus de velocidade não compensa um erro. O relógio para enquanto você lê a explicação.',
-      onWin: res => finish(d, res) }, `Desafio diário #${dayNum(d)}`);
+      onWin: res => finish(d, res, ch, official) }, `${ch ? 'Duelo' : 'Desafio diário'} #${dayNum(d)}`);
   };
 }
 
-function finish(d, res) {
+function finish(d, res, ch, official) {
   const speed = S.left * 10;
   const rec = { d, n: dayNum(d), log: S.qlog.slice(), score: res.total, speed, total: res.total + speed, miss: S.miss.slice(0, 6) };
-  store('noc_daily', rec);
-  const st = store('noc_streak') || {};
-  if (st.d !== d) store('noc_streak', { d, c: st.d === yesterday(d) ? st.c + 1 : 1 });
-  sendToday();
-  result(rec);
+  if (official) {
+    store('noc_daily', rec);
+    const st = store('noc_streak') || {};
+    if (st.d !== d) store('noc_streak', { d, c: st.d === yesterday(d) ? st.c + 1 : 1 });
+    sendToday();
+  }
+  result(rec, ch, !official);
 }
 
 // Envia o resultado de hoje para o ranking (se o jogador entrou nele).
@@ -138,22 +146,45 @@ function sendToday() {
 
 const hitsOf = rec => rec.log.filter(Boolean).length;
 const grid = rec => rec.log.map(ok => ok ? '🟩' : '🟥').join('');
+const url = () => location.origin + location.pathname;
 
-function result(rec) {
+// Link de duelo: mesma data (mesmas perguntas) e o placar de quem desafia.
+function duelLink(rec) {
+  const p = profile(), q = new URLSearchParams({ d: rec.d, p: rec.total, g: rec.log.map(Number).join('') });
+  if (p && p.name) q.set('n', p.name);
+  return `${url()}?${q}`;
+}
+
+// Lê um duelo da URL (?d=&p=&g=&n=), valida tudo e limpa a barra de endereço.
+export function readChallenge() {
+  const q = new URLSearchParams(location.search);
+  if (!q.has('d')) return null;
+  history.replaceState(null, '', url());
+  const d = q.get('d'), p = +q.get('p'), g = q.get('g') || '';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || d < START || d > today() || !/^[01]{5}$/.test(g) || !(p >= 0 && p <= 3000)) return null;
+  const log = [...g].map(c => c === '1');
+  return { d, p: Math.round(p), g: log, h: log.filter(Boolean).length, n: (q.get('n') || 'Um analista').replace(/\s+/g, ' ').trim().slice(0, 24) || 'Um analista' };
+}
+
+function result(rec, ch, duel) {
   const h = hitsOf(rec), st = store('noc_streak') || { c: 1 };
-  modal(`<div class="tag">DESAFIO DIÁRIO #${rec.n}</div><h2>${h === N ? 'Plantão perfeito!' : h >= 3 ? 'Rede de pé.' : 'O Z3R0 passou perto.'}</h2>
-    <div class="dgrid">${grid(rec)}</div>
+  const win = ch && (rec.total > ch.p ? 1 : rec.total < ch.p ? -1 : 0);
+  modal(`<div class="tag">${duel ? 'DUELO' : 'DESAFIO DIÁRIO'} #${rec.n}</div><h2>${ch ? (win > 0 ? '🏆 Você venceu!' : win < 0 ? 'Não foi dessa vez.' : 'Empate técnico!') : h === N ? 'Plantão perfeito!' : h >= 3 ? 'Rede de pé.' : 'O Z3R0 passou perto.'}</h2>
+    ${ch ? `<div class="vsbox"><div><small>VOCÊ</small><span class="dgrid sm">${grid(rec)}</span><b>${fmt(rec.total)} pts</b></div><i>×</i><div><small class="vsn"></small><span class="dgrid sm">${grid({ log: ch.g })}</span><b>${fmt(ch.p)} pts</b></div></div>` : `<div class="dgrid">${grid(rec)}</div>`}
     <div class="pts"><span>Acertos</span><b>${h}/${N}</b></div>
     <div class="pts"><span>Pontos + integridade</span><b>${fmt(rec.score)}</b></div>
     <div class="pts"><span>Bônus de velocidade</span><b>+${fmt(rec.speed)}</b></div>
     <div class="pts" style="color:var(--warn)"><span>TOTAL</span><b style="color:var(--warn)">${fmt(rec.total)} pts</b></div>
-    <div class="dstreak">🔥 ${st.c} ${st.c > 1 ? 'dias seguidos' : 'dia seguido'}</div>
+    ${duel ? '<div class="dnext">Duelo não conta para o desafio do dia nem para o ranking.</div>' : `<div class="dstreak">🔥 ${st.c} ${st.c > 1 ? 'dias seguidos' : 'dia seguido'}</div>`}
     ${reviewHTML(rec.miss || [])}
-    <div class="dnext">Próximo desafio em <b id="dNext"></b></div>
-    <button class="btn wideb" id="dShare">COMPARTILHAR RESULTADO</button>
-    <div class="row">${rankOn() ? '<button class="btn ghostb" id="dRank">RANKING</button>' : ''}<button class="btn ghostb" id="mOk">VOLTAR</button></div>`);
+    ${rec.d === today() && !duel ? '<div class="dnext">Próximo desafio em <b id="dNext"></b></div>' : ''}
+    <button class="btn wideb" id="dDuel">⚔️ ${ch ? 'DEVOLVER O DESAFIO' : 'DESAFIAR UM COLEGA'}</button>
+    <button class="btn ghostb wideb" id="dShare">COMPARTILHAR RESULTADO</button>
+    <div class="row">${rankOn() && !duel ? '<button class="btn ghostb" id="dRank">RANKING</button>' : ''}<button class="btn ghostb" id="mOk">VOLTAR</button></div>`);
+  if (ch) $('mcard').querySelector('.vsn').textContent = ch.n.toUpperCase();
   tick();
-  $('dShare').onclick = e => share(`NOC: Última Linha de Defesa · Desafio #${rec.n}\n${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts · 🔥 ${st.c}\n${location.origin + location.pathname}`, e.currentTarget);
+  $('dDuel').onclick = e => share(`⚔️ Te desafio no NOC: Última Linha de Defesa!\nDesafio #${rec.n}: ${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts\nBate isso? ${duelLink(rec)}`, e.currentTarget);
+  $('dShare').onclick = e => share(`NOC: Última Linha de Defesa · Desafio #${rec.n}\n${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts${duel ? '' : ' · 🔥 ' + st.c}\n${url()}`, e.currentTarget);
   if ($('dRank')) $('dRank').onclick = () => openRanking(board(rec.d), 1);
   $('mOk').onclick = () => { if ($('game').classList.contains('on')) goMap(); closeModal(); };
 }
@@ -173,7 +204,7 @@ function banner() {
   box.innerHTML = `<button class="daily${done ? ' done' : ''}" id="dailyBtn"><span class="di">${done ? '✓' : '⚡'}</span>
     <span class="dt"><b>Desafio diário #${dayNum(d)}</b><small>${done ? `Feito hoje: ${hitsOf(rec)}/${N} · ${fmt(rec.total)} pts` : `${N} perguntas · ${TIME} s cada · 1 por dia`}</small></span>
     <span class="dg">${done ? 'VER' : 'JOGAR'}</span></button>`;
-  $('dailyBtn').onclick = startDaily;
+  $('dailyBtn').onclick = () => startDaily();
 }
 
 export function initDaily() {

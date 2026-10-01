@@ -4,7 +4,7 @@ Guia para trabalhar neste repositório.
 
 ## O projeto
 
-"NOC: Última Linha de Defesa" é um jogo **educativo** de redes e segurança, em português do Brasil, que roda no navegador (celular primeiro). O jogador é o analista de plantão contra o hacker Z3R0 ao longo de 19 fases em 5 atos. É publicado no GitHub Pages: https://umbralgml.github.io/noc-defesa/
+"NOC: Última Linha de Defesa" é um jogo **educativo** de redes e segurança, em português do Brasil, que roda no navegador (celular primeiro). O jogador é o analista de plantão contra o hacker Z3R0 ao longo de 21 fases em 6 atos. É publicado no GitHub Pages: https://umbralgml.github.io/noc-defesa/
 
 O objetivo principal é **ensinar**. Diversão é o veículo. Toda mudança de conteúdo precisa manter isto: aula antes (`lesson`), explicação a cada jogada (`why`/`explain`) e revisão dos erros no fim.
 
@@ -54,15 +54,17 @@ src/engine/
   wire.js             tipo "wire" (ligar pares)
   drop.js             tipo "drop" (modes "buckets" e "slots")
   quiz.js             tipo "quiz" (e chefe com "boss")
+  term.js             tipo "term": terminal simulado (comandos com saída fixa, alias, diagnóstico em passos)
+  room.js             sala do NOC no topo do mapa: herói anda (toque/setas), câmera acompanha, estação abre os incidentes do `loc`
 tools/validar-fases.mjs
 docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 ```
 
 ### Grafo de dependências (sem ciclos)
 
-`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz` ← `game` ← `daily` ← `main` (e `util` ← `news` ← `main`)
+`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `term` ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa` ← `main`)
 
-Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
+Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js`, `flow.room()` (placas da sala) pelo `room.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
 
 ### Fases fora do mapa
 
@@ -92,6 +94,8 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Fases novas** entram só pelo JSON sempre que possível. Rode o validador sem erros nem avisos antes de commitar.
 - **Changelog:** toda mudança que o jogador percebe ganha uma entrada no topo de `src/changelog.json` (versão `1.x`, data `AAAA-MM-DD`, título divertido curto e 3 a 5 itens em linguagem de jogador). Ela aparece na tela inicial com o selo NOVO (`localStorage` `noc_seen_ver`).
 - **Desafio diário:** o sorteio depende da data (fuso de Brasília) e do conteúdo de `LEVELS` e `GEN`. Mudar os geradores ou os quizzes muda as perguntas do dia para todo mundo; quiz novo entra com `"dailyFrom": "<amanhã>"` para não mexer no desafio em curso. Todo gerador devolve `why` na pergunta e em cada opção errada.
+- **Duelo:** o link `?d=AAAA-MM-DD&p=pts&g=10111&n=nome` reabre as perguntas daquela data (`readChallenge()` valida tudo e limpa a URL). Só conta como desafio oficial se for de hoje e o jogador ainda não tiver jogado. Mudar quizzes ou geradores muda as perguntas de datas passadas também; duelos antigos podem divergir.
+- **Sala do NOC:** estações em `STATIONS` (`scene.js`) por `loc`; um `loc` novo precisa de estação lá e de desenho em `sceneSVG`.
 - **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. O perfil é pedido no primeiro turno (`ensureProfile`); sem nome, o jogador aparece como `Analista #XXXX` (`anonName()`). Nome e LinkedIn só saem do aparelho com consentimento marcado (`publicName()`/`publicLinkedin()`); sem ele, envia o apelido anônimo.
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
 - **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`) puxa a `main` a cada 15 minutos. Não há outro passo de publicação.

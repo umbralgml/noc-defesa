@@ -114,6 +114,37 @@ export function sceneSVG(loc, boss, loose) {
   if (loc === 'server') s += srvS(262, 'sc1');
   return s + HERO + '</svg>';
 }
+// ---------- sala do NOC (mapa explorável) ----------
+// Estações: onde cada equipamento é desenhado (x), onde o herói para (stand) e a área de toque.
+export const ROOM_W = 910;
+export const STATIONS = [
+  { loc: 'rack', name: 'RACK', x: 60, stand: 34, x1: 20, x2: 130 },
+  { loc: 'server', name: 'SERVIDOR', x: 190, stand: 178, x1: 160, x2: 316 },
+  { loc: 'desk', name: 'TERMINAL', x: 360, stand: 348, x1: 330, x2: 464 },
+  { loc: 'firewall', name: 'FIREWALL', x: 520, stand: 508, x1: 490, x2: 646 },
+  { loc: 'war', name: 'TELÃO', x: 700, stand: 706, x1: 680, x2: 900 }
+];
+export function roomSVG() {
+  let s = `<svg viewBox="0 0 ${ROOM_W} 120" preserveAspectRatio="xMinYMax meet" class="roomsvg" role="img" aria-label="Sala do NOC">`;
+  // fundo: três faixas do cenário padrão lado a lado
+  for (let k = 0; k < 3; k++) s += `<g transform="translate(${k * 400},0)">${bgS()}</g>`;
+  const st = Object.fromEntries(STATIONS.map(t => [t.loc, t]));
+  s += rackS(st.rack.x, false) + srvS(st.server.x, 'rm1') + deskS(st.desk.x, 'rm2') + fwS(st.firewall.x, 'rm3');
+  s += `<g transform="translate(${st.war.x - 200},0)">${warS(false, 'rm4')}</g>`;
+  // placas e áreas de toque
+  STATIONS.forEach(t => {
+    const cx = (t.x1 + t.x2) / 2;
+    s += `<g class="stn" data-loc="${t.loc}" tabindex="0" role="button" aria-label="${t.name}">
+      <rect class="stnhit" x="${t.x1}" y="0" width="${t.x2 - t.x1}" height="100" fill="transparent"/>
+      <g class="stntag" transform="translate(${cx},16)"><rect x="-34" y="-8" width="68" height="13" rx="6.5" fill="#070d18" stroke="#2c3d5c"/>
+      <text y="1.6" text-anchor="middle" font-family="Orbitron,monospace" font-size="6.4" font-weight="800" fill="#c9d6ea" letter-spacing=".6">${t.name}</text>
+      <text class="stncnt" y="1.6" x="40" font-family="JetBrains Mono,monospace" font-size="6" fill="#8a9bb8"></text></g>
+      <g class="stnalert" transform="translate(${cx},34)"><circle r="7" fill="#ff2e63"/><text y="2.8" text-anchor="middle" font-size="8.5" font-weight="900" fill="#fff">!</text></g>
+    </g>`;
+  });
+  return s + `<g class="rhero">${HERO}</g></svg>`;
+}
+
 export function heroTo(sc, x, instant) {
   const h = sc.querySelector('.hero');
   if (instant) { h.style.transition = 'none'; h.style.transform = `translate(${x}px,106px)`; h.getBoundingClientRect(); h.style.transition = ''; }

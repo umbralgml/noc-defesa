@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.9",
+      "date": "2026-10-01",
+      "title": "O NOC ganhou corpo",
+      "items": [
+        "Sala do NOC no mapa: toque no chão para andar e no equipamento para abrir os incidentes. No PC, use as setas",
+        "Novo tipo de fase: terminal de verdade, com comandos IOS para investigar e corrigir",
+        "Ato 6 com 2 fases de troubleshooting: Link caído e Rota sumiu",
+        "Desafie um colega: o link leva as mesmas perguntas do desafio diário e o seu placar"
+      ]
+    },
+    {
       "v": "1.8",
       "date": "2026-10-01",
       "title": "Temporada 2",
