@@ -352,6 +352,14 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .rn .in{display:inline-block;font:700 9px system-ui;color:#fff;background:#0a66c2;border-radius:3px;padding:1px 3px;vertical-align:2px}
 .rs{font:700 12px 'JetBrains Mono',monospace;color:var(--warn);white-space:nowrap}
 .rs i{font-style:normal;color:var(--muted);margin-right:8px}
+.rkbox{margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.rkbox .rlist{max-height:none}
+.lnk.rkall{display:block;margin:10px auto 0;font-size:12px}
+.rrow.anon .rn{color:var(--muted)}
+.rrow.me{background:rgba(0,224,168,.1)}
+.you{font:800 8.5px 'Orbitron',monospace;letter-spacing:1px;color:#03130d;background:var(--acc);border-radius:5px;padding:1px 5px;vertical-align:2px;margin-left:4px}
+.twho{margin-top:14px;font-size:12.5px;color:var(--muted)}
+.twho b{color:var(--text)}
 .rmsg{padding:18px 12px;text-align:center;color:var(--muted);font-size:13px}
 .rme{margin-top:12px;font-size:12.5px;line-height:1.5;color:#c9d6ea}
 .lnk{background:none;border:none;padding:0;color:var(--acc);font:inherit;text-decoration:underline}

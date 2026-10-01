@@ -8,7 +8,7 @@ import { initGame, renderMap, askReset } from './engine/game.js';
 import { progress } from './engine/state.js';
 import { loadNews, markNewsSeen } from './engine/news.js';
 import { initDaily, startDaily, dailyBoard } from './engine/daily.js';
-import { loadRankConfig, openRanking } from './engine/rank.js';
+import { loadRankConfig, openRanking, ensureProfile, profileForm, profile, anonName, titleRanking, hooks } from './engine/rank.js';
 import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
 
@@ -29,7 +29,15 @@ function showProgress() {
 }
 
 initGame(); initDrop(); initWire(); initDaily();
-loadRankConfig();
+loadRankConfig().then(on => { $('rkBox').hidden = !on; if (on) titleRanking(dailyBoard()); });
+// "Jogando como ..." na tela inicial; atualiza quando o perfil muda.
+function showWho() {
+  const p = profile(); $('tWho').hidden = !p;
+  if (p) $('tWhoName').textContent = p.name || anonName();
+}
+hooks.profile = () => { showWho(); titleRanking(dailyBoard()); };
+showWho();
+$('tWhoEdit').onclick = () => profileForm();
 document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openRanking(dailyBoard()); });
 loadNews().catch(e => { console.error(e); $('news').hidden = true; $('newsBtn').hidden = true; });
 
@@ -38,9 +46,9 @@ go.disabled = daily.disabled = true;
 try {
   await loadLevels();
   go.disabled = daily.disabled = false;
-  daily.onclick = () => { au(); markNewsSeen(); startDaily(); };
+  daily.onclick = () => { au(); markNewsSeen(); ensureProfile(startDaily); };
   showProgress();
-  go.onclick = () => { au(); markNewsSeen(); renderMap(); show('map'); music('menu'); };
+  go.onclick = () => { au(); markNewsSeen(); ensureProfile(() => { renderMap(); show('map'); music('menu'); }); };
 } catch (e) {
   console.error(e);
   go.textContent = 'ERRO AO CARREGAR';
