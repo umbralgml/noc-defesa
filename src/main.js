@@ -7,9 +7,10 @@ import { show } from './engine/ui.js';
 import { initGame, renderMap, askReset } from './engine/game.js';
 import { progress } from './engine/state.js';
 import { loadNews, markNewsSeen } from './engine/news.js';
-import { initDaily, startDaily, dailyBoard } from './engine/daily.js';
+import { initDaily, startDaily, dailyBoard, readChallenge } from './engine/daily.js';
 import { loadRankConfig, openRanking, ensureProfile, profileForm, profile, anonName, titleRanking, hooks } from './engine/rank.js';
 import { initPWA } from './engine/pwa.js';
+import { initRoom } from './engine/room.js';
 import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
 
@@ -29,7 +30,7 @@ function showProgress() {
   el.innerHTML = p.done ? `Seu plantão: <b>★ ${p.stars}/${p.max}</b> · ${p.done}/${p.max / 3} fases` : '';
 }
 
-initGame(); initDrop(); initWire(); initDaily(); initPWA();
+initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom();
 loadRankConfig().then(on => { $('rkBox').hidden = !on; if (on) titleRanking(dailyBoard()); });
 // "Jogando como ..." na tela inicial; atualiza quando o perfil muda.
 function showWho() {
@@ -49,7 +50,9 @@ go.disabled = daily.disabled = true;
 try {
   await loadLevels();
   go.disabled = daily.disabled = false;
-  daily.onclick = () => { au(); markNewsSeen(); ensureProfile(startDaily); };
+  daily.onclick = () => { au(); markNewsSeen(); ensureProfile(() => startDaily()); };
+  // Link de duelo (?d=...): abre o desafio do colega direto.
+  const ch = readChallenge(); if (ch) ensureProfile(() => startDaily(ch));
   showProgress();
   go.onclick = () => { au(); markNewsSeen(); ensureProfile(() => { renderMap(); show('map'); music('menu'); }); };
 } catch (e) {

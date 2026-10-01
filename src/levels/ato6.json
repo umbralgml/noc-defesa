@@ -1,0 +1,277 @@
+{
+  "tag": "ATO 6",
+  "name": "Troubleshooting no terminal",
+  "levels": [
+    {
+      "title": "Link caído",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "SW-CORE",
+      "cap": "Plugando o cabo console no switch core...",
+      "goal": "Investigue o switch core, descubra por que o andar 2 caiu e corrija.",
+      "intro": "O <b>andar 2</b> (VLAN 20) está sem rede. Você está no console do <b>SW-CORE</b>. Investigue antes de mexer.",
+      "z": "Entrei no seu switch core e desliguei uma porta. Adivinha qual. O andar 2 inteiro está sem rede.",
+      "me": "Não vou adivinhar. Vou olhar.",
+      "lesson": [
+        "<b>Troubleshooting</b> é método: confirme o sintoma, colete evidência, diagnostique e só então corrija.",
+        "<b>show ip interface brief</b>: Status é a camada 1 (física) e Protocol a camada 2. <b>administratively down</b> = porta desligada por comando.",
+        "<b>show interfaces status</b>: <b>connected</b> ok, <b>notconnect</b> sem cabo ou outro lado desligado, <b>disabled</b> desligada, <b>err-disabled</b> desligada por proteção.",
+        "<b>show logging</b> conta o que mudou, quando e quem mudou. <b>show running-config</b> mostra a configuração em uso.",
+        "No IOS, <b>no</b> desfaz um comando. E <b>copy running-config startup-config</b> salva a configuração para sobreviver a um reboot."
+      ],
+      "tip": "\"administratively down\" é shutdown. Corrija com \"no shutdown\" na interface e feche o acesso VTY do invasor.",
+      "learn": "Interface \"administratively down\" foi desligada por comando, e \"no shutdown\" religa. O log mostrou quem fez (z3r0 pelo vty0), então a correção completa inclui ACL no acesso VTY, troca de credenciais e salvar a configuração.",
+      "cmds": [
+        {
+          "c": "show ip interface brief",
+          "alias": [
+            "sh ip int br",
+            "show ip int brief",
+            "sh ip int brief"
+          ],
+          "out": "Interface              IP-Address      OK? Method Status                Protocol\nVlan10                 10.10.0.1       YES manual up                    up\nVlan20                 10.20.0.1       YES manual up                    down\nGigabitEthernet1/0/1   unassigned      YES unset  up                    up\nGigabitEthernet1/0/2   unassigned      YES unset  administratively down down\nGigabitEthernet1/0/3   unassigned      YES unset  up                    up",
+          "why": "Resume cada interface: IP, Status (camada 1) e Protocol (camada 2). \"administratively down\" quer dizer que alguém deu shutdown."
+        },
+        {
+          "c": "show interfaces status",
+          "alias": [
+            "sh int status",
+            "sh interfaces status"
+          ],
+          "out": "Port      Name               Status       Vlan       Duplex  Speed Type\nGi1/0/1   UPLINK-ANDAR1      connected    trunk      a-full a-1000 10/100/1000BaseTX\nGi1/0/2   UPLINK-ANDAR2      disabled     trunk        auto   auto 10/100/1000BaseTX\nGi1/0/3   SERVIDORES         connected    10         a-full a-1000 10/100/1000BaseTX",
+          "why": "Mostra o estado de cada porta do switch. \"disabled\" é porta desligada por configuração; \"notconnect\" seria cabo; \"err-disabled\" seria uma proteção, como o port-security."
+        },
+        {
+          "c": "show logging",
+          "alias": [
+            "sh log",
+            "sh logging",
+            "show log"
+          ],
+          "out": "*Oct  1 03:12:41: %SYS-5-CONFIG_I: Configured from console by z3r0 on vty0 (45.67.89.10)\n*Oct  1 03:12:41: %LINK-5-CHANGED: Interface GigabitEthernet1/0/2, changed state to administratively down\n*Oct  1 03:12:42: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/2, changed state to down",
+          "why": "O log diz o que mudou, quando e quem mudou. Sempre olhe o log antes de mexer."
+        },
+        {
+          "c": "show running-config interface GigabitEthernet1/0/2",
+          "alias": [
+            "sh run int gi1/0/2",
+            "show run interface gi1/0/2",
+            "show running-config interface gi1/0/2",
+            "sh run int g1/0/2"
+          ],
+          "out": "interface GigabitEthernet1/0/2\n description UPLINK-ANDAR2\n switchport trunk allowed vlan 20\n switchport mode trunk\n shutdown\nend",
+          "why": "Mostra a configuração da interface. A linha \"shutdown\" desliga a porta."
+        },
+        {
+          "c": "ping 10.20.0.50",
+          "out": "Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 10.20.0.50, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+          "why": "Confirma o sintoma: nenhuma máquina do andar 2 (VLAN 20) responde. Cada \".\" é um pacote sem resposta."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que o andar 2 está sem rede?",
+          "a": 0,
+          "o": [
+            "A Gi1/0/2 foi desligada com shutdown",
+            {
+              "t": "O cabo da Gi1/0/2 rompeu",
+              "why": "Cabo rompido aparece como \"down/down\" ou \"notconnect\", não como \"administratively down\"."
+            },
+            {
+              "t": "A VLAN 20 foi apagada",
+              "why": "A VLAN existe: a SVI Vlan20 aparece na lista. O problema é a porta que leva a VLAN estar desligada."
+            },
+            {
+              "t": "Duplex incompatível na porta",
+              "why": "Duplex errado causa erros e lentidão, mas a porta continua up."
+            }
+          ],
+          "why": "Status \"administratively down\" e a linha \"shutdown\" na configuração: alguém desligou a porta de propósito. O log mostra que foi o z3r0, pelo vty0."
+        },
+        {
+          "q": "Dentro de \"interface Gi1/0/2\", qual comando religa a porta?",
+          "a": 0,
+          "o": [
+            "no shutdown",
+            {
+              "t": "shutdown",
+              "why": "shutdown é justamente o que desliga a porta."
+            },
+            {
+              "t": "reload",
+              "why": "Reiniciar o switch derruba todo mundo, e a porta volta desligada: o shutdown está na configuração."
+            },
+            {
+              "t": "clear counters",
+              "why": "Zera os contadores da interface. Não muda o estado da porta."
+            }
+          ],
+          "why": "No IOS, \"no\" desfaz um comando: \"no shutdown\" liga a porta de novo.",
+          "run": "configure terminal\n interface GigabitEthernet1/0/2\n  no shutdown",
+          "out": "%LINK-3-UPDOWN: Interface GigabitEthernet1/0/2, changed state to up\n%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/2, changed state to up\n%LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan20, changed state to up"
+        },
+        {
+          "q": "Rede de pé. O que impede o Z3R0 de repetir isso?",
+          "a": 0,
+          "o": [
+            "Restringir o acesso VTY com ACL, trocar as credenciais e salvar",
+            {
+              "t": "Apagar o log para ele não ver o que você fez",
+              "why": "Sem log você perde a evidência e não enxerga o próximo ataque."
+            },
+            {
+              "t": "Mudar a porta para a VLAN 1",
+              "why": "VLAN não tem relação com quem acessa a gerência do switch."
+            },
+            {
+              "t": "Nada: foi só uma porta",
+              "why": "Ele tinha acesso de configuração ao switch core. Isso é um incidente."
+            }
+          ],
+          "why": "O log mostra login do z3r0 pelo vty0 vindo de 45.67.89.10. ACL no \"line vty\" (access-class) só deixa a rede de gerência entrar, senha nova corta o acesso dele, e salvar garante que a correção sobrevive a um reboot.",
+          "run": "copy running-config startup-config",
+          "out": "Building configuration...\n[OK]"
+        }
+      ]
+    },
+    {
+      "title": "Rota sumiu",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "firewall",
+      "host": "RT-BORDA",
+      "cap": "Abrindo o console do roteador de borda...",
+      "goal": "Investigue o roteador de borda, descubra por que a internet caiu e restaure.",
+      "intro": "Ninguém acessa a internet, mas a rede interna funciona. Console do <b>RT-BORDA</b>: o link com o provedor é a <b>Gi0/0</b> (200.1.1.2/30), e o provedor é o <b>200.1.1.1</b>.",
+      "z": "Apaguei uma linha da configuração do seu roteador de borda. Uma só. A empresa inteira está sem internet.",
+      "me": "Uma linha. Vamos ver qual.",
+      "lesson": [
+        "Método: um <b>ping</b> no próximo salto (o gateway do provedor) separa problema de link de problema de roteamento.",
+        "<b>show ip route</b>: C = conectada, S = estática, B = BGP. <b>Gateway of last resort</b> é a rota padrão (0.0.0.0/0).",
+        "Sem rota padrão, o roteador descarta tudo que não está na tabela: a internet some, mas a rede local continua.",
+        "<b>traceroute</b> mostra até onde o pacote chega. Morrer no salto 1 = o problema está no próprio roteador.",
+        "<b>show running-config | include</b> filtra a configuração. Num roteador, a saída para a internet é <b>ip route 0.0.0.0 0.0.0.0 próximo-salto</b>."
+      ],
+      "tip": "Gateway do provedor responde e a internet não: é rota. \"Gateway of last resort is not set\" = falta a rota padrão. Volte com ip route 0.0.0.0 0.0.0.0 200.1.1.1.",
+      "learn": "Link de pé + ping no gateway OK + internet fora = problema de roteamento. A rota padrão (ip route 0.0.0.0 0.0.0.0 200.1.1.1) tinha sido apagada; as redes conectadas (C) continuam funcionando sem ela.",
+      "cmds": [
+        {
+          "c": "show ip route",
+          "alias": [
+            "sh ip route",
+            "sh ip ro"
+          ],
+          "out": "Codes: L - local, C - connected, S - static, B - BGP\n\nGateway of last resort is not set\n\n      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks\nC        10.0.0.0/24 is directly connected, GigabitEthernet0/1\nL        10.0.0.1/32 is directly connected, GigabitEthernet0/1\n      200.1.1.0/24 is variably subnetted, 2 subnets, 2 masks\nC        200.1.1.0/30 is directly connected, GigabitEthernet0/0\nL        200.1.1.2/32 is directly connected, GigabitEthernet0/0",
+          "why": "A tabela de rotas. \"Gateway of last resort is not set\" = não existe rota padrão: o roteador não sabe para onde mandar o que não está na tabela."
+        },
+        {
+          "c": "ping 200.1.1.1",
+          "out": "Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 200.1.1.1, timeout is 2 seconds:\n!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 1/1/2 ms",
+          "why": "O gateway do provedor responde: o link físico e a rede /30 com o provedor estão de pé."
+        },
+        {
+          "c": "ping 8.8.8.8",
+          "out": "Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to 8.8.8.8, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)",
+          "why": "A internet não responde. Como o link com o provedor está de pé, o problema é de roteamento."
+        },
+        {
+          "c": "traceroute 8.8.8.8",
+          "alias": [
+            "trace 8.8.8.8",
+            "tracert 8.8.8.8"
+          ],
+          "out": "Type escape sequence to abort.\nTracing the route to 8.8.8.8\n  1  *  *  *\n  2  *  *  *\n  3  *  *  *",
+          "why": "Nem o primeiro salto responde: o pacote não sai do roteador."
+        },
+        {
+          "c": "show logging",
+          "alias": [
+            "sh log",
+            "sh logging",
+            "show log"
+          ],
+          "out": "*Oct  1 03:31:07: %SYS-5-CONFIG_I: Configured from console by z3r0 on vty0 (45.67.89.10)\n*Oct  1 03:31:07: %PARSER-5-CFGLOG_LOGGEDCMD: User:z3r0  logged command:no ip route 0.0.0.0 0.0.0.0 200.1.1.1",
+          "why": "Com o log de comandos ligado (archive log config), cada linha digitada fica registrada. Aqui aparece o comando exato que o invasor usou."
+        },
+        {
+          "c": "show running-config | include ip route",
+          "alias": [
+            "sh run | i ip route",
+            "show run | include ip route",
+            "sh run | inc ip route"
+          ],
+          "out": "(nenhuma linha encontrada)",
+          "why": "Filtra a configuração pelas rotas estáticas. Vazio: a rota padrão foi apagada."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que a internet caiu para todo mundo?",
+          "a": 0,
+          "o": [
+            "O roteador não tem mais rota padrão",
+            {
+              "t": "O link com o provedor caiu",
+              "why": "O ping no 200.1.1.1 responde: o link está de pé."
+            },
+            {
+              "t": "O DNS parou",
+              "why": "O ping vai direto no IP 8.8.8.8 e mesmo assim falha. Não é DNS."
+            },
+            {
+              "t": "O provedor bloqueou o 8.8.8.8",
+              "why": "O traceroute morre já no primeiro salto: o pacote nem sai do seu roteador."
+            }
+          ],
+          "why": "Sem rota padrão (\"Gateway of last resort is not set\"), tudo que não é rede conhecida é descartado. O log mostra o \"no ip route 0.0.0.0 0.0.0.0 200.1.1.1\" do z3r0."
+        },
+        {
+          "q": "Qual comando restaura a saída para a internet?",
+          "a": 0,
+          "o": [
+            "ip route 0.0.0.0 0.0.0.0 200.1.1.1",
+            {
+              "t": "ip route 200.1.1.1 255.255.255.255 0.0.0.0",
+              "why": "Está invertido: o destino é 0.0.0.0/0 (qualquer rede) e o próximo salto é o provedor."
+            },
+            {
+              "t": "ip default-gateway 200.1.1.1",
+              "why": "ip default-gateway só vale com o roteamento desligado, como num switch L2. Num roteador, use rota padrão."
+            },
+            {
+              "t": "ip route 8.8.8.8 255.255.255.255 200.1.1.1",
+              "why": "Isso só leva ao 8.8.8.8. O resto da internet continuaria fora."
+            }
+          ],
+          "why": "Rota padrão: destino 0.0.0.0 com máscara 0.0.0.0 (qualquer rede) e próximo salto 200.1.1.1, o provedor.",
+          "run": "configure terminal\n ip route 0.0.0.0 0.0.0.0 200.1.1.1\n end\nping 8.8.8.8",
+          "out": "!!!!!\nSuccess rate is 100 percent (5/5), round-trip min/avg/max = 12/13/15 ms"
+        },
+        {
+          "q": "Por que o ping no 200.1.1.1 funcionava mesmo sem rota padrão?",
+          "a": 0,
+          "o": [
+            "Ele está numa rede diretamente conectada (a /30 com o provedor)",
+            {
+              "t": "Porque ping não usa a tabela de rotas",
+              "why": "Todo pacote IP consulta a tabela de rotas, inclusive o ping."
+            },
+            {
+              "t": "Porque o provedor tem uma rota até você",
+              "why": "A rota de volta do provedor não ajuda o seu roteador a achar o caminho de ida."
+            },
+            {
+              "t": "Foi o cache de ARP",
+              "why": "ARP resolve MAC na rede local. Quem decide o caminho é a rota \"C\" (connected)."
+            }
+          ],
+          "why": "Redes diretamente conectadas entram sozinhas na tabela (código C). O 200.1.1.1 está na /30 da Gi0/0, então não depende da rota padrão.",
+          "run": "copy running-config startup-config",
+          "out": "Building configuration...\n[OK]"
+        }
+      ]
+    }
+  ]
+}

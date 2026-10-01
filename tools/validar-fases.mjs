@@ -58,6 +58,21 @@ function check(L, where) {
       else if (!(q.a >= 0 && q.a < q.o.length)) err(`pergunta ${i + 1}: "a" = ${q.a} fora das opções`);
       else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`pergunta ${i + 1}: opção errada "${txt(o)}" sem "why"`); });
     });
+  } else if (L.type === 'term') {
+    if (!L.host) err('terminal precisa de "host" (nome do equipamento no prompt)');
+    if (!L.cmds || L.cmds.length < 2) err('"cmds" precisa de pelo menos 2 comandos (o diagnóstico libera com 2)');
+    const seen = new Set();
+    (L.cmds || []).forEach(c => {
+      if (!c.c || c.out === undefined) err(`comando sem "c" ou "out"`);
+      [c.c, ...(c.alias || [])].forEach(n => { const k = (n || '').trim().toLowerCase().replace(/\s+/g, ' '); if (seen.has(k)) err(`comando/alias repetido: "${n}"`); seen.add(k); });
+      if (!c.why) warn(`comando "${c.c}" sem "why"`);
+    });
+    if (!L.steps || !L.steps.length) err('"steps" vazio');
+    (L.steps || []).forEach((q, i) => {
+      if (!q.q || !q.why) err(`passo ${i + 1} sem "q" ou "why"`);
+      if (!Array.isArray(q.o) || q.o.length < 2 || !(q.a >= 0 && q.a < q.o.length)) err(`passo ${i + 1}: opções ou "a" inválidos`);
+      else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`passo ${i + 1}: opção errada "${txt(o)}" sem "why"`); });
+    });
   } else err(`tipo "${L.type}"${L.mode ? '/' + L.mode : ''} desconhecido`);
 }
 

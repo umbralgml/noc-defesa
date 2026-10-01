@@ -8,7 +8,7 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 19 fases em 5 atos:
+São 21 fases em 6 atos:
 
 | Ato | Tema | Fases |
 |-----|------|-------|
@@ -17,13 +17,15 @@ São 19 fases em 5 atos:
 | 3 | Switching e BGP | VLAN hopping, filtro de cliente BGP, sequestro de prefixo e RPKI |
 | 4 | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM e o chefe final |
 | 5 | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
+| 6 | Troubleshooting no terminal | investigar switch e roteador com comandos IOS: porta em shutdown e rota padrão apagada |
 
 O jogo foi feito para ensinar, não só para testar:
 
 - **Aula rápida** no briefing de cada fase, com o conceito que você vai precisar. Ela também aparece no botão **?** durante a fase.
 - **Explicação na hora** de cada jogada, certa ou errada: por que aquele IP é público, por que aquela regra vem primeiro, por que aquela opção do quiz não serve.
 - **Revisão no fim da fase** com tudo o que você errou e a explicação de cada item.
-- **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar.
+- **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar. Dá para **desafiar um colega** com um link que leva as mesmas perguntas e o seu placar.
+- **Sala do NOC:** no mapa, o analista anda pela sala (toque ou setas) até o equipamento e abre os incidentes de lá.
 
 ## Rodar localmente
 

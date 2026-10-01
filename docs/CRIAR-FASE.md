@@ -258,6 +258,61 @@ Quando o jogador erra, aparece o `why` da pergunta e, embaixo, **"Sobre a sua re
 
 ---
 
+## Tipo `term`: troubleshooting no terminal
+
+O jogador investiga um equipamento num terminal: digita comandos (aceita os apelidos de `alias`) ou toca nos comandos sugeridos. Depois de rodar **2 comandos diferentes**, liberam os passos de diagnóstico e correção (múltipla escolha). Errar um passo custa 15% de integridade, explica o porquê e deixa tentar de novo.
+
+| Campo | Formato |
+|-------|---------|
+| `host` | nome do equipamento no prompt (`SW-CORE` vira `SW-CORE#`) |
+| `intro` | HTML com o sintoma e o contexto |
+| `cmds` | lista de `{ "c", "out", "why", "alias"? }`: comando, saída exata, o que ele mostra e formas curtas aceitas |
+| `steps` | lista de passos no formato do quiz (`q`, `o`, `a`, `why`) e, opcionalmente, `run` e `out`: o comando e a saída que aparecem no terminal quando o passo é acertado (a correção sendo aplicada) |
+
+- `"?"` lista os comandos e `"clear"` limpa a tela; comando fora da lista mostra erro de terminal, sem perder vida.
+- A saída é mostrada exatamente como está (`\n` quebra linha, espaços alinham tabelas). Copie de um equipamento real sempre que puder.
+- O `why` de cada comando aparece no painel na primeira vez que ele roda: é a aula do comando.
+
+```json
+{
+  "title": "Porta em err-disabled",
+  "tag": "TERMINAL",
+  "type": "term",
+  "loc": "rack",
+  "host": "SW-ACESSO",
+  "cap": "Plugando o console no switch de acesso...",
+  "goal": "Descubra por que a impressora do RH sumiu e devolva a porta.",
+  "intro": "A impressora do RH na <b>Gi1/0/7</b> parou. Investigue o <b>SW-ACESSO</b>.",
+  "z": "Pluguei um notebook na porta da impressora. Seu switch fez o resto.",
+  "me": "Port-security. Vamos ver o log.",
+  "lesson": [
+    "<b>err-disabled</b> é uma porta desligada por proteção, como o <b>port-security</b> ao ver um MAC não autorizado.",
+    "Para voltar: <b>shutdown</b> e <b>no shutdown</b> na interface, depois de remover a causa."
+  ],
+  "tip": "show interfaces status mostra err-disabled; show logging diz o motivo.",
+  "learn": "Port-security desligou a porta ao ver um MAC estranho. Tirar o equipamento intruso e dar shutdown/no shutdown devolve a porta.",
+  "cmds": [
+    { "c": "show interfaces status", "alias": ["sh int status"], "out": "Port      Status       Vlan\nGi1/0/7   err-disabled 30", "why": "err-disabled = porta desligada por uma proteção do switch." },
+    { "c": "show logging", "alias": ["sh log"], "out": "%PORT_SECURITY-2-PSECURE_VIOLATION: Security violation occurred, caused by MAC address 3c22.fb11.0a7e on port GigabitEthernet1/0/7.", "why": "O log diz qual proteção agiu e por quê." }
+  ],
+  "steps": [
+    {
+      "q": "Por que a porta caiu?", "a": 0,
+      "o": ["Port-security viu um MAC não autorizado", { "t": "Cabo com defeito", "why": "Cabo ruim aparece como notconnect, não err-disabled." }],
+      "why": "A violação de port-security colocou a porta em err-disabled."
+    },
+    {
+      "q": "Depois de tirar o notebook intruso, como devolver a porta?", "a": 0,
+      "o": ["shutdown e no shutdown na interface", { "t": "reload no switch", "why": "Derruba todo mundo para resolver uma porta." }],
+      "why": "Desligar e ligar a interface tira o estado err-disabled.",
+      "run": "interface Gi1/0/7\n shutdown\n no shutdown", "out": "%LINK-3-UPDOWN: Interface GigabitEthernet1/0/7, changed state to up"
+    }
+  ]
+}
+```
+
+---
+
 ## Checklist antes do pull request
 
 - [ ] `node tools/validar-fases.mjs` sem erros nem avisos.
