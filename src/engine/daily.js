@@ -91,7 +91,8 @@ const GEN = {
 export function questions(d) {
   const r = rng('noc-' + d);
   // Perguntas das fases, menos as que os geradores já cobrem (evita duas de hosts no mesmo dia).
-  const pool = LEVELS.filter(L => L.type === 'quiz').flatMap(L => L.qs).filter(q => !/^(Quantos hosts úteis|Qual a wildcard)/.test(q.q));
+  // "dailyFrom" (AAAA-MM-DD) segura um quiz novo fora do sorteio até essa data, sem mudar o desafio do dia em curso.
+  const pool = LEVELS.filter(L => L.type === 'quiz' && !(L.dailyFrom && d < L.dailyFrom)).flatMap(L => L.qs).filter(q => !/^(Quantos hosts úteis|Qual a wildcard)/.test(q.q));
   const gens = sh(r, Object.keys(GEN)).slice(0, N - 2).map(k => GEN[k](r));
   return sh(r, [...sh(r, pool).slice(0, 2), ...gens]);
 }

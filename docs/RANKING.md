@@ -6,7 +6,7 @@ O jogo grava e lê o ranking direto do navegador pela API REST do [Supabase](htt
 
 ## O que aparece no ranking
 
-- **Campanha:** a melhor soma de pontos das 15 fases de cada jogador, com as estrelas.
+- **Campanha:** a melhor soma de pontos de todas as fases de cada jogador, com as estrelas.
 - **Desafio de hoje:** a pontuação do desafio diário do dia (horário de Brasília).
 
 Ao iniciar o primeiro turno (ou o primeiro desafio diário), o jogo pergunta nome e LinkedIn, **ambos opcionais**:

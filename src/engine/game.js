@@ -135,7 +135,8 @@ function win() {
   S.prog[K(S.cur)] = Math.max(S.prog[K(S.cur)] || 0, st);
   S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
   submitCampaign();
-  const last = S.cur === LEVELS.length - 1;
+  // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
+  const last = !!L.boss, more = S.cur < LEVELS.length - 1;
   let delay = 650;
   if (L.boss) {
     delay = 3600; stopMusic();
@@ -161,11 +162,11 @@ function win() {
       ${reviewHTML()}
       ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}
       ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
-      <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${last ? `<button class="btn" id="mAgain">JOGAR DE NOVO</button>` : `<button class="btn" id="mNext">PRÓXIMA</button>`}</div>`);
+      <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`);
     $('mMap').onclick = () => { closeModal(); goMap(); };
     if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${location.origin + location.pathname}`, e.currentTarget); };
-    if (last) $('mAgain').onclick = () => { closeModal(); startLevel(S.cur); };
-    else $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
+    if (more) $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
+    else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur); };
   }, delay);
 }
 function fail(msg) {

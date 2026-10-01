@@ -39,6 +39,8 @@ function showWho() {
 hooks.profile = () => { showWho(); titleRanking(dailyBoard()); };
 showWho();
 $('tWhoEdit').onclick = () => profileForm();
+// Mapa → tela inicial, com resumo e ranking atualizados.
+$('homeBtn').onclick = () => { showProgress(); showWho(); titleRanking(dailyBoard()); show('title'); };
 document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openRanking(dailyBoard()); });
 loadNews().catch(e => { console.error(e); $('news').hidden = true; $('newsBtn').hidden = true; });
 

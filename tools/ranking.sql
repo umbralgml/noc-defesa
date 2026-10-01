@@ -9,12 +9,18 @@ create table if not exists public.ranking (
   linkedin   text        check (linkedin is null or linkedin ~ '^https://www\.linkedin\.com/in/[A-Za-z0-9_-]{3,100}$'),
   board      text        not null check (board = 'campanha' or board ~ '^dia-\d{4}-\d{2}-\d{2}$'),
   score      integer     not null check (score >= 0),
-  stars      integer     not null default 0 check (stars between 0 and 45),
+  stars      integer     not null default 0,
   hidden     boolean     not null default false,         -- moderação: marque true para esconder
   created_at timestamptz not null default now(),
-  -- Tetos plausíveis: campanha (15 fases) e desafio diário (5 perguntas + bônus).
-  check ((board = 'campanha' and score <= 50000) or (board <> 'campanha' and score <= 3000))
+  -- Tetos com folga para fases futuras: campanha e desafio diário (5 perguntas + bônus).
+  constraint ranking_stars_check check (stars between 0 and 300),
+  constraint ranking_check check ((board = 'campanha' and score <= 200000) or (board <> 'campanha' and score <= 3000))
 );
+-- Atualiza os limites de bancos criados pela versão anterior deste arquivo (até 15 fases).
+alter table public.ranking drop constraint if exists ranking_stars_check;
+alter table public.ranking add constraint ranking_stars_check check (stars between 0 and 300);
+alter table public.ranking drop constraint if exists ranking_check;
+alter table public.ranking add constraint ranking_check check ((board = 'campanha' and score <= 200000) or (board <> 'campanha' and score <= 3000));
 create index if not exists ranking_board_score on public.ranking (board, score desc);
 
 alter table public.ranking enable row level security;
