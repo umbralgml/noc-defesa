@@ -21,16 +21,26 @@
 <div id="app">
 
   <div class="screen on" id="title">
-    <div class="scene title" id="tScene"></div>
-    <div class="content">
-      <h1 class="logo">NOC</h1>
-      <div class="slogan">ÚLTIMA LINHA DE DEFESA</div>
-      <p class="story">03:12 da madrugada. O grupo <b style="color:var(--z)">Z3R0</b> invadiu o telão do NOC e lançou um ataque contra o provedor. Você é o analista de plantão. Religue o rack, feche o firewall e cace o invasor antes que a rede caia.</p>
-      <button class="btn" id="goMap">INICIAR TURNO</button>
-      <div class="row" style="justify-content:center;margin-top:12px"><button class="btn ghostb" id="sndT" style="flex:0 0 auto;padding:10px 16px;font-size:11px">SOM: ON</button></div>
-      <button class="reset" id="resetBtn">Zerar progresso</button>
-      <div class="credit">criado por <b>Marcos dos Anjos</b> · redes, infra e segurança</div>
+    <div class="tmain">
+      <div class="scene title" id="tScene"></div>
+      <div class="content">
+        <h1 class="logo">NOC</h1>
+        <div class="slogan">ÚLTIMA LINHA DE DEFESA</div>
+        <p class="story">03:12 da madrugada. O grupo <b style="color:var(--z)">Z3R0</b> invadiu o telão do NOC e lançou um ataque contra o provedor. Você é o analista de plantão. Religue o rack, feche o firewall e cace o invasor antes que a rede caia.</p>
+        <div class="tprog" id="tProg"></div>
+        <button class="btn" id="goMap">INICIAR TURNO</button>
+        <div class="row" style="justify-content:center;margin-top:12px">
+          <button class="btn ghostb tsmall" id="sndT">SOM: ON</button>
+          <button class="btn ghostb tsmall" id="newsBtn">NOVIDADES <span class="ndot" id="newsDot"></span></button>
+          <button class="btn ghostb tsmall" id="resetBtn">ZERAR PROGRESSO</button>
+        </div>
+        <div class="credit">criado por <b>Marcos dos Anjos</b> · redes, infra e segurança</div>
+      </div>
     </div>
+    <aside class="news" id="news" aria-label="Atualizações do jogo">
+      <div class="newsh"><span>LOG DE MUDANÇAS</span><b>Atualizações do NOC</b></div>
+      <div class="tl" id="newsList"></div>
+    </aside>
   </div>
 
   <div class="screen" id="map">

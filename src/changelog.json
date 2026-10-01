@@ -1,0 +1,39 @@
+{
+  "versions": [
+    {
+      "v": "1.2",
+      "date": "2026-10-01",
+      "title": "Sala de espera do plantão",
+      "items": [
+        "Tela inicial nova, com esta linha do tempo de atualizações",
+        "Botão de zerar progresso mais visível, também no fim do mapa",
+        "A confirmação mostra quantas estrelas e pontos serão apagados",
+        "Resumo do seu progresso na tela inicial"
+      ]
+    },
+    {
+      "v": "1.1",
+      "date": "2026-09-30",
+      "title": "O NOC precisa treinar alguém",
+      "items": [
+        "Aula rápida no briefing de cada fase",
+        "Explicação a cada jogada, acertando ou errando",
+        "No quiz, o porquê de a sua alternativa não servir",
+        "Revisão dos erros no fim da fase",
+        "Código aberto: dá para criar fase nova editando um JSON"
+      ]
+    },
+    {
+      "v": "1.0",
+      "date": "2026-09-28",
+      "title": "O Z3R0 ataca",
+      "items": [
+        "15 fases em 4 atos: cabeamento, endereçamento, firewall, DDoS, switching, BGP e resposta a incidente",
+        "3 tipos de desafio: ligar cabos, arrastar e soltar, quiz",
+        "Chefe final ao vivo contra o Z3R0, com cronômetro",
+        "Estrelas, pontos e combo",
+        "Trilha e efeitos sonoros sintetizados no navegador"
+      ]
+    }
+  ]
+}

@@ -42,6 +42,7 @@ Qualquer servidor estático serve (`npx serve`, extensão Live Server do VS Code
 index.html          telas do jogo (HTML) e carregamento do CSS/JS
 src/style.css       todo o visual
 src/main.js         ponto de entrada
+src/changelog.json  histórico de atualizações mostrado na tela inicial
 src/engine/         motor do jogo em ES modules (cenas, áudio, tipos de fase, fluxo)
 src/levels/         fases em JSON, um arquivo por ato
 tools/              validador opcional das fases
