@@ -8,7 +8,7 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 15 fases em 4 atos:
+São 19 fases em 5 atos:
 
 | Ato | Tema | Fases |
 |-----|------|-------|
@@ -16,6 +16,7 @@ São 15 fases em 4 atos:
 | 2 | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, mitigação de DDoS |
 | 3 | Switching e BGP | VLAN hopping, filtro de cliente BGP, sequestro de prefixo e RPKI |
 | 4 | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM e o chefe final |
+| 5 | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
 
 O jogo foi feito para ensinar, não só para testar:
 

@@ -218,6 +218,7 @@ Perguntas de múltipla escolha. As opções são embaralhadas na tela.
 | `o` | opções: `"texto"` ou `{ "t": "texto", "why": "por que está errada" }` |
 | `a` | índice da opção correta em `o` (começa em 0) |
 | `why` | explicação da resposta certa, mostrada sempre |
+| `dailyFrom` | opcional, `AAAA-MM-DD`: as perguntas só entram no sorteio do desafio diário a partir dessa data (use o dia seguinte ao da publicação, para não mudar o desafio do dia) |
 | `boss` | opcional, `true` transforma em chefe: barra de vida do Z3R0, precisa acertar 70% e cada erro custa 20% |
 | `time` | obrigatório com `boss`: segundos por pergunta |
 

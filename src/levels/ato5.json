@@ -1,0 +1,414 @@
+{
+  "tag": "ATO 5",
+  "name": "IPv6, Wi-Fi e serviços",
+  "levels": [
+    {
+      "title": "Endereços IPv6",
+      "tag": "IPV6",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo a tabela de vizinhos IPv6...",
+      "heads": [
+        "ENDEREÇO",
+        "TIPO"
+      ],
+      "goal": "Ligue cada endereço IPv6 ao seu tipo.",
+      "z": "Voltei. Agora pelo IPv6, que o seu firewall nem olha. Aposto que você nem sabe ler esses endereços.",
+      "me": "Endereço IPv6 se lê pelo começo. É só olhar o prefixo.",
+      "lesson": [
+        "IPv6 tem <b>128 bits</b>, escritos em 8 grupos de 4 dígitos hexadecimais separados por <b>:</b>.",
+        "Para encurtar: os zeros à esquerda de cada grupo somem, e <b>uma</b> sequência de grupos zerados vira <b>::</b> (só uma vez por endereço).",
+        "Os primeiros dígitos dizem o tipo: <b>2 ou 3</b> = global (internet), <b>fe80</b> = link-local, <b>fc/fd</b> = ULA (privado), <b>ff</b> = multicast, <b>::1</b> = loopback.",
+        "<b>2001:db8::/32</b> é reservado para documentação: aparece em livros e exemplos, nunca numa rede de verdade.",
+        "IPv6 não tem broadcast. Quem faz esse papel é o multicast, como <b>ff02::1</b> (todos os nós do enlace)."
+      ],
+      "tip": "Olhe o começo: 2 ou 3 é global, fe80 é link-local, fd é ULA, ff é multicast, ::1 é loopback e 2001:db8 é documentação.",
+      "learn": "Classificar IPv6 é ler o prefixo: ::1/128 loopback, fe80::/10 link-local, fc00::/7 ULA, ff00::/8 multicast e 2000::/3 global unicast. 2001:db8::/32 é só para documentação (RFC 3849).",
+      "left": [
+        {
+          "id": "a",
+          "t": "::1",
+          "s": "Responde só na própria máquina",
+          "why": "::1 é o loopback do IPv6, o equivalente ao 127.0.0.1."
+        },
+        {
+          "id": "b",
+          "t": "fe80::1a2b:3cff:fe4d:5e6f",
+          "s": "Aparece em toda interface",
+          "why": "fe80::/10 é link-local: toda interface IPv6 gera um sozinha, e ele não atravessa roteador."
+        },
+        {
+          "id": "c",
+          "t": "2804:7f4:8000::10",
+          "s": "Servidor web do provedor",
+          "why": "Começa com 2: está em 2000::/3, o global unicast, roteável na internet."
+        },
+        {
+          "id": "d",
+          "t": "fd12:3456:789a::1",
+          "s": "Rede interna do laboratório",
+          "why": "fc00::/7 é ULA (Unique Local), o \"privado\" do IPv6. Na prática se usa fd00::/8."
+        },
+        {
+          "id": "e",
+          "t": "ff02::1",
+          "s": "Destino de um anúncio",
+          "why": "ff00::/8 é multicast. ff02::1 é \"todos os nós do enlace\", o que faz o papel do broadcast."
+        },
+        {
+          "id": "f",
+          "t": "2001:db8::bad",
+          "s": "Visto num slide",
+          "why": "2001:db8::/32 é reservado para documentação e exemplos (RFC 3849). Nunca deveria aparecer na internet."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Loopback",
+          "s": "",
+          "why": "Loopback é só o ::1, o próprio host."
+        },
+        {
+          "id": "b",
+          "t": "Link-local",
+          "s": "",
+          "why": "Link-local começa com fe80 (fe80::/10)."
+        },
+        {
+          "id": "c",
+          "t": "Global unicast",
+          "s": "",
+          "why": "Global unicast é 2000::/3 (começa com 2 ou 3), tirando as faixas reservadas como 2001:db8::/32."
+        },
+        {
+          "id": "d",
+          "t": "ULA (privado)",
+          "s": "",
+          "why": "ULA começa com fc ou fd (fc00::/7)."
+        },
+        {
+          "id": "e",
+          "t": "Multicast",
+          "s": "",
+          "why": "Multicast começa com ff (ff00::/8)."
+        },
+        {
+          "id": "f",
+          "t": "Documentação",
+          "s": "",
+          "why": "Documentação é o bloco 2001:db8::/32."
+        }
+      ]
+    },
+    {
+      "title": "Plano IPv6",
+      "tag": "SUB-REDES IPV6",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "cap": "Recebendo o bloco IPv6 do provedor...",
+      "goal": "Monte o plano IPv6 do NOC a partir do bloco /48.",
+      "intro": "O provedor entregou o bloco <b>2001:db8:cafe::/48</b>. Planeje as redes do NOC.",
+      "z": "Seu endereçamento IPv6 é uma bagunça. Vou me esconder num desses trilhões de endereços.",
+      "me": "Com uma /64 por VLAN e o número no 4º grupo, eu acho qualquer rede.",
+      "lesson": [
+        "Em IPv6 não se economiza endereço: <b>toda rede local é /64</b>. É o tamanho que o SLAAC precisa para o host montar o próprio endereço.",
+        "O provedor entrega um bloco maior, como <b>/48</b> para empresa ou <b>/56</b> para casa, e você divide em várias /64.",
+        "Cada bit a mais dobra o número de redes: de /48 para /64 são 16 bits, então 2^16 = <b>65.536</b> redes /64.",
+        "Num /48, o <b>4º grupo</b> numera as redes: 2001:db8:cafe:<b>10</b>::/64 é a rede 10.",
+        "Para encurtar: tire os zeros à esquerda e troque <b>uma</b> sequência de grupos zerados por <b>::</b>."
+      ],
+      "tip": "LAN é sempre /64. De /48 para /64 são 16 bits = 65.536 redes. O número da rede vai no 4º grupo. :: só uma vez. Link-local é fe80::/10. Casa costuma receber /56.",
+      "learn": "Plano IPv6 típico: bloco /48 do provedor, uma /64 por VLAN usando o 4º grupo (2001:db8:cafe:10::/64 para a VLAN 10) e link-local fe80::/10 em toda interface. Cliente residencial recebe /56, ou seja, 256 redes /64.",
+      "html": "<div class=\"kv\">Tamanho de cada rede local (LAN)<span class=\"grow\"></span>[lan]</div>\n<div class=\"kv\">Redes /64 dentro do /48<span class=\"grow\"></span>[n]</div>\n<div class=\"kv\">Prefixo da VLAN 10<span class=\"grow\"></span>[v10]</div>\n<div class=\"kv\">Forma curta de 2001:0db8:0000:0000:0000:0000:0000:0001<span class=\"grow\"></span>[short]</div>\n<div class=\"kv\">Prefixo link-local de toda interface<span class=\"grow\"></span>[ll]</div>\n<div class=\"kv\">Bloco típico de um cliente residencial<span class=\"grow\"></span>[res]</div>",
+      "zones": {
+        "lan": [
+          "/64"
+        ],
+        "n": [
+          "65.536"
+        ],
+        "v10": [
+          "2001:db8:cafe:10::/64"
+        ],
+        "short": [
+          "2001:db8::1"
+        ],
+        "ll": [
+          "fe80::/10"
+        ],
+        "res": [
+          "/56"
+        ]
+      },
+      "explain": {
+        "lan": "Toda LAN IPv6 é /64: é o que o SLAAC precisa.",
+        "n": "De /48 para /64 sobram 16 bits: 2^16 = 65.536 redes.",
+        "v10": "O 4º grupo numera a rede dentro do /48: cafe:10 é a VLAN 10.",
+        "short": "0db8 vira db8, e os seis grupos zerados viram ::.",
+        "ll": "fe80::/10 é link-local, presente em toda interface IPv6.",
+        "res": "Prática comum para casa: /56, que dá 256 redes /64."
+      },
+      "chips": [
+        {
+          "t": "/64",
+          "why": "Tamanho padrão de uma LAN IPv6: é o que o SLAAC exige."
+        },
+        {
+          "t": "/48",
+          "why": "/48 é o bloco inteiro do NOC, não uma LAN."
+        },
+        {
+          "t": "/24",
+          "why": "/24 é tamanho de rede IPv4. Em IPv6 a LAN é /64."
+        },
+        {
+          "t": "65.536",
+          "why": "De /48 para /64 são 16 bits: 2^16 = 65.536 redes."
+        },
+        {
+          "t": "256",
+          "why": "256 é o número de /64 dentro de um /56, não de um /48."
+        },
+        {
+          "t": "16",
+          "why": "16 é a quantidade de bits entre /48 e /64, não a quantidade de redes."
+        },
+        {
+          "t": "2001:db8:cafe:10::/64",
+          "why": "O 4º grupo identifica a rede dentro do /48."
+        },
+        {
+          "t": "2001:db8:cafe::10/64",
+          "why": "Aqui o 10 caiu na parte de host, no fim do endereço. Essa seria a rede cafe:0."
+        },
+        {
+          "t": "2001:db8::1",
+          "why": "Forma curta: zeros à esquerda somem e os grupos zerados viram ::."
+        },
+        {
+          "t": "2001:db8:::1",
+          "why": "Três dois-pontos não existem. O :: aparece uma vez, com dois pontos."
+        },
+        {
+          "t": "2001:db8:0:1",
+          "why": "Sem o ::, o endereço precisa ter os 8 grupos. Aqui faltam quatro."
+        },
+        {
+          "t": "fe80::/10",
+          "why": "Link-local: toda interface IPv6 gera um sozinha."
+        },
+        {
+          "t": "fc00::/7",
+          "why": "fc00::/7 é ULA, o privado. Link-local é fe80::/10."
+        },
+        {
+          "t": "/56",
+          "why": "Prática comum para cliente residencial: /56, que dá 256 redes /64."
+        },
+        {
+          "t": "/128",
+          "why": "/128 é um único endereço. O cliente precisa de várias redes /64."
+        }
+      ]
+    },
+    {
+      "title": "Wi-Fi blindado",
+      "tag": "WI-FI",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Auditando os pontos de acesso Wi-Fi...",
+      "goal": "Classifique cada configuração de Wi-Fi como segura ou vulnerável.",
+      "intro": "O Z3R0 está no estacionamento tentando entrar pelo Wi-Fi. Separe as configurações <b>seguras</b> das <b>vulneráveis</b>.",
+      "z": "Estou no estacionamento com uma antena direcional. Seu Wi-Fi vai me deixar entrar.",
+      "me": "Não com WPA3, PMF e WPS desligado.",
+      "lesson": [
+        "<b>WEP</b> e <b>WPA com TKIP</b> estão quebrados. O mínimo hoje é <b>WPA2 com AES</b>, e o ideal é <b>WPA3</b>.",
+        "<b>WPA3-Personal (SAE)</b> usa um handshake que resiste a ataque de dicionário offline: capturar o tráfego não entrega a senha.",
+        "Em empresa, use <b>Enterprise (802.1X)</b>: cada pessoa tem login próprio, validado num servidor RADIUS.",
+        "<b>WPS</b> tem um PIN de 8 dígitos que cai por força bruta. Desligue.",
+        "<b>PMF (802.11w)</b> protege os quadros de gerência contra o ataque de desautenticação. Esconder o SSID <b>não</b> é segurança."
+      ],
+      "tip": "Seguro: WPA3, 802.1X, PMF, visitantes isolados e firmware em dia. Vulnerável: WEP, TKIP, WPS, senha padrão e SSID oculto como \"proteção\".",
+      "learn": "Wi-Fi seguro vem em camadas: WPA3-SAE ou 802.1X, PMF obrigatório, WPS desligado, visitantes isolados e firmware atualizado. WEP, TKIP e senha padrão entregam a rede; SSID oculto é só obscuridade.",
+      "buckets": [
+        {
+          "label": "SEGURO",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "WPA3-Personal (SAE)",
+              "why": "O SAE resiste a ataque de dicionário offline: capturar o handshake não basta para descobrir a senha."
+            },
+            {
+              "t": "WPA2/WPA3-Enterprise com 802.1X",
+              "why": "Cada usuário entra com a própria credencial via RADIUS. Desligou alguém, só aquela conta cai."
+            },
+            {
+              "t": "Rede de visitantes isolada da interna",
+              "why": "Visitante só chega à internet. O notebook de terceiro não enxerga seus servidores."
+            },
+            {
+              "t": "PMF (802.11w) obrigatório",
+              "why": "Protege os quadros de gerência e impede o deauth que derruba os clientes."
+            },
+            {
+              "t": "Firmware do AP atualizado",
+              "why": "Corrige falhas conhecidas, como o KRACK do WPA2."
+            }
+          ]
+        },
+        {
+          "label": "VULNERÁVEL",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "WEP",
+              "why": "WEP é quebrado em minutos com ferramentas prontas. Não existe WEP seguro."
+            },
+            {
+              "t": "WPS ativado",
+              "why": "O PIN do WPS cai por força bruta e entrega a senha da rede."
+            },
+            {
+              "t": "WPA2 com TKIP",
+              "why": "TKIP é legado e vulnerável. WPA2 deve usar só AES (CCMP)."
+            },
+            {
+              "t": "Senha padrão do fabricante no AP",
+              "why": "Senhas padrão estão em listas públicas: é a primeira tentativa de qualquer atacante."
+            },
+            {
+              "t": "Esconder o SSID como proteção",
+              "why": "Os próprios clientes anunciam o nome da rede ao procurar por ela. Esconder o SSID não protege nada."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Serviços de base",
+      "tag": "QUIZ",
+      "type": "quiz",
+      "loc": "war",
+      "cap": "Os serviços da rede começaram a falhar...",
+      "dailyFrom": "2026-10-02",
+      "goal": "Responda sobre DHCP, DNS e NTP para restaurar os serviços de base da rede.",
+      "z": "Derrubei seu DHCP, envenenei o cache do DNS e atrasei seus relógios. Boa sorte investigando.",
+      "me": "DHCP, DNS e NTP são a base. Eu conheço cada um.",
+      "lesson": [
+        "<b>DHCP</b> entrega IP, máscara, gateway e DNS. A conversa tem 4 passos: <b>D</b>iscover, <b>O</b>ffer, <b>R</b>equest, <b>A</b>ck (DORA).",
+        "<b>DHCP snooping</b> no switch só aceita respostas DHCP vindas de portas confiáveis: barra o servidor DHCP pirata.",
+        "<b>DNS</b> traduz nomes. Registros principais: <b>A</b> (IPv4), <b>AAAA</b> (IPv6), <b>CNAME</b> (apelido), <b>MX</b> (e-mail) e <b>PTR</b> (reverso).",
+        "Toda resposta DNS tem um <b>TTL</b>: quanto tempo ela pode ficar em cache.",
+        "<b>NTP</b> sincroniza os relógios. Sem ele, os logs de máquinas diferentes não batem e a investigação vira adivinhação."
+      ],
+      "tip": "DORA. Servidor DHCP pirata se barra com DHCP snooping. IPv6 no DNS é AAAA. Mudança de DNS demorando é TTL. Relógio é NTP.",
+      "learn": "Os serviços de base sustentam tudo: DHCP (DORA, protegido por DHCP snooping), DNS (A, AAAA, MX, PTR e o TTL que controla o cache) e NTP, que mantém os logs alinhados para qualquer investigação.",
+      "qs": [
+        {
+          "q": "Em que ordem acontecem as mensagens do DHCP?",
+          "a": 0,
+          "o": [
+            "Discover, Offer, Request, Ack",
+            {
+              "t": "Request, Offer, Discover, Ack",
+              "why": "O cliente primeiro procura um servidor (Discover). Só depois pede (Request)."
+            },
+            {
+              "t": "Offer, Discover, Ack, Request",
+              "why": "O servidor só oferece depois que o cliente pergunta."
+            },
+            {
+              "t": "Discover, Request, Offer, Ack",
+              "why": "O cliente só pode pedir (Request) o que foi oferecido (Offer)."
+            }
+          ],
+          "why": "DORA: Discover, Offer, Request, Ack. O cliente procura, o servidor oferece, o cliente pede e o servidor confirma."
+        },
+        {
+          "q": "Alguém ligou um roteador doméstico na rede e ele está distribuindo IP errado por DHCP. O que bloqueia isso no switch?",
+          "a": 0,
+          "o": [
+            "DHCP snooping",
+            {
+              "t": "Port mirroring",
+              "why": "Port mirroring copia tráfego para análise. Não bloqueia nada."
+            },
+            {
+              "t": "Spanning Tree",
+              "why": "STP evita loops de camada 2. Não olha DHCP."
+            },
+            {
+              "t": "Trocar a native VLAN",
+              "why": "A native VLAN não tem relação com servidor DHCP falso."
+            }
+          ],
+          "why": "DHCP snooping só deixa respostas DHCP saírem de portas confiáveis, as do servidor real. Um servidor pirata numa porta de usuário é descartado."
+        },
+        {
+          "q": "Qual registro DNS aponta um nome para um endereço IPv6?",
+          "a": 0,
+          "o": [
+            "AAAA",
+            {
+              "t": "A",
+              "why": "O registro A aponta para IPv4."
+            },
+            {
+              "t": "PTR",
+              "why": "PTR faz o caminho inverso: de IP para nome."
+            },
+            {
+              "t": "MX",
+              "why": "MX indica o servidor de e-mail do domínio."
+            }
+          ],
+          "why": "AAAA (\"quad A\") guarda o IPv6; o A guarda o IPv4."
+        },
+        {
+          "q": "Você trocou o IP do site no DNS, mas metade dos usuários ainda cai no IP antigo. O que explica?",
+          "a": 0,
+          "o": [
+            "O TTL: os resolvers guardam a resposta antiga até ela expirar",
+            {
+              "t": "O DNS só atualiza à meia-noite",
+              "why": "Não existe horário fixo: cada resposta vale pelo TTL dela."
+            },
+            {
+              "t": "Falta reiniciar o servidor web",
+              "why": "O problema é a resposta antiga guardada no cache do DNS, não o servidor web."
+            },
+            {
+              "t": "O registro MX está errado",
+              "why": "MX é de e-mail. Não afeta o acesso ao site."
+            }
+          ],
+          "why": "Toda resposta DNS tem um TTL. Até ele vencer, resolvers e clientes reaproveitam a resposta em cache. Antes de uma migração, baixe o TTL."
+        },
+        {
+          "q": "Os logs de dois servidores estão com 7 minutos de diferença. Por que isso atrapalha a investigação, e o que resolve?",
+          "a": 0,
+          "o": [
+            "Fica impossível correlacionar os eventos; o NTP sincroniza os relógios",
+            {
+              "t": "Só atrapalha o backup; o DHCP resolve",
+              "why": "DHCP entrega IP. Quem acerta relógio é o NTP."
+            },
+            {
+              "t": "Não atrapalha: o horário do log é só informativo",
+              "why": "Sem horário confiável não dá para montar a linha do tempo do ataque."
+            },
+            {
+              "t": "O DNS sincroniza os horários pelo TTL",
+              "why": "TTL é tempo de cache, não relógio."
+            }
+          ],
+          "why": "Com relógios desalinhados, a linha do tempo do incidente sai errada. O NTP (UDP 123) sincroniza todos com a mesma fonte. Kerberos e certificados também quebram com relógio errado."
+        }
+      ]
+    }
+  ]
+}

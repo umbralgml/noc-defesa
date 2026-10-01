@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.8",
+      "date": "2026-10-01",
+      "title": "Temporada 2",
+      "items": [
+        "Ato 5 com 4 fases novas: endereços IPv6, plano IPv6 com /48 e /64, Wi-Fi blindado e DHCP, DNS e NTP",
+        "Botão ⌂ no mapa para voltar à tela inicial",
+        "Fases que você já concluiu nunca ficam travadas, mesmo quando entra fase nova antes delas",
+        "Depois de derrotar o Z3R0, o jogo segue para a temporada 2"
+      ]
+    },
+    {
       "v": "1.7",
       "date": "2026-10-01",
       "title": "Plantão de bolso",

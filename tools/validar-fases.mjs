@@ -22,6 +22,7 @@ function check(L, where) {
   REQ.forEach(k => { if (L[k] === undefined || L[k] === '') err(`campo obrigatório "${k}" ausente`); });
   if (L.loc && !LOCS.includes(L.loc)) err(`loc "${L.loc}" inválido (use ${LOCS.join(', ')})`);
   if (!L.lesson || !L.lesson.length) warn('sem "lesson" (aula rápida do briefing)');
+  if (L.dailyFrom !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(L.dailyFrom)) err('"dailyFrom" precisa ser AAAA-MM-DD');
 
   if (L.type === 'wire') {
     const l = (L.left || []).map(p => p.id), r = (L.right || []).map(p => p.id);

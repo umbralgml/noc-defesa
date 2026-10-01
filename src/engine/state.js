@@ -22,7 +22,8 @@ export const resetProgress = () => { S.prog = {}; S.best = {}; save(); };
 
 // O progresso é indexado pelo TÍTULO da fase. Renomear uma fase apaga o progresso dela.
 export const K = i => LEVELS[i].title;
-export const unlocked = i => i === 0 || (S.prog[K(i - 1)] || 0) > 0;
+// Liberada: a primeira, as que já têm estrela (mesmo se entrou fase nova antes delas) e a seguinte de uma concluída.
+export const unlocked = i => i === 0 || (S.prog[K(i)] || 0) > 0 || (S.prog[K(i - 1)] || 0) > 0;
 
 // Resumo do progresso salvo: estrelas, pontos e fases concluídas.
 export function progress() {
