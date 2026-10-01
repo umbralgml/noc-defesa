@@ -34,6 +34,7 @@ export function floatTxt(x, y, t, c) {
 export function flash(el) { el.classList.remove('bad'); void el.offsetWidth; el.classList.add('bad'); setTimeout(() => el.classList.remove('bad'), 400); }
 
 // ---------- hud ----------
+const mult = () => Math.min(5, S.streak);
 export function setHP() {
   $('hpFill').style.width = S.hp + '%';
   $('hpFill').classList.toggle('low', S.hp <= 40);
@@ -41,9 +42,10 @@ export function setHP() {
 }
 export function setScore() {
   $('scoreTxt').textContent = fmt(S.score);
-  const c = $('comboTxt'); c.textContent = 'COMBO x' + S.combo;
-  c.classList.toggle('on', S.combo > 1);
-  c.classList.remove('pop'); void c.offsetWidth; if (S.combo > 1) c.classList.add('pop');
+  // Mostra o multiplicador que valeu na última jogada (some ao errar).
+  const m = mult(), c = $('comboTxt'); c.textContent = 'COMBO x' + m;
+  c.classList.toggle('on', m > 1);
+  c.classList.remove('pop'); void c.offsetWidth; if (m > 1) c.classList.add('pop');
 }
 let toastT;
 export function toast(msg, good) {
@@ -55,7 +57,7 @@ export function toast(msg, good) {
 
 // ---------- acerto / erro ----------
 export function damage(n, at) {
-  S.err++; S.combo = 1; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
+  S.err++; S.streak = 0; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
   sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450);
   const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');
   if (at) floatTxt(at.x, at.y, '-' + n + '%', '#ff4d6d');
@@ -63,8 +65,9 @@ export function damage(n, at) {
   if (S.hp <= 0) { S.busy = true; clearInterval(S.timer); setTimeout(() => flow.fail('A integridade da rede chegou a zero. O Z3R0 assumiu o controle.'), 650); }
 }
 export function good(at, color) {
-  const pts = 100 * S.combo;
-  S.score += pts; sfx.ok(S.combo); S.combo = Math.min(5, S.combo + 1); setScore();
+  S.streak++;
+  const pts = 100 * mult();
+  S.score += pts; sfx.ok(mult()); setScore();
   sceneFx('okf', 350); heroState('happy', 500);
   if (at) { burst(at.x, at.y, color || '#00e0a8'); floatTxt(at.x, at.y - 10, '+' + pts, color || '#00e0a8'); }
   if (Math.random() < .3) toast(PRAISE[Math.random() * PRAISE.length | 0], true);

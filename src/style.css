@@ -295,7 +295,15 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .learn b{display:block;font:800 10px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--acc);margin-bottom:5px}
 
 /* ---------- ensino: aula, explicações e revisão ---------- */
-.coach{display:none;gap:10px;align-items:flex-start;padding:9px 12px;border-bottom:1px solid var(--line);border-left:3px solid var(--acc);background:var(--panel2);font-size:12.5px;line-height:1.5;color:#c9d6ea;max-height:26%;overflow-y:auto;flex:0 0 auto}
+.lbar{flex:0 0 auto;border-bottom:1px solid var(--line);background:#0c1a2c}
+.lbh{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;background:none;border:none;padding:8px 12px;color:var(--warn);font:800 10px 'Orbitron',monospace;letter-spacing:1.5px}
+.lbh i{font-style:normal;color:var(--muted);font-size:9px}
+.lbb{max-height:min(15vh,130px);overflow-y:auto;padding:0 12px 10px;font-size:12.5px;line-height:1.5;color:#c9d6ea}
+.lbb ul{margin:0;padding-left:17px}
+.lbb li{margin:3px 0}
+.lbb li b{color:var(--text)}
+.lbar.shut .lbb{display:none}
+.coach{display:none;gap:10px;align-items:flex-start;padding:9px 12px;border-bottom:1px solid var(--line);border-left:3px solid var(--acc);background:var(--panel2);font-size:12.5px;line-height:1.5;color:#c9d6ea;max-height:20%;overflow-y:auto;flex:0 0 auto}
 .coach.on{display:flex;animation:pop .3s}
 .coach.bad{border-left-color:var(--bad)}
 .coach .k{flex:0 0 auto;font:800 9px 'Orbitron',monospace;letter-spacing:1px;color:var(--acc);padding-top:3px;white-space:nowrap}

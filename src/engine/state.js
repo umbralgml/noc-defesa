@@ -8,7 +8,7 @@ export const S = {
   prog: {}, best: {},       // estrelas e melhor pontuação por fase (chave = título)
   cur: 0, hp: 100, err: 0, placed: 0, need: 0, busy: false,
   lv: null,                 // fase em andamento (do mapa ou montada na hora, como o desafio diário)
-  pairs: [], timer: null, intro: [], score: 0, combo: 1,
+  pairs: [], timer: null, intro: [], score: 0, streak: 0,   // streak = acertos seguidos; multiplicador = min(5, streak)
   miss: []                  // erros da fase atual, mostrados na revisão: { t, why }
 };
 
