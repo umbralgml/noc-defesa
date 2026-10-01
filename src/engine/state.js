@@ -7,6 +7,7 @@ export const ACTS = [];     // [tag, nome] de cada ato, ex.: ['ATO 1', 'Camada f
 export const S = {
   prog: {}, best: {},       // estrelas e melhor pontuação por fase (chave = título)
   cur: 0, hp: 100, err: 0, placed: 0, need: 0, busy: false,
+  lv: null,                 // fase em andamento (do mapa ou montada na hora, como o desafio diário)
   pairs: [], timer: null, intro: [], score: 0, combo: 1,
   miss: []                  // erros da fase atual, mostrados na revisão: { t, why }
 };
@@ -22,3 +23,10 @@ export const resetProgress = () => { S.prog = {}; S.best = {}; save(); };
 // O progresso é indexado pelo TÍTULO da fase. Renomear uma fase apaga o progresso dela.
 export const K = i => LEVELS[i].title;
 export const unlocked = i => i === 0 || (S.prog[K(i - 1)] || 0) > 0;
+
+// Resumo do progresso salvo: estrelas, pontos e fases concluídas.
+export function progress() {
+  let stars = 0, pts = 0, done = 0;
+  LEVELS.forEach((L, i) => { const st = S.prog[K(i)] || 0; stars += st; pts += S.best[K(i)] || 0; if (st) done++; });
+  return { stars, pts, done, max: LEVELS.length * 3 };
+}

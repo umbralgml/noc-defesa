@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.3",
+      "date": "2026-10-01",
+      "title": "Plantão relâmpago",
+      "items": [
+        "Desafio diário: 5 perguntas por dia, iguais para todo mundo, com cronômetro e bônus de velocidade",
+        "Perguntas novas a cada dia: sub-rede, wildcard, faixas de IP e portas",
+        "Sequência de dias seguidos 🔥 e contagem para o próximo desafio",
+        "Compartilhe o resultado em quadradinhos 🟩🟥 e também a vitória contra o Z3R0"
+      ]
+    },
+    {
       "v": "1.2",
       "date": "2026-10-01",
       "title": "Sala de espera do plantão",

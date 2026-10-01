@@ -2,8 +2,9 @@
 import { $, fmt, center, buzz } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
-import { S, LEVELS, ACTS, K, unlocked, save, resetProgress } from './state.js';
-import { flow, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML } from './ui.js';
+import { S, LEVELS, ACTS, K, unlocked, save, resetProgress, progress } from './state.js';
+import { flow, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
+import { submitCampaign } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
 import { renderQuiz } from './quiz.js';
@@ -27,16 +28,10 @@ export function renderMap() {
     html += '</div>';
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
-  $('mapList').innerHTML = html;
+  $('mapList').innerHTML = '<div id="dailyBox"></div>' + html;
+  flow.map();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
-}
-
-// Resumo do progresso salvo: estrelas, pontos e fases concluídas.
-export function progress() {
-  let stars = 0, pts = 0, done = 0;
-  LEVELS.forEach((L, i) => { const st = S.prog[K(i)] || 0; stars += st; pts += S.best[K(i)] || 0; if (st) done++; });
-  return { stars, pts, done, max: LEVELS.length * 3 };
 }
 
 // Confirma antes de apagar. "after" atualiza a tela que chamou.
@@ -68,11 +63,14 @@ function cleanup() {
   resetDrop(); resetWire();
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
-function startLevel(i) {
+function startLevel(i) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title); }
+
+// Roda qualquer fase. Fases fora do mapa (S.cur = -1) não salvam estrelas e
+// podem trazer L.onWin(res) para tratar o fim do jeito delas.
+export function play(L, name) {
   cleanup();
-  const L = LEVELS[i];
-  Object.assign(S, { cur: i, hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, combo: 1, miss: [] });
-  $('lvName').textContent = (i + 1) + '. ' + L.title;
+  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, combo: 1, miss: [] });
+  $('lvName').textContent = name || L.title;
   setHP(); setScore(); hideCoach();
   $('stage').innerHTML = ''; $('bank').style.display = 'none';
   $('stage').classList.add('veil'); $('bank').classList.add('veil');
@@ -98,7 +96,7 @@ function typeCap(t) {
 }
 function finishIntro() {
   S.intro.forEach(clearTimeout); S.intro = [];
-  const L = LEVELS[S.cur], sc = $('scene'), hero = sc.querySelector('.hero');
+  const L = S.lv, sc = $('scene'), hero = sc.querySelector('.hero');
   heroTo(sc, HX[L.loc], true); hero.classList.remove('walk'); hero.classList.add('type');
   $('capTxt').textContent = LOCNAME[L.loc] + (L.boss ? ' · Z3R0 AO VIVO' : '');
   sc.classList.remove('big');
@@ -110,11 +108,18 @@ function finishIntro() {
 
 function win() {
   cleanup(); S.busy = true;
-  const L = LEVELS[S.cur], st = stars(), bonus = S.hp * 5, total = S.score + bonus;
+  const L = S.lv, st = stars(), bonus = S.hp * 5, total = S.score + bonus;
+  const hero = $('scene').querySelector('.hero');
+  if (L.onWin) {
+    sfx.win(); buzz([40, 60, 40]);
+    if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
+    setTimeout(() => L.onWin({ score: S.score, hp: S.hp, bonus, total }), 650);
+    return;
+  }
   S.prog[K(S.cur)] = Math.max(S.prog[K(S.cur)] || 0, st);
   S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
+  submitCampaign();
   const last = S.cur === LEVELS.length - 1;
-  const hero = $('scene').querySelector('.hero');
   let delay = 650;
   if (L.boss) {
     delay = 3600; stopMusic();
@@ -139,8 +144,10 @@ function win() {
       <div class="learn"><b>${last ? 'RELATÓRIO FINAL' : 'O QUE VOCÊ DEFENDEU'}</b>${L.learn}</div>
       ${reviewHTML()}
       ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}
+      ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
       <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${last ? `<button class="btn" id="mAgain">JOGAR DE NOVO</button>` : `<button class="btn" id="mNext">PRÓXIMA</button>`}</div>`);
     $('mMap').onclick = () => { closeModal(); goMap(); };
+    if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${location.origin + location.pathname}`, e.currentTarget); };
     if (last) $('mAgain').onclick = () => { closeModal(); startLevel(S.cur); };
     else $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
   }, delay);
@@ -149,11 +156,11 @@ function fail(msg) {
   cleanup(); sfx.lose(); stopMusic(); setTimeout(() => music('menu'), 2500);
   modal(`<div class="tag">FALHA NA DEFESA</div><h2>Rede comprometida</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${msg} Hahaha!</div></div>
-    <div class="learn"><b>DICA</b>${LEVELS[S.cur].tip}</div>
+    <div class="learn"><b>DICA</b>${S.lv.tip}</div>
     ${reviewHTML()}
     <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mRetry">TENTAR DE NOVO</button></div>`);
   $('mMap').onclick = () => { closeModal(); goMap(); };
-  $('mRetry').onclick = () => { closeModal(); startLevel(S.cur); };
+  $('mRetry').onclick = () => { closeModal(); if (S.cur >= 0) startLevel(S.cur); else goMap(); };
 }
 export function goMap() { cleanup(); renderMap(); show('map'); music('menu'); }
 
@@ -168,10 +175,10 @@ export function initGame() {
   $('backBtn').onclick = goMap;
   // Dica durante a fase: repete a aula e mostra a dica técnica.
   $('tipBtn').onclick = () => {
-    const L = LEVELS[S.cur];
+    const L = S.lv;
     modal(`<div class="tag">DICA TÉCNICA</div><h2>${L.title}</h2><div class="learn">${L.tip}</div>${lessonHTML(L)}<div class="row"><button class="btn ghostb" id="sndG">SOM: ${isMuted() ? 'OFF' : 'ON'}</button><button class="btn" id="mOk">ENTENDI</button></div>`);
     $('mOk').onclick = closeModal;
-    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(LEVELS[S.cur].boss ? 'boss' : 'play'); };
+    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(S.lv.boss ? 'boss' : 'play'); };
   };
   $('modal').addEventListener('click', e => { if (e.target.id === 'modal' && $('mcard').querySelector('#mCancel,#mOk,#mNo')) closeModal(); });
 }

@@ -4,8 +4,11 @@ import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
 import { AV_ME, HX, sceneSVG, heroTo } from './engine/scene.js';
 import { loadLevels } from './engine/levels.js';
 import { show } from './engine/ui.js';
-import { initGame, renderMap, askReset, progress } from './engine/game.js';
+import { initGame, renderMap, askReset } from './engine/game.js';
+import { progress } from './engine/state.js';
 import { loadNews, markNewsSeen } from './engine/news.js';
+import { initDaily, startDaily, dailyBoard } from './engine/daily.js';
+import { loadRankConfig, openRanking } from './engine/rank.js';
 import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
 
@@ -25,14 +28,17 @@ function showProgress() {
   el.innerHTML = p.done ? `Seu plantão: <b>★ ${p.stars}/${p.max}</b> · ${p.done}/${p.max / 3} fases` : '';
 }
 
-initGame(); initDrop(); initWire();
-loadNews().catch(e => { console.error(e); $('news').hidden = true; $('newsBtn').style.display = 'none'; });
+initGame(); initDrop(); initWire(); initDaily();
+loadRankConfig();
+document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openRanking(dailyBoard()); });
+loadNews().catch(e => { console.error(e); $('news').hidden = true; $('newsBtn').hidden = true; });
 
-const go = $('goMap');
-go.disabled = true;
+const go = $('goMap'), daily = $('dailyT');
+go.disabled = daily.disabled = true;
 try {
   await loadLevels();
-  go.disabled = false;
+  go.disabled = daily.disabled = false;
+  daily.onclick = () => { au(); markNewsSeen(); startDaily(); };
   showProgress();
   go.onclick = () => { au(); markNewsSeen(); renderMap(); show('map'); music('menu'); };
 } catch (e) {

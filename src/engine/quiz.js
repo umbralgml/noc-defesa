@@ -5,7 +5,7 @@ import { sfx } from './audio.js';
 import { S } from './state.js';
 import { good, damage, toast, note, ZHURT, flow } from './ui.js';
 
-let L = null;
+let L = null, left = 0;
 // Opção no JSON pode ser "texto" ou { "t": texto, "why": por que está errada }.
 const opt = o => typeof o === 'string' ? { t: o } : o;
 const bossPct = () => Math.max(0, 100 - S.hits / S.needHits * 100);
@@ -14,6 +14,7 @@ export function renderQuiz(level) {
   L = level;
   $('bank').style.display = 'none';
   S.qi = 0; S.hits = 0; S.needHits = L.boss ? Math.ceil(L.qs.length * .7) : L.qs.length;
+  S.qlog = []; S.left = 0;   // acerto de cada pergunta e segundos que sobraram nos acertos
   showQ();
 }
 
@@ -24,13 +25,13 @@ function showQ() {
   const st = $('stage');
   st.innerHTML = (L.boss ? `<div class="bossbar"><div class="b"><span>Z3R0 · CONEXÃO C2</span><div class="bb"><div id="bossFill" style="width:${bossPct()}%"></div></div></div></div>` : '')
     + `<div class="qmeta">PERGUNTA ${S.qi + 1}/${L.qs.length}${L.boss ? ' · ACERTOS ' + S.hits + '/' + S.needHits : ''}</div>`
-    + (L.boss ? `<div class="timer"><div id="tFill"></div></div>` : '')
+    + (L.time ? `<div class="timer"><div id="tFill"></div></div>` : '')
     + `<div class="q"></div><div id="opts"></div><div id="whyBox"></div>`;
   st.querySelector('.q').textContent = q.q;
   opts.forEach(o => { const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.t; b._ok = o.ok; b._why = o.why; b.onclick = () => answer(b); $('opts').append(b); });
   st.scrollTop = 0;
-  if (L.boss) {
-    let left = L.time * 1000;
+  left = (L.time || 0) * 1000;
+  if (L.time) {
     clearInterval(S.timer);
     S.timer = setInterval(() => {
       left -= 100;
@@ -45,6 +46,7 @@ function answer(btn) {
   if (S.busy) return;
   clearInterval(S.timer);
   const q = L.qs[S.qi], ok = !!(btn && btn._ok);
+  S.qlog.push(ok); if (ok && L.time) S.left += Math.max(0, Math.ceil(left / 1000));
   document.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (b._ok) b.classList.add('right'); });
   if (btn && !ok) btn.classList.add('wrong');
   const at = btn ? center(btn) : center($('stage'));

@@ -22,6 +22,7 @@ O jogo foi feito para ensinar, não só para testar:
 - **Aula rápida** no briefing de cada fase, com o conceito que você vai precisar. Ela também aparece no botão **?** durante a fase.
 - **Explicação na hora** de cada jogada, certa ou errada: por que aquele IP é público, por que aquela regra vem primeiro, por que aquela opção do quiz não serve.
 - **Revisão no fim da fase** com tudo o que você errou e a explicação de cada item.
+- **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar.
 
 ## Rodar localmente
 
@@ -43,10 +44,12 @@ index.html          telas do jogo (HTML) e carregamento do CSS/JS
 src/style.css       todo o visual
 src/main.js         ponto de entrada
 src/changelog.json  histórico de atualizações mostrado na tela inicial
+src/config.json     configuração do ranking (opcional, veja docs/RANKING.md)
 src/engine/         motor do jogo em ES modules (cenas, áudio, tipos de fase, fluxo)
 src/levels/         fases em JSON, um arquivo por ato
 tools/              validador opcional das fases
 docs/CRIAR-FASE.md  guia do formato das fases
+docs/RANKING.md     como ligar o ranking público (Supabase)
 ```
 
 ## Como contribuir

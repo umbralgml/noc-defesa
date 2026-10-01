@@ -29,8 +29,10 @@
         <p class="story">03:12 da madrugada. O grupo <b style="color:var(--z)">Z3R0</b> invadiu o telão do NOC e lançou um ataque contra o provedor. Você é o analista de plantão. Religue o rack, feche o firewall e cace o invasor antes que a rede caia.</p>
         <div class="tprog" id="tProg"></div>
         <button class="btn" id="goMap">INICIAR TURNO</button>
+        <button class="btn ghostb tdaily" id="dailyT">⚡ DESAFIO DIÁRIO</button>
         <div class="row" style="justify-content:center;margin-top:12px">
           <button class="btn ghostb tsmall" id="sndT">SOM: ON</button>
+          <button class="btn ghostb tsmall rankBtn" id="rankT" hidden>🏆 RANKING</button>
           <button class="btn ghostb tsmall" id="newsBtn">NOVIDADES <span class="ndot" id="newsDot"></span></button>
           <button class="btn ghostb tsmall" id="resetBtn">ZERAR PROGRESSO</button>
         </div>
@@ -48,6 +50,7 @@
       <div class="av" id="mA"></div>
       <div class="who"><b>ANALISTA DE PLANTÃO</b><span>Escolha o próximo incidente</span></div>
       <div class="starsTot" id="starsTot"></div>
+      <button class="iconbtn rankBtn" id="rankM" aria-label="Ranking" hidden>🏆</button>
       <button class="iconbtn sndbtn" id="sndM" aria-label="Som">♪</button>
     </div>
     <div class="mapList" id="mapList"></div>
