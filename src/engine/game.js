@@ -1,5 +1,5 @@
 // Fluxo do jogo: mapa, briefing, intro animada da fase, vitória, derrota e dica.
-import { $, fmt, center, buzz } from './util.js';
+import { $, fmt, center, buzz, store } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
 import { S, LEVELS, ACTS, K, unlocked, save, resetProgress, progress } from './state.js';
@@ -69,9 +69,9 @@ function startLevel(i) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title); }
 // podem trazer L.onWin(res) para tratar o fim do jeito delas.
 export function play(L, name) {
   cleanup();
-  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, combo: 1, miss: [] });
+  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [] });
   $('lvName').textContent = name || L.title;
-  setHP(); setScore(); hideCoach();
+  setHP(); setScore(); hideCoach(); lessonBar(L);
   $('stage').innerHTML = ''; $('bank').style.display = 'none';
   $('stage').classList.add('veil'); $('bank').classList.add('veil');
   show('game');
@@ -90,6 +90,21 @@ export function play(L, name) {
   S.intro.push(setTimeout(finishIntro, 2300));
   sc.onclick = () => { if (S.intro.length) finishIntro(); };
 }
+// Aula fixa durante a fase: aberta ou fechada conforme a última escolha do jogador.
+function lessonBar(L) {
+  const bar = $('lbar');
+  bar.hidden = !L.lesson;
+  if (!L.lesson) return;
+  $('lbb').innerHTML = `<ul>${L.lesson.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  setLesson(store('noc_lesson') !== false);
+}
+function setLesson(open) {
+  $('lbar').classList.toggle('shut', !open);
+  $('lbh').setAttribute('aria-expanded', open);
+  $('lbi').textContent = open ? 'ESCONDER ▴' : 'MOSTRAR ▾';
+  $('lbb').scrollTop = 0;
+}
+
 function typeCap(t) {
   const el = $('capTxt'); let i = 0; el.textContent = '';
   const iv = setInterval(() => { if (!el.isConnected) return clearInterval(iv); el.textContent = t.slice(0, ++i); if (i >= t.length) clearInterval(iv); }, 28);
@@ -173,6 +188,7 @@ export function initGame() {
     au(); brief(i);
   });
   $('backBtn').onclick = goMap;
+  $('lbh').onclick = () => { const open = $('lbar').classList.contains('shut'); store('noc_lesson', open); setLesson(open); };
   // Dica durante a fase: repete a aula e mostra a dica técnica.
   $('tipBtn').onclick = () => {
     const L = S.lv;
