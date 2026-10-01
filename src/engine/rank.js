@@ -1,6 +1,7 @@
 // Ranking público opcional, gravado no Supabase pela API REST (sem SDK).
 // Fica desligado (botões escondidos) enquanto src/config.json não tiver url e key.
-// Setup do banco: docs/RANKING.md. Nome e LinkedIn só são enviados com consentimento.
+// Setup do banco: docs/RANKING.md. Todo jogador com perfil entra (anônimo por padrão);
+// nome e LinkedIn só são enviados com consentimento.
 import { $, esc, fmt, store as ls } from './util.js';
 import { progress } from './state.js';
 import { modal, closeModal } from './ui.js';
@@ -8,7 +9,11 @@ import { modal, closeModal } from './ui.js';
 let CFG = null;
 export const rankOn = () => !!CFG;
 
-export const profile = () => ls('noc_profile');
+export const profile = () => {
+  const p = ls('noc_profile');
+  if (p && p.consent === undefined) p.consent = !!p.name;   // perfis da v1.3 só existiam com consentimento
+  return p;
+};
 
 export async function loadRankConfig() {
   try {
@@ -47,7 +52,7 @@ async function api(path, opt = {}) {
 
 export async function submit(board, score, stars) {
   const p = profile(); if (!CFG || !p) return false;
-  await api('ranking', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ player: playerId(), name: p.name, linkedin: p.linkedin || null, board, score, stars }) });
+  await api('ranking', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ player: playerId(), name: publicName(), linkedin: publicLinkedin(), board, score, stars }) });
   return true;
 }
 
@@ -59,60 +64,78 @@ export function submitCampaign() {
   submit('campanha', p.pts, p.stars).then(() => ls('noc_rank_sent', p.pts)).catch(console.error);
 }
 
-// Callback do daily.js para reenviar o resultado de hoje quando o jogador entra no ranking.
-export const hooks = { joined() {} };
+// Ganchos: daily.js reenvia o resultado de hoje; main.js atualiza a tela inicial.
+export const hooks = { joined() {}, profile() {} };
+
+// Quem não informa nome aparece como "Analista #4F2A" (derivado do id anônimo do aparelho).
+export const anonName = () => 'Analista #' + playerId().replace(/-/g, '').slice(0, 4).toUpperCase();
+const isAnon = n => /^Analista #[0-9A-F]{4}$/.test(n || '');
+// Nome e LinkedIn só vão para o ranking público com consentimento.
+export const publicName = () => { const p = profile(); return p && p.consent && p.name ? p.name : anonName(); };
+const publicLinkedin = () => { const p = profile(); return p && p.consent && p.linkedin ? p.linkedin : null; };
+
+// Pede o perfil na primeira vez e depois segue para "next".
+export function ensureProfile(next) { if (profile()) next(); else profileForm(next, true); }
+
+export function profileForm(after, first) {
+  const p = profile() || {};
+  modal(`<div class="tag">IDENTIFICAÇÃO DO PLANTÃO</div><h2>${first ? 'Quem está de plantão?' : 'Seu perfil'}</h2>
+    <div class="fnote" style="margin-top:6px;font-size:13px;color:#c9d6ea">Como você quer aparecer no ranking? Os dois campos são <b>opcionais</b>. Em branco, você aparece como <b id="fAnon"></b>.</div>
+    <label class="fl">Nome ou apelido <small>(opcional)</small><input id="fName" maxlength="24" autocomplete="nickname" placeholder="Ex.: Marcos"></label>
+    <label class="fl">Perfil do LinkedIn <small>(opcional)</small><input id="fIn" inputmode="url" placeholder="linkedin.com/in/seu-perfil" autocomplete="url"></label>
+    <label class="fc"><input type="checkbox" id="fOk"> Pode mostrar meu nome e o LinkedIn no ranking público, junto com a minha pontuação.</label>
+    <div class="fnote">Sem marcar a caixa, seus pontos entram como anônimos. Para apagar dados já publicados, abra uma issue em <a href="https://github.com/umbralgml/noc-defesa/issues" target="_blank" rel="noopener">github.com/umbralgml/noc-defesa</a>.</div>
+    <div class="ferr" id="fErr"></div>
+    <div class="row"><button class="btn ghostb" id="fSkip">${first ? 'PULAR' : 'VOLTAR'}</button><button class="btn" id="fSave">${first ? 'ENTRAR NO PLANTÃO' : 'SALVAR'}</button></div>`);
+  $('fAnon').textContent = anonName();
+  $('fName').value = p.name || ''; $('fIn').value = p.linkedin || ''; $('fOk').checked = !!p.consent;
+  const done = v => { ls('noc_profile', v); ls('noc_rank_sent', null); submitCampaign(); hooks.joined(); hooks.profile(); closeModal(); after && after(); };
+  $('fSkip').onclick = () => { if (first) done({ name: '', linkedin: '', consent: false }); else { closeModal(); after && after(); } };
+  $('fSave').onclick = () => {
+    const name = cleanName($('fName').value), li = normLinkedin($('fIn').value), ok = $('fOk').checked, err = m => { $('fErr').textContent = m; };
+    if (name && name.length < 2) return err('O nome precisa de pelo menos 2 letras (ou deixe em branco).');
+    if (BAD.test(name) || isAnon(name)) return err('Escolha outro nome, por favor.');
+    if (li === null) return err('Use o endereço do perfil, no formato linkedin.com/in/seu-perfil.');
+    if ((name || li) && !ok) return err('Para mostrar nome ou LinkedIn no ranking, marque a caixa. Ou deixe os campos em branco.');
+    done({ name, linkedin: li || '', consent: !!(name || li) && ok });
+  };
+}
 
 const BOARDS = [['campanha', 'CAMPANHA'], [null, 'DESAFIO DE HOJE']];
+const top = (board, n) => api(`ranking_top?board=eq.${encodeURIComponent(board)}&order=score.desc,created_at.asc&limit=${n}&select=name,linkedin,score,stars`);
+const tabsHTML = tab => `<div class="tabs">${BOARDS.map((b, i) => `<button class="tabb${i === tab ? ' on' : ''}" data-t="${i}">${b[1]}</button>`).join('')}</div>`;
+const failMsg = el => { if (el) el.innerHTML = '<div class="rmsg">Não consegui carregar o ranking agora. Tente de novo mais tarde.</div>'; };
 
 export function openRanking(dailyBoard, tab = 0) {
   if (!CFG) return;
-  const p = profile();
-  modal(`<div class="tag">QUADRO DE PLANTÃO</div><h2>Ranking</h2>
-    <div class="tabs">${BOARDS.map((b, i) => `<button class="tabb${i === tab ? ' on' : ''}" data-t="${i}">${b[1]}</button>`).join('')}</div>
+  modal(`<div class="tag">QUADRO DE PLANTÃO</div><h2>Ranking</h2>${tabsHTML(tab)}
     <div class="rlist" id="rList"><div class="rmsg">Carregando...</div></div>
-    <div class="rme">${p ? `Você aparece como <b></b>. <button class="lnk" id="rEdit">editar</button> · <button class="lnk" id="rLeave">parar de enviar</button>` : 'Você ainda não está no ranking. Nome e LinkedIn são opcionais: jogar não depende disso.'}</div>
-    <div class="row">${p ? '' : '<button class="btn" id="rJoin">ENTRAR NO RANKING</button>'}<button class="btn ghostb" id="mOk">FECHAR</button></div>`);
-  if (p) $('mcard').querySelector('.rme b').textContent = p.name;
+    <div class="rme">Você aparece como <b></b>. <button class="lnk" id="rEdit">editar perfil</button></div>
+    <div class="row"><button class="btn ghostb" id="mOk">FECHAR</button></div>`);
+  $('mcard').querySelector('.rme b').textContent = publicName();
   $('mOk').onclick = closeModal;
-  if ($('rJoin')) $('rJoin').onclick = () => joinForm(dailyBoard);
-  if ($('rEdit')) $('rEdit').onclick = () => joinForm(dailyBoard);
-  if ($('rLeave')) $('rLeave').onclick = () => { ls('noc_profile', null); ls('noc_rank_sent', null); openRanking(dailyBoard, tab); };
+  $('rEdit').onclick = () => profileForm(() => openRanking(dailyBoard, tab));
   $('mcard').querySelectorAll('.tabb').forEach(b => b.onclick = () => openRanking(dailyBoard, +b.dataset.t));
-  const board = BOARDS[tab][0] || dailyBoard;
-  api(`ranking_top?board=eq.${encodeURIComponent(board)}&order=score.desc,created_at.asc&limit=50&select=name,linkedin,score,stars`)
-    .then(rows => renderRows(rows, !!BOARDS[tab][0]))
-    .catch(e => { console.error(e); const l = $('rList'); if (l) l.innerHTML = '<div class="rmsg">Não consegui carregar o ranking agora. Tente de novo mais tarde.</div>'; });
+  top(BOARDS[tab][0] || dailyBoard, 50).then(rows => renderRows($('rList'), rows, !!BOARDS[tab][0])).catch(e => { console.error(e); failMsg($('rList')); });
 }
 
-function renderRows(rows, campaign) {
-  const l = $('rList'); if (!l) return;
+// Quadro compacto (top 10) na tela inicial.
+export function titleRanking(dailyBoard, tab = 0) {
+  const box = $('rkBox'); if (!CFG || !box) return;
+  $('rkTabs').innerHTML = tabsHTML(tab);
+  $('rkTabs').querySelectorAll('.tabb').forEach(b => b.onclick = () => titleRanking(dailyBoard, +b.dataset.t));
+  $('rkAll').onclick = () => openRanking(dailyBoard, tab);
+  $('rkList').innerHTML = '<div class="rmsg">Carregando...</div>';
+  top(BOARDS[tab][0] || dailyBoard, 10).then(rows => renderRows($('rkList'), rows, !!BOARDS[tab][0])).catch(e => { console.error(e); failMsg($('rkList')); });
+}
+
+function renderRows(l, rows, campaign) {
+  if (!l) return;
   if (!rows.length) { l.innerHTML = `<div class="rmsg">${campaign ? 'Ninguém no quadro ainda. Seja o primeiro.' : 'Ninguém fez o desafio de hoje ainda.'}</div>`; return; }
+  const me = publicName();
   l.innerHTML = rows.map((r, i) => {
-    const li = normLinkedin(r.linkedin);
+    const li = normLinkedin(r.linkedin), you = r.name === me ? ' <span class="you">você</span>' : '';
     const name = li ? `<a href="${esc(li)}" target="_blank" rel="noopener nofollow ugc">${esc(r.name)} <span class="in">in</span></a>` : esc(r.name);
-    return `<div class="rrow${i < 3 ? ' top' : ''}"><span class="rp">${['🥇', '🥈', '🥉'][i] || i + 1}</span><span class="rn">${name}</span><span class="rs">${campaign ? `<i>★ ${r.stars}</i>` : ''}${fmt(r.score)}</span></div>`;
+    return `<div class="rrow${i < 3 ? ' top' : ''}${isAnon(r.name) ? ' anon' : ''}${you ? ' me' : ''}"><span class="rp">${['🥇', '🥈', '🥉'][i] || i + 1}</span><span class="rn">${name}${you}</span><span class="rs">${campaign ? `<i>★ ${r.stars}</i>` : ''}${fmt(r.score)}</span></div>`;
   }).join('');
-}
-
-function joinForm(dailyBoard) {
-  const p = profile() || {};
-  modal(`<div class="tag">QUADRO DE PLANTÃO</div><h2>Entrar no ranking</h2>
-    <label class="fl">Nome ou apelido <small>(2 a 24 letras)</small><input id="fName" maxlength="24" autocomplete="nickname"></label>
-    <label class="fl">Perfil do LinkedIn <small>(opcional)</small><input id="fIn" inputmode="url" placeholder="linkedin.com/in/seu-perfil" autocomplete="url"></label>
-    <label class="fc"><input type="checkbox" id="fOk"> Concordo em mostrar este nome e, se preenchido, o LinkedIn no ranking público, junto com minha pontuação.</label>
-    <div class="fnote">Nada é enviado sem marcar a caixa acima. Para apagar dados já publicados, abra uma issue em <a href="https://github.com/umbralgml/noc-defesa/issues" target="_blank" rel="noopener">github.com/umbralgml/noc-defesa</a>.</div>
-    <div class="ferr" id="fErr"></div>
-    <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="fSave">SALVAR</button></div>`);
-  $('fName').value = p.name || ''; $('fIn').value = p.linkedin || '';
-  $('mCancel').onclick = () => openRanking(dailyBoard);
-  $('fSave').onclick = () => {
-    const name = cleanName($('fName').value), li = normLinkedin($('fIn').value), err = m => { $('fErr').textContent = m; };
-    if (name.length < 2) return err('Coloque um nome com pelo menos 2 letras.');
-    if (BAD.test(name)) return err('Escolha outro nome, por favor.');
-    if (li === null) return err('Use o endereço do perfil, no formato linkedin.com/in/seu-perfil.');
-    if (!$('fOk').checked) return err('Marque a caixa de consentimento para aparecer no ranking.');
-    ls('noc_profile', { name, linkedin: li || '' }); ls('noc_rank_sent', null);
-    submitCampaign(); hooks.joined();
-    openRanking(dailyBoard);
-  };
 }

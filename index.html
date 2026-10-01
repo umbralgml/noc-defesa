@@ -36,10 +36,17 @@
           <button class="btn ghostb tsmall" id="newsBtn">NOVIDADES <span class="ndot" id="newsDot"></span></button>
           <button class="btn ghostb tsmall" id="resetBtn">ZERAR PROGRESSO</button>
         </div>
+        <div class="twho" id="tWho" hidden>Jogando como <b id="tWhoName"></b> · <button class="lnk" id="tWhoEdit">trocar</button></div>
         <div class="credit">criado por <b>Marcos dos Anjos</b> · redes, infra e segurança</div>
       </div>
     </div>
-    <aside class="news" id="news" aria-label="Atualizações do jogo">
+    <aside class="news" id="news" aria-label="Ranking e atualizações do jogo">
+      <section class="rkbox" id="rkBox" hidden>
+        <div class="newsh"><span>QUADRO DE PLANTÃO</span><b>🏆 Top analistas</b></div>
+        <div id="rkTabs"></div>
+        <div class="rlist" id="rkList"></div>
+        <button class="lnk rkall" id="rkAll">ver ranking completo</button>
+      </section>
       <div class="newsh"><span>LOG DE MUDANÇAS</span><b>Atualizações do NOC</b></div>
       <div class="tl" id="newsList"></div>
     </aside>
@@ -48,7 +55,7 @@
   <div class="screen" id="map">
     <div class="mapTop">
       <div class="av" id="mA"></div>
-      <div class="who"><b>ANALISTA DE PLANTÃO</b><span>Escolha o próximo incidente</span></div>
+      <div class="who"><b id="mapWho">ANALISTA DE PLANTÃO</b><span>Escolha o próximo incidente</span></div>
       <div class="starsTot" id="starsTot"></div>
       <button class="iconbtn rankBtn" id="rankM" aria-label="Ranking" hidden>🏆</button>
       <button class="iconbtn sndbtn" id="sndM" aria-label="Som">♪</button>

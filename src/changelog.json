@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "v": "1.5",
+      "date": "2026-10-01",
+      "title": "Crachá do plantão",
+      "items": [
+        "Ao começar, diga como quer ser chamado: nome e LinkedIn, ambos opcionais",
+        "Seu nome aparece no topo do mapa e dá para trocar na tela inicial",
+        "Quem prefere não se identificar joga como \"Analista #XXXX\""
+      ]
+    },
+    {
       "v": "1.4",
       "date": "2026-10-01",
       "title": "Ouvindo o plantão",

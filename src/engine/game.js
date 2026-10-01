@@ -4,7 +4,7 @@ import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
 import { S, LEVELS, ACTS, K, unlocked, save, resetProgress, progress } from './state.js';
 import { flow, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
-import { submitCampaign } from './rank.js';
+import { submitCampaign, profile } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
 import { renderQuiz } from './quiz.js';
@@ -32,6 +32,7 @@ export function renderMap() {
   flow.map();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
+  const p = profile(); $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
 }
 
 // Confirma antes de apagar. "after" atualiza a tela que chamou.

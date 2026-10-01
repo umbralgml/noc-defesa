@@ -9,7 +9,14 @@ O jogo grava e lê o ranking direto do navegador pela API REST do [Supabase](htt
 - **Campanha:** a melhor soma de pontos das 15 fases de cada jogador, com as estrelas.
 - **Desafio de hoje:** a pontuação do desafio diário do dia (horário de Brasília).
 
-O jogador só entra se quiser. Ele informa um nome ou apelido (2 a 24 letras), o LinkedIn se quiser, e marca a caixa de consentimento. Sem isso, nada é enviado. Cada aparelho recebe um id anônimo que separa os jogadores e nunca aparece na tela.
+Ao iniciar o primeiro turno (ou o primeiro desafio diário), o jogo pergunta nome e LinkedIn, **ambos opcionais**:
+
+- **Em branco (ou "PULAR"):** o jogador entra no ranking como `Analista #XXXX`, um apelido derivado do id anônimo do aparelho. Nenhum dado pessoal é enviado.
+- **Com nome e/ou LinkedIn:** só aparecem no ranking público se a caixa de consentimento estiver marcada. Sem ela, o jogo envia o apelido anônimo.
+
+O perfil pode ser trocado a qualquer momento ("trocar" na tela inicial, "editar perfil" no ranking). O ranking mostra sempre o nome mais recente de cada jogador. Cada aparelho recebe um id anônimo que separa os jogadores e nunca aparece na tela.
+
+O top 10 aparece na tela inicial (acima das atualizações) e o ranking completo abre pelo botão 🏆.
 
 ## Configurar (uma vez, uns 10 minutos)
 
