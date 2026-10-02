@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "v": "1.15",
+      "date": "2026-10-02",
+      "title": "Instala de qualquer jeito",
+      "items": [
+        "O botão 📲 INSTALAR APP agora aparece sempre no celular, primeiro da lista",
+        "Sem o pedido automático do navegador, ele mostra o passo a passo do seu: Chrome, Samsung Internet, Firefox ou iPhone",
+        "Abriu o link pelo Instagram, LinkedIn ou WhatsApp? O botão explica como abrir no navegador e copia o link"
+      ]
+    },
+    {
       "v": "1.14",
       "date": "2026-10-02",
       "title": "Mais tela para jogar",

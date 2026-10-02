@@ -76,6 +76,7 @@ Não edite arquivos direto em `/var/www/noc-defesa`. A atualização sobrescreve
 Com HTTPS ativo, o jogo pode ser instalado e funciona até sem internet. O ranking volta quando a conexão voltar.
 
 - **Android (Chrome):** botão **📲 INSTALAR APP** na tela inicial do jogo, ou menu ⋮ → *Instalar app*.
+- **Android (Samsung Internet):** menu ≡ → *Adicionar página a* → *Tela inicial*.
 - **iPhone/iPad (Safari):** Compartilhar → *Adicionar à Tela de Início*. O botão do jogo mostra o passo a passo.
 - **PC (Chrome/Edge):** botão **📲 INSTALAR APP**, ou o ícone de instalar na barra de endereço.
 
@@ -89,7 +90,7 @@ Com HTTPS ativo, o jogo pode ser instalado e funciona até sem internet. O ranki
 | "porta 80 ocupada por outro programa" | Aponte o proxy desse programa para a pasta `/var/www/noc-defesa`, que é só arquivo estático. |
 | Ver se a atualização roda | `systemctl list-timers noc-defesa-update.timer` e `journalctl -u noc-defesa-update` |
 | Logs do site | `/var/log/nginx/access.log` e `/var/log/nginx/error.log` (ou `/var/log/apache2/`) |
-| Botão "INSTALAR APP" não aparece | Precisa de HTTPS. No iPhone o botão sempre aparece; no Firefox desktop não há instalação. |
+| Instalação não funciona | Precisa de HTTPS. O botão **📲 INSTALAR APP** aparece sempre que o jogo não está instalado: no Chrome/Edge abre o pedido nativo; nos outros navegadores mostra o passo a passo. Dentro do Instagram, LinkedIn ou WhatsApp é preciso abrir no Chrome/Safari primeiro. |
 
 ## Desinstalar
 
