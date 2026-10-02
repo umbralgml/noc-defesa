@@ -1,6 +1,21 @@
 {
-  "tag": "ATO 5",
+  "tag": "ATO 6",
   "name": "IPv6, Wi-Fi e serviços",
+  "diff": "avançado",
+  "story": [
+    {
+      "who": "z",
+      "t": "Pensou que tinha acabado? Voltei. Agora pelo IPv6 e pelo Wi-Fi."
+    },
+    {
+      "who": "chefe",
+      "t": "Temporada 2. IPv6, Wi-Fi e os serviços de base: DHCP, DNS e NTP."
+    },
+    {
+      "who": "me",
+      "t": "Endereço de 128 bits não me assusta."
+    }
+  ],
   "levels": [
     {
       "title": "Endereços IPv6",

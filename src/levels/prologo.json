@@ -1,0 +1,437 @@
+{
+  "tag": "PRÓLOGO",
+  "name": "Primeiros passos na rede",
+  "diff": "iniciante",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Bem-vindo ao NOC! Daqui a gente cuida da rede de um provedor inteiro. Hoje é o seu primeiro plantão."
+    },
+    {
+      "who": "me",
+      "t": "Primeiro dia... e por que o telão está piscando vermelho?"
+    },
+    {
+      "who": "z",
+      "t": "Oi, novato. Eu sou o Z3R0. Vou passar a noite derrubando a sua rede. Tenta me acompanhar."
+    },
+    {
+      "who": "chefe",
+      "t": "Calma. Comece pelo básico: quem é quem na rede. Cada fase tem uma aula curta antes, e você pode rever a aula durante o jogo."
+    }
+  ],
+  "levels": [
+    {
+      "title": "Primeiro dia no NOC",
+      "tag": "TUTORIAL",
+      "type": "wire",
+      "tutorial": true,
+      "loc": "rack",
+      "cap": "Chegando para o primeiro plantão...",
+      "heads": [
+        "EQUIPAMENTO",
+        "O QUE ELE FAZ"
+      ],
+      "goal": "Ligue cada equipamento ao que ele faz. Comece tocando no Switch e depois na função dele, à direita.",
+      "z": "Primeiro dia? Que fofo. Aposto que você nem sabe a diferença entre switch e roteador.",
+      "me": "Ainda não sei tudo. Mas aprendo rápido.",
+      "lesson": [
+        "Uma <b>rede</b> é um conjunto de equipamentos conversando. Cada um tem um papel.",
+        "O <b>switch</b> liga os computadores do mesmo lugar, a rede local (LAN).",
+        "O <b>roteador</b> liga redes diferentes. É ele que leva você até a internet.",
+        "O <b>firewall</b> é o porteiro: decide o que pode entrar e sair.",
+        "O <b>access point</b> (AP) é a antena do Wi-Fi. O <b>servidor</b> é a máquina que oferece um serviço, como um site."
+      ],
+      "tip": "Switch = mesma rede. Roteador = entre redes. Firewall = porteiro. Access point = Wi-Fi. Servidor = oferece um serviço.",
+      "learn": "Cada equipamento tem um papel: o switch conecta a rede local, o roteador conecta redes diferentes, o firewall filtra, o access point leva a rede para o Wi-Fi e o servidor oferece os serviços. Esse é o mapa mental de qualquer NOC.",
+      "left": [
+        {
+          "id": "a",
+          "t": "Switch",
+          "s": "Caixa cheia de portas de rede",
+          "why": "O switch liga os aparelhos da mesma rede local e entrega cada mensagem só para quem deve receber."
+        },
+        {
+          "id": "b",
+          "t": "Roteador",
+          "s": "Fica entre a sua rede e a internet",
+          "why": "O roteador escolhe o caminho entre redes diferentes. Sem ele, a sua rede não sai para a internet."
+        },
+        {
+          "id": "c",
+          "t": "Firewall",
+          "s": "Fica na entrada da rede",
+          "why": "O firewall compara cada conexão com as regras e bloqueia o que não foi permitido."
+        },
+        {
+          "id": "d",
+          "t": "Access point",
+          "s": "Tem antenas",
+          "why": "O access point transforma a rede com fio em Wi-Fi."
+        },
+        {
+          "id": "e",
+          "t": "Servidor",
+          "s": "Fica ligado o tempo todo no datacenter",
+          "why": "Servidor é o computador que oferece um serviço para os outros: site, arquivos, e-mail, DNS."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Liga os computadores da mesma rede local",
+          "s": "",
+          "why": "Ligar os computadores da mesma rede é o papel do switch."
+        },
+        {
+          "id": "b",
+          "t": "Leva o tráfego de uma rede para outra",
+          "s": "E para a internet",
+          "why": "Levar de uma rede para outra é o papel do roteador."
+        },
+        {
+          "id": "c",
+          "t": "Decide o que pode entrar e sair",
+          "s": "",
+          "why": "Decidir o que passa é o papel do firewall."
+        },
+        {
+          "id": "d",
+          "t": "Dá acesso pelo Wi-Fi",
+          "s": "",
+          "why": "Wi-Fi é o papel do access point."
+        },
+        {
+          "id": "e",
+          "t": "Oferece um serviço, como um site",
+          "s": "",
+          "why": "Oferecer um serviço é o papel do servidor."
+        }
+      ]
+    },
+    {
+      "title": "Endereço, porta e MAC",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Abrindo a planilha de inventário...",
+      "goal": "Classifique cada item como endereço IP, porta ou endereço MAC.",
+      "intro": "Na planilha do NOC está tudo misturado. Separe o que é <b>endereço IP</b>, o que é <b>porta</b> e o que é <b>endereço MAC</b>.",
+      "z": "Misturei IPs, portas e MACs na sua planilha. Boa sorte organizando.",
+      "me": "Endereço, apartamento e RG. Consigo separar.",
+      "lesson": [
+        "Pense num prédio: o <b>endereço IP</b> é o endereço do prédio, e a <b>porta</b> é o número do apartamento (qual programa vai atender).",
+        "<b>IPv4</b> tem 4 números de 0 a 255 separados por ponto, como <b>192.168.1.10</b>.",
+        "<b>Porta</b> é um número só, de 0 a 65535. Algumas são famosas: <b>80</b> (site), <b>443</b> (site seguro), <b>22</b> (SSH).",
+        "<b>MAC</b> é o \"RG\" da placa de rede, gravado de fábrica: 6 pares em hexadecimal, como <b>3c:22:fb:11:0a:7e</b>."
+      ],
+      "tip": "Quatro números com ponto = IP. Um número só = porta. Seis pares com dois-pontos ou hífen = MAC.",
+      "learn": "Endereço IP diz qual máquina, a porta diz qual programa dentro dela e o MAC identifica a placa de rede no cabo ou no Wi-Fi. São três camadas diferentes da mesma conversa.",
+      "buckets": [
+        {
+          "label": "ENDEREÇO IP",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "192.168.1.10",
+              "why": "4 números de 0 a 255 separados por ponto: endereço IPv4."
+            },
+            {
+              "t": "8.8.8.8",
+              "why": "Endereço IPv4 do DNS público do Google."
+            },
+            {
+              "t": "10.0.0.1",
+              "why": "Endereço IPv4, comum em redes internas."
+            }
+          ]
+        },
+        {
+          "label": "PORTA",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "443",
+              "why": "Um número só, até 65535: é porta. A 443 é a do site seguro (HTTPS)."
+            },
+            {
+              "t": "22",
+              "why": "Porta do SSH, o acesso remoto seguro."
+            },
+            {
+              "t": "80",
+              "why": "Porta do site sem criptografia (HTTP)."
+            },
+            {
+              "t": "3389",
+              "why": "Porta da área de trabalho remota do Windows (RDP)."
+            }
+          ]
+        },
+        {
+          "label": "ENDEREÇO MAC",
+          "c": "#ff7ad9",
+          "a": [
+            {
+              "t": "3c:22:fb:11:0a:7e",
+              "why": "6 pares em hexadecimal separados por dois-pontos: endereço MAC."
+            },
+            {
+              "t": "00-1A-2B-3C-4D-5E",
+              "why": "MAC escrito com hífens, como o Windows mostra."
+            },
+            {
+              "t": "aa:bb:cc:11:22:33",
+              "why": "Também é MAC: 6 pares de 00 a ff."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "O que o ping conta",
+      "tag": "QUIZ",
+      "type": "quiz",
+      "loc": "war",
+      "cap": "Abrindo o painel de monitoramento...",
+      "dailyFrom": "2026-10-03",
+      "goal": "Responda as perguntas sobre ping, gateway e DNS para entender o painel do NOC.",
+      "z": "Seu painel está cheio de números. Aposto que você nem sabe ler um ping.",
+      "me": "Ping é a primeira ferramenta de qualquer analista. Bora ler.",
+      "lesson": [
+        "<b>ping</b> manda um \"você está aí?\" para outro equipamento e mede quanto tempo a resposta leva.",
+        "Resposta em <b>ms</b> (milissegundos) = chegou. <b>Timeout</b> = nada voltou.",
+        "O <b>gateway</b> é a porta de saída da sua rede, normalmente o roteador.",
+        "<b>DNS</b> traduz nomes (google.com) em endereços IP. Se o ping no IP funciona mas no nome não, o problema é DNS."
+      ],
+      "tip": "Timeout = sem resposta. ms = tempo de ida e volta. Gateway = saída da rede. IP responde e nome não = DNS.",
+      "learn": "O ping mede se algo responde e em quanto tempo. Com ele você separa os problemas: sem resposta do gateway é rede local, sem resposta da internet é saída, e nome que não resolve é DNS.",
+      "qs": [
+        {
+          "q": "Você deu ping no servidor e recebeu \"Request timed out\" (tempo esgotado). O que isso indica?",
+          "a": 0,
+          "o": [
+            "Nenhuma resposta voltou: o servidor pode estar desligado, fora da rede ou bloqueando ping",
+            {
+              "t": "O servidor respondeu rápido",
+              "why": "Resposta rápida aparece como tempo em ms, por exemplo \"time=12 ms\"."
+            },
+            {
+              "t": "A internet está mais rápida que o normal",
+              "why": "Timeout é falta de resposta, não velocidade."
+            },
+            {
+              "t": "O cabo do seu computador é de fibra",
+              "why": "O tipo de cabo não aparece no ping."
+            }
+          ],
+          "why": "Timeout quer dizer que nenhuma resposta voltou no tempo esperado. Pode ser equipamento desligado, caminho quebrado ou firewall bloqueando o ping."
+        },
+        {
+          "q": "Num resultado de ping aparece \"time=15 ms\". O que é esse número?",
+          "a": 0,
+          "o": [
+            "O tempo que o pacote levou para ir e voltar",
+            {
+              "t": "A velocidade da internet em megabits",
+              "why": "Velocidade (banda) se mede em Mbps, não em ms."
+            },
+            {
+              "t": "Quantos pacotes se perderam",
+              "why": "Perda aparece em porcentagem, como \"0% packet loss\"."
+            },
+            {
+              "t": "O número da porta usada",
+              "why": "O ping nem usa porta: ele é ICMP."
+            }
+          ],
+          "why": "ms é a latência: o tempo de ida e volta. Quanto menor, mais rápida a resposta."
+        },
+        {
+          "q": "O que é o gateway padrão de um computador?",
+          "a": 0,
+          "o": [
+            "O equipamento, geralmente o roteador, por onde saem os pacotes para outras redes",
+            {
+              "t": "O servidor que guarda os arquivos",
+              "why": "Isso é um servidor de arquivos."
+            },
+            {
+              "t": "O cabo que liga o computador na parede",
+              "why": "Cabo é o meio físico, não um endereço de saída."
+            },
+            {
+              "t": "O site que abre quando o navegador liga",
+              "why": "Isso é a página inicial, não o gateway."
+            }
+          ],
+          "why": "Tudo que não é da sua rede local vai para o gateway, que encaminha para fora."
+        },
+        {
+          "q": "ping 8.8.8.8 responde, mas ping google.com dá erro. Onde está o problema mais provável?",
+          "a": 0,
+          "o": [
+            "No DNS, que traduz o nome em IP",
+            {
+              "t": "No cabo de rede",
+              "why": "Com o cabo ruim, nem o ping no 8.8.8.8 responderia."
+            },
+            {
+              "t": "No site do Google",
+              "why": "O ping nem saiu: o nome não chegou a ser traduzido."
+            },
+            {
+              "t": "No monitor",
+              "why": "O monitor não tem relação com a rede."
+            }
+          ],
+          "why": "Se o IP responde, a conexão funciona. O que falhou foi traduzir o nome: DNS."
+        }
+      ]
+    },
+    {
+      "title": "Primeiro terminal",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "desk",
+      "host": "noc",
+      "prompt": "voce@noc:~$",
+      "cap": "Abrindo um terminal Linux...",
+      "goal": "Descubra por que o Google não abre na máquina do colega e resolva.",
+      "intro": "Um colega reclamou: \"o Google não abre\". Você está num <b>terminal Linux</b> da máquina dele. Comandos são frases curtas que você digita (ou toca abaixo), e o computador responde.",
+      "z": "Derrubei o DNS do seu colega. Ele acha que a internet caiu. Você também vai achar.",
+      "me": "Vou testar por partes: rede local, internet e nome.",
+      "lesson": [
+        "O <b>terminal</b> é uma conversa por texto com o computador. Quase todo equipamento de rede é configurado assim.",
+        "<b>ip a</b> mostra os endereços da máquina. <b>ip route</b> mostra o gateway (a linha que começa com <b>default</b>).",
+        "<b>ping</b> testa se outro equipamento responde. No Linux, <b>-c 4</b> manda só 4 tentativas.",
+        "<b>cat</b> mostra o conteúdo de um arquivo. Em <b>/etc/resolv.conf</b> fica o servidor DNS que a máquina usa."
+      ],
+      "tip": "Teste em camadas: ping no gateway, ping num IP da internet e ping num nome. Se só o nome falha, é DNS.",
+      "learn": "Diagnóstico em camadas: rede local (gateway), internet (IP público) e nomes (DNS). O ip a mostra o seu IP, o ip route mostra o gateway e o /etc/resolv.conf mostra o DNS em uso.",
+      "cmds": [
+        {
+          "c": "ip a",
+          "alias": [
+            "ip addr",
+            "ip address",
+            "ip -br a"
+          ],
+          "out": "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536\n    inet 127.0.0.1/8 scope host lo\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    link/ether 3c:22:fb:11:0a:7e brd ff:ff:ff:ff:ff:ff\n    inet 192.168.1.50/24 brd 192.168.1.255 scope global eth0",
+          "why": "Mostra as interfaces. A eth0 é a placa de rede: IP 192.168.1.50 (linha inet) e MAC 3c:22:fb:11:0a:7e (linha link/ether). A lo é o loopback, a própria máquina."
+        },
+        {
+          "c": "ip route",
+          "alias": [
+            "ip r",
+            "ip ro"
+          ],
+          "out": "default via 192.168.1.1 dev eth0\n192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.50",
+          "why": "A linha \"default via\" é o gateway: 192.168.1.1. Tudo que não é da rede 192.168.1.0/24 sai por ele."
+        },
+        {
+          "c": "ping -c 4 192.168.1.1",
+          "alias": [
+            "ping 192.168.1.1"
+          ],
+          "out": "PING 192.168.1.1 56(84) bytes of data.\n64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.9 ms\n64 bytes from 192.168.1.1: icmp_seq=2 ttl=64 time=1.1 ms\n64 bytes from 192.168.1.1: icmp_seq=3 ttl=64 time=0.8 ms\n64 bytes from 192.168.1.1: icmp_seq=4 ttl=64 time=1.0 ms\n\n--- 192.168.1.1 ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss",
+          "why": "O gateway responde: a rede local está funcionando."
+        },
+        {
+          "c": "ping -c 4 8.8.8.8",
+          "alias": [
+            "ping 8.8.8.8"
+          ],
+          "out": "PING 8.8.8.8 56(84) bytes of data.\n64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=14.2 ms\n64 bytes from 8.8.8.8: icmp_seq=2 ttl=117 time=13.9 ms\n64 bytes from 8.8.8.8: icmp_seq=3 ttl=117 time=14.5 ms\n64 bytes from 8.8.8.8: icmp_seq=4 ttl=117 time=14.1 ms\n\n--- 8.8.8.8 ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss",
+          "why": "Um IP da internet responde: a saída para a internet funciona."
+        },
+        {
+          "c": "ping -c 4 google.com",
+          "alias": [
+            "ping google.com"
+          ],
+          "out": "ping: google.com: Temporary failure in name resolution",
+          "why": "O ping nem começou: a máquina não conseguiu traduzir o nome em IP. Falha de resolução de nome = DNS."
+        },
+        {
+          "c": "cat /etc/resolv.conf",
+          "out": "# gerado pelo NetworkManager\nnameserver 192.168.1.250",
+          "why": "O DNS configurado é o 192.168.1.250. Vale testar se ele existe."
+        },
+        {
+          "c": "ping -c 4 192.168.1.250",
+          "alias": [
+            "ping 192.168.1.250"
+          ],
+          "out": "PING 192.168.1.250 56(84) bytes of data.\nFrom 192.168.1.50 icmp_seq=1 Destination Host Unreachable\nFrom 192.168.1.50 icmp_seq=2 Destination Host Unreachable\nFrom 192.168.1.50 icmp_seq=3 Destination Host Unreachable\n\n--- 192.168.1.250 ping statistics ---\n4 packets transmitted, 0 received, +3 errors, 100% packet loss",
+          "why": "O servidor DNS configurado não responde. É por isso que os nomes não funcionam."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Qual é o endereço IP desta máquina?",
+          "a": 0,
+          "o": [
+            "192.168.1.50",
+            {
+              "t": "192.168.1.1",
+              "why": "Esse é o gateway, da linha \"default via\" do ip route."
+            },
+            {
+              "t": "127.0.0.1",
+              "why": "Esse é o loopback, a própria máquina falando com ela mesma."
+            },
+            {
+              "t": "3c:22:fb:11:0a:7e",
+              "why": "Isso é o MAC, não o IP."
+            }
+          ],
+          "why": "A linha inet da eth0 mostra 192.168.1.50/24."
+        },
+        {
+          "q": "Por que o Google não abre, se o ping no 8.8.8.8 funciona?",
+          "a": 0,
+          "o": [
+            "O DNS configurado (192.168.1.250) não responde, então o nome não vira IP",
+            {
+              "t": "O cabo está desconectado",
+              "why": "Com o cabo desconectado, nem o gateway responderia."
+            },
+            {
+              "t": "O Google está fora do ar",
+              "why": "O ping no google.com nem saiu: falhou antes, na tradução do nome."
+            },
+            {
+              "t": "Falta o gateway",
+              "why": "O gateway existe (192.168.1.1) e responde."
+            }
+          ],
+          "why": "IP funciona e nome não: é DNS. E o DNS configurado, 192.168.1.250, não responde."
+        },
+        {
+          "q": "Como resolver agora?",
+          "a": 0,
+          "o": [
+            "Apontar a máquina para um DNS que funciona, como o 1.1.1.1",
+            {
+              "t": "Reiniciar o roteador",
+              "why": "O roteador está funcionando: o ping no 8.8.8.8 passou por ele."
+            },
+            {
+              "t": "Trocar o cabo de rede",
+              "why": "O cabo está bom: a máquina fala com o gateway e com a internet."
+            },
+            {
+              "t": "Desligar o firewall",
+              "why": "Nada indica bloqueio de firewall. O problema é o DNS que não responde."
+            }
+          ],
+          "why": "Com um servidor DNS que responde, os nomes voltam a funcionar. Depois, vale descobrir por que o 192.168.1.250 caiu.",
+          "run": "sudo resolvectl dns eth0 1.1.1.1\nping -c 2 google.com",
+          "out": "PING google.com (142.250.79.46) 56(84) bytes of data.\n64 bytes from 142.250.79.46: icmp_seq=1 ttl=117 time=15.1 ms\n64 bytes from 142.250.79.46: icmp_seq=2 ttl=117 time=14.8 ms"
+        }
+      ]
+    }
+  ]
+}

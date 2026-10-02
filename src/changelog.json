@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.10",
+      "date": "2026-10-02",
+      "title": "Plantão para todos",
+      "items": [
+        "Prólogo para quem nunca viu rede: equipamentos, IP x porta x MAC, ping e o primeiro terminal Linux, com tutorial guiado",
+        "Ato 3 novo, Linux no NOC: portas expostas, DNS aberto, SSH sob ataque e boas práticas, tudo no terminal",
+        "Cada ato mostra o nível (iniciante a avançado) e abre com uma cena com o chefe do NOC e o Z3R0",
+        "Nos níveis iniciante e básico, a dica aparece sozinha depois do 2º erro"
+      ]
+    },
+    {
       "v": "1.9",
       "date": "2026-10-01",
       "title": "O NOC ganhou corpo",

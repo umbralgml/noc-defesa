@@ -9,17 +9,17 @@ import { good, damage, explain, info, note, flow } from './ui.js';
 const MIN_CMDS = 2;   // comandos diferentes antes de liberar o diagnóstico
 const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
 const opt = o => typeof o === 'string' ? { t: o } : o;
-let L = null, ran = new Set(), step = 0;
+let L = null, ran = new Set(), step = 0, ps = '';
 
 export function renderTerm(level) {
-  L = level; ran = new Set(); step = 0;
+  L = level; ran = new Set(); step = 0; ps = L.prompt || L.host + '#';
   const st = $('stage');
   st.innerHTML = `${L.intro ? `<div class="task">${L.intro}</div>` : ''}
     <div class="term"><div class="tlog" id="tlog"></div>
       <form class="tline" id="tform"><span class="tps"></span><input id="tin" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-label="Comando"></form></div>
     <div class="tstep" id="tstep"></div>`;
-  st.querySelector('.tps').textContent = L.host + '#';
-  print(`${L.host} — digite um comando ou toque num dos sugeridos abaixo. "?" lista os comandos.`, 'tsys');
+  st.querySelector('.tps').textContent = ps;
+  print(`${L.host}: digite um comando ou toque num dos sugeridos abaixo. "?" lista os comandos.`, 'tsys');
   $('tform').onsubmit = e => { e.preventDefault(); run($('tin').value); $('tin').value = ''; };
   const bank = $('bank');
   bank.innerHTML = `<div class="bankh"><span>COMANDOS · TOQUE PARA EXECUTAR</span><span id="bankCnt">0/${MIN_CMDS}</span></div>`;
@@ -37,7 +37,7 @@ function print(text, cls) {
 function run(raw) {
   if (S.busy) return;
   const n = norm(raw); if (!n) return;
-  print(`${L.host}# ${raw.trim()}`, 'tcmd'); sfx.key();
+  print(`${ps} ${raw.trim()}`, 'tcmd'); sfx.key();
   if (n === '?' || n === 'help') { print('Comandos disponíveis:\n' + L.cmds.map(c => '  ' + c.c).join('\n'), 'tsys'); return; }
   if (n === 'clear' || n === 'cls') { $('tlog').innerHTML = ''; return; }
   const c = L.cmds.find(c => norm(c.c) === n || (c.alias || []).some(a => norm(a) === n));
@@ -75,7 +75,7 @@ function answer(b, o, q) {
   }
   $('tstep').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x === b) x.classList.add('right'); });
   explain(true, o.t, q.why); good(at);
-  if (q.run) print(`${L.host}# ${q.run}`, 'tcmd');
+  if (q.run) print(`${ps} ${q.run}`, 'tcmd');
   if (q.out) print(q.out, 'tok');
   step++;
   if (step >= L.steps.length) { S.busy = true; setTimeout(() => flow.win(), 1400); }

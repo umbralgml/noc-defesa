@@ -13,7 +13,7 @@ export async function loadLevels() {
   const { acts } = await get('index.json');
   const data = await Promise.all(acts.map(get));
   data.forEach((a, ai) => {
-    ACTS.push([a.tag, a.name]);
+    ACTS.push([a.tag, a.name, a.diff || '', a.story || null]);
     a.levels.forEach(L => LEVELS.push({ ...L, act: ai }));
   });
 }

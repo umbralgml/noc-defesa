@@ -1,6 +1,21 @@
 {
-  "tag": "ATO 6",
+  "tag": "ATO 7",
   "name": "Troubleshooting no terminal",
+  "diff": "avançado",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "O Z3R0 mexeu direto na configuração dos equipamentos. Investigue no terminal antes de mexer."
+    },
+    {
+      "who": "z",
+      "t": "Uma linha aqui, um shutdown ali. Ache se for capaz."
+    },
+    {
+      "who": "me",
+      "t": "show, log e só depois configure terminal."
+    }
+  ],
   "levels": [
     {
       "title": "Link caído",

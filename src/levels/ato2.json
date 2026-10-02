@@ -1,6 +1,21 @@
 {
   "tag": "ATO 2",
   "name": "Firewall e DDoS",
+  "diff": "básico",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Agora o ataque é tráfego. Precisamos de firewall bem escrito e mitigação de DDoS."
+    },
+    {
+      "who": "z",
+      "t": "Vou encher seus links até não caber mais nada. E escondo meus pacotes no meio dos seus."
+    },
+    {
+      "who": "me",
+      "t": "Política primeiro, regra depois. E DDoS se resolve antes da borda."
+    }
+  ],
   "levels": [
     {
       "title": "Triagem de tráfego",

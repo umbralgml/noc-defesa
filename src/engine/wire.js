@@ -27,6 +27,8 @@ export function renderWire(L) {
   };
   L.left.forEach(p => $('colL').append(mk(p, 'L')));
   shuffle(L.right).forEach(p => $('colR').append(mk(p, 'R')));
+  // Tutorial: destaca o primeiro par até o jogador fazer a primeira ligação.
+  if (L.tutorial) { const id = L.left[0].id; st.querySelectorAll(`.port[data-id="${id}"]`).forEach(p => p.classList.add('tut')); }
   setStep();
   requestAnimationFrame(() => drawWires());
 }
@@ -72,6 +74,7 @@ function connect(l, r) {
   const at = center(r), label = `${l._t} → ${r._t}`;
   if (l.dataset.id === r.dataset.id) {
     l.classList.add('done'); r.classList.add('done'); r.style.setProperty('--jc', l._c);
+    document.querySelectorAll('.port.tut').forEach(p => p.classList.remove('tut'));   // tutorial cumprido
     S.pairs.push({ l, r, c: l._c }); S.placed++;
     explain(true, label, l._p.why);
     drawWires(null, S.pairs.length - 1); sfx.plug(); good(at, l._c);
