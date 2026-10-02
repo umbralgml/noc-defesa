@@ -50,7 +50,7 @@ p.on('console', m => { if (m.type() === 'error' && !/fonts\.g|ERR_CERT|ERR_TUNNE
 const firstWire = levels.findIndex(L => L.type === 'wire'), firstSlots = levels.findIndex(L => L.mode === 'slots');
 let falhas = 0;
 try {
-  await p.goto(URL0);
+  await p.goto(URL0); await p.waitForSelector('#goMap:not([disabled])');   // carga inicial completa antes de recarregar
   await p.evaluate(() => { localStorage.noc_lesson = 'false'; localStorage.noc_teste = '1'; localStorage.noc_profile = JSON.stringify({ name: '', linkedin: '', consent: false }); });
   await p.reload(); await p.waitForSelector('#goMap:not([disabled])');
   await p.click('#goMap'); await p.waitForSelector('#map.on');
