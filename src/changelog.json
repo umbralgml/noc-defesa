@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "v": "1.13",
+      "date": "2026-10-02",
+      "title": "Plantão com estilo",
+      "items": [
+        "Vestiário: escolha camisa, cabelo, pele e acessório do seu analista (botão 🎨 ANALISTA); tem visual que destrava por estrelas",
+        "Modo difícil: com 3 estrelas numa fase, jogue com dano em dobro. Sem errar, ganhe a estrela de ouro",
+        "Certificado de plantão: concluiu um ato? Gere o PNG no mapa e compartilhe",
+        "Ranking de equipes: coloque sua turma ou empresa no perfil e some pontos juntos",
+        "Acessibilidade: jogue tudo pelo teclado, com alto contraste, texto maior e menos animação (botão ♿)"
+      ]
+    },
+    {
       "v": "1.12",
       "date": "2026-10-02",
       "title": "Pacotes ao vivo",

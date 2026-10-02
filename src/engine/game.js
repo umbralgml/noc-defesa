@@ -14,15 +14,18 @@ import { renderTopo, resetTopo } from './topo.js';
 import { renderPcap } from './pcap.js';
 import { startZ3r0, stopZ3r0 } from './z3r0.js';
 import { addXP, xpHTML, rankOf } from './career.js';
-import { onLevelWin } from './ach.js';
+import { onLevelWin, unlock } from './ach.js';
+import { certModal } from './cert.js';
+import { metric } from './rank.js';
 
 const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm, defense: renderDefense, topo: renderTopo, pcap: renderPcap };
 
 // ---------- map ----------
 export function renderMap() {
-  let html = '', tot = 0, pts = 0, nextI = LEVELS.findIndex((L, i) => unlocked(i) && !S.prog[K(i)]);
+  let html = '', tot = 0, pts = 0, gold = store('noc_gold') || [], nextI = LEVELS.findIndex((L, i) => unlocked(i) && !S.prog[K(i)]);
   ACTS.forEach((a, ai) => {
-    html += `<div class="acth"><span>${a[0]}</span>${a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}<b>${a[1]}</b></div><div class="path">`;
+    const done = LEVELS.every((L, i) => L.act !== ai || S.prog[K(i)]);
+    html += `<div class="acth"><span>${a[0]}</span>${a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div><div class="path">`;
     LEVELS.forEach((L, i) => {
       if (L.act !== ai) return;
       const st = S.prog[K(i)] || 0; tot += st; pts += S.best[K(i)] || 0;
@@ -30,7 +33,7 @@ export function renderMap() {
       const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
       html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : i + 1}</span>
         <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
-        ${lock ? '' : `<span class="res"><span class="st">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
+        ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
     });
     html += '</div>';
   });
@@ -38,7 +41,7 @@ export function renderMap() {
   $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div>' + html;
   flow.map(); flow.room(); flow.train();
   $('mapReset').onclick = () => askReset(renderMap);
-  $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
+  $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}${gold.length ? ` <i class="gold">★${gold.length}</i>` : ''}<small>${fmt(pts)} PTS</small>`;
   const p = profile(), r = rankOf();
   $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
   $('mapRank').textContent = `${r.name} · ${fmt(r.v)} XP`;
@@ -76,9 +79,11 @@ function showBrief(i) {
     <div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>${L.me}</div></div>
     ${lessonHTML(L)}
     <div class="goal"><b>Missão:</b> ${L.goal}</div>
+    ${S.prog[K(i)] === 3 && !L.tutorial ? `<button class="btn ghostb wideb hardb" id="mHard">☠ MODO DIFÍCIL${(store('noc_gold') || []).includes(L.title) ? ' · ★ OURO' : ''}<small>Dano em dobro e o Z3R0 mais agressivo. Vença sem errar para ganhar a estrela de ouro.</small></button>` : ''}
     <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="mGo">IR PARA ${GOTO[L.loc]}</button></div>`);
   $('mCancel').onclick = closeModal;
   $('mGo').onclick = () => { closeModal(); startLevel(i); };
+  if ($('mHard')) $('mHard').onclick = () => { closeModal(); startLevel(i, true); };
 }
 
 // ---------- game core ----------
@@ -87,13 +92,13 @@ function cleanup() {
   resetDrop(); resetWire(); resetDefense(); resetTopo(); stopZ3r0();
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
-function startLevel(i) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title); }
+function startLevel(i, hard) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title + (hard ? ' ☠' : ''), { hard }); }
 
 // Roda qualquer fase. Fases fora do mapa (S.cur = -1) não salvam estrelas e
 // podem trazer L.onWin(res) para tratar o fim do jeito delas.
-export function play(L, name) {
+export function play(L, name, opt = {}) {
   cleanup();
-  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [] });
+  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [], hard: !!opt.hard, t0: Date.now() });
   $('lvName').textContent = name || L.title;
   setHP(); setScore(); hideCoach(); lessonBar(L);
   $('stage').innerHTML = ''; $('bank').style.display = 'none';
@@ -161,8 +166,11 @@ function win() {
   S.prog[K(S.cur)] = Math.max(S.prog[K(S.cur)] || 0, st);
   S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
   submitCampaign();
-  const xr = addXP(20 + st * 15 + (first ? 50 : 0));
-  onLevelWin(L, st);
+  // Modo difícil sem erro: estrela de ouro (uma por fase) e XP extra.
+  const gold = S.hard && S.err === 0, gl = store('noc_gold') || [], newGold = gold && !gl.includes(L.title);
+  if (newGold) { store('noc_gold', [...gl, L.title]); unlock('ouro'); }
+  const xr = addXP(20 + st * 15 + (first ? 50 : 0) + (gold ? 40 : 0));
+  onLevelWin(L, st); metric('win');
   // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
   const last = !!L.boss, more = S.cur < LEVELS.length - 1;
   let delay = 650;
@@ -182,7 +190,8 @@ function win() {
   }
   setTimeout(() => {
     modal(`<div class="tag">${last ? 'FIM DE TURNO' : 'INCIDENTE CONTIDO'}</div><h2>${last ? 'Z3R0 derrotado!' : L.title}</h2>
-      <div class="bigstars">${[0, 1, 2].map(k => `<span>${k < st ? '★' : '☆'}</span>`).join('')}</div>
+      <div class="bigstars${gold ? ' gold' : ''}">${[0, 1, 2].map(k => `<span>${k < st ? '★' : '☆'}</span>`).join('')}</div>
+      ${gold ? `<div class="goldm">${newGold ? 'ESTRELA DE OURO CONQUISTADA!' : 'MODO DIFÍCIL SEM ERROS'}</div>` : S.hard ? '<div class="goldm off">Modo difícil vencido. Sem erros, a estrela vira ouro.</div>' : ''}
       <div class="pts"><span>Acertos</span><b>${fmt(S.score)}</b></div>
       <div class="pts"><span>Bônus integridade ${S.hp}%</span><b>+${fmt(bonus)}</b></div>
       <div class="pts" style="color:var(--warn)"><span>TOTAL</span><b style="color:var(--warn)">${fmt(total)} pts</b></div>
@@ -195,24 +204,25 @@ function win() {
     $('mMap').onclick = () => { closeModal(); goMap(); };
     if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${location.origin + location.pathname}`, e.currentTarget); };
     if (more) $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
-    else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur); };
+    else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
   }, delay);
 }
 function fail(msg) {
-  cleanup(); sfx.lose(); stopMusic(); setTimeout(() => music('menu'), 2500);
+  metric('fail'); cleanup(); sfx.lose(); stopMusic(); setTimeout(() => music('menu'), 2500);
   modal(`<div class="tag">FALHA NA DEFESA</div><h2>Rede comprometida</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${msg} Hahaha!</div></div>
     <div class="learn"><b>DICA</b>${S.lv.tip}</div>
     ${reviewHTML()}
     <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mRetry">TENTAR DE NOVO</button></div>`);
   $('mMap').onclick = () => { closeModal(); goMap(); };
-  $('mRetry').onclick = () => { closeModal(); if (S.cur >= 0) startLevel(S.cur); else goMap(); };
+  $('mRetry').onclick = () => { closeModal(); if (S.cur >= 0) startLevel(S.cur, S.hard); else goMap(); };
 }
 export function goMap() { cleanup(); renderMap(); show('map'); music('menu'); }
 
 export function initGame() {
   flow.win = win; flow.fail = fail;
   $('mapList').addEventListener('click', e => {
+    const c = e.target.closest('.certb'); if (c) { au(); certModal(+c.dataset.a); return; }
     const b = e.target.closest('.node'); if (!b) return;
     const i = +b.dataset.i;
     if (!unlocked(i)) { buzz(30); return; }

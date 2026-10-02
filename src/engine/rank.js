@@ -3,7 +3,7 @@
 // Setup do banco: docs/RANKING.md. Todo jogador com perfil entra (anônimo por padrão);
 // nome e LinkedIn só são enviados com consentimento.
 import { $, esc, fmt, store as ls } from './util.js';
-import { progress } from './state.js';
+import { S, progress } from './state.js';
 import { modal, closeModal } from './ui.js';
 
 let CFG = null;
@@ -52,8 +52,20 @@ async function api(path, opt = {}) {
 
 export async function submit(board, score, stars) {
   const p = profile(); if (!CFG || !p) return false;
-  await api('ranking', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ player: playerId(), name: publicName(), linkedin: publicLinkedin(), board, score, stars }) });
+  const row = { player: playerId(), name: publicName(), linkedin: publicLinkedin(), board, score, stars };
+  const post = r => api('ranking', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(r) });
+  // Banco ainda sem a coluna "team" (SQL antigo): manda de novo sem a equipe.
+  if (p.team) { try { await post({ ...row, team: p.team }); return true; } catch (e) {} }
+  await post(row);
   return true;
+}
+
+// Métricas anônimas por fase (sem id, nome ou aparelho): ajudam a achar fase difícil demais.
+// Desliga no perfil. Falha em silêncio (o banco pode não ter a tabela).
+export function metric(event) {
+  if (!CFG || S.cur < 0 || ls('noc_metricas') === false || ls('noc_teste')) return;
+  const secs = Math.min(7200, Math.round((Date.now() - (S.t0 || Date.now())) / 1000));
+  api('metricas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ level: S.lv.title.slice(0, 60), event, err: Math.min(99, S.err), hp: S.hp, secs, hard: !!S.hard }) }).catch(() => {});
 }
 
 // Envia o total da campanha quando ele melhora (o ranking guarda o melhor de cada jogador).
@@ -83,26 +95,33 @@ export function profileForm(after, first) {
     <div class="fnote" style="margin-top:6px;font-size:13px;color:#c9d6ea">Como você quer aparecer no ranking? Os dois campos são <b>opcionais</b>. Em branco, você aparece como <b id="fAnon"></b>.</div>
     <label class="fl">Nome ou apelido <small>(opcional)</small><input id="fName" maxlength="24" autocomplete="nickname" placeholder="Ex.: Marcos"></label>
     <label class="fl">Perfil do LinkedIn <small>(opcional)</small><input id="fIn" inputmode="url" placeholder="linkedin.com/in/seu-perfil" autocomplete="url"></label>
+    <label class="fl">Equipe <small>(opcional: turma, faculdade, empresa)</small><input id="fTeam" maxlength="24" placeholder="Ex.: Redes 2026 IFSP"></label>
     <label class="fc"><input type="checkbox" id="fOk"> Pode mostrar meu nome e o LinkedIn no ranking público, junto com a minha pontuação.</label>
-    <div class="fnote">Sem marcar a caixa, seus pontos entram como anônimos. Para apagar dados já publicados, abra uma issue em <a href="https://github.com/umbralgml/noc-defesa/issues" target="_blank" rel="noopener">github.com/umbralgml/noc-defesa</a>.</div>
+    <label class="fc"><input type="checkbox" id="fMet"> Enviar estatísticas anônimas das fases (acertos, erros e tempo, sem nome nem id) para melhorar o jogo.</label>
+    <div class="fnote">A equipe aparece no ranking de equipes, que soma os pontos de campanha de quem joga por ela. Sem marcar a primeira caixa, seus pontos entram como anônimos. Para apagar dados já publicados, abra uma issue em <a href="https://github.com/umbralgml/noc-defesa/issues" target="_blank" rel="noopener">github.com/umbralgml/noc-defesa</a>.</div>
     <div class="ferr" id="fErr"></div>
     <div class="row"><button class="btn ghostb" id="fSkip">${first ? 'PULAR' : 'VOLTAR'}</button><button class="btn" id="fSave">${first ? 'ENTRAR NO PLANTÃO' : 'SALVAR'}</button></div>`);
   $('fAnon').textContent = anonName();
   $('fName').value = p.name || ''; $('fIn').value = p.linkedin || ''; $('fOk').checked = !!p.consent;
-  const done = v => { ls('noc_profile', v); ls('noc_rank_sent', null); submitCampaign(); hooks.joined(); hooks.profile(); closeModal(); after && after(); };
-  $('fSkip').onclick = () => { if (first) done({ name: '', linkedin: '', consent: false }); else { closeModal(); after && after(); } };
+  $('fTeam').value = p.team || ''; $('fMet').checked = ls('noc_metricas') !== false;
+  const done = v => { ls('noc_metricas', $('fMet').checked); ls('noc_profile', v); ls('noc_rank_sent', null); submitCampaign(); hooks.joined(); hooks.profile(); closeModal(); after && after(); };
+  $('fSkip').onclick = () => { if (first) done({ name: '', linkedin: '', consent: false, team: '' }); else { closeModal(); after && after(); } };
   $('fSave').onclick = () => {
-    const name = cleanName($('fName').value), li = normLinkedin($('fIn').value), ok = $('fOk').checked, err = m => { $('fErr').textContent = m; };
+    const name = cleanName($('fName').value), li = normLinkedin($('fIn').value), ok = $('fOk').checked, team = cleanName($('fTeam').value), err = m => { $('fErr').textContent = m; };
     if (name && name.length < 2) return err('O nome precisa de pelo menos 2 letras (ou deixe em branco).');
     if (BAD.test(name) || isAnon(name)) return err('Escolha outro nome, por favor.');
     if (li === null) return err('Use o endereço do perfil, no formato linkedin.com/in/seu-perfil.');
+    if (team && (team.length < 2 || BAD.test(team))) return err('Escolha outro nome de equipe (2 a 24 letras).');
     if ((name || li) && !ok) return err('Para mostrar nome ou LinkedIn no ranking, marque a caixa. Ou deixe os campos em branco.');
-    done({ name, linkedin: li || '', consent: !!(name || li) && ok });
+    done({ name, linkedin: li || '', consent: !!(name || li) && ok, team });
   };
 }
 
-const BOARDS = [['campanha', 'CAMPANHA'], [null, 'DESAFIO DE HOJE']];
-const top = (board, n) => api(`ranking_top?board=eq.${encodeURIComponent(board)}&order=score.desc,created_at.asc&limit=${n}&select=name,linkedin,score,stars`);
+const BOARDS = [['campanha', 'CAMPANHA'], [null, 'HOJE'], ['equipes', 'EQUIPES']];
+// Equipes vêm de outra visão; o banco antigo não tem e aí a aba mostra o aviso de falha.
+const top = (board, n) => board === 'equipes'
+  ? api(`ranking_equipes?order=score.desc&limit=${n}&select=team,members,score`).then(r => r.map(x => ({ name: x.team, score: x.score, members: x.members, team: true })))
+  : api(`ranking_top?board=eq.${encodeURIComponent(board)}&order=score.desc,created_at.asc&limit=${n}&select=name,linkedin,score,stars`);
 const tabsHTML = tab => `<div class="tabs">${BOARDS.map((b, i) => `<button class="tabb${i === tab ? ' on' : ''}" data-t="${i}">${b[1]}</button>`).join('')}</div>`;
 const failMsg = el => { if (el) el.innerHTML = '<div class="rmsg">Não consegui carregar o ranking agora. Tente de novo mais tarde.</div>'; };
 
@@ -116,7 +135,7 @@ export function openRanking(dailyBoard, tab = 0) {
   $('mOk').onclick = closeModal;
   $('rEdit').onclick = () => profileForm(() => openRanking(dailyBoard, tab));
   $('mcard').querySelectorAll('.tabb').forEach(b => b.onclick = () => openRanking(dailyBoard, +b.dataset.t));
-  top(BOARDS[tab][0] || dailyBoard, 50).then(rows => renderRows($('rList'), rows, !!BOARDS[tab][0])).catch(e => { console.error(e); failMsg($('rList')); });
+  top(BOARDS[tab][0] || dailyBoard, 50).then(rows => renderRows($('rList'), rows, !!BOARDS[tab][0], BOARDS[tab][0] === 'equipes')).catch(e => { console.error(e); failMsg($('rList')); });
 }
 
 // Quadro compacto (top 10) na tela inicial.
@@ -126,12 +145,17 @@ export function titleRanking(dailyBoard, tab = 0) {
   $('rkTabs').querySelectorAll('.tabb').forEach(b => b.onclick = () => titleRanking(dailyBoard, +b.dataset.t));
   $('rkAll').onclick = () => openRanking(dailyBoard, tab);
   $('rkList').innerHTML = '<div class="rmsg">Carregando...</div>';
-  top(BOARDS[tab][0] || dailyBoard, 10).then(rows => renderRows($('rkList'), rows, !!BOARDS[tab][0])).catch(e => { console.error(e); failMsg($('rkList')); });
+  top(BOARDS[tab][0] || dailyBoard, 10).then(rows => renderRows($('rkList'), rows, !!BOARDS[tab][0], BOARDS[tab][0] === 'equipes')).catch(e => { console.error(e); failMsg($('rkList')); });
 }
 
-function renderRows(l, rows, campaign) {
+function renderRows(l, rows, campaign, teams) {
   if (!l) return;
-  if (!rows.length) { l.innerHTML = `<div class="rmsg">${campaign ? 'Ninguém no quadro ainda. Seja o primeiro.' : 'Ninguém fez o desafio de hoje ainda.'}</div>`; return; }
+  if (!rows.length) { l.innerHTML = `<div class="rmsg">${teams ? 'Nenhuma equipe no quadro ainda. Escolha a sua no perfil.' : campaign ? 'Ninguém no quadro ainda. Seja o primeiro.' : 'Ninguém fez o desafio de hoje ainda.'}</div>`; return; }
+  if (rows[0].team) {
+    const mine = (profile() || {}).team;
+    l.innerHTML = rows.map((r, i) => `<div class="rrow${i < 3 ? ' top' : ''}${r.name === mine ? ' me' : ''}"><span class="rp">${['🥇', '🥈', '🥉'][i] || i + 1}</span><span class="rn">${esc(r.name)}${r.name === mine ? ' <span class="you">sua</span>' : ''}</span><span class="rs"><i>👥 ${r.members}</i>${fmt(r.score)}</span></div>`).join('');
+    return;
+  }
   const me = publicName();
   l.innerHTML = rows.map((r, i) => {
     const li = normLinkedin(r.linkedin), you = r.name === me ? ' <span class="you">você</span>' : '';

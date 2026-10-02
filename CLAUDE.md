@@ -73,6 +73,8 @@ src/engine/
   train.js            treino dos seus erros: quiz com os itens do banco; 2 acertos seguidos tiram o item
   career.js           XP e cargos (Estagiário → Arquiteto de Redes)
   ach.js              conquistas (lista ACH), faixa no topo (#achv), vitrine; stat() para contadores
+  prefs.js            visual do analista (camisa/cabelo/pele/acessório em variáveis CSS do HERO) e acessibilidade (classes hc, big, calm no <html>)
+  cert.js             certificado PNG por ato concluído (canvas), baixar ou compartilhar
   room.js             sala do NOC no topo do mapa: herói anda (toque/setas), câmera acompanha, estação abre os incidentes do `loc`
 tools/validar-fases.mjs
 docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
@@ -80,7 +82,7 @@ docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 
 ### Grafo de dependências (sem ciclos)
 
-`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `steps` ← `term`, `topo`, `defense`, `pcap` (+ `netlib`) ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa` ← `main`)
+`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `steps` ← `term`, `topo`, `defense`, `pcap` (+ `netlib`) ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa`, `prefs` ← `main`; `rank` ← `cert` ← `game`)
 
 Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js`, `flow.room()` (placas da sala) pelo `room.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
 
@@ -115,6 +117,9 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Duelo:** o link `?d=AAAA-MM-DD&p=pts&g=10111&n=nome` reabre as perguntas daquela data (`readChallenge()` valida tudo e limpa a URL). Só conta como desafio oficial se for de hoje e o jogador ainda não tiver jogado. Mudar quizzes ou geradores muda as perguntas de datas passadas também; duelos antigos podem divergir.
 - **Sala do NOC:** estações em `STATIONS` (`scene.js`) por `loc`; um `loc` novo precisa de estação lá e de desenho em `sceneSVG`.
 - **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. O perfil é pedido no primeiro turno (`ensureProfile`); sem nome, o jogador aparece como `Analista #XXXX` (`anonName()`). Nome e LinkedIn só saem do aparelho com consentimento marcado (`publicName()`/`publicLinkedin()`); sem ele, envia o apelido anônimo.
+- **Modo difícil:** liberado no briefing da fase com 3 estrelas. `S.hard` dobra o dano (`damage()`) e soma um evento do Z3R0. Vencer sem erro grava o título em `noc_gold` (estrela de ouro, destrava a camisa dourada).
+- **Acessibilidade:** todo elemento jogável precisa funcionar com Tab + Enter/espaço. Animação nova deve respeitar a classe `calm` (o CSS já zera animações; pacotes que se movem por transição ficam de fora).
+- **Métricas:** `metric('win'|'fail')` em `rank.js` envia só dados anônimos da fase, e só se o jogador não desligou no perfil (`noc_metricas`).
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
 - **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`) puxa a `main` a cada 15 minutos. Não há outro passo de publicação.
 - **Dificuldade gradativa:** o jogo é para quem nunca viu rede até quem trabalha num NOC. Cada ato tem `diff` (iniciante → avançado, só sobe). Iniciante/básico: analogias, sem cronômetro, dica automática no 2º erro (`hint()` em `ui.js`). Pressão (tempo, eventos do Z3R0) só a partir de intermediário. A primeira fase tem `"tutorial": true`.

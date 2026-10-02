@@ -21,7 +21,7 @@ export function renderWire(L) {
     const d = document.createElement('div');
     const jc = side === 'L' ? (p.m ? MEDIA[p.m].c : '#00e0a8') : '#5b6b86';
     const ico = side === 'L' ? (p.m ? MEDIA[p.m].ico : '') : (p.ico || '');
-    d.className = 'port ' + side; d.dataset.id = p.id; d.style.setProperty('--jc', jc); d._c = jc; d._t = p.t; d._p = p;
+    d.className = 'port ' + side; d.tabIndex = 0; d.setAttribute('role', 'button'); d.dataset.id = p.id; d.style.setProperty('--jc', jc); d._c = jc; d._t = p.t; d._p = p;
     d.innerHTML = `<span class="st"></span><div class="pic">${ico ? icon(ico, side === 'L' ? jc : null) : ''}<div class="t"></div></div>${p.s ? '<div class="s"></div>' : ''}<span class="up">LINK UP</span><span class="jack"></span>`;
     d.querySelector('.t').textContent = p.t; if (p.s) d.querySelector('.s').textContent = p.s;
     return d;
@@ -136,6 +136,14 @@ export function initWire() {
   };
   addEventListener('pointerup', e => end(e, false));
   addEventListener('pointercancel', e => end(e, true));
+  // Teclado: Enter ou espaço na esquerda escolhe; na direita, liga ao escolhido.
+  $('stage').addEventListener('keydown', e => {
+    const p = e.target.closest('.port'); if (!p || (e.key !== 'Enter' && e.key !== ' ') || p.classList.contains('done') || S.busy) return;
+    e.preventDefault(); au();
+    if (p.classList.contains('L')) { select(wsel === p ? null : p); if (wsel) { const r = $('colR').querySelector('.port:not(.done)'); if (r) r.focus(); } }
+    else if (wsel) { const a = wsel; wsel.classList.remove('sel'); wsel = null; connect(a, p); setStep(); const n = $('colL').querySelector('.port:not(.done)'); if (n) n.focus(); }
+    else toast('Comece pelo item da esquerda.', true);
+  });
   (function autoScroll() {
     if (WD && WD.moved && WD.as) $('stage').scrollTop += WD.as * 7;
     requestAnimationFrame(autoScroll);

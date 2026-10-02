@@ -29,7 +29,12 @@ O jogo foi feito para ensinar, não só para testar:
 - **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar. Dá para **desafiar um colega** com um link que leva as mesmas perguntas e o seu placar.
 - **Z3R0 ativo:** a partir do nível intermediário, ele ataca durante a fase (glitch, embaralha, ataque relâmpago com contagem regressiva).
 - **Treino dos seus erros:** cada erro vira uma pergunta de revisão no mapa; dois acertos seguidos tiram o item da lista.
-- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 23 conquistas.
+- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 24 conquistas.
+- **Modo difícil e estrela de ouro:** com 3 estrelas numa fase, jogue de novo com dano em dobro; sem errar, a estrela vira ouro.
+- **Seu analista:** camisas, cabelo, pele e acessórios, com visuais que destravam por estrelas.
+- **Certificado por ato:** ao concluir um ato, gere um certificado em PNG para baixar ou compartilhar.
+- **Ranking de equipes:** jogue pela sua turma, faculdade ou empresa (opcional).
+- **Acessibilidade:** jogável no teclado, alto contraste, texto maior e menos animação.
 - **Jeitos de jogar:** ligar cabos, arrastar fichas, quiz, terminal, **defesa ao vivo** (regras de firewall contra ondas de pacotes), **topologia viva** (ping animado para achar a falha) e **captura estilo Wireshark** (filtros de exibição).
 - **Sala do NOC:** no mapa, o analista anda pela sala (toque ou setas) até o equipamento e abre os incidentes de lá.
 

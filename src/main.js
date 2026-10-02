@@ -17,6 +17,9 @@ import { rankOf, RANKS } from './engine/career.js';
 import { achHTML, achCount, ACH } from './engine/ach.js';
 import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
+import { applyPrefs, lookModal, a11yModal } from './engine/prefs.js';
+
+applyPrefs();
 
 $('mA').innerHTML = AV_ME;
 $('tScene').innerHTML = sceneSVG('war', true) + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
@@ -26,6 +29,8 @@ $('sndT').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(MUS
 $('sndM').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music('menu'); };
 setMute(isMuted());
 $('resetBtn').onclick = () => askReset(showProgress);
+$('lookBtn').onclick = () => { au(); lookModal(); };
+$('a11yBtn').onclick = () => { au(); a11yModal(); };
 
 // Resumo na tela inicial, só para quem já concluiu alguma fase.
 function showProgress() {

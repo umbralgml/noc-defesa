@@ -18,20 +18,20 @@ export function renderDrop(level) {
   if (L.intro) st.insertAdjacentHTML('beforeend', `<div class="task">${L.intro}</div>`);
   let chips;
   if (L.mode === 'slots') {
-    const html = L.html.replace(/\[(\w+)\]/g, (m, id) => `<span class="zone slot${L.wide ? ' wide' : ''}" data-z="${id}">${L.wide ? 'solte aqui' : '?'}</span>`);
+    const html = L.html.replace(/\[(\w+)\]/g, (m, id) => `<span class="zone slot${L.wide ? ' wide' : ''}" data-z="${id}" tabindex="0" role="button" aria-label="Lacuna">${L.wide ? 'solte aqui' : '?'}</span>`);
     st.insertAdjacentHTML('beforeend', `<div class="tpl">${html}</div>`);
     S.need = Object.keys(L.zones).length;
     chips = L.chips.map(norm);
   } else {
     const w = document.createElement('div'); w.className = 'buckets';
-    L.buckets.forEach((b, bi) => w.insertAdjacentHTML('beforeend', `<div class="zone bucket" data-b="${bi}" style="--bc:${b.c}"><div class="bh">${b.label}</div><div class="bl"></div></div>`));
+    L.buckets.forEach((b, bi) => w.insertAdjacentHTML('beforeend', `<div class="zone bucket" data-b="${bi}" style="--bc:${b.c}" tabindex="0" role="button"><div class="bh">${b.label}</div><div class="bl"></div></div>`));
     st.append(w);
     bucketVals = L.buckets.map(b => b.a.map(x => norm(x).v));
     chips = L.buckets.flatMap(b => b.a.map(norm));
     S.need = chips.length;
   }
   const bank = $('bank'); bank.innerHTML = `<div class="bankh"><span>ARRASTE OU TOQUE E ESCOLHA O DESTINO</span><span id="bankCnt">0/${S.need}</span></div>`; bank.style.display = 'flex';
-  shuffle(chips).forEach(c => { const d = document.createElement('div'); d.className = 'chip'; d.textContent = c.t; d._c = c; bank.append(d); });
+  shuffle(chips).forEach(c => { const d = document.createElement('div'); d.className = 'chip'; d.textContent = c.t; d._c = c; d.tabIndex = 0; d.setAttribute('role', 'button'); bank.append(d); });
 }
 
 function zoneAt(x, y) {
@@ -86,6 +86,17 @@ export function initDrop() {
   $('stage').addEventListener('click', e => {
     const z = e.target.closest('.zone');
     if (z && sel) tryPlace(sel, z);
+  });
+  // Teclado: Enter ou espaço escolhe a ficha e depois o destino.
+  const key = e => e.key === 'Enter' || e.key === ' ';
+  $('bank').addEventListener('keydown', e => {
+    const c = e.target.closest('.chip'); if (!c || !key(e) || c.classList.contains('used') || S.busy) return;
+    e.preventDefault(); au();
+    if (sel === c) clearSel(); else { clearSel(); sel = c; c.classList.add('sel'); sfx.sel(); const z = $('stage').querySelector('.zone:not(.ok)'); if (z) z.focus(); }
+  });
+  $('stage').addEventListener('keydown', e => {
+    const z = e.target.closest('.zone'); if (!z || !key(e)) return;
+    e.preventDefault(); if (sel) { tryPlace(sel, z); const n = $('bank').querySelector('.chip:not(.used)'); if (n) n.focus(); }
   });
   addEventListener('pointermove', e => {
     if (!D || e.pointerId !== D.id) return;

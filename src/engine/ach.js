@@ -16,6 +16,7 @@ export const ACH = [
   ['temporada2', '🌐', 'Temporada 2', 'Vença uma fase depois do chefe final.'],
   ['muralha', '🧱', 'Muralha', 'Segure uma defesa ao vivo sem deixar nenhum pacote errado passar.'],
   ['wireshark', '🦈', 'Olho de Wireshark', 'Classifique uma captura inteira sem errar nenhum pacote.'],
+  ['ouro', '🥇', 'Estrela de ouro', 'Vença uma fase no modo difícil sem nenhum erro.'],
   ['rastreador', '🗺️', 'Rastreador', 'Ache a falha de uma topologia na primeira tentativa.'],
   ['teclado', '⌨️', 'Mãos no teclado', 'Digite 10 comandos no terminal (sem tocar nos sugeridos).'],
   ['relampago', '⚡', 'Bloqueio relâmpago', 'Bloqueie um ataque relâmpago do Z3R0.'],
