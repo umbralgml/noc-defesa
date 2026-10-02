@@ -115,10 +115,10 @@ export function explain(ok, label, why, rec = true) {
   if (rec && !ok && why !== GENERIC) note(label, why);
 }
 // Painel em modo informativo (o que um comando mostra): não conta como erro nem acerto.
-export function info(label, text) {
+export function info(label, text, kind = 'COMANDO') {
   const c = $('coach');
   c.className = 'coach'; void c.offsetWidth; c.className = 'coach on info';
-  c.innerHTML = '<span class="k">ℹ COMANDO</span><span class="ct"><b></b> <span></span></span>';
+  c.innerHTML = `<span class="k">ℹ ${kind}</span><span class="ct"><b></b> <span></span></span>`;
   c.querySelector('b').textContent = label + ':'; c.querySelector('.ct span').textContent = text; c.scrollTop = 0;
 }
 // Acrescenta uma dica embaixo da explicação que está no painel.

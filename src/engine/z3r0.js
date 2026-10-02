@@ -22,7 +22,7 @@ export function stopZ3r0() {
 
 export function startZ3r0(L) {
   stopZ3r0();
-  if (L.onWin || L.tutorial || store('noc_teste')) return;
+  if (L.onWin || L.tutorial || L.type === 'defense' || store('noc_teste')) return;   // defesa já é tempo real
   const n = Math.max(0, diffOf(L) - 1) + (L.hard ? 1 : 0);   // intermediário 1, avançado 2 (+1 no modo difícil)
   let t = 9000 + Math.random() * 6000;
   for (let k = 0; k < n; k++) { later(() => fire(L), t); t += 16000 + Math.random() * 10000; }
@@ -30,7 +30,7 @@ export function startZ3r0(L) {
 
 function fire(L) {
   if (!active()) return;
-  const kinds = ['glitch', 'rush'];
+  const kinds = L.type === 'topo' ? ['glitch'] : ['glitch', 'rush'];   // na topologia não há acerto rápido para fazer
   if (L.type === 'drop' || L.type === 'wire') kinds.push('shuffle');
   const k = kinds[Math.random() * kinds.length | 0];
   if (k === 'glitch') glitch(); else if (k === 'shuffle') scramble(L); else startRush(L);
@@ -49,7 +49,7 @@ function scramble(L) {
 }
 
 function startRush(L) {
-  const quick = L.type === 'quiz' || L.type === 'term';
+  const quick = ['quiz', 'term', 'pcap'].includes(L.type);
   const need = quick ? 1 : 2, secs = quick ? 20 : 12;
   rush = { need, got: 0, left: secs };
   sfx.siren();

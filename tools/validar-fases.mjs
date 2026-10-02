@@ -4,6 +4,7 @@
 // Erros (fase quebrada) fazem o script sair com código 1. Avisos apontam conteúdo didático faltando.
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { matches, path, reach, lid, compile } from '../src/engine/netlib.js';
 
 const DIR = fileURLToPath(new URL('../src/levels/', import.meta.url));
 const LOCS = ['rack', 'desk', 'firewall', 'war', 'server'];
@@ -51,7 +52,7 @@ function check(L, where) {
     (L.buckets || []).forEach(b => { if (!b.label || !b.c) err('categoria sem "label" ou "c"'); b.a.forEach(x => { if (!hasWhy(x)) warn(`item "${txt(x)}" sem "why"`); }); });
   } else if (L.type === 'quiz') {
     if (!L.qs || !L.qs.length) err('"qs" vazio');
-    if (L.boss && !L.time) err('chefe precisa de "time" (segundos por pergunta)');
+    if ((L.boss || L.miniboss) && L.type === 'quiz' && !L.time) err('chefe precisa de "time" (segundos por pergunta)');
     (L.qs || []).forEach((q, i) => {
       if (!q.q || !q.why) err(`pergunta ${i + 1} sem "q" ou "why"`);
       if (!Array.isArray(q.o) || q.o.length < 2) err(`pergunta ${i + 1} precisa de 2+ opções`);
@@ -68,12 +69,53 @@ function check(L, where) {
       if (!c.why) warn(`comando "${c.c}" sem "why"`);
     });
     if (!L.steps || !L.steps.length) err('"steps" vazio');
-    (L.steps || []).forEach((q, i) => {
+    checkSteps(L.steps, err, warn);
+  } else if (L.type === 'defense') {
+    const rules = L.rules || [], pk = (L.waves || []).flatMap(w => w.packets || []);
+    if (!rules.length || !pk.length) err('defesa precisa de "rules" e "waves" com "packets"');
+    rules.forEach(r => { if (!r.id || !r.t || !r.match) err(`regra sem "id", "t" ou "match"`); if (!r.why) warn(`regra "${r.t}" sem "why"`); });
+    pk.forEach(p => {
+      if (!p.src || !p.why) err(`pacote ${p.t || p.src} sem "src" ou "why"`);
+      const hit = rules.filter(r => r.match && matches(r.match, p));
+      // ataque precisa de uma regra boa que o pare; legítimo não pode ser barrado por regra boa
+      if (p.bad && !hit.some(r => r.good)) err(`ataque ${p.src}/${p.port} não é bloqueado por nenhuma regra "good"`);
+      if (!p.bad && hit.some(r => r.good)) err(`cliente legítimo ${p.src}/${p.port} seria bloqueado pela regra boa "${hit.find(r => r.good).t}"`);
+    });
+    rules.filter(r => !r.good && r.match).forEach(r => { if (!pk.some(p => !p.bad && matches(r.match, p))) warn(`armadilha "${r.t}" não pega nenhum cliente legítimo (não ensina o falso positivo)`); });
+  } else if (L.type === 'topo') {
+    const ids = (L.nodes || []).map(n => n.id), links = (L.links || []).map(k => lid(k.a, k.b));
+    if (!ids.includes(L.from)) err(`"from" = ${L.from} não é um nó`);
+    (L.nodes || []).forEach(n => { if (!n.id || !n.t || n.x === undefined || n.y === undefined) err(`nó sem "id", "t", "x" ou "y"`); if (n.id !== L.from && !n.why) warn(`nó "${n.t}" sem "why"`); });
+    (L.links || []).forEach(k => { if (!ids.includes(k.a) || !ids.includes(k.b)) err(`enlace ${k.a}-${k.b} liga nó inexistente`); });
+    const all = [...ids, ...links];
+    if (!all.includes(L.fault)) err(`"fault" = ${L.fault} não é nó nem enlace (enlace é "a-b" em ordem alfabética)`);
+    (L.accept || []).forEach(a => { if (!all.includes(a)) err(`"accept" tem ${a}, que não existe`); });
+    if (L.accept && !L.accept.includes(L.fault)) err('"accept" precisa incluir o "fault"');
+    if (!L.faultWhy || !L.faultName) err('topologia precisa de "faultName" e "faultWhy"');
+    if (L.nodes && L.links && all.includes(L.fault)) {
+      const res = ids.filter(n => n !== L.from).map(n => { const p = path(L, n); return p ? reach(L, p) === p.length - 1 : null; });
+      if (res.includes(null)) err('algum nó não tem caminho a partir de "from"');
+      if (!res.includes(true) || !res.includes(false)) err('precisa de destinos que respondem e que falham para o jogador comparar');
+    }
+    if (L.steps) checkSteps(L.steps, err, warn);
+  } else if (L.type === 'pcap') {
+    const P = L.packets || [];
+    if (P.length < 4) err('"packets" precisa de pelo menos 4 pacotes');
+    if (!P.some(p => p.bad) || !P.some(p => !p.bad)) err('a captura precisa ter pacotes normais e suspeitos');
+    P.forEach((p, i) => { if (!p.src || !p.dst || !p.proto || !p.info) err(`pacote ${i + 1} sem "src", "dst", "proto" ou "info"`); if (!p.why) warn(`pacote ${i + 1} sem "why"`); });
+    (L.filters || []).forEach(f => {
+      try { const fn = compile(f.f); if (!P.some(fn)) warn(`filtro "${f.f}" não mostra nenhum pacote`); } catch (e) { err(`filtro "${f.f}" inválido: ${e.message}`); }
+      if (!f.why) warn(`filtro "${f.f}" sem "why"`);
+    });
+  } else err(`tipo "${L.type}"${L.mode ? '/' + L.mode : ''} desconhecido`);
+}
+
+function checkSteps(steps, err, warn) {
+    steps.forEach((q, i) => {
       if (!q.q || !q.why) err(`passo ${i + 1} sem "q" ou "why"`);
       if (!Array.isArray(q.o) || q.o.length < 2 || !(q.a >= 0 && q.a < q.o.length)) err(`passo ${i + 1}: opções ou "a" inválidos`);
       else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`passo ${i + 1}: opção errada "${txt(o)}" sem "why"`); });
     });
-  } else err(`tipo "${L.type}"${L.mode ? '/' + L.mode : ''} desconhecido`);
 }
 
 const idxActs = () => read('index.json').acts;

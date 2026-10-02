@@ -63,6 +63,11 @@ src/engine/
   drop.js             tipo "drop" (modes "buckets" e "slots")
   quiz.js             tipo "quiz" (e chefe com "boss")
   term.js             tipo "term": terminal simulado (comandos com saída fixa, alias, diagnóstico em passos)
+  steps.js            perguntas de diagnóstico em passos, comuns ao "term" e ao "topo"
+  defense.js          tipo "defense": pacotes em ondas, regras de firewall ligadas em tempo real
+  topo.js             tipo "topo": diagrama da rede, ping animado, apontar a falha
+  pcap.js             tipo "pcap": captura estilo Wireshark, filtros de exibição, classificar pacotes
+  netlib.js           lógica de rede pura (casamento de regra, caminho na topologia, compilador de filtro); o validador também importa
   z3r0.js             eventos do Z3R0 durante a fase (glitch, embaralhar, ataque relâmpago), na medida do `diff` do ato
   bank.js             banco de erros (localStorage noc_bank) em formato de quiz; sem dependências de tela
   train.js            treino dos seus erros: quiz com os itens do banco; 2 acertos seguidos tiram o item
@@ -75,7 +80,7 @@ docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 
 ### Grafo de dependências (sem ciclos)
 
-`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `term` ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa` ← `main`)
+`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `steps` ← `term`, `topo`, `defense`, `pcap` (+ `netlib`) ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa` ← `main`)
 
 Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js`, `flow.room()` (placas da sala) pelo `room.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
 

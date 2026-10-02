@@ -38,12 +38,13 @@ python3 -m http.server 8000   # e abra http://localhost:8000
 |-------|:-:|---------|----------------|
 | `title` | sim | texto | Nome da fase. **Precisa ser único e não pode mudar depois de publicado**: o progresso salvo usa o título como chave. |
 | `tag` | sim | texto | Rótulo curto em maiúsculas no mapa (`SUB-REDES`, `BGP`, `QUIZ`). |
-| `type` | sim | `wire`, `drop` ou `quiz` | Tipo de fase (veja abaixo). |
+| `type` | sim | `wire`, `drop`, `quiz`, `term`, `defense`, `topo` ou `pcap` | Tipo de fase (veja abaixo). |
 | `mode` | só em `drop` | `buckets` ou `slots` | Variante da fase `drop`. |
 | `loc` | sim | `rack`, `desk`, `firewall`, `war`, `server` | Cenário animado e texto do botão "IR PARA...". |
 | `cap` | sim | texto | Legenda digitada enquanto o analista anda até o local. |
 | `goal` | sim | HTML | Missão, mostrada no briefing (e no topo da fase `wire`). |
-| `intro` | não | HTML | Enunciado no topo da fase `drop`. |
+| `intro` | não | HTML | Enunciado no topo da fase (`drop`, `term`, `defense`, `topo`, `pcap`). |
+| `miniboss` | não | `true` | Chefe intermediário: telão do Z3R0, música de chefe e animação de derrota, sem encerrar a campanha. Use com `loc: "war"`. |
 | `z` | sim | HTML | Fala do Z3R0 no briefing. |
 | `me` | sim | HTML | Resposta do analista no briefing. |
 | `lesson` | recomendado | lista de HTML | **Aula rápida**: 3 a 6 tópicos com o conceito necessário para a fase. Aparece no briefing e no botão **?**. |
@@ -323,6 +324,69 @@ O jogador investiga um equipamento num terminal: digita comandos (aceita os apel
   ]
 }
 ```
+
+---
+
+## Tipo `defense`: defesa em tempo real
+
+Os pacotes chegam em ondas e atravessam uma pista até o servidor. O jogador liga e desliga regras de firewall a qualquer momento; cada pacote é avaliado quando cruza a linha laranja. Ataque bloqueado é acerto. Ataque que passa, ou cliente legítimo bloqueado (**falso positivo**), custa integridade e explica o porquê. O Z3R0 não faz eventos surpresa aqui: a fase já é tempo real.
+
+| Campo | Formato |
+|-------|---------|
+| `rules` | lista de `{ "id", "t", "match", "good"?, "why" }`. `match` casa por igualdade de campos do pacote; `src` aceita prefixo `/8`, `/16` ou `/24`. `good: true` marca as regras certas (o validador e o teste usam). O `why` aparece na primeira vez que a regra é ligada. |
+| `waves` | lista de `{ "msg"?, "gap"?, "travel"?, "packets" }`. `gap` = ms entre pacotes (padrão 1500), `travel` = ms para atravessar a pista (padrão 5200). |
+| `packets` | `{ "src", "proto", "port"?, "sport"?, "bad"?, "why" }`. `port` é a porta de **destino**, `sport` a de **origem**. O rótulo na pista é `origem PROTO sport→port`. |
+| `reveal` | `true` pinta ataque de vermelho e cliente de azul desde o início (use no nível básico). Sem ele, a cor só aparece depois da decisão. |
+| `server` | texto embaixo do servidor na pista (`LOJA 177.10.0.5`). |
+| `start` | ms antes da primeira onda (padrão 2500). |
+| `dmg` | dano por erro (padrão 10). |
+
+O validador confere que todo ataque é barrado por alguma regra `good`, que nenhuma regra `good` barra cliente legítimo e avisa quando uma armadilha (regra sem `good`) não pega nenhum cliente, porque aí ela não ensina o falso positivo.
+
+```json
+"rules": [
+  { "id": "ntp", "t": "Bloquear UDP com origem 123 (NTP)", "match": { "proto": "udp", "sport": 123 }, "good": true, "why": "Para a reflexão NTP." },
+  { "id": "https", "t": "Bloquear TCP/443 (HTTPS)", "match": { "proto": "tcp", "port": 443 }, "why": "Armadilha: é a porta da loja." }
+],
+"waves": [
+  { "msg": "Primeira onda.", "packets": [
+    { "src": "91.200.12.4", "proto": "udp", "port": 51000, "sport": 123, "bad": true, "why": "Resposta NTP que ninguém pediu: reflexão." },
+    { "src": "189.40.12.7", "proto": "tcp", "port": 443, "why": "Cliente comprando na loja." }
+  ] }
+]
+```
+
+---
+
+## Tipo `topo`: topologia viva
+
+Um diagrama da rede. No modo **PING** o jogador toca num equipamento e vê o pacote andar pelos enlaces a partir de `from`: ou volta, ou morre no ponto da falha. Depois de **2 pings** libera o modo **APONTAR FALHA**: tocar no equipamento ou no cabo com problema. Errar custa 15% e a explicação sai dos próprios testes ("um ping passou por aqui e voltou..."). Acertando, seguem os `steps` (opcionais, no formato do `term`) e a vitória.
+
+| Campo | Formato |
+|-------|---------|
+| `from` | id do nó de onde saem os pings |
+| `nodes` | `{ "id", "t", "ip"?, "kind", "x", "y", "why" }`. `kind`: `pc`, `sw`, `rt`, `fw`, `srv`, `net`, `ap`. Coordenadas numa área de 360 × 230 (deixe ~30 de margem). O `why` (o papel do equipamento) aparece no primeiro ping até ele. |
+| `links` | `{ "a", "b", "t"?, "off"?, "why"? }`. `off: true` desenha tracejado e não encaminha (enlace reserva desligado). O `why` explica por que **não** é a falha. |
+| `fault` | o nó ou o enlace com defeito. Enlace é `"a-b"` com os ids em **ordem alfabética** (`"rt-swdc"`). |
+| `accept` | opcional, respostas aceitas quando os testes não distinguem (o cabo ou o switch da ponta). Precisa incluir o `fault`. |
+| `faultName`, `faultWhy` | a resposta certa em texto curto (vai para o treino) e a explicação. |
+| `trace` | `false` esconde o traceroute; sem ele, o jogador só vê responde ou não responde (use do intermediário em diante). Switches (`sw`, `ap`) não aparecem no traceroute, como na vida real. |
+| `steps` | opcional, perguntas depois de achar a falha (`q`, `o`, `a`, `why`, `run`?, `out`?). |
+
+O caminho é o mais curto em saltos, ignorando enlaces `off`. O validador exige destinos que respondem e destinos que falham, para o jogador ter o que comparar.
+
+---
+
+## Tipo `pcap`: análise de captura
+
+Uma captura no estilo Wireshark. O jogador filtra com filtros de exibição (chips prontos ou digitados) e classifica cada pacote como **NORMAL** ou **SUSPEITO**, um a um ou **todos os visíveis** de uma vez. Filtro largo demais pega cliente legítimo junto, e cada pacote errado custa 10%.
+
+| Campo | Formato |
+|-------|---------|
+| `packets` | `{ "src", "dst", "proto", "info", "sport"?, "dport"?, "flags"?, "method"?, "qname"?, "len"?, "bad"?, "why" }`. `proto` como no Wireshark (`TCP`, `UDP`, `DNS`, `HTTP`, `TLS`, `NTP`, `ICMP`); `flags` como `"SYN"` ou `"SYN,ACK"`. |
+| `filters` | `{ "f", "why" }`: chips de filtro. O `why` aparece na primeira vez que o filtro é aplicado. |
+
+Filtros aceitos (subconjunto do Wireshark, em `src/engine/netlib.js`): protocolos (`tcp`, `udp`, `icmp`, `dns`, `http`, `tls`, `ntp`, `ssh`), `ip.src`, `ip.dst`, `ip.addr` (aceitam prefixo `/8`, `/16`, `/24`), `tcp.port`, `udp.port`, `tcp.srcport`, `tcp.dstport`, `udp.srcport`, `udp.dstport`, `tcp.flags.syn`, `tcp.flags.ack`, `tcp.flags.rst`, `http.request`, `http.request.method`, `dns.qry.name`, `frame.len`. Operadores `== != > < >= <=` e `contains`, combinados com `&&`, `||`, `!` (ou `and`, `or`, `not`) e parênteses. O validador compila cada chip e avisa se ele não mostra nenhum pacote.
 
 ---
 

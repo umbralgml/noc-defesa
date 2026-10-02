@@ -1,20 +1,19 @@
 // Motor "term": troubleshooting num terminal. O jogador investiga rodando comandos
 // (digitando ou tocando nos sugeridos) e depois responde os passos de diagnóstico e correção.
 // Errar um passo custa integridade e explica o porquê, mas dá para tentar de novo.
-import { $, shuffle, center } from './util.js';
+import { $ } from './util.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
-import { good, damage, explain, info, note, flow } from './ui.js';
-import { bankAdd } from './bank.js';
+import { info, flow } from './ui.js';
+import { runSteps } from './steps.js';
 import { stat, unlock } from './ach.js';
 
 const MIN_CMDS = 2;   // comandos diferentes antes de liberar o diagnóstico
 const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
-const opt = o => typeof o === 'string' ? { t: o } : o;
-let L = null, ran = new Set(), step = 0, ps = '';
+let L = null, ran = new Set(), ps = '';
 
 export function renderTerm(level) {
-  L = level; ran = new Set(); step = 0; ps = L.prompt || L.host + '#';
+  L = level; ran = new Set(); ps = L.prompt || L.host + '#';
   const st = $('stage');
   st.innerHTML = `${L.intro ? `<div class="task">${L.intro}</div>` : ''}
     <div class="term"><div class="tlog" id="tlog"></div>
@@ -57,30 +56,6 @@ function run(raw) {
 function showStep() {
   const box = $('tstep'); if (!box) return;
   if (ran.size < MIN_CMDS) { box.innerHTML = `<div class="tlock">🔎 Investigue: rode pelo menos ${MIN_CMDS} comandos para liberar o diagnóstico.</div>`; return; }
-  const q = L.steps[step];
-  box.innerHTML = `<div class="qmeta">DIAGNÓSTICO ${step + 1}/${L.steps.length}</div><div class="q"></div><div class="topts"></div><div id="whyBox"></div>`;
-  box.querySelector('.q').textContent = q.q;
-  shuffle(q.o.map((o, i) => ({ ...opt(o), ok: i === q.a }))).forEach(o => {
-    const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.t;
-    b.onclick = () => answer(b, o, q); box.querySelector('.topts').append(b);
-  });
-}
-
-function answer(b, o, q) {
-  if (S.busy || b.disabled) return;
-  const at = center(b);
-  if (!o.ok) {
-    b.disabled = true; b.classList.add('wrong');
-    explain(false, o.t, o.why || q.why, false);
-    note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
-    bankAdd(`${L.title}|${q.q}`, { lv: L.title, q: q.q, o: q.o, a: q.a, why: q.why });
-    damage(15, at); return;
-  }
-  $('tstep').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x === b) x.classList.add('right'); });
-  explain(true, o.t, q.why); good(at);
-  if (q.run) print(`${ps} ${q.run}`, 'tcmd');
-  if (q.out) print(q.out, 'tok');
-  step++;
-  if (step >= L.steps.length) { S.busy = true; setTimeout(() => flow.win(), 1400); }
-  else setTimeout(showStep, 900);
+  runSteps(box, L, L.steps, q => { if (q.run) print(`${ps} ${q.run}`, 'tcmd'); if (q.out) print(q.out, 'tok'); },
+    () => { S.busy = true; setTimeout(() => flow.win(), 1400); });
 }
