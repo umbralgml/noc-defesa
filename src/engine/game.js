@@ -3,7 +3,7 @@ import { $, fmt, center, buzz, store } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
 import { S, LEVELS, ACTS, DIFFS, K, unlocked, save, resetProgress, progress } from './state.js';
-import { flow, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
+import { flow, initScrollHints, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
 import { submitCampaign, profile } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
@@ -144,6 +144,8 @@ function finishIntro() {
   heroTo(sc, HX[L.loc], true); hero.classList.remove('walk'); hero.classList.add('type');
   $('capTxt').textContent = LOCNAME[L.loc] + (L.boss || L.miniboss ? ' · Z3R0 AO VIVO' : '');
   sc.classList.remove('big');
+  // Celular: cena baixa durante a jogada; a cena inteira cabe em miniatura à direita.
+  if (matchMedia('(max-width:600px),(max-height:760px)').matches) sc.querySelector('svg').setAttribute('preserveAspectRatio', 'xMaxYMax meet');
   S.busy = false;
   ENGINES[L.type](L);
   startZ3r0(L);
@@ -220,6 +222,7 @@ function fail(msg) {
 export function goMap() { cleanup(); renderMap(); show('map'); music('menu'); }
 
 export function initGame() {
+  initScrollHints();
   flow.win = win; flow.fail = fail;
   $('mapList').addEventListener('click', e => {
     const c = e.target.closest('.certb'); if (c) { au(); certModal(+c.dataset.a); return; }

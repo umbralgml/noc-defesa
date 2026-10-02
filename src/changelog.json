@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.14",
+      "date": "2026-10-02",
+      "title": "Mais tela para jogar",
+      "items": [
+        "No celular, a cena encolhe durante a fase e sobra mais espaço para jogar",
+        "Aviso \"▼ TEM MAIS ABAIXO\" quando a fase ou as fichas continuam fora da tela; toque nele para rolar",
+        "Perguntas de diagnóstico rolam sozinhas até aparecer na tela",
+        "Terminal e aula da fase mais compactos em telas pequenas"
+      ]
+    },
+    {
       "v": "1.13",
       "date": "2026-10-02",
       "title": "Plantão com estilo",

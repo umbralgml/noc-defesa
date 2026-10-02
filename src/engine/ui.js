@@ -135,3 +135,27 @@ export function note(t, why) { if (!S.miss.some(m => m.t === t)) S.miss.push({ t
 export const lessonHTML = L => L.lesson ? `<div class="lesson"><span class="lh">AULA RÁPIDA</span><ul>${L.lesson.map(x => `<li>${x}</li>`).join('')}</ul></div>` : '';
 export const reviewHTML = (miss = S.miss) => miss.length ? `<div class="review"><span class="lh">PARA REVISAR</span>${miss.slice(0, 6).map(m => `<div><b>${esc(m.t)}</b><br>${esc(m.why)}</div>`).join('')}</div>` : '';
 
+
+// ---------- aviso de "tem mais embaixo" ----------
+// No celular a área da fase e o banco de fichas rolam. Uma pílula aparece no rodapé de cada
+// um enquanto houver conteúdo escondido; tocar nela rola para baixo.
+export function initScrollHints() {
+  const g = $('game');
+  const pills = [['stage', '▼ TEM MAIS ABAIXO'], ['bank', '▼ MAIS OPÇÕES']].map(([id, txt]) => {
+    const el = $(id), p = document.createElement('button');
+    p.className = 'more'; p.type = 'button'; p.textContent = txt; p.setAttribute('aria-label', 'Rolar para ver mais');
+    p.onclick = () => el.scrollBy({ top: el.clientHeight * .7, behavior: 'smooth' });
+    g.append(p); el.addEventListener('scroll', () => upd(), { passive: true });
+    return [el, p];
+  });
+  const upd = () => {
+    if (!g.classList.contains('on')) return;
+    pills.forEach(([el, p]) => {
+      const show = el.offsetParent !== null && getComputedStyle(el).display !== 'none' && !el.classList.contains('veil')
+        && el.scrollHeight - el.scrollTop - el.clientHeight > 24;
+      if (show) p.style.top = (el.offsetTop + el.offsetHeight - 38) + 'px';
+      p.classList.toggle('on', show);
+    });
+  };
+  setInterval(upd, 400); addEventListener('resize', upd);
+}

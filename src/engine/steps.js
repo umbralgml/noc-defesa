@@ -19,6 +19,8 @@ export function runSteps(box, L, steps, onRight, done) {
       const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.t;
       b.onclick = () => answer(b, o, q); box.querySelector('.topts').append(b);
     });
+    // a pergunta nova pode surgir fora da tela no celular
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
   const answer = (b, o, q) => {
     if (S.busy || b.disabled) return;
