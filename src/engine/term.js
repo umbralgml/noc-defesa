@@ -5,6 +5,8 @@ import { $, shuffle, center } from './util.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
 import { good, damage, explain, info, note, flow } from './ui.js';
+import { bankAdd } from './bank.js';
+import { stat, unlock } from './ach.js';
 
 const MIN_CMDS = 2;   // comandos diferentes antes de liberar o diagnóstico
 const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -20,7 +22,7 @@ export function renderTerm(level) {
     <div class="tstep" id="tstep"></div>`;
   st.querySelector('.tps').textContent = ps;
   print(`${L.host}: digite um comando ou toque num dos sugeridos abaixo. "?" lista os comandos.`, 'tsys');
-  $('tform').onsubmit = e => { e.preventDefault(); run($('tin').value); $('tin').value = ''; };
+  $('tform').onsubmit = e => { e.preventDefault(); if ($('tin').value.trim() && stat('typed') >= 10) unlock('teclado'); run($('tin').value); $('tin').value = ''; };
   const bank = $('bank');
   bank.innerHTML = `<div class="bankh"><span>COMANDOS · TOQUE PARA EXECUTAR</span><span id="bankCnt">0/${MIN_CMDS}</span></div>`;
   bank.style.display = 'flex';
@@ -71,6 +73,7 @@ function answer(b, o, q) {
     b.disabled = true; b.classList.add('wrong');
     explain(false, o.t, o.why || q.why, false);
     note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
+    bankAdd(`${L.title}|${q.q}`, { lv: L.title, q: q.q, o: q.o, a: q.a, why: q.why });
     damage(15, at); return;
   }
   $('tstep').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x === b) x.classList.add('right'); });

@@ -47,6 +47,8 @@ export const sfx = {
   key() { if (!AC) return; noise(.018, { v: .12, f: 4000 + Math.random() * 2000 }); },
   sel() { osc(1320, .06, { type: 'sine', v: .05 }); osc(1760, .05, { type: 'sine', v: .03, at: AC && AC.currentTime + .03 }); },
   whoosh() { noise(.45, { v: .12, type: 'bandpass', f: 300, f2: 3000, q: 1.5 }); },
+  combo(m) { if (!AC) return; const t = AC.currentTime; [0, 4, 7, 12, 16].slice(0, m).forEach((n, i) => { osc(mtof(76 + n), .16, { type: 'square', v: .05, at: t + i * .05 }); osc(mtof(88 + n), .3, { type: 'triangle', v: .05, at: t + i * .05, echo: true }); }); },
+  drop() { if (!AC) return; const t = AC.currentTime; osc(110, .12, { type: 'sine', v: .2, sl: -50, at: t }); noise(.05, { v: .12, type: 'lowpass', f: 900, at: t }); },
   tick() { osc(1500, .04, { type: 'square', v: .03 }); },
   zap() { if (!AC) return; osc(1400, .25, { type: 'sawtooth', v: .07, sl: -1250 }); noise(.15, { v: .1, f: 2000 }); },
   win() { if (!AC) return; const t = AC.currentTime; [60, 64, 67, 72, 76, 79].forEach((m, i) => { osc(mtof(m), .22, { type: 'square', v: .05, at: t + i * .09 }); osc(mtof(m), .22, { type: 'triangle', v: .06, at: t + i * .09, echo: true }); }); [72, 76, 79, 84].forEach(m => osc(mtof(m), 1.1, { type: 'triangle', v: .06, at: t + .6, echo: true })); kick(t + .6, .5, SFXG); },

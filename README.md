@@ -27,6 +27,9 @@ O jogo foi feito para ensinar, não só para testar:
 - **Explicação na hora** de cada jogada, certa ou errada: por que aquele IP é público, por que aquela regra vem primeiro, por que aquela opção do quiz não serve.
 - **Revisão no fim da fase** com tudo o que você errou e a explicação de cada item.
 - **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar. Dá para **desafiar um colega** com um link que leva as mesmas perguntas e o seu placar.
+- **Z3R0 ativo:** a partir do nível intermediário, ele ataca durante a fase (glitch, embaralha, ataque relâmpago com contagem regressiva).
+- **Treino dos seus erros:** cada erro vira uma pergunta de revisão no mapa; dois acertos seguidos tiram o item da lista.
+- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 20 conquistas.
 - **Sala do NOC:** no mapa, o analista anda pela sala (toque ou setas) até o equipamento e abre os incidentes de lá.
 
 ## Rodar localmente

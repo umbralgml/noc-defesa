@@ -63,6 +63,11 @@ src/engine/
   drop.js             tipo "drop" (modes "buckets" e "slots")
   quiz.js             tipo "quiz" (e chefe com "boss")
   term.js             tipo "term": terminal simulado (comandos com saída fixa, alias, diagnóstico em passos)
+  z3r0.js             eventos do Z3R0 durante a fase (glitch, embaralhar, ataque relâmpago), na medida do `diff` do ato
+  bank.js             banco de erros (localStorage noc_bank) em formato de quiz; sem dependências de tela
+  train.js            treino dos seus erros: quiz com os itens do banco; 2 acertos seguidos tiram o item
+  career.js           XP e cargos (Estagiário → Arquiteto de Redes)
+  ach.js              conquistas (lista ACH), faixa no topo (#achv), vitrine; stat() para contadores
   room.js             sala do NOC no topo do mapa: herói anda (toque/setas), câmera acompanha, estação abre os incidentes do `loc`
 tools/validar-fases.mjs
 docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
@@ -110,4 +115,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Dificuldade gradativa:** o jogo é para quem nunca viu rede até quem trabalha num NOC. Cada ato tem `diff` (iniciante → avançado, só sobe). Iniciante/básico: analogias, sem cronômetro, dica automática no 2º erro (`hint()` em `ui.js`). Pressão (tempo, eventos do Z3R0) só a partir de intermediário. A primeira fase tem `"tutorial": true`.
 - **Linux:** muita coisa de rede roda em Linux, então há um ato próprio e o Prólogo já apresenta o terminal (`ip a`, `ping`). Fases `term` com `prompt` Linux. Saídas de comando realistas (copie de um sistema de verdade).
 - **História:** `story` no ato, mostrada uma vez (`noc_story`) com o chefe do NOC (`AV_CHEFE`), o analista e o Z3R0.
+- **Eventos do Z3R0:** nunca em iniciante/básico, tutorial, desafio diário, treino ou com `localStorage.noc_teste` (usado pelo teste automático). Falhar no ataque relâmpago tira integridade mas não conta como erro (não tira estrela).
+- **Treino:** todo erro de jogada grava no banco (`bankAdd`/`bankWhy`). Tipo de fase novo precisa gravar os erros dele também.
+- **XP e conquistas:** `addXP()` e `unlock(id)`; mostre o ganho com `xpHTML()`. Conquista nova entra na lista `ACH` de `ach.js` com o gatilho no lugar certo. "Zerar progresso" não apaga XP nem conquistas.
 - **CSS:** cores pelos tokens de `:root` (`--acc`, `--bad`, `--warn`, `--z`, `--panel`...). Fontes: Orbitron para rótulos, JetBrains Mono para dados técnicos, system-ui para texto corrido.

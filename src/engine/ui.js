@@ -3,10 +3,11 @@
 import { $, buzz, esc, fmt } from './util.js';
 import { AV_ME, AV_Z, heroState, sceneFx } from './scene.js';
 import { sfx } from './audio.js';
+import { unlock } from './ach.js';
 import { S, diffOf } from './state.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
-export const flow = { win() {}, fail() {}, map() {}, room() {} };
+export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, good() {} };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
@@ -58,7 +59,7 @@ export function toast(msg, good) {
 // ---------- acerto / erro ----------
 export function damage(n, at) {
   S.err++; S.streak = 0; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
-  sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450);
+  sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450); vignette('bad');
   const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');
   if (at) floatTxt(at.x, at.y, '-' + n + '%', '#ff4d6d');
   toast(TAUNT[Math.random() * TAUNT.length | 0], false);
@@ -72,7 +73,21 @@ export function good(at, color) {
   S.score += pts; sfx.ok(mult()); setScore();
   sceneFx('okf', 350); heroState('happy', 500);
   if (at) { burst(at.x, at.y, color || '#00e0a8'); floatTxt(at.x, at.y - 10, '+' + pts, color || '#00e0a8'); }
-  if (Math.random() < .3) toast(PRAISE[Math.random() * PRAISE.length | 0], true);
+  // Marcos de combo: faixa no centro, som especial e conquista no x5.
+  if (S.streak === 3 || S.streak === 5) { comboBanner(mult()); if (S.streak === 5) unlock('combo5'); }
+  else if (Math.random() < .3) toast(PRAISE[Math.random() * PRAISE.length | 0], true);
+  flow.good(at);
+}
+
+// Flash na borda da tela: vermelho no erro, verde no combo.
+export function vignette(kind) {
+  const v = $('vig'); if (!v) return;
+  v.className = ''; void v.offsetWidth; v.className = 'on ' + kind;
+}
+function comboBanner(m) {
+  const el = document.createElement('div'); el.className = 'combob'; el.textContent = `COMBO x${m}!`;
+  $('fx').append(el); setTimeout(() => el.remove(), 1100);
+  sfx.combo(m); vignette('good');
 }
 export const stars = () => S.err === 0 ? 3 : S.err <= 2 ? 2 : 1;
 
