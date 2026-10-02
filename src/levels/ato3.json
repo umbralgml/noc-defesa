@@ -1,6 +1,21 @@
 {
-  "tag": "ATO 3",
+  "tag": "ATO 4",
   "name": "Switching e BGP",
+  "diff": "intermediário",
+  "story": [
+    {
+      "who": "z",
+      "t": "Achou que ia ficar só no Linux? Vou pular de VLAN e sequestrar seus prefixos."
+    },
+    {
+      "who": "chefe",
+      "t": "Switching e BGP: erros aqui derrubam muita gente de uma vez. Cuidado."
+    },
+    {
+      "who": "me",
+      "t": "Trunk blindado e prefix-list estrita."
+    }
+  ],
   "levels": [
     {
       "title": "VLAN hopping",

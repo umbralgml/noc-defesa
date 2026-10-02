@@ -1,8 +1,8 @@
 // Fluxo do jogo: mapa, briefing, intro animada da fase, vitória, derrota e dica.
 import { $, fmt, center, buzz, store } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
-import { AV_ME, AV_Z, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
-import { S, LEVELS, ACTS, K, unlocked, save, resetProgress, progress } from './state.js';
+import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
+import { S, LEVELS, ACTS, DIFFS, K, unlocked, save, resetProgress, progress } from './state.js';
 import { flow, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
 import { submitCampaign, profile } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
@@ -16,7 +16,7 @@ const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: re
 export function renderMap() {
   let html = '', tot = 0, pts = 0, nextI = LEVELS.findIndex((L, i) => unlocked(i) && !S.prog[K(i)]);
   ACTS.forEach((a, ai) => {
-    html += `<div class="acth"><span>${a[0]}</span><b>${a[1]}</b></div><div class="path">`;
+    html += `<div class="acth"><span>${a[0]}</span>${a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}<b>${a[1]}</b></div><div class="path">`;
     LEVELS.forEach((L, i) => {
       if (L.act !== ai) return;
       const st = S.prog[K(i)] || 0; tot += st; pts += S.best[K(i)] || 0;
@@ -46,8 +46,22 @@ export function askReset(after) {
   $('mYes').onclick = () => { resetProgress(); closeModal(); if (after) after(); };
 }
 
-// Briefing: diálogo, aula rápida e missão.
-export function brief(i) {
+// História do ato: aparece uma vez, antes da primeira fase do ato.
+const AVS = { z: [AV_Z, 'Z3R0', 'z'], me: [AV_ME, 'VOCÊ', 'me'], chefe: [AV_CHEFE, 'CHEFE DO NOC', 'chefe'] };
+function story(L, next) {
+  const a = ACTS[L.act], seen = store('noc_story') || [];
+  if (!a || !a[3] || seen.includes(a[1]) || LEVELS.findIndex(x => x.act === L.act) !== LEVELS.indexOf(L)) return next();
+  modal(`<div class="tag">${a[0]}${a[2] ? ' · ' + a[2].toUpperCase() : ''}</div><h2>${a[1]}</h2>
+    ${a[3].map(s => { const [av, who, cls] = AVS[s.who] || AVS.chefe; return `<div class="dlg"><div class="av">${av}</div><div class="bubble ${cls}"><span class="who">${who}</span>${s.t}</div></div>`; }).join('')}
+    <div class="row"><button class="btn" id="mStory">BORA</button></div>`);
+  $('mStory').onclick = () => { store('noc_story', [...seen, a[1]]); next(); };
+}
+
+// Briefing (precedido da história do ato, na primeira vez).
+export function brief(i) { story(LEVELS[i], () => showBrief(i)); }
+
+// Diálogo, aula rápida e missão.
+function showBrief(i) {
   const L = LEVELS[i];
   modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${i + 1}. ${L.title}</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${L.z}</div></div>

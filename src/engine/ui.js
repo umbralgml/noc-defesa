@@ -3,7 +3,7 @@
 import { $, buzz, esc, fmt } from './util.js';
 import { AV_ME, AV_Z, heroState, sceneFx } from './scene.js';
 import { sfx } from './audio.js';
-import { S } from './state.js';
+import { S, diffOf } from './state.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
 export const flow = { win() {}, fail() {}, map() {}, room() {} };
@@ -62,6 +62,8 @@ export function damage(n, at) {
   const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');
   if (at) floatTxt(at.x, at.y, '-' + n + '%', '#ff4d6d');
   toast(TAUNT[Math.random() * TAUNT.length | 0], false);
+  // Iniciante/básico: depois do 2º erro, a dica da fase aparece sozinha no painel.
+  if (S.err === 2 && S.lv && S.lv.tip && diffOf(S.lv) <= 1) setTimeout(() => hint(S.lv.tip), 900);
   if (S.hp <= 0) { S.busy = true; clearInterval(S.timer); setTimeout(() => flow.fail('A integridade da rede chegou a zero. O Z3R0 assumiu o controle.'), 650); }
 }
 export function good(at, color) {
@@ -103,6 +105,13 @@ export function info(label, text) {
   c.className = 'coach'; void c.offsetWidth; c.className = 'coach on info';
   c.innerHTML = '<span class="k">ℹ COMANDO</span><span class="ct"><b></b> <span></span></span>';
   c.querySelector('b').textContent = label + ':'; c.querySelector('.ct span').textContent = text; c.scrollTop = 0;
+}
+// Acrescenta uma dica embaixo da explicação que está no painel.
+export function hint(html) {
+  const c = $('coach'); if (!c.classList.contains('on')) c.className = 'coach on info';
+  const d = document.createElement('div'); d.className = 'chint';
+  d.innerHTML = '<b>💡 DICA</b> <span></span>'; d.querySelector('span').textContent = html.replace(/<[^>]+>/g, '');
+  (c.querySelector('.ct') || c).append(d);
 }
 export function hideCoach() { $('coach').className = 'coach'; }
 export function note(t, why) { if (!S.miss.some(m => m.t === t)) S.miss.push({ t, why }); }

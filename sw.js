@@ -4,7 +4,7 @@
 const CACHE = 'noc-app-v1', FONTS = 'noc-fonts-v1', TIMEOUT = 4000;
 const CORE = [
   './', 'index.html', 'manifest.webmanifest', 'src/style.css', 'src/main.js',
-  'src/changelog.json', 'src/config.json', 'src/levels/index.json',
+  'src/changelog.json', 'src/config.json', 'src/levels/index.json', 'src/levels/prologo.json', 'src/levels/linux.json',
   'src/levels/ato1.json', 'src/levels/ato2.json', 'src/levels/ato3.json', 'src/levels/ato4.json', 'src/levels/ato5.json', 'src/levels/ato6.json',
   ...['util', 'state', 'levels', 'scene', 'audio', 'ui', 'rank', 'wire', 'drop', 'quiz', 'game', 'daily', 'news', 'pwa', 'room', 'term'].map(m => `src/engine/${m}.js`),
   'src/icons/icon-192.png', 'src/icons/icon-512.png'

@@ -12,7 +12,18 @@ src/levels/
 
 - A **ordem no mapa** é a ordem dos arquivos no `index.json` e, dentro de cada arquivo, a ordem do array `levels`.
 - Uma fase só é **desbloqueada** quando a anterior, na ordem geral, tem pelo menos 1 estrela.
-- Para criar um **ato novo**, crie `atoN.json` com `tag`, `name` e `levels` e acrescente o nome do arquivo em `index.json`.
+- Para criar um **ato novo**, crie `atoN.json` com `tag`, `name`, `diff`, `story` e `levels` e acrescente o nome do arquivo em `index.json`.
+
+### Campos do ato
+
+| Campo | Formato | Para que serve |
+|-------|---------|----------------|
+| `tag` | texto | Rótulo no mapa (`PRÓLOGO`, `ATO 3`). |
+| `name` | texto | Nome do ato. |
+| `diff` | `iniciante`, `básico`, `intermediário` ou `avançado` | Selo no mapa. Iniciante e básico ganham dica automática depois do 2º erro. A dificuldade só pode subir ao longo da campanha (o validador avisa). |
+| `story` | lista de `{ "who": "z" \| "me" \| "chefe", "t": "HTML" }` | Cena com o Z3R0, o analista e o chefe do NOC, mostrada uma vez antes da primeira fase do ato. |
+
+**Pense em quem está começando.** O Prólogo assume zero conhecimento: analogias, nenhuma pressão de tempo e um tutorial guiado. Conteúdo novo entra no ato do nível certo; se for básico demais para o ato, vai para um ato anterior.
 
 Depois de editar, rode o validador e jogue a fase:
 
@@ -63,6 +74,7 @@ O jogador liga cada item da esquerda ao par da direita, arrastando o cabo ou toc
 | `heads` | opcional, `["TÍTULO ESQUERDA", "TÍTULO DIREITA"]` |
 | `legend` | opcional, `true` mostra a legenda de cores dos cabos |
 | `loose` | opcional, `true` desenha cabos soltos no rack da cena |
+| `tutorial` | opcional, `true` destaca o primeiro par com uma mão animada até o primeiro acerto (use na primeira fase do jogo) |
 
 - `t` é o nome e `s` o subtítulo (pode ser `""`).
 - `m` é o tipo de cabo, que define a cor: `sm` (monomodo), `mm` (multimodo), `dac`, `cu` (Cat6), `pon` (GPON). Sem `m`, o cabo fica verde.
@@ -265,6 +277,7 @@ O jogador investiga um equipamento num terminal: digita comandos (aceita os apel
 | Campo | Formato |
 |-------|---------|
 | `host` | nome do equipamento no prompt (`SW-CORE` vira `SW-CORE#`) |
+| `prompt` | opcional, prompt completo, para terminais Linux: `"admin@web01:~$"` ou `"root@bastion:~#"` |
 | `intro` | HTML com o sintoma e o contexto |
 | `cmds` | lista de `{ "c", "out", "why", "alias"? }`: comando, saída exata, o que ele mostra e formas curtas aceitas |
 | `steps` | lista de passos no formato do quiz (`q`, `o`, `a`, `why`) e, opcionalmente, `run` e `out`: o comando e a saída que aparecem no terminal quando o passo é acertado (a correção sendo aplicada) |

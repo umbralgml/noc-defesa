@@ -4,7 +4,7 @@ Guia para trabalhar neste repositório.
 
 ## O projeto
 
-"NOC: Última Linha de Defesa" é um jogo **educativo** de redes e segurança, em português do Brasil, que roda no navegador (celular primeiro). O jogador é o analista de plantão contra o hacker Z3R0 ao longo de 21 fases em 6 atos. É publicado no GitHub Pages: https://umbralgml.github.io/noc-defesa/
+"NOC: Última Linha de Defesa" é um jogo **educativo** de redes e segurança, em português do Brasil, que roda no navegador (celular primeiro). O jogador é o analista de plantão contra o hacker Z3R0 ao longo de 30 fases: um Prólogo para iniciantes e 7 atos de dificuldade crescente (inclui um ato de Linux). É publicado no GitHub Pages: https://umbralgml.github.io/noc-defesa/
 
 O objetivo principal é **ensinar**. Diversão é o veículo. Toda mudança de conteúdo precisa manter isto: aula antes (`lesson`), explicação a cada jogada (`why`/`explain`) e revisão dos erros no fim.
 
@@ -22,7 +22,15 @@ python3 -m http.server 8000             # jogo em http://localhost:8000
 node tools/validar-fases.mjs            # valida todos os JSON de fase (Node 18+)
 ```
 
-O validador sai com código 1 se houver erro estrutural e lista avisos de conteúdo didático faltando. Não existe suíte de testes automatizados; para mudanças no motor, jogue as fases afetadas no navegador (ou dirija com Playwright), incluindo erros de propósito.
+O validador sai com código 1 se houver erro estrutural e lista avisos de conteúdo didático faltando.
+
+Teste de ponta a ponta (opcional, precisa do Playwright: `npm i -g playwright`):
+
+```bash
+node tools/testes/campanha.mjs     # joga todas as fases num Chromium; código 1 se algo travar ou der erro no console
+```
+
+Rode depois de qualquer mudança no motor ou em fases. Tipo de fase novo precisa de roteiro nesse teste.
 
 ## Arquitetura
 
@@ -37,7 +45,7 @@ src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mai
 src/config.json       { "ranking": { "url", "key" } } do Supabase; vazio = ranking desligado (botões .rankBtn escondidos)
 src/levels/
   index.json          { "acts": ["ato1.json", ...] } na ordem do mapa
-  atoN.json           { "tag", "name", "levels": [ ... ] }
+  prologo.json, atoN.json, linux.json   { "tag", "name", "diff", "story", "levels": [ ... ] }
 src/engine/
   util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON); sem dependências
   state.js            S (estado da partida; S.lv = fase atual), LEVELS, ACTS, save, K, unlocked, resetProgress, progress
@@ -99,4 +107,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. O perfil é pedido no primeiro turno (`ensureProfile`); sem nome, o jogador aparece como `Analista #XXXX` (`anonName()`). Nome e LinkedIn só saem do aparelho com consentimento marcado (`publicName()`/`publicLinkedin()`); sem ele, envia o apelido anônimo.
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
 - **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`) puxa a `main` a cada 15 minutos. Não há outro passo de publicação.
+- **Dificuldade gradativa:** o jogo é para quem nunca viu rede até quem trabalha num NOC. Cada ato tem `diff` (iniciante → avançado, só sobe). Iniciante/básico: analogias, sem cronômetro, dica automática no 2º erro (`hint()` em `ui.js`). Pressão (tempo, eventos do Z3R0) só a partir de intermediário. A primeira fase tem `"tutorial": true`.
+- **Linux:** muita coisa de rede roda em Linux, então há um ato próprio e o Prólogo já apresenta o terminal (`ip a`, `ping`). Fases `term` com `prompt` Linux. Saídas de comando realistas (copie de um sistema de verdade).
+- **História:** `story` no ato, mostrada uma vez (`noc_story`) com o chefe do NOC (`AV_CHEFE`), o analista e o Z3R0.
 - **CSS:** cores pelos tokens de `:root` (`--acc`, `--bad`, `--warn`, `--z`, `--panel`...). Fontes: Orbitron para rótulos, JetBrains Mono para dados técnicos, system-ui para texto corrido.

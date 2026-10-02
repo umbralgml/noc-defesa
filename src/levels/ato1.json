@@ -1,6 +1,21 @@
 {
   "tag": "ATO 1",
   "name": "Camada física e endereçamento",
+  "diff": "básico",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Primeiro incidente de verdade: o Z3R0 entrou no datacenter, arrancou cabos e bagunçou o endereçamento."
+    },
+    {
+      "who": "z",
+      "t": "Se a base cai, nada em cima funciona. Física e endereços: vamos ver se você aprendeu."
+    },
+    {
+      "who": "me",
+      "t": "Cabo certo, IP certo. Começa pelo chão."
+    }
+  ],
   "levels": [
     {
       "title": "Rack derrubado",

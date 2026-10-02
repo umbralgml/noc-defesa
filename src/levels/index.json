@@ -1,7 +1,9 @@
 {
   "acts": [
+    "prologo.json",
     "ato1.json",
     "ato2.json",
+    "linux.json",
     "ato3.json",
     "ato4.json",
     "ato5.json",

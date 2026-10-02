@@ -8,16 +8,18 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 21 fases em 6 atos:
+São 30 fases, do zero ao avançado: um Prólogo para quem nunca viu rede e 7 atos de dificuldade crescente.
 
-| Ato | Tema | Fases |
-|-----|------|-------|
-| 1 | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, portas de serviço |
-| 2 | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, mitigação de DDoS |
-| 3 | Switching e BGP | VLAN hopping, filtro de cliente BGP, sequestro de prefixo e RPKI |
-| 4 | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM e o chefe final |
-| 5 | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
-| 6 | Troubleshooting no terminal | investigar switch e roteador com comandos IOS: porta em shutdown e rota padrão apagada |
+| Parte | Nível | Tema | Fases |
+|-------|-------|------|-------|
+| Prólogo | iniciante | Primeiros passos | equipamentos e o que fazem, IP x porta x MAC, ping/gateway/DNS, primeiro terminal Linux (com tutorial) |
+| 1 | básico | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, portas de serviço |
+| 2 | básico | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, mitigação de DDoS |
+| 3 | intermediário | Linux no NOC | comandos de rede no Linux, serviço exposto (ss, ufw), resolvedor DNS aberto (tcpdump, dig), SSH sob ataque (journalctl, last), boas práticas |
+| 4 | intermediário | Switching e BGP | VLAN hopping, filtro de cliente BGP, sequestro de prefixo e RPKI |
+| 5 | intermediário | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM e o chefe final |
+| 6 | avançado | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
+| 7 | avançado | Troubleshooting no terminal | investigar switch e roteador com comandos IOS: porta em shutdown e rota padrão apagada |
 
 O jogo foi feito para ensinar, não só para testar:
 
@@ -74,9 +76,10 @@ Contribuições são bem-vindas, principalmente **fases novas** e **correções 
 
 1. Faça um fork e crie um branch.
 2. Para criar ou editar uma fase, siga o [guia de criação de fases](docs/CRIAR-FASE.md). Na maioria dos casos você só mexe em JSON.
-3. Valide as fases (precisa de Node 18+):
+3. Valide as fases (precisa de Node 18+) e, se tiver o Playwright, jogue a campanha inteira automaticamente:
    ```bash
    node tools/validar-fases.mjs
+   node tools/testes/campanha.mjs
    ```
 4. Rode o jogo localmente e jogue a fase do começo ao fim, errando de propósito para conferir as explicações.
 5. Abra um pull request contando o que a fase ensina e de onde vem a referência técnica (RFC, documentação do fabricante, NIST etc.).

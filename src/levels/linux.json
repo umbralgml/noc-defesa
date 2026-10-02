@@ -1,0 +1,599 @@
+{
+  "tag": "ATO 3",
+  "name": "Linux no NOC",
+  "diff": "intermediário",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Metade da nossa rede roda Linux: servidores web, DNS, o bastion de acesso. E o Z3R0 descobriu isso."
+    },
+    {
+      "who": "z",
+      "t": "Você mexe em switch e roteador. Mas e o terminal Linux? Eu moro nele."
+    },
+    {
+      "who": "me",
+      "t": "ip, ss, dig, journalctl. Vou aprender a conversar com esses servidores."
+    }
+  ],
+  "levels": [
+    {
+      "title": "Canivete suíço Linux",
+      "tag": "COMANDOS",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo o terminal do servidor...",
+      "heads": [
+        "COMANDO",
+        "PARA QUE SERVE"
+      ],
+      "goal": "Ligue cada comando Linux ao que ele faz.",
+      "z": "Instalei Linux em todo canto da sua rede. Quero ver você se virar no terminal.",
+      "me": "Cada comando é uma ferramenta. É só saber qual pegar.",
+      "lesson": [
+        "Muito do que roda numa rede é Linux: servidores, firewalls, roteadores e até o roteador de casa.",
+        "<b>ip a</b> e <b>ip route</b> (do pacote iproute2) mostram endereços e rotas. <b>ifconfig</b> e <b>route</b> são os comandos antigos.",
+        "<b>ss</b> mostra conexões e portas abertas. <b>dig</b> testa DNS. <b>tcpdump</b> captura pacotes.",
+        "<b>systemctl</b> controla os serviços e <b>journalctl</b> mostra os logs deles."
+      ],
+      "tip": "ip a = endereços, ip route = rotas, ss = portas, dig = DNS, tcpdump = pacotes, journalctl = logs, systemctl = serviços.",
+      "learn": "O kit básico de redes no Linux: ip a e ip route para endereços e rotas, ss para portas, dig para DNS, tcpdump para pacotes, journalctl para logs e systemctl para serviços.",
+      "left": [
+        {
+          "id": "a",
+          "t": "ip a",
+          "s": "iproute2",
+          "why": "ip a (ip address) lista as interfaces e os IPs delas. Substituiu o antigo ifconfig."
+        },
+        {
+          "id": "b",
+          "t": "ip route",
+          "s": "iproute2",
+          "why": "Mostra a tabela de rotas e o gateway padrão (linha default via)."
+        },
+        {
+          "id": "c",
+          "t": "ss -tulpn",
+          "s": "socket statistics",
+          "why": "Lista portas TCP (t) e UDP (u) em escuta (l), com o processo (p), sem traduzir nomes (n). Substituiu o netstat."
+        },
+        {
+          "id": "d",
+          "t": "dig",
+          "s": "domain information groper",
+          "why": "Faz consultas DNS e mostra a resposta completa: registros, TTL e quem respondeu."
+        },
+        {
+          "id": "e",
+          "t": "tcpdump",
+          "s": "captura no terminal",
+          "why": "Captura os pacotes que passam pela interface. É o Wireshark do terminal."
+        },
+        {
+          "id": "f",
+          "t": "journalctl",
+          "s": "systemd",
+          "why": "Lê os logs do systemd. Com -u nome-do-serviço, mostra um serviço só."
+        },
+        {
+          "id": "g",
+          "t": "systemctl",
+          "s": "systemd",
+          "why": "Inicia, para, reinicia e mostra o estado dos serviços, como em systemctl status nginx."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Ver os IPs das interfaces",
+          "s": "",
+          "why": "Os IPs das interfaces aparecem com ip a."
+        },
+        {
+          "id": "b",
+          "t": "Ver as rotas e o gateway",
+          "s": "",
+          "why": "Rotas e gateway aparecem com ip route."
+        },
+        {
+          "id": "c",
+          "t": "Ver as portas abertas e quem escuta nelas",
+          "s": "",
+          "why": "Portas em escuta aparecem com ss -tulpn."
+        },
+        {
+          "id": "d",
+          "t": "Consultar o DNS",
+          "s": "",
+          "why": "Consulta DNS se faz com dig."
+        },
+        {
+          "id": "e",
+          "t": "Capturar pacotes",
+          "s": "",
+          "why": "Captura de pacotes no terminal se faz com tcpdump."
+        },
+        {
+          "id": "f",
+          "t": "Ler os logs do sistema",
+          "s": "",
+          "why": "Os logs do sistema se leem com journalctl."
+        },
+        {
+          "id": "g",
+          "t": "Iniciar ou parar serviços",
+          "s": "",
+          "why": "Serviços se controlam com systemctl."
+        }
+      ]
+    },
+    {
+      "title": "Porta aberta demais",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "web01",
+      "prompt": "admin@web01:~$",
+      "cap": "Conectando por SSH no web01...",
+      "goal": "Descubra o que está exposto no web01 e feche.",
+      "intro": "O <b>web01</b> deveria mostrar só o site para a internet. O Z3R0 diz que entrou no banco de dados dele. Descubra o que está exposto.",
+      "z": "Seu servidor web tem uma surpresa escutando. Eu achei antes de você.",
+      "me": "ss -tulpn primeiro. Depois a gente conversa.",
+      "lesson": [
+        "Um serviço escuta numa <b>porta</b>. O endereço de escuta define quem consegue chegar nele.",
+        "<b>0.0.0.0</b> (ou <b>*</b>) = escuta em todas as interfaces, inclusive a da internet. <b>127.0.0.1</b> = só a própria máquina.",
+        "<b>ss -tulpn</b> mostra o que está escutando e qual processo. <b>sudo</b> roda o comando como administrador.",
+        "Defesa em camadas: o serviço escuta só onde precisa <b>e</b> o firewall (ufw) bloqueia o resto."
+      ],
+      "tip": "Procure na coluna Local Address quem escuta em 0.0.0.0 sem precisar. Banco de dados usado só pelo site deve escutar em 127.0.0.1.",
+      "learn": "O MySQL escutava em 0.0.0.0 num servidor com IP público e firewall desligado. Com bind-address = 127.0.0.1 ele só aceita a própria máquina, e o ufw negando por padrão segura o que escapar.",
+      "cmds": [
+        {
+          "c": "ss -tulpn",
+          "alias": [
+            "sudo ss -tulpn",
+            "ss -tlnp",
+            "ss -ltnp",
+            "ss -tlpn"
+          ],
+          "out": "Netid State  Recv-Q Send-Q  Local Address:Port   Peer Address:Port  Process\ntcp   LISTEN 0      128           0.0.0.0:22          0.0.0.0:*      users:((\"sshd\",pid=812))\ntcp   LISTEN 0      511           0.0.0.0:80          0.0.0.0:*      users:((\"nginx\",pid=1044))\ntcp   LISTEN 0      511           0.0.0.0:443         0.0.0.0:*      users:((\"nginx\",pid=1044))\ntcp   LISTEN 0      151           0.0.0.0:3306        0.0.0.0:*      users:((\"mysqld\",pid=977))\ntcp   LISTEN 0      511         127.0.0.1:6379        0.0.0.0:*      users:((\"redis-server\",pid=690))",
+          "why": "Lista quem está escutando. Repare na coluna Local Address: 0.0.0.0 é aberto para todas as redes, 127.0.0.1 é só local."
+        },
+        {
+          "c": "sudo ufw status",
+          "alias": [
+            "ufw status",
+            "sudo ufw status verbose"
+          ],
+          "out": "Status: inactive",
+          "why": "O firewall do Ubuntu (ufw) está desligado: nada filtra as portas abertas."
+        },
+        {
+          "c": "ip -br a",
+          "alias": [
+            "ip a",
+            "ip addr"
+          ],
+          "out": "lo               UNKNOWN        127.0.0.1/8\neth0             UP             177.10.0.25/24",
+          "why": "O web01 tem IP público (177.10.0.25): tudo que escuta em 0.0.0.0 está na internet."
+        },
+        {
+          "c": "sudo journalctl -u mysql --since today",
+          "alias": [
+            "journalctl -u mysql",
+            "sudo journalctl -u mysql"
+          ],
+          "out": "Oct 02 03:41:07 web01 mysqld[977]: Access denied for user 'root'@'45.67.89.10' (using password: YES)\nOct 02 03:41:09 web01 mysqld[977]: Access denied for user 'root'@'45.67.89.10' (using password: YES)\nOct 02 03:44:52 web01 mysqld[977]: Aborted connection 1188 to db: 'loja' user: 'app' host: '45.67.89.10'",
+          "why": "O log do MySQL mostra 45.67.89.10, um IP da internet, tentando o root e depois conectado no banco 'loja' com o usuário app."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Qual serviço está exposto para a internet sem precisar?",
+          "a": 0,
+          "o": [
+            "MySQL na porta 3306, escutando em 0.0.0.0",
+            {
+              "t": "nginx nas portas 80 e 443",
+              "why": "O site precisa estar aberto: é o trabalho do web01."
+            },
+            {
+              "t": "Redis na 6379",
+              "why": "O Redis escuta só em 127.0.0.1: ninguém de fora alcança."
+            },
+            {
+              "t": "SSH na 22",
+              "why": "SSH aberto merece cuidado (chave e fail2ban), mas foi o banco exposto que deixou o Z3R0 entrar."
+            }
+          ],
+          "why": "O banco escuta em 0.0.0.0 num servidor com IP público, e o firewall está desligado. Qualquer um na internet chega na 3306."
+        },
+        {
+          "q": "Por que o Redis, na 6379, não é problema aqui?",
+          "a": 0,
+          "o": [
+            "Ele escuta só em 127.0.0.1, então só a própria máquina acessa",
+            {
+              "t": "Porque o Redis não guarda nada importante",
+              "why": "O Redis guarda dados e já foi muito usado em invasões quando ficou exposto."
+            },
+            {
+              "t": "Porque a porta 6379 é segura por natureza",
+              "why": "Nenhuma porta é segura por natureza: depende de quem consegue alcançá-la."
+            },
+            {
+              "t": "Porque o ufw bloqueia a 6379",
+              "why": "O ufw está desligado. Quem protege é o endereço de escuta."
+            }
+          ],
+          "why": "127.0.0.1 é o loopback: só conexões da própria máquina. É assim que um banco usado só pelo site deveria estar."
+        },
+        {
+          "q": "Como fechar o MySQL para a internet sem derrubar o site?",
+          "a": 0,
+          "o": [
+            "Configurar bind-address = 127.0.0.1 e reiniciar o MySQL",
+            {
+              "t": "Trocar a porta do MySQL para 3307",
+              "why": "Mudar a porta só atrasa: uma varredura acha qualquer porta."
+            },
+            {
+              "t": "Desligar o nginx",
+              "why": "O site não tem culpa. O problema é o banco aberto."
+            },
+            {
+              "t": "Apagar o usuário root do Linux",
+              "why": "O problema é o banco escutando para a internet, não a conta root do sistema."
+            }
+          ],
+          "why": "Com bind-address = 127.0.0.1, o MySQL só aceita conexões locais. O site, que roda na mesma máquina, continua funcionando.",
+          "run": "sudo sed -i 's/^bind-address.*/bind-address = 127.0.0.1/' /etc/mysql/mysql.conf.d/mysqld.cnf\nsudo systemctl restart mysql\nss -tlnp | grep 3306",
+          "out": "LISTEN 0      151         127.0.0.1:3306        0.0.0.0:*      users:((\"mysqld\",pid=2210))"
+        },
+        {
+          "q": "E a segunda camada de defesa?",
+          "a": 0,
+          "o": [
+            "Ligar o ufw negando entrada por padrão e liberando só 22, 80 e 443",
+            {
+              "t": "Ligar o ufw liberando tudo",
+              "why": "Firewall que libera tudo não protege nada."
+            },
+            {
+              "t": "Não precisa: o bind-address já resolveu",
+              "why": "Defesa em camadas: se alguém mudar a configuração por engano, o firewall ainda segura."
+            },
+            {
+              "t": "Bloquear a porta 443",
+              "why": "A 443 é o site em HTTPS: bloquear derruba o serviço que o web01 existe para oferecer."
+            }
+          ],
+          "why": "Negar por padrão e liberar só o necessário: se um serviço novo abrir porta por engano, o firewall segura.",
+          "run": "sudo ufw default deny incoming\nsudo ufw allow 22,80,443/tcp\nsudo ufw enable",
+          "out": "Firewall is active and enabled on system startup"
+        }
+      ]
+    },
+    {
+      "title": "Resolvedor aberto",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "dns01",
+      "prompt": "admin@dns01:~$",
+      "cap": "Conectando no servidor DNS...",
+      "goal": "Descubra por que o dns01 está lotando o link e corrija na origem.",
+      "intro": "O link do provedor está lotado de tráfego <b>saindo</b> do servidor <b>dns01</b> (BIND). O NOC suspeita que ele está sendo usado num ataque.",
+      "z": "Seu servidor DNS está trabalhando para mim agora. Obrigado pela banda.",
+      "me": "tcpdump primeiro: quero ver quem está perguntando o quê.",
+      "lesson": [
+        "Um <b>resolvedor DNS</b> busca respostas na internet para os clientes. Ele deve atender <b>só a sua rede</b>.",
+        "<b>Resolvedor aberto</b> responde para qualquer um: o atacante forja o IP da vítima e usa você para amplificar um DDoS.",
+        "<b>tcpdump -ni eth0 udp port 53</b> mostra as consultas DNS chegando, com a origem e o tipo de pergunta.",
+        "No BIND, <b>allow-recursion</b> define quem pode usar a recursão."
+      ],
+      "tip": "Muitas consultas ANY de um IP de fora + allow-recursion { any; } = resolvedor aberto usado em amplificação. Limite a recursão à rede interna.",
+      "learn": "Resolvedor aberto vira arma de amplificação: o atacante forja o IP da vítima, manda perguntas pequenas e o seu servidor responde com pacotes enormes para ela. A correção na origem é limitar a recursão à rede interna (allow-recursion).",
+      "cmds": [
+        {
+          "c": "sudo tcpdump -ni eth0 -c 5 udp port 53",
+          "alias": [
+            "tcpdump -ni eth0 udp port 53",
+            "sudo tcpdump -ni eth0 udp port 53",
+            "sudo tcpdump -i eth0 port 53"
+          ],
+          "out": "listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes\n03:52:01.104 IP 203.0.113.77.41022 > 177.10.0.53.53: 4512+ ANY? isc.org. (25)\n03:52:01.104 IP 203.0.113.77.39811 > 177.10.0.53.53: 7731+ ANY? isc.org. (25)\n03:52:01.105 IP 203.0.113.77.52007 > 177.10.0.53.53: 1290+ ANY? isc.org. (25)\n03:52:01.105 IP 203.0.113.77.60415 > 177.10.0.53.53: 8854+ ANY? isc.org. (25)\n03:52:01.106 IP 203.0.113.77.33380 > 177.10.0.53.53: 2210+ ANY? isc.org. (25)\n5 packets captured",
+          "why": "Muitas consultas ANY, pequenas, vindas de um único IP de fora. ANY pede tudo sobre um domínio, então a resposta é enorme."
+        },
+        {
+          "c": "dig @127.0.0.1 isc.org ANY",
+          "alias": [
+            "dig isc.org ANY @127.0.0.1",
+            "dig isc.org any"
+          ],
+          "out": ";; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 3361\n;; flags: qr rd ra; QUERY: 1, ANSWER: 27, AUTHORITY: 0, ADDITIONAL: 1\n...\n;; Query time: 41 msec\n;; SERVER: 127.0.0.1#53(127.0.0.1) (UDP)\n;; MSG SIZE  rcvd: 3418",
+          "why": "A pergunta tem 25 bytes; a resposta, 3.418. Cada consulta forjada vira mais de 100 vezes mais tráfego contra a vítima."
+        },
+        {
+          "c": "grep -n recursion /etc/bind/named.conf.options",
+          "alias": [
+            "grep recursion /etc/bind/named.conf.options"
+          ],
+          "out": "4:        recursion yes;\n5:        allow-recursion { any; };",
+          "why": "allow-recursion { any; } = resolvedor aberto: responde para a internet inteira."
+        },
+        {
+          "c": "ss -tulpn | grep :53",
+          "alias": [
+            "ss -ulpn | grep 53",
+            "ss -tulpn"
+          ],
+          "out": "udp   UNCONN 0      0       177.10.0.53:53         0.0.0.0:*      users:((\"named\",pid=640))\ntcp   LISTEN 0      10      177.10.0.53:53         0.0.0.0:*      users:((\"named\",pid=640))",
+          "why": "O named (BIND) escuta no IP público, na porta 53 UDP e TCP."
+        }
+      ],
+      "steps": [
+        {
+          "q": "O que está acontecendo?",
+          "a": 0,
+          "o": [
+            "O dns01 é um resolvedor aberto usado para amplificar um DDoS contra 203.0.113.77",
+            {
+              "t": "O dns01 está atacando a 203.0.113.77 por conta própria",
+              "why": "Ele só responde. Quem forja as perguntas com o IP da vítima é o atacante."
+            },
+            {
+              "t": "A 203.0.113.77 é um cliente legítimo fazendo muitas consultas",
+              "why": "Consultas ANY repetidas sem parar, de fora da sua rede, não são uso normal."
+            },
+            {
+              "t": "O BIND está com defeito",
+              "why": "O BIND faz exatamente o que a configuração manda: recursão para qualquer um."
+            }
+          ],
+          "why": "Perguntas pequenas com a origem forjada (a vítima) e respostas enormes: amplificação DNS. O seu servidor virou arma por estar aberto."
+        },
+        {
+          "q": "Qual correção resolve na origem?",
+          "a": 0,
+          "o": [
+            "Limitar a recursão à rede interna: allow-recursion { 127.0.0.1; 10.0.0.0/8; };",
+            {
+              "t": "Bloquear a porta 53 inteira no firewall",
+              "why": "Isso derruba o DNS da sua própria rede."
+            },
+            {
+              "t": "Aumentar o link com o provedor",
+              "why": "Só deixa o ataque maior."
+            },
+            {
+              "t": "Mudar o DNS para a porta 5353",
+              "why": "Clientes procuram DNS na 53. Mudar a porta quebra o serviço e não fecha a recursão."
+            }
+          ],
+          "why": "Com a recursão só para a rede interna, perguntas vindas da internet recebem REFUSED e a amplificação acaba.",
+          "run": "sudo sed -i 's|allow-recursion { any; };|allow-recursion { 127.0.0.1; 10.0.0.0/8; };|' /etc/bind/named.conf.options\nsudo named-checkconf && sudo systemctl reload named",
+          "out": "(consultas vindas da internet agora recebem status: REFUSED)"
+        },
+        {
+          "q": "Por que a vítima recebe o tráfego, se as perguntas vieram \"dela\"?",
+          "a": 0,
+          "o": [
+            "O atacante forjou o IP de origem, e as respostas vão para o dono desse IP",
+            {
+              "t": "A vítima pediu as respostas",
+              "why": "Ela nunca mandou nada: o IP foi falsificado."
+            },
+            {
+              "t": "O dns01 escolhe quem atacar",
+              "why": "O servidor só responde para o IP de origem do pacote."
+            },
+            {
+              "t": "Por causa do TCP",
+              "why": "O ataque usa UDP, que aceita origem forjada por não ter handshake."
+            }
+          ],
+          "why": "UDP não tem handshake, então dá para forjar a origem, e a resposta segue para o IP forjado: a vítima. Filtrar spoofing na borda (BCP 38) evita isso na raiz."
+        }
+      ]
+    },
+    {
+      "title": "SSH sob ataque",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "bastion",
+      "prompt": "root@bastion:~#",
+      "cap": "Entrando no bastion...",
+      "goal": "Investigue os logs do bastion, contenha o invasor e feche a porta de vez.",
+      "intro": "O <b>bastion</b> é o servidor por onde a equipe acessa a rede. Ele está lento e o CPU disparou. Investigue os logs.",
+      "z": "Tentei umas senhas no seu bastion. Umas 48 mil. Uma funcionou.",
+      "me": "Então vamos ver qual, de onde e o que você deixou para trás.",
+      "lesson": [
+        "<b>journalctl -u ssh</b> mostra o log do SSH: logins aceitos e senhas erradas.",
+        "<b>grep</b> filtra linhas e <b>wc -l</b> ou <b>grep -c</b> contam. <b>sort | uniq -c</b> agrupa repetidos. O <b>|</b> (pipe) liga um comando no outro.",
+        "<b>last</b> mostra os últimos logins que deram certo.",
+        "<b>~/.ssh/authorized_keys</b> lista as chaves que entram numa conta sem senha. Chave estranha ali é porta dos fundos."
+      ],
+      "tip": "Conte as falhas, veja de qual IP vêm, confira no last se alguém entrou e olhe o authorized_keys. Contenção primeiro (sessão e IP), depois erradicação (chave, senha, configuração).",
+      "learn": "Força bruta virou invasão: a senha fraca da conta deploy caiu e o Z3R0 deixou uma chave para voltar. Resposta: derrubar a sessão e bloquear o IP (contenção), tirar a chave e trocar a credencial (erradicação) e desligar login por senha e de root (prevenção).",
+      "cmds": [
+        {
+          "c": "journalctl -u ssh | grep -c 'Failed password'",
+          "alias": [
+            "journalctl -u ssh | grep -c \"Failed password\"",
+            "sudo journalctl -u ssh | grep -c 'Failed password'"
+          ],
+          "out": "48213",
+          "why": "Mais de 48 mil senhas erradas: força bruta contra o SSH."
+        },
+        {
+          "c": "journalctl -u ssh | grep 'Failed password' | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn | head -3",
+          "out": "  46980 45.67.89.10\n    812 185.220.101.4\n    421 103.77.12.9",
+          "why": "Agrupa as tentativas por IP de origem: quase tudo vem de 45.67.89.10."
+        },
+        {
+          "c": "last -n 5",
+          "alias": [
+            "last"
+          ],
+          "out": "deploy   pts/1        45.67.89.10      Thu Oct  2 03:58   still logged in\nana      pts/0        10.99.0.15       Wed Oct  1 18:02 - 18:40  (00:38)\ndeploy   pts/0        10.99.0.20       Wed Oct  1 09:15 - 12:01  (02:46)",
+          "why": "Um login deu certo: a conta deploy entrou de 45.67.89.10, o mesmo IP da força bruta, e continua conectada."
+        },
+        {
+          "c": "cat /home/deploy/.ssh/authorized_keys",
+          "out": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK9fQx...q1 deploy@ci\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM2bTr...z3 z3r0@kali",
+          "why": "Duas chaves: a do servidor de CI e uma \"z3r0@kali\" que ninguém da equipe conhece. Porta dos fundos."
+        },
+        {
+          "c": "grep -E '^(PasswordAuthentication|PermitRootLogin)' /etc/ssh/sshd_config",
+          "alias": [
+            "grep PasswordAuthentication /etc/ssh/sshd_config"
+          ],
+          "out": "PasswordAuthentication yes\nPermitRootLogin yes",
+          "why": "Senha liberada e login direto como root: a combinação que facilita a força bruta."
+        }
+      ],
+      "steps": [
+        {
+          "q": "O que aconteceu?",
+          "a": 0,
+          "o": [
+            "A força bruta descobriu a senha da conta deploy, e o Z3R0 deixou uma chave para voltar",
+            {
+              "t": "Só tentativas: ninguém entrou",
+              "why": "O last mostra a conta deploy logada a partir do IP do ataque."
+            },
+            {
+              "t": "Alguém da equipe errou a senha muitas vezes",
+              "why": "48 mil tentativas de um IP externo não é erro de digitação."
+            },
+            {
+              "t": "O CPU alto é só um serviço travado",
+              "why": "O CPU vem do ataque e do que o invasor está rodando com a conta deploy."
+            }
+          ],
+          "why": "Muitas falhas de um IP, depois um login aceito do mesmo IP e uma chave nova: invasão por força bruta com persistência."
+        },
+        {
+          "q": "Qual é a primeira ação de contenção?",
+          "a": 0,
+          "o": [
+            "Derrubar a sessão do invasor e bloquear o IP 45.67.89.10",
+            {
+              "t": "Formatar o servidor agora",
+              "why": "Formatar antes de entender apaga a evidência e não mostra por onde mais ele passou."
+            },
+            {
+              "t": "Desligar o servidor da tomada",
+              "why": "Perde a evidência na memória e corta o acesso da equipe sem necessidade."
+            },
+            {
+              "t": "Esperar ele sair sozinho",
+              "why": "Cada minuto dá mais tempo para ele se espalhar pela rede."
+            }
+          ],
+          "why": "Contenção primeiro: cortar a sessão ativa e o IP de origem. A análise e a limpeza vêm depois.",
+          "run": "pkill -KILL -u deploy\nufw deny from 45.67.89.10",
+          "out": "Rule added"
+        },
+        {
+          "q": "E para fechar a porta de vez?",
+          "a": 0,
+          "o": [
+            "Remover a chave z3r0@kali, travar a senha do deploy e desligar login por senha e de root",
+            {
+              "t": "Só trocar a senha",
+              "why": "A chave z3r0@kali continua lá: ele entra sem senha."
+            },
+            {
+              "t": "Só remover a chave",
+              "why": "Com senha fraca e login por senha liberado, a força bruta funciona de novo."
+            },
+            {
+              "t": "Mudar o SSH para a porta 2222",
+              "why": "Porta diferente só reduz o barulho. A força bruta acha a porta nova."
+            }
+          ],
+          "why": "Erradicação completa: tira a persistência (chave), invalida a credencial roubada e corta o vetor (PasswordAuthentication no, PermitRootLogin no). Um fail2ban ajuda contra as próximas tentativas.",
+          "run": "sed -i '/z3r0@kali/d' /home/deploy/.ssh/authorized_keys\npasswd -l deploy\nsed -i -E 's/^(PasswordAuthentication|PermitRootLogin) yes/\\1 no/' /etc/ssh/sshd_config\nsystemctl reload ssh",
+          "out": "passwd: password expiry information changed."
+        }
+      ]
+    },
+    {
+      "title": "Boas práticas Linux",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Revisando a configuração dos servidores...",
+      "goal": "Separe as práticas seguras das arriscadas nos servidores Linux.",
+      "intro": "Auditoria dos servidores Linux do NOC. Separe o que é <b>boa prática</b> do que é <b>risco</b>.",
+      "z": "Adoro servidor com chmod 777 e senha no histórico. Facilita meu trabalho.",
+      "me": "Menos privilégio, mais chave e menos senha. Vamos arrumar.",
+      "lesson": [
+        "<b>Permissões</b>: r (ler), w (escrever) e x (executar) para dono, grupo e outros. <b>600</b> = só o dono lê e escreve; <b>777</b> = todo mundo faz tudo.",
+        "<b>root</b> pode tudo. Use o seu usuário e o <b>sudo</b> só quando precisar: fica registrado quem fez o quê.",
+        "SSH seguro: <b>chave</b> no lugar de senha e <b>sem login de root</b>.",
+        "Mantenha o sistema atualizado (<b>unattended-upgrades</b>) e rode cada serviço com um usuário próprio."
+      ],
+      "tip": "Seguro: 600 no authorized_keys, sem root no SSH, chave com passphrase, atualização automática, serviço com usuário próprio. Risco: 777, senha no SSH exposto, senha na linha de comando, script baixado direto no sudo, banco aberto.",
+      "learn": "Segurança no Linux é menos privilégio (permissões certas, sem root direto, serviço com usuário próprio), menos senha (chave SSH) e sistema atualizado. Atalhos como 777 e senha na linha de comando são exatamente o que um invasor procura.",
+      "buckets": [
+        {
+          "label": "BOA PRÁTICA",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "chmod 600 ~/.ssh/authorized_keys",
+              "why": "Só o dono lê e escreve o arquivo de chaves. O SSH até recusa o arquivo se ele estiver aberto demais."
+            },
+            {
+              "t": "PermitRootLogin no",
+              "why": "Ninguém entra direto como root: entra com o próprio usuário e usa sudo, que deixa registro."
+            },
+            {
+              "t": "Chave SSH ed25519 com passphrase",
+              "why": "Chave moderna. Mesmo se o arquivo vazar, a passphrase protege."
+            },
+            {
+              "t": "unattended-upgrades ligado",
+              "why": "Atualizações de segurança automáticas: falhas conhecidas são corrigidas sem depender de alguém lembrar."
+            },
+            {
+              "t": "nginx rodando como www-data",
+              "why": "Se o serviço for invadido, o atacante fica preso a um usuário com poucos direitos."
+            }
+          ]
+        },
+        {
+          "label": "RISCO",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "chmod -R 777 /var/www",
+              "why": "777 deixa qualquer usuário ler, alterar e executar. Um invasor no site troca arquivos à vontade."
+            },
+            {
+              "t": "PasswordAuthentication yes em servidor exposto",
+              "why": "Senha no SSH exposto convida força bruta. Use chave."
+            },
+            {
+              "t": "mysql -u root -pSenha123 no terminal",
+              "why": "A senha fica no histórico (~/.bash_history) e aparece na lista de processos."
+            },
+            {
+              "t": "curl http://site/install.sh | sudo bash sem ler",
+              "why": "Você executa como root um código que não viu, baixado sem HTTPS."
+            },
+            {
+              "t": "Banco escutando em 0.0.0.0 sem firewall",
+              "why": "Qualquer um na internet alcança o banco."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

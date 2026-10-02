@@ -2,7 +2,10 @@
 // LEVELS e ACTS começam vazios e são preenchidos por loadLevels() (levels.js).
 
 export const LEVELS = [];   // fases na ordem do mapa; cada uma recebe .act (índice do ato)
-export const ACTS = [];     // [tag, nome] de cada ato, ex.: ['ATO 1', 'Camada física e endereçamento']
+export const ACTS = [];     // [tag, nome, dificuldade, história] de cada ato, ex.: ['ATO 1', 'Camada física e endereçamento', 'básico', [...]]
+// Iniciante e básico ganham ajuda extra (dica automática); os eventos do Z3R0 crescem com o nível.
+export const DIFFS = ['iniciante', 'básico', 'intermediário', 'avançado'];
+export const diffOf = L => Math.max(0, DIFFS.indexOf((ACTS[L.act] || [])[2]));
 
 export const S = {
   prog: {}, best: {},       // estrelas e melhor pontuação por fase (chave = título)

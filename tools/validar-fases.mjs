@@ -77,11 +77,19 @@ function check(L, where) {
 }
 
 const idxActs = () => read('index.json').acts;
+// A dificuldade só pode subir ao longo da campanha (progressão para quem está começando).
+{
+  const D = ['iniciante', 'básico', 'intermediário', 'avançado']; let prev = 0;
+  idxActs().forEach(f => { const d = D.indexOf(read(f).diff); if (d >= 0 && d < prev) warns.push(`${f}: dificuldade "${D[d]}" depois de um ato mais difícil`); if (d >= 0) prev = d; });
+}
 const titles = new Map();
 let total = 0;
 for (const f of read('index.json').acts) {
   const a = read(f);
   if (!a.tag || !a.name) errors.push(`${f}: ato sem "tag" ou "name"`);
+  if (a.diff !== undefined && !['iniciante', 'básico', 'intermediário', 'avançado'].includes(a.diff)) errors.push(`${f}: "diff" deve ser iniciante, básico, intermediário ou avançado`);
+  if (!a.diff) warns.push(`${f}: ato sem "diff" (dificuldade)`);
+  (a.story || []).forEach((s, i) => { if (!['z', 'me', 'chefe'].includes(s.who) || !s.t) errors.push(`${f}: story[${i}] precisa de "who" (z, me ou chefe) e "t"`); });
   a.levels.forEach((L, i) => {
     total++;
     const where = `${f} #${i + 1} "${L.title}"`;
