@@ -9,11 +9,14 @@ import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
 import { renderQuiz } from './quiz.js';
 import { renderTerm } from './term.js';
+import { renderDefense, resetDefense } from './defense.js';
+import { renderTopo, resetTopo } from './topo.js';
+import { renderPcap } from './pcap.js';
 import { startZ3r0, stopZ3r0 } from './z3r0.js';
 import { addXP, xpHTML, rankOf } from './career.js';
 import { onLevelWin } from './ach.js';
 
-const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm };
+const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm, defense: renderDefense, topo: renderTopo, pcap: renderPcap };
 
 // ---------- map ----------
 export function renderMap() {
@@ -24,7 +27,7 @@ export function renderMap() {
       if (L.act !== ai) return;
       const st = S.prog[K(i)] || 0; tot += st; pts += S.best[K(i)] || 0;
       const lock = !unlocked(i), next = i === nextI;
-      const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss ? 'boss' : ''].join(' ');
+      const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
       html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : i + 1}</span>
         <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
         ${lock ? '' : `<span class="res"><span class="st">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
@@ -81,7 +84,7 @@ function showBrief(i) {
 // ---------- game core ----------
 function cleanup() {
   clearInterval(S.timer); S.timer = null; S.intro.forEach(clearTimeout); S.intro = [];
-  resetDrop(); resetWire(); stopZ3r0();
+  resetDrop(); resetWire(); resetDefense(); resetTopo(); stopZ3r0();
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
 function startLevel(i) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title); }
@@ -97,16 +100,16 @@ export function play(L, name) {
   $('stage').classList.add('veil'); $('bank').classList.add('veil');
   show('game');
   const sc = $('scene');
-  sc.innerHTML = sceneSVG(L.loc, L.boss, L.loose) + `<div class="caption"><i></i><span id="capTxt"></span></div><div class="skip">TOQUE PARA PULAR</div>`;
+  sc.innerHTML = sceneSVG(L.loc, L.boss || L.miniboss, L.loose) + `<div class="caption"><i></i><span id="capTxt"></span></div><div class="skip">TOQUE PARA PULAR</div>`;
   sc.classList.remove('defeat'); sc.classList.add('big');
   heroTo(sc, 150, true);
   const hero = sc.querySelector('.hero'); hero.classList.add('walk');
   requestAnimationFrame(() => requestAnimationFrame(() => heroTo(sc, HX[L.loc])));
   typeCap(L.cap);
-  music(L.boss ? 'boss' : 'play'); sfx.whoosh();
+  music(L.boss || L.miniboss ? 'boss' : 'play'); sfx.whoosh();
   for (let k = 0; k < 8; k++) S.intro.push(setTimeout(sfx.step, k * 170));
   for (let k = 0; k < 7; k++) S.intro.push(setTimeout(sfx.key, 1500 + k * 90 + Math.random() * 40));
-  if (L.boss) S.intro.push(setTimeout(sfx.siren, 300), setTimeout(sfx.siren, 1100));
+  if (L.boss || L.miniboss) S.intro.push(setTimeout(sfx.siren, 300), setTimeout(sfx.siren, 1100));
   S.intro.push(setTimeout(() => { hero.classList.remove('walk'); hero.classList.add('type'); }, 1420));
   S.intro.push(setTimeout(finishIntro, 2300));
   sc.onclick = () => { if (S.intro.length) finishIntro(); };
@@ -134,7 +137,7 @@ function finishIntro() {
   S.intro.forEach(clearTimeout); S.intro = [];
   const L = S.lv, sc = $('scene'), hero = sc.querySelector('.hero');
   heroTo(sc, HX[L.loc], true); hero.classList.remove('walk'); hero.classList.add('type');
-  $('capTxt').textContent = LOCNAME[L.loc] + (L.boss ? ' · Z3R0 AO VIVO' : '');
+  $('capTxt').textContent = LOCNAME[L.loc] + (L.boss || L.miniboss ? ' · Z3R0 AO VIVO' : '');
   sc.classList.remove('big');
   S.busy = false;
   ENGINES[L.type](L);
@@ -163,11 +166,11 @@ function win() {
   // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
   const last = !!L.boss, more = S.cur < LEVELS.length - 1;
   let delay = 650;
-  if (L.boss) {
+  if (L.boss || L.miniboss) {
     delay = 3600; stopMusic();
     const sc = $('scene'); sc.classList.add('big', 'defeat'); $('stage').classList.add('veil');
     if (hero) { hero.classList.remove('type'); }
-    const cap = $('capTxt'); if (cap) cap.textContent = 'C2 DESCONECTADO · Z3R0 OFFLINE';
+    const cap = $('capTxt'); if (cap) cap.textContent = L.boss ? 'C2 DESCONECTADO · Z3R0 OFFLINE' : 'ATAQUE CONTIDO · Z3R0 RECUOU';
     sfx.zap(); setTimeout(sfx.boom, 250); buzz([100, 50, 200]);
     setTimeout(() => { const c = center(sc); for (let k = 0; k < 5; k++) setTimeout(() => burst(c.x + (k - 2) * 60, c.y - 20, ['#ff2e63', '#ffd166', '#00e0a8', '#4dd2ff', '#ff7ad9'][k], 18), k * 120); }, 700);
     setTimeout(() => { if (hero) hero.classList.add('cheer'); sfx.win(); }, 1300);
@@ -222,7 +225,7 @@ export function initGame() {
     const L = S.lv;
     modal(`<div class="tag">DICA TÉCNICA</div><h2>${L.title}</h2><div class="learn">${L.tip}</div>${lessonHTML(L)}<div class="row"><button class="btn ghostb" id="sndG">SOM: ${isMuted() ? 'OFF' : 'ON'}</button><button class="btn" id="mOk">ENTENDI</button></div>`);
     $('mOk').onclick = closeModal;
-    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(S.lv.boss ? 'boss' : 'play'); };
+    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(S.lv.boss || S.lv.miniboss ? 'boss' : 'play'); };
   };
   $('modal').addEventListener('click', e => { if (e.target.id === 'modal' && $('mcard').querySelector('#mCancel,#mOk,#mNo')) closeModal(); });
 }

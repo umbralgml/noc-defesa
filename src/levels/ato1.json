@@ -341,6 +341,172 @@
       ]
     },
     {
+      "title": "Onde a rede quebrou?",
+      "tag": "TOPOLOGIA",
+      "type": "topo",
+      "loc": "rack",
+      "cap": "Abrindo o mapa da rede...",
+      "goal": "Descubra com pings onde o caminho quebrou e aponte a falha no mapa.",
+      "z": "Puxei um cabo em algum lugar do seu datacenter. Boa sorte achando qual.",
+      "me": "Não preciso de sorte. Preciso de ping.",
+      "intro": "O financeiro não abre a pasta da rede nem o ERP, mas a internet funciona. Mande pings a partir do <b>PC do financeiro</b> e descubra <b>onde</b> o caminho quebra.",
+      "lesson": [
+        "Para achar uma falha, teste <b>por partes</b>, do mais perto para o mais longe. O problema está entre o <b>último ponto que responde</b> e o <b>primeiro que não responde</b>.",
+        "Se <b>vários</b> destinos caem juntos, procure o que eles têm <b>em comum</b> no caminho.",
+        "O <b>traceroute</b> lista os roteadores (saltos) até o destino. Switches trabalham na camada 2 e não aparecem nele.",
+        "Comece pela <b>camada física</b>: LED apagado, cabo solto e porta desligada explicam muita queda."
+      ],
+      "tip": "Pingue a internet (responde?) e um servidor (falha?). O que os servidores têm em comum que a internet não tem? O SW-DC e o cabo que liga o roteador a ele.",
+      "learn": "Isolar a falha comparando testes é a base do troubleshooting. Internet ok e servidores fora = problema no trecho que só os servidores usam: o uplink entre o roteador e o SW-DC. Camada física primeiro: o cabo estava solto.",
+      "from": "pc",
+      "nodes": [
+        {
+          "id": "pc",
+          "t": "PC FINANC.",
+          "ip": "10.0.10.25",
+          "kind": "pc",
+          "x": 45,
+          "y": 190
+        },
+        {
+          "id": "swa",
+          "t": "SW-ACESSO",
+          "ip": "10.0.10.2",
+          "kind": "sw",
+          "x": 45,
+          "y": 115,
+          "why": "Switch de acesso: liga os PCs do andar. É camada 2, encaminha por endereço MAC e não aparece no traceroute."
+        },
+        {
+          "id": "rt",
+          "t": "ROTEADOR",
+          "ip": "10.0.10.1",
+          "kind": "rt",
+          "x": 165,
+          "y": 115,
+          "why": "Roteador e gateway do PC. Liga a rede dos usuários à rede dos servidores e à saída para a internet."
+        },
+        {
+          "id": "fw",
+          "t": "FIREWALL",
+          "ip": "10.0.0.1",
+          "kind": "fw",
+          "x": 165,
+          "y": 35,
+          "why": "Firewall de borda: tudo que vai para a internet passa por ele."
+        },
+        {
+          "id": "net",
+          "t": "INTERNET",
+          "ip": "8.8.8.8",
+          "kind": "net",
+          "x": 290,
+          "y": 35,
+          "why": "8.8.8.8 é o DNS público do Google. Bom alvo para testar se a saída para a internet funciona."
+        },
+        {
+          "id": "swdc",
+          "t": "SW-DC",
+          "ip": "10.0.20.2",
+          "kind": "sw",
+          "x": 290,
+          "y": 115,
+          "why": "Switch do datacenter: liga os servidores. Se ele, ou o cabo até ele, cair, todos os servidores somem juntos."
+        },
+        {
+          "id": "srv",
+          "t": "ARQUIVOS",
+          "ip": "10.0.20.10",
+          "kind": "srv",
+          "x": 235,
+          "y": 190,
+          "why": "Servidor de arquivos, onde fica a pasta da rede do financeiro."
+        },
+        {
+          "id": "erp",
+          "t": "ERP",
+          "ip": "10.0.20.11",
+          "kind": "srv",
+          "x": 320,
+          "y": 190,
+          "why": "Servidor do ERP, o sistema de gestão da empresa."
+        }
+      ],
+      "links": [
+        {
+          "a": "pc",
+          "b": "swa"
+        },
+        {
+          "a": "swa",
+          "b": "rt"
+        },
+        {
+          "a": "rt",
+          "b": "fw"
+        },
+        {
+          "a": "fw",
+          "b": "net"
+        },
+        {
+          "a": "rt",
+          "b": "swdc",
+          "t": "uplink"
+        },
+        {
+          "a": "swdc",
+          "b": "srv"
+        },
+        {
+          "a": "swdc",
+          "b": "erp"
+        }
+      ],
+      "fault": "rt-swdc",
+      "accept": [
+        "rt-swdc",
+        "swdc"
+      ],
+      "faultName": "No uplink entre o roteador e o SW-DC",
+      "faultWhy": "O roteador e a internet respondem, mas o SW-DC e os dois servidores não. O que eles têm em comum é o uplink do roteador até o SW-DC: a falha está ali.",
+      "steps": [
+        {
+          "q": "Roteador e internet respondem; SW-DC e servidores não. O que isso indica?",
+          "o": [
+            "A falha está entre o roteador e o SW-DC",
+            {
+              "t": "A internet caiu",
+              "why": "O ping para 8.8.8.8 voltou: a saída para a internet funciona."
+            },
+            {
+              "t": "O PC do financeiro está com defeito",
+              "why": "Se fosse o PC, nada responderia, nem o roteador, que é o gateway dele."
+            }
+          ],
+          "a": 0,
+          "why": "O problema fica entre o último ponto que responde (roteador) e o primeiro que não responde (SW-DC)."
+        },
+        {
+          "q": "No rack, o LED da porta do uplink está apagado. Qual o primeiro passo?",
+          "o": [
+            "Conferir o cabo e reconectar: camada física primeiro",
+            {
+              "t": "Reiniciar o servidor de arquivos",
+              "why": "O servidor não tem culpa: o caminho até ele é que está cortado. Reiniciar só gera mais indisponibilidade."
+            },
+            {
+              "t": "Trocar o IP do PC do financeiro",
+              "why": "Endereço IP não acende LED. LED apagado é problema físico (camada 1)."
+            }
+          ],
+          "a": 0,
+          "why": "LED apagado = sem sinal elétrico ou óptico. Cabo solto, mal crimpado ou porta desligada. Resolva a camada física antes de mexer em configuração.",
+          "out": "LED da porta verde de novo.\n$ ping -c 3 10.0.20.10\n3 packets transmitted, 3 received, 0% packet loss"
+        }
+      ]
+    },
+    {
       "title": "Portas e serviços",
       "tag": "CONEXÃO",
       "type": "wire",

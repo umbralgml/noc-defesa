@@ -14,6 +14,9 @@ export const ACH = [
   ['chefe', '💀', 'Z3R0 offline', 'Derrote o chefe final.'],
   ['intocavel', '🛡️', 'Intocável', 'Derrote o chefe com 100% de integridade.'],
   ['temporada2', '🌐', 'Temporada 2', 'Vença uma fase depois do chefe final.'],
+  ['muralha', '🧱', 'Muralha', 'Segure uma defesa ao vivo sem deixar nenhum pacote errado passar.'],
+  ['wireshark', '🦈', 'Olho de Wireshark', 'Classifique uma captura inteira sem errar nenhum pacote.'],
+  ['rastreador', '🗺️', 'Rastreador', 'Ache a falha de uma topologia na primeira tentativa.'],
   ['teclado', '⌨️', 'Mãos no teclado', 'Digite 10 comandos no terminal (sem tocar nos sugeridos).'],
   ['relampago', '⚡', 'Bloqueio relâmpago', 'Bloqueie um ataque relâmpago do Z3R0.'],
   ['diario', '☀️', 'Bom dia, NOC', 'Complete um desafio diário.'],
@@ -55,6 +58,9 @@ export function onLevelWin(L, stars) {
   if (actDone && act[0] === 'PRÓLOGO') unlock('prologo');
   if (actDone && /linux/i.test(act[1] || '')) unlock('linux');
   if (actLv.every(([, i]) => S.prog[K(i)] === 3)) unlock('atoperfeito');
+  const perfect = { defense: 'muralha', pcap: 'wireshark' }[L.type];
+  if (perfect && S.err === 0) unlock(perfect);
+  if (L.type === 'topo' && !S.miss.some(m => m.t.startsWith(L.title + ':'))) unlock('rastreador');
   if (L.boss) { unlock('chefe'); if (S.hp === 100) unlock('intocavel'); }
   const bossI = LEVELS.findIndex(x => x.boss);
   if (bossI >= 0 && LEVELS.indexOf(L) > bossI) unlock('temporada2');

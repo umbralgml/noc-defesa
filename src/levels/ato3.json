@@ -110,6 +110,197 @@
       ]
     },
     {
+      "title": "Uplink rompido",
+      "tag": "TOPOLOGIA",
+      "type": "topo",
+      "loc": "rack",
+      "trace": false,
+      "cap": "Abrindo o mapa do campus...",
+      "goal": "Ache o corte, entenda por que a redundância falhou e religue o caminho reserva.",
+      "z": "Cortei o caminho do 3º andar. E aquele seu cabo reserva? Hahaha.",
+      "me": "Se tem reserva, tem saída. Primeiro eu acho o corte.",
+      "intro": "O 3º andar inteiro sumiu do monitoramento. Teste a partir do <b>MONITOR</b> do datacenter. Sem traceroute agora: só responde ou não responde. O enlace <b>tracejado</b> é o reserva.",
+      "lesson": [
+        "Sem traceroute, você só sabe se cada destino <b>responde ou não</b>. Compare os resultados para cercar a falha.",
+        "<b>Redundância</b>: o switch de acesso tem dois uplinks, um para cada switch de core. Se um cabo cai, o outro assume.",
+        "O <b>STP</b> (Spanning Tree) deixa o enlace reserva <b>bloqueado</b> para não formar loop e o libera quando o principal cai. Com <b>RSTP</b>, em poucos segundos.",
+        "Porta em <b>shutdown</b> foi desligada pelo administrador. Ela não assume nada sozinha."
+      ],
+      "tip": "Pingue o SW-CORE-1, a internet e o SW-ANDAR3. O que responde fica do lado do datacenter. O andar 3 está atrás do cabo Gi0/1.",
+      "learn": "Redundância só protege se estiver ativa: o uplink reserva estava em shutdown, então o corte do Gi0/1 isolou o andar. Com os dois uplinks ligados, o STP (RSTP) bloqueia um e libera em segundos quando o outro cai. Monitore os dois enlaces para saber quando você está sem reserva.",
+      "from": "mon",
+      "nodes": [
+        {
+          "id": "pc",
+          "t": "PC ANDAR3",
+          "ip": "10.3.0.50",
+          "kind": "pc",
+          "x": 55,
+          "y": 200,
+          "why": "Um dos PCs do 3º andar. Ele depende do SW-ANDAR3 para falar com qualquer coisa."
+        },
+        {
+          "id": "acc",
+          "t": "SW-ANDAR3",
+          "ip": "10.3.0.2",
+          "kind": "sw",
+          "x": 55,
+          "y": 120,
+          "why": "Switch de acesso do 3º andar. Tem dois uplinks: Gi0/1 para o SW-CORE-1 e Gi0/2 (reserva) para o SW-CORE-2."
+        },
+        {
+          "id": "sw1",
+          "t": "SW-CORE-1",
+          "ip": "10.0.0.2",
+          "kind": "sw",
+          "x": 175,
+          "y": 75,
+          "why": "Switch de core principal. Concentra os andares, os servidores e a saída."
+        },
+        {
+          "id": "sw2",
+          "t": "SW-CORE-2",
+          "ip": "10.0.0.3",
+          "kind": "sw",
+          "x": 175,
+          "y": 175,
+          "why": "Switch de core reserva, ligado ao core principal. É ele que receberia o andar 3 se o Gi0/2 estivesse ativo."
+        },
+        {
+          "id": "rt",
+          "t": "BORDA",
+          "ip": "10.0.0.1",
+          "kind": "rt",
+          "x": 295,
+          "y": 80,
+          "why": "Roteador de borda: a saída para a internet."
+        },
+        {
+          "id": "net",
+          "t": "INTERNET",
+          "ip": "8.8.8.8",
+          "kind": "net",
+          "x": 295,
+          "y": 22,
+          "why": "Teste de saída para a internet."
+        },
+        {
+          "id": "srv",
+          "t": "SRV-DC",
+          "ip": "10.0.1.10",
+          "kind": "srv",
+          "x": 295,
+          "y": 140,
+          "why": "Servidor do datacenter, pendurado no core principal."
+        },
+        {
+          "id": "mon",
+          "t": "MONITOR",
+          "ip": "10.0.1.5",
+          "kind": "srv",
+          "x": 295,
+          "y": 200
+        }
+      ],
+      "links": [
+        {
+          "a": "pc",
+          "b": "acc"
+        },
+        {
+          "a": "acc",
+          "b": "sw1",
+          "t": "Gi0/1"
+        },
+        {
+          "a": "acc",
+          "b": "sw2",
+          "t": "Gi0/2 reserva",
+          "off": true,
+          "why": "Este é o enlace reserva, desligado (tracejado). Ele não caiu agora: já estava fora do ar. É parte do problema, mas não é o corte."
+        },
+        {
+          "a": "sw1",
+          "b": "sw2"
+        },
+        {
+          "a": "sw1",
+          "b": "rt"
+        },
+        {
+          "a": "net",
+          "b": "rt"
+        },
+        {
+          "a": "sw1",
+          "b": "srv"
+        },
+        {
+          "a": "mon",
+          "b": "sw2"
+        }
+      ],
+      "fault": "acc-sw1",
+      "accept": [
+        "acc-sw1",
+        "acc"
+      ],
+      "faultName": "No uplink Gi0/1 entre o SW-ANDAR3 e o SW-CORE-1",
+      "faultWhy": "O monitor alcança os dois cores, a borda, a internet e o servidor, mas nada do andar 3. O corte está no uplink Gi0/1 entre o SW-ANDAR3 e o SW-CORE-1. O log de console do switch do andar confirma: Gi0/1 down. Como o reserva estava em shutdown, ninguém assumiu.",
+      "steps": [
+        {
+          "q": "Por que o enlace reserva (Gi0/2) não salvou o andar 3?",
+          "o": [
+            "A porta reserva estava em shutdown: redundância desligada não protege",
+            {
+              "t": "O STP bloqueia o enlace reserva para sempre",
+              "why": "O STP bloqueia o reserva só enquanto o principal está de pé. Quando o principal cai, ele libera o reserva."
+            },
+            {
+              "t": "Enlace reserva só funciona com BGP",
+              "why": "Entre switches da mesma rede, quem cuida da redundância é o STP (ou a agregação de links). BGP é entre redes (AS)."
+            }
+          ],
+          "a": 0,
+          "why": "Redundância precisa estar ativa e testada. Com o STP, o reserva fica bloqueado e assume sozinho quando o principal cai. Em shutdown, ele não assume nunca."
+        },
+        {
+          "q": "Pelo cabo de console do SW-ANDAR3, como religar a porta reserva Gi0/2?",
+          "o": [
+            "interface gi0/2 e depois no shutdown",
+            {
+              "t": "interface gi0/2 e depois spanning-tree portfast",
+              "why": "PortFast é para porta de usuário (acelera a subida). Em porta entre switches ele arrisca um loop, e a porta continuaria desligada."
+            },
+            {
+              "t": "interface gi0/2 e depois shutdown",
+              "why": "shutdown desliga a porta. É o contrário do que você quer."
+            }
+          ],
+          "a": 0,
+          "why": "no shutdown liga a porta. O STP negocia e o andar 3 volta pelo SW-CORE-2.",
+          "run": "interface gi0/2 → no shutdown",
+          "out": "%LINK-3-UPDOWN: Interface GigabitEthernet0/2, changed state to up\n%SPANTREE: Gi0/2 forwarding. Andar 3 de volta pelo SW-CORE-2."
+        },
+        {
+          "q": "Para o próximo corte não derrubar o andar, o certo é:",
+          "o": [
+            "Deixar os dois uplinks ligados com STP (ou agregação LACP) e monitorar os dois",
+            {
+              "t": "Desligar o STP para os dois uplinks encaminharem juntos",
+              "why": "Sem STP, dois caminhos entre switches formam um loop: tempestade de broadcast derruba a rede em segundos."
+            },
+            {
+              "t": "Usar só um uplink, de fibra mais cara",
+              "why": "Um cabo só é ponto único de falha, não importa o preço."
+            }
+          ],
+          "a": 0,
+          "why": "Dois caminhos ativos e vigiados. O STP evita o loop; a agregação (LACP) usa os dois ao mesmo tempo quando ligam no mesmo par de switches."
+        }
+      ]
+    },
+    {
       "title": "Filtro de cliente BGP",
       "tag": "BGP",
       "type": "drop",

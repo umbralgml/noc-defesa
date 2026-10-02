@@ -257,6 +257,171 @@
       ]
     },
     {
+      "title": "Wireshark do plantão",
+      "tag": "CAPTURA",
+      "type": "pcap",
+      "loc": "desk",
+      "cap": "Abrindo a captura no Wireshark...",
+      "goal": "Classifique cada pacote da captura como NORMAL ou SUSPEITO.",
+      "z": "Mandei uns SYN para a sua loja. Uns milhares. Por segundo.",
+      "me": "Captura na mão. Quem não termina o handshake vai aparecer.",
+      "intro": "A loja virtual (<b>177.10.0.5</b>, HTTPS) está lenta. Capturei 12 pacotes. Use os filtros para separar ataque de cliente e classifique tudo. Dá para marcar <b>todos os visíveis</b> de uma vez, mas filtro largo pega inocente junto.",
+      "lesson": [
+        "O <b>Wireshark</b> captura os pacotes e mostra cada um: origem, destino, protocolo e um resumo (Info). Toque num pacote para ver os detalhes.",
+        "<b>Filtro de exibição</b> esconde o que não interessa: <b>tcp.flags.syn == 1</b>, <b>ip.src == 1.2.3.4</b>, <b>udp.port == 53</b>. Combine com <b>&&</b> (e), <b>||</b> (ou) e <b>!</b> (não).",
+        "Toda conexão TCP começa com o <b>handshake</b>: o cliente manda <b>SYN</b>, o servidor responde <b>SYN-ACK</b> e o cliente confirma com <b>ACK</b>.",
+        "<b>SYN flood</b>: o atacante manda milhares de SYN, quase sempre com origem forjada, e nunca confirma. O servidor guarda cada conexão pela metade até lotar a fila."
+      ],
+      "tip": "Filtre SYN puro (syn == 1 && ack == 0). Um deles é do cliente 189.40.12.7, que completa o handshake e manda TLS. Os outros só mandam SYN.",
+      "learn": "A assinatura do SYN flood é muito SYN sem o ACK final, vindo de origens variadas (forjadas). Mitigação: SYN cookies no servidor (ele só guarda estado depois do ACK), limite de taxa de SYN no firewall e scrubbing no provedor quando o volume é grande.",
+      "filters": [
+        {
+          "f": "tcp.flags.syn == 1 && tcp.flags.ack == 0",
+          "why": "Só SYN puro, o primeiro passo do handshake. Num SYN flood eles dominam a captura. Cuidado: cliente legítimo também começa com SYN."
+        },
+        {
+          "f": "ip.addr == 189.40.12.7",
+          "why": "Tudo de e para um IP. Serve para seguir uma conexão inteira: SYN, SYN-ACK, ACK e dados."
+        },
+        {
+          "f": "tcp.flags.syn == 1 && tcp.flags.ack == 0 && ip.src != 189.40.12.7",
+          "why": "SYN puro, menos o cliente que completou o handshake. Sobra só o ataque."
+        },
+        {
+          "f": "tls || dns",
+          "why": "Conexões já abertas (TLS) e consultas de nome (DNS). Quem chegou ao TLS completou o handshake."
+        }
+      ],
+      "packets": [
+        {
+          "src": "189.40.12.7",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 51522,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "51522 → 443 [SYN] Seq=0",
+          "why": "Primeiro passo do handshake de um cliente. Ele continua: SYN-ACK, ACK e TLS logo depois. É cliente de verdade."
+        },
+        {
+          "src": "177.10.0.5",
+          "dst": "189.40.12.7",
+          "proto": "TCP",
+          "sport": 443,
+          "dport": 51522,
+          "flags": "SYN,ACK",
+          "info": "443 → 51522 [SYN, ACK]",
+          "why": "O servidor respondendo ao cliente: segundo passo do handshake."
+        },
+        {
+          "src": "189.40.12.7",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 51522,
+          "dport": 443,
+          "flags": "ACK",
+          "info": "51522 → 443 [ACK]",
+          "why": "O cliente confirma e a conexão abre. Quem faz SYN flood nunca manda este ACK."
+        },
+        {
+          "src": "203.0.113.44",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 40112,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "40112 → 443 [SYN] Seq=0",
+          "bad": true,
+          "why": "SYN de uma origem que nunca completa o handshake. Muitos IPs diferentes, todos só com SYN, no mesmo segundo: SYN flood com origem forjada."
+        },
+        {
+          "src": "198.51.100.7",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 1187,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "1187 → 443 [SYN] Seq=0",
+          "bad": true,
+          "why": "SYN de uma origem que nunca completa o handshake. Muitos IPs diferentes, todos só com SYN, no mesmo segundo: SYN flood com origem forjada."
+        },
+        {
+          "src": "203.0.113.201",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 59034,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "59034 → 443 [SYN] Seq=0",
+          "bad": true,
+          "why": "SYN de uma origem que nunca completa o handshake. Muitos IPs diferentes, todos só com SYN, no mesmo segundo: SYN flood com origem forjada."
+        },
+        {
+          "src": "189.40.12.7",
+          "dst": "177.10.0.5",
+          "proto": "TLS",
+          "sport": 51522,
+          "dport": 443,
+          "flags": "PSH,ACK",
+          "info": "Client Hello (SNI=loja.exemplo.com.br)",
+          "why": "Conexão completa já negociando o HTTPS: tráfego legítimo."
+        },
+        {
+          "src": "192.0.2.88",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 23311,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "23311 → 443 [SYN] Seq=0",
+          "bad": true,
+          "why": "SYN de uma origem que nunca completa o handshake. Muitos IPs diferentes, todos só com SYN, no mesmo segundo: SYN flood com origem forjada."
+        },
+        {
+          "src": "198.51.100.150",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 8812,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "8812 → 443 [SYN] Seq=0",
+          "bad": true,
+          "why": "SYN de uma origem que nunca completa o handshake. Muitos IPs diferentes, todos só com SYN, no mesmo segundo: SYN flood com origem forjada."
+        },
+        {
+          "src": "203.0.113.9",
+          "dst": "177.10.0.5",
+          "proto": "TCP",
+          "sport": 47720,
+          "dport": 443,
+          "flags": "SYN",
+          "info": "47720 → 443 [SYN] Seq=0",
+          "bad": true,
+          "why": "SYN de uma origem que nunca completa o handshake. Muitos IPs diferentes, todos só com SYN, no mesmo segundo: SYN flood com origem forjada."
+        },
+        {
+          "src": "177.10.0.5",
+          "dst": "200.160.0.10",
+          "proto": "DNS",
+          "sport": 33012,
+          "dport": 53,
+          "qname": "a.ntp.br",
+          "info": "Standard query A a.ntp.br",
+          "why": "Consulta DNS do próprio servidor, procurando o servidor de hora. Nada a ver com o ataque."
+        },
+        {
+          "src": "191.5.77.3",
+          "dst": "177.10.0.5",
+          "proto": "TLS",
+          "sport": 60211,
+          "dport": 443,
+          "flags": "PSH,ACK",
+          "info": "Application Data",
+          "why": "Cliente com conexão já estabelecida trocando dados criptografados."
+        }
+      ]
+    },
+    {
       "title": "Mitigação DDoS",
       "tag": "QUIZ",
       "type": "quiz",
@@ -374,6 +539,168 @@
           ],
           "a": 0,
           "why": "uRPF strict confere se a rota para o IP de origem sai pela mesma interface. É a base do BCP 38 contra spoofing."
+        }
+      ]
+    },
+    {
+      "title": "Botnet ao vivo",
+      "tag": "DEFESA AO VIVO",
+      "type": "defense",
+      "loc": "war",
+      "miniboss": true,
+      "reveal": true,
+      "cap": "Z3R0 no telão: a botnet está chegando...",
+      "goal": "Ligue as regras certas e segure as duas ondas da botnet sem derrubar os clientes.",
+      "z": "Chega de teoria. Minha botnet inteira contra o seu firewall. Ao vivo.",
+      "me": "Regra certa, na hora certa. Pode vir.",
+      "intro": "Loja <b>177.10.0.5</b> sob ataque. Toque nas regras para ligar e desligar a qualquer momento. Os pacotes são avaliados na <b>linha laranja</b>.",
+      "lesson": [
+        "Agora é em tempo real: os pacotes atravessam a pista e o firewall decide quando eles cruzam a linha laranja.",
+        "Ligue só as regras que barram o ataque. Regra larga demais derruba cliente: é o <b>falso positivo</b>, e ele também custa integridade.",
+        "<b>Reflexão NTP</b>: a resposta chega com porta de <b>origem 123</b>. <b>Telnet</b> (TCP/23) é a porta preferida das botnets. Origem conhecida de ataque se bloqueia pelo IP.",
+        "Nunca bloqueie a porta do seu próprio serviço (a 443 da loja) nem a sua própria rede."
+      ],
+      "tip": "Três regras resolvem: UDP com origem 123, origem 45.67.89.10 e TCP/23. Bloquear a 443 ou a 177.10.0.0/16 derruba clientes.",
+      "learn": "Defesa em camadas na borda: ACL contra reflexão (UDP origem 123), bloqueio de portas que não deveriam estar expostas (Telnet) e bloqueio da origem identificada do C2. Cada regra precisa ser específica: bloquear a porta do serviço ou a própria rede é fazer o DDoS pelo atacante.",
+      "server": "LOJA 177.10.0.5",
+      "rules": [
+        {
+          "id": "ntp",
+          "t": "Bloquear UDP com origem 123 (NTP)",
+          "match": {
+            "proto": "udp",
+            "sport": 123
+          },
+          "good": true,
+          "why": "Para a reflexão NTP. O servidor da loja acerta o relógio pelo NTP interno, então nada legítimo chega de fora com origem 123."
+        },
+        {
+          "id": "c2",
+          "t": "Bloquear origem 45.67.89.10",
+          "match": {
+            "src": "45.67.89.10"
+          },
+          "good": true,
+          "why": "IP do C2 do Z3R0. Não é cliente: bloqueie a origem, qualquer que seja a porta."
+        },
+        {
+          "id": "tel",
+          "t": "Bloquear TCP/23 (Telnet)",
+          "match": {
+            "proto": "tcp",
+            "port": 23
+          },
+          "good": true,
+          "why": "Telnet manda senha em texto puro e é a porta favorita de botnet. Gerência se faz por SSH, de dentro da rede."
+        },
+        {
+          "id": "https",
+          "t": "Bloquear TCP/443 (HTTPS)",
+          "match": {
+            "proto": "tcp",
+            "port": 443
+          },
+          "why": "Armadilha: 443 é a porta da loja. Bloquear derruba os clientes, e é exatamente isso que o Z3R0 quer."
+        },
+        {
+          "id": "own",
+          "t": "Bloquear origem 177.10.0.0/16",
+          "match": {
+            "src": "177.10.0.0/16"
+          },
+          "why": "Armadilha: 177.10 é a SUA rede. O ERP interno consultando a loja seria bloqueado."
+        }
+      ],
+      "waves": [
+        {
+          "msg": "Primeira onda: reflexão NTP, Telnet e o C2 fazendo varredura.",
+          "gap": 1700,
+          "travel": 5800,
+          "packets": [
+            {
+              "src": "91.200.12.4",
+              "proto": "udp",
+              "port": 51000,
+              "sport": 123,
+              "bad": true,
+              "why": "Resposta NTP que ninguém pediu: reflexão. Origem 123 vinda de fora, numa porta aleatória do seu servidor."
+            },
+            {
+              "src": "189.40.12.7",
+              "proto": "tcp",
+              "port": 443,
+              "why": "Cliente comprando na loja (HTTPS). Tem que passar."
+            },
+            {
+              "src": "45.67.89.10",
+              "proto": "tcp",
+              "port": 22,
+              "bad": true,
+              "why": "O C2 do Z3R0 tentando SSH na loja. Bloqueie pela origem."
+            },
+            {
+              "src": "177.10.3.20",
+              "proto": "tcp",
+              "port": 443,
+              "why": "O ERP interno (177.10.3.20) consultando a loja. É da sua rede."
+            },
+            {
+              "src": "103.77.5.9",
+              "proto": "tcp",
+              "port": 23,
+              "bad": true,
+              "why": "Bot tentando Telnet com senha padrão, como a botnet Mirai faz com câmeras e roteadores."
+            },
+            {
+              "src": "200.150.1.8",
+              "proto": "udp",
+              "port": 51000,
+              "sport": 123,
+              "bad": true,
+              "why": "Resposta NTP que ninguém pediu: reflexão. Origem 123 vinda de fora, numa porta aleatória do seu servidor."
+            }
+          ]
+        },
+        {
+          "msg": "A botnet acelerou! Repare: o C2 agora vem pela 443.",
+          "gap": 1300,
+          "travel": 4800,
+          "packets": [
+            {
+              "src": "45.67.89.10",
+              "proto": "tcp",
+              "port": 443,
+              "bad": true,
+              "why": "Mesmo na 443, é o C2 do Z3R0. Só a regra de origem pega este sem derrubar os clientes."
+            },
+            {
+              "src": "201.17.40.2",
+              "proto": "tcp",
+              "port": 443,
+              "why": "Outro cliente na loja."
+            },
+            {
+              "src": "61.12.8.200",
+              "proto": "tcp",
+              "port": 23,
+              "bad": true,
+              "why": "Bot tentando Telnet com senha padrão, como a botnet Mirai faz com câmeras e roteadores."
+            },
+            {
+              "src": "186.2.30.14",
+              "proto": "udp",
+              "port": 51000,
+              "sport": 123,
+              "bad": true,
+              "why": "Resposta NTP que ninguém pediu: reflexão. Origem 123 vinda de fora, numa porta aleatória do seu servidor."
+            },
+            {
+              "src": "191.5.77.3",
+              "proto": "tcp",
+              "port": 443,
+              "why": "Cliente na loja (HTTPS)."
+            }
+          ]
         }
       ]
     }

@@ -297,6 +297,179 @@
       ]
     },
     {
+      "title": "Rastro do C2",
+      "tag": "CAPTURA",
+      "type": "pcap",
+      "loc": "server",
+      "cap": "Abrindo a captura do switch...",
+      "goal": "Classifique a captura e encontre todos os rastros do C2.",
+      "z": "Meu implante está quietinho na sua rede. Você nunca vai achar.",
+      "me": "Implante quieto ainda precisa falar com o C2. E isso fica na captura.",
+      "intro": "O <b>10.0.5.23</b> está estranho. A captura do switch tem 12 pacotes. Ache o C2, o beacon, a exfiltração e o movimento lateral. O resto é normal.",
+      "lesson": [
+        "<b>C2</b> (comando e controle) é o servidor que dá ordens ao malware. O host infectado faz <b>beacon</b>: chama o C2 em intervalos regulares.",
+        "Rastros típicos: DNS de domínio estranho, conexões periódicas para o mesmo IP, <b>POST</b> grande para fora (exfiltração) e varredura interna, o <b>movimento lateral</b> (ex.: SMB na 445).",
+        "Filtros úteis: <b>ip.addr == X</b> (os dois sentidos), <b>ip.src == X</b>, <b>dns</b> e <b>http.request.method == \"POST\"</b>.",
+        "O que você achar vira <b>IoC</b> (indicador de comprometimento): domínio, IP e host para bloquear e caçar no resto da rede."
+      ],
+      "tip": "Filtre ip.src == 10.0.5.23: tudo que ele mandou é suspeito. Depois olhe o DNS: a resposta que entrega o IP do C2 também é rastro.",
+      "learn": "Caça ao C2 na captura: DNS de domínio estranho → IP do C2 → beacon periódico (GET) → exfiltração (POST grande) → movimento lateral (SMB 445). Os IoCs são o domínio update-cdn-z3r0.xyz, o IP 45.67.89.10 e o host 10.0.5.23, que vai para isolamento.",
+      "filters": [
+        {
+          "f": "ip.src == 10.0.5.23",
+          "why": "Tudo que o host suspeito mandou: DNS, beacon, exfiltração e varredura."
+        },
+        {
+          "f": "ip.addr == 45.67.89.10",
+          "why": "Tudo que fala com o IP do C2, nos dois sentidos."
+        },
+        {
+          "f": "dns",
+          "why": "Consultas e respostas de nome. Domínio estranho costuma ser o primeiro rastro do C2."
+        },
+        {
+          "f": "http.request.method == \"POST\"",
+          "why": "Pedidos que enviam dados. POST grande para IP desconhecido é sinal de exfiltração."
+        },
+        {
+          "f": "tcp.dstport == 445",
+          "why": "SMB entre estações. Numa rede de usuários, quase sempre é movimento lateral."
+        }
+      ],
+      "packets": [
+        {
+          "src": "10.0.5.23",
+          "dst": "10.0.0.53",
+          "proto": "DNS",
+          "sport": 51111,
+          "dport": 53,
+          "qname": "update-cdn-z3r0.xyz",
+          "info": "Standard query A update-cdn-z3r0.xyz",
+          "bad": true,
+          "why": "Domínio esquisito consultado pelo host suspeito logo antes do beacon. É o primeiro rastro do C2."
+        },
+        {
+          "src": "10.0.0.53",
+          "dst": "10.0.5.23",
+          "proto": "DNS",
+          "sport": 53,
+          "dport": 51111,
+          "qname": "update-cdn-z3r0.xyz",
+          "info": "Standard query response A 45.67.89.10",
+          "bad": true,
+          "why": "A resposta entrega o IP do C2: 45.67.89.10. O resolvedor não é culpado, mas este pacote faz parte do rastro e é um IoC."
+        },
+        {
+          "src": "10.0.5.40",
+          "dst": "10.0.0.53",
+          "proto": "DNS",
+          "sport": 50200,
+          "dport": 53,
+          "qname": "erp.empresa.local",
+          "info": "Standard query A erp.empresa.local",
+          "why": "Um usuário procurando o ERP interno. Nome conhecido da empresa."
+        },
+        {
+          "src": "10.0.5.23",
+          "dst": "45.67.89.10",
+          "proto": "HTTP",
+          "sport": 49822,
+          "dport": 80,
+          "flags": "PSH,ACK",
+          "method": "GET",
+          "info": "GET /beacon?id=7f3a HTTP/1.1",
+          "bad": true,
+          "why": "Beacon: o malware avisa ao C2 que está vivo e pede ordens."
+        },
+        {
+          "src": "10.0.5.40",
+          "dst": "10.0.0.10",
+          "proto": "TLS",
+          "sport": 50201,
+          "dport": 443,
+          "flags": "PSH,ACK",
+          "info": "Client Hello (SNI=erp.empresa.local)",
+          "why": "Acesso HTTPS ao ERP interno, logo depois de resolver o nome. Uso normal."
+        },
+        {
+          "src": "10.0.5.40",
+          "dst": "10.0.0.123",
+          "proto": "NTP",
+          "sport": 123,
+          "dport": 123,
+          "info": "NTP Version 4, client",
+          "why": "Estação acertando o relógio no NTP interno."
+        },
+        {
+          "src": "10.0.5.23",
+          "dst": "45.67.89.10",
+          "proto": "HTTP",
+          "sport": 49830,
+          "dport": 80,
+          "flags": "PSH,ACK",
+          "method": "GET",
+          "info": "GET /beacon?id=7f3a HTTP/1.1 (60 s depois)",
+          "bad": true,
+          "why": "O mesmo beacon de novo, 60 segundos depois. Conexão periódica para o mesmo IP é a marca de um implante."
+        },
+        {
+          "src": "10.0.5.23",
+          "dst": "45.67.89.10",
+          "proto": "HTTP",
+          "sport": 49831,
+          "dport": 80,
+          "flags": "PSH,ACK",
+          "method": "POST",
+          "len": 1514,
+          "info": "POST /upload HTTP/1.1 (4,8 MB)",
+          "bad": true,
+          "why": "Exfiltração: o host mandando 4,8 MB para o C2. Dados da empresa saindo."
+        },
+        {
+          "src": "10.0.5.31",
+          "dst": "10.0.0.53",
+          "proto": "DNS",
+          "sport": 50990,
+          "dport": 53,
+          "qname": "erp.empresa.local",
+          "info": "Standard query A erp.empresa.local",
+          "why": "Outro usuário resolvendo o nome do ERP. Normal."
+        },
+        {
+          "src": "10.0.5.31",
+          "dst": "10.0.0.10",
+          "proto": "TLS",
+          "sport": 50991,
+          "dport": 443,
+          "flags": "PSH,ACK",
+          "info": "Application Data",
+          "why": "Sessão HTTPS já aberta com o ERP. Normal."
+        },
+        {
+          "src": "10.0.5.23",
+          "dst": "10.0.5.31",
+          "proto": "TCP",
+          "sport": 49900,
+          "dport": 445,
+          "flags": "SYN",
+          "info": "49900 → 445 [SYN]",
+          "bad": true,
+          "why": "O host infectado tentando SMB (445) em outro PC: movimento lateral. Estação de usuário não tem motivo para abrir SMB em outra estação."
+        },
+        {
+          "src": "10.0.5.23",
+          "dst": "10.0.5.40",
+          "proto": "TCP",
+          "sport": 49901,
+          "dport": 445,
+          "flags": "SYN",
+          "info": "49901 → 445 [SYN]",
+          "bad": true,
+          "why": "Mais uma tentativa de SMB, agora no 10.0.5.40. É varredura interna em busca do próximo alvo."
+        }
+      ]
+    },
+    {
       "title": "Confronto: Z3R0",
       "tag": "CHEFE FINAL",
       "type": "quiz",

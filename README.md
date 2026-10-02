@@ -8,18 +8,18 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 30 fases, do zero ao avançado: um Prólogo para quem nunca viu rede e 7 atos de dificuldade crescente.
+São 36 fases, do zero ao avançado: um Prólogo para quem nunca viu rede e 7 atos de dificuldade crescente.
 
 | Parte | Nível | Tema | Fases |
 |-------|-------|------|-------|
 | Prólogo | iniciante | Primeiros passos | equipamentos e o que fazem, IP x porta x MAC, ping/gateway/DNS, primeiro terminal Linux (com tutorial) |
-| 1 | básico | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, portas de serviço |
-| 2 | básico | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, mitigação de DDoS |
+| 1 | básico | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, achar a falha na topologia com ping e traceroute, portas de serviço |
+| 2 | básico | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, SYN flood no Wireshark, mitigação de DDoS e a botnet ao vivo |
 | 3 | intermediário | Linux no NOC | comandos de rede no Linux, serviço exposto (ss, ufw), resolvedor DNS aberto (tcpdump, dig), SSH sob ataque (journalctl, last), boas práticas |
-| 4 | intermediário | Switching e BGP | VLAN hopping, filtro de cliente BGP, sequestro de prefixo e RPKI |
-| 5 | intermediário | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM e o chefe final |
+| 4 | intermediário | Switching e BGP | VLAN hopping, uplink redundante e STP, filtro de cliente BGP, sequestro de prefixo e RPKI |
+| 5 | intermediário | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM, rastro do C2 numa captura e o chefe final |
 | 6 | avançado | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
-| 7 | avançado | Troubleshooting no terminal | investigar switch e roteador com comandos IOS: porta em shutdown e rota padrão apagada |
+| 7 | avançado | Troubleshooting no terminal | investigar switch e roteador com comandos IOS (porta em shutdown, rota padrão apagada) e o contra-ataque final na borda |
 
 O jogo foi feito para ensinar, não só para testar:
 
@@ -29,7 +29,8 @@ O jogo foi feito para ensinar, não só para testar:
 - **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar. Dá para **desafiar um colega** com um link que leva as mesmas perguntas e o seu placar.
 - **Z3R0 ativo:** a partir do nível intermediário, ele ataca durante a fase (glitch, embaralha, ataque relâmpago com contagem regressiva).
 - **Treino dos seus erros:** cada erro vira uma pergunta de revisão no mapa; dois acertos seguidos tiram o item da lista.
-- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 20 conquistas.
+- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 23 conquistas.
+- **Jeitos de jogar:** ligar cabos, arrastar fichas, quiz, terminal, **defesa ao vivo** (regras de firewall contra ondas de pacotes), **topologia viva** (ping animado para achar a falha) e **captura estilo Wireshark** (filtros de exibição).
 - **Sala do NOC:** no mapa, o analista anda pela sala (toque ou setas) até o equipamento e abre os incidentes de lá.
 
 ## Rodar localmente
