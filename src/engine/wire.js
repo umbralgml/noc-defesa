@@ -5,6 +5,7 @@ import { au, sfx } from './audio.js';
 import { S } from './state.js';
 import { MEDIA, icon } from './scene.js';
 import { good, damage, flash, toast, explain, flow } from './ui.js';
+import { bankWhy } from './bank.js';
 
 let wsel = null, WD = null;
 
@@ -84,6 +85,7 @@ function connect(l, r) {
     drawWires({ a: jackPos(l), b: jackPos(r), c: '#ff4d6d', bad: true });
     setTimeout(() => drawWires(), 450);
     flash(l); flash(r); damage(15, at);
+    bankWhy(S.lv.title, l._t, l._p.why, S.lv.left.map(p => p.why));
   }
   setStep();
 }

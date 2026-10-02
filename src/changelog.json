@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "v": "1.11",
+      "date": "2026-10-02",
+      "title": "O Z3R0 acordou",
+      "items": [
+        "A partir do nível intermediário, o Z3R0 ataca durante a fase: glitch, embaralhada e ataque relâmpago com contagem regressiva",
+        "Treino dos seus erros: cada erro vira revisão no mapa e sai da lista depois de 2 acertos seguidos",
+        "Carreira: ganhe XP e suba de Estagiário a Arquiteto de Redes",
+        "20 conquistas para desbloquear (botão 🏅 CONQUISTAS na tela inicial)",
+        "Mais impacto: faixa de COMBO, flash na tela e sons novos"
+      ]
+    },
+    {
       "v": "1.10",
       "date": "2026-10-02",
       "title": "Plantão para todos",

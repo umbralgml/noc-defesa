@@ -5,6 +5,7 @@ import { $, shuffle, center } from './util.js';
 import { au, sfx } from './audio.js';
 import { S } from './state.js';
 import { good, damage, flash, explain, flow } from './ui.js';
+import { bankAdd, bankWhy } from './bank.js';
 
 // Ficha no JSON pode ser "texto" ou { "t": texto, "v": valor, "why": explicação }.
 const norm = c => typeof c === 'string' ? { t: c, v: c } : { t: c.t, v: c.v ?? c.t, why: c.why };
@@ -57,11 +58,20 @@ function tryPlace(chip, zone) {
   clearSel();
   explain(ok, c.t, why);
   if (ok) {
-    chip.classList.add('used'); S.placed++; good(at, zone.dataset.b !== undefined ? L.buckets[+zone.dataset.b].c : null);
+    chip.classList.add('used'); S.placed++; sfx.drop(); good(at, zone.dataset.b !== undefined ? L.buckets[+zone.dataset.b].c : null);
     const bc = $('bankCnt'); if (bc) bc.textContent = S.placed + '/' + S.need;
     zone.classList.add('pop'); setTimeout(() => zone.classList.remove('pop'), 320);
     if (S.placed >= S.need) { S.busy = true; setTimeout(() => flow.win(), 600); }
-  } else { flash(zone); flash(chip); damage(15, at); }
+  } else { flash(zone); flash(chip); toBank(c); damage(15, at); }
+}
+
+// Erro vira item do treino.
+function toBank(c) {
+  if (L.mode === 'buckets') {
+    const a = bucketVals.findIndex(v => v.includes(c.v)), labels = L.buckets.map(b => b.label.replace(/<[^>]+>/g, ''));
+    bankAdd(`${L.title}|${c.t}`, { lv: L.title, q: `${L.title}: em qual categoria fica "${c.t}"?`, a,
+      o: labels.map((t, i) => i === a ? t : { t, why: `"${c.t}" não pertence a ${t}.` }), why: c.why || `"${c.t}" pertence a ${labels[a]}.` });
+  } else bankWhy(L.title, c.t, c.why, L.chips.map(x => typeof x === 'string' ? '' : x.why));
 }
 
 export function resetDrop() { clearSel(); D = null; }

@@ -40,10 +40,12 @@
           <button class="btn ghostb tsmall" id="sndT">SOM: ON</button>
           <button class="btn ghostb tsmall rankBtn" id="rankT" hidden>🏆 RANKING</button>
           <button class="btn ghostb tsmall" id="installBtn" hidden>📲 INSTALAR APP</button>
+          <button class="btn ghostb tsmall" id="achBtn">🏅 CONQUISTAS</button>
           <button class="btn ghostb tsmall" id="newsBtn">NOVIDADES <span class="ndot" id="newsDot"></span></button>
           <button class="btn ghostb tsmall" id="resetBtn">ZERAR PROGRESSO</button>
         </div>
         <div class="twho" id="tWho" hidden>Jogando como <b id="tWhoName"></b> · <button class="lnk" id="tWhoEdit">trocar</button></div>
+        <div class="trank" id="tRank"></div>
         <div class="credit">criado por <b>Marcos dos Anjos</b> · redes, infra e segurança</div>
       </div>
     </div>
@@ -63,7 +65,7 @@
     <div class="mapTop">
       <button class="iconbtn" id="homeBtn" aria-label="Voltar para a tela inicial" title="Tela inicial">⌂</button>
       <div class="av" id="mA"></div>
-      <div class="who"><b id="mapWho">ANALISTA DE PLANTÃO</b><span>Escolha o próximo incidente</span></div>
+      <div class="who"><b id="mapWho">ANALISTA DE PLANTÃO</b><span id="mapRank">Escolha o próximo incidente</span></div>
       <div class="starsTot" id="starsTot"></div>
       <button class="iconbtn rankBtn" id="rankM" aria-label="Ranking" hidden>🏆</button>
       <button class="iconbtn sndbtn" id="sndM" aria-label="Som">♪</button>
@@ -98,6 +100,8 @@
 </div>
 <div class="modal" id="modal"><div class="card" id="mcard"></div></div>
 <div id="fx"></div>
+<div id="vig"></div>
+<div class="achv" id="achv" role="status" aria-live="polite"></div>
 <script type="module" src="src/main.js"></script>
 </body>
 </html>

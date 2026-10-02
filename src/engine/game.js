@@ -9,6 +9,9 @@ import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
 import { renderQuiz } from './quiz.js';
 import { renderTerm } from './term.js';
+import { startZ3r0, stopZ3r0 } from './z3r0.js';
+import { addXP, xpHTML, rankOf } from './career.js';
+import { onLevelWin } from './ach.js';
 
 const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm };
 
@@ -29,11 +32,13 @@ export function renderMap() {
     html += '</div>';
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
-  $('mapList').innerHTML = '<div id="dailyBox"></div>' + html;
-  flow.map(); flow.room();
+  $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div>' + html;
+  flow.map(); flow.room(); flow.train();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}<small>${fmt(pts)} PTS</small>`;
-  const p = profile(); $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
+  const p = profile(), r = rankOf();
+  $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
+  $('mapRank').textContent = `${r.name} · ${fmt(r.v)} XP`;
 }
 
 // Confirma antes de apagar. "after" atualiza a tela que chamou.
@@ -76,7 +81,7 @@ function showBrief(i) {
 // ---------- game core ----------
 function cleanup() {
   clearInterval(S.timer); S.timer = null; S.intro.forEach(clearTimeout); S.intro = [];
-  resetDrop(); resetWire();
+  resetDrop(); resetWire(); stopZ3r0();
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
 function startLevel(i) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title); }
@@ -133,6 +138,7 @@ function finishIntro() {
   sc.classList.remove('big');
   S.busy = false;
   ENGINES[L.type](L);
+  startZ3r0(L);
   requestAnimationFrame(() => { $('stage').classList.remove('veil'); $('bank').classList.remove('veil'); });
   setTimeout(() => { if ($('wire')) drawWires(); }, 520);
 }
@@ -147,9 +153,13 @@ function win() {
     setTimeout(() => L.onWin({ score: S.score, hp: S.hp, bonus, total }), 650);
     return;
   }
+  // XP: base + estrelas, com bônus na primeira vez que a fase é concluída.
+  const first = !S.prog[K(S.cur)];
   S.prog[K(S.cur)] = Math.max(S.prog[K(S.cur)] || 0, st);
   S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
   submitCampaign();
+  const xr = addXP(20 + st * 15 + (first ? 50 : 0));
+  onLevelWin(L, st);
   // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
   const last = !!L.boss, more = S.cur < LEVELS.length - 1;
   let delay = 650;
@@ -173,6 +183,7 @@ function win() {
       <div class="pts"><span>Acertos</span><b>${fmt(S.score)}</b></div>
       <div class="pts"><span>Bônus integridade ${S.hp}%</span><b>+${fmt(bonus)}</b></div>
       <div class="pts" style="color:var(--warn)"><span>TOTAL</span><b style="color:var(--warn)">${fmt(total)} pts</b></div>
+      ${xpHTML(xr)}
       <div class="learn"><b>${last ? 'RELATÓRIO FINAL' : 'O QUE VOCÊ DEFENDEU'}</b>${L.learn}</div>
       ${reviewHTML()}
       ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}

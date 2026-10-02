@@ -4,6 +4,7 @@ import { $, shuffle, center } from './util.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
 import { good, damage, toast, note, ZHURT, flow } from './ui.js';
+import { bankAdd } from './bank.js';
 
 let L = null, left = 0;
 // Opção no JSON pode ser "texto" ou { "t": texto, "why": por que está errada }.
@@ -55,6 +56,7 @@ function answer(btn) {
     if (L.boss) { sfx.zap(); toast(ZHURT[Math.random() * ZHURT.length | 0], false); const f = $('bossFill'); if (f) f.style.width = bossPct() + '%'; }
   } else {
     note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
+    if (!L.train) bankAdd(`${L.title}|${q.q}`, { lv: L.title, q: q.q, o: q.o, a: q.a, why: q.why });
     damage(L.boss ? 20 : 15, at);
     if (!btn) toast('Tempo esgotado! Hahaha!', false);
     if (S.hp <= 0) return;

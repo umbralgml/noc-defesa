@@ -8,6 +8,8 @@ import { au } from './audio.js';
 import { flow, modal, closeModal, reviewHTML, share } from './ui.js';
 import { play, goMap } from './game.js';
 import { rankOn, submit, profile, openRanking, hooks } from './rank.js';
+import { addXP, xpHTML } from './career.js';
+import { unlock } from './ach.js';
 
 const START = '2026-10-01', N = 5, TIME = 20;
 
@@ -128,13 +130,17 @@ export function startDaily(ch) {
 function finish(d, res, ch, official) {
   const speed = S.left * 10;
   const rec = { d, n: dayNum(d), log: S.qlog.slice(), score: res.total, speed, total: res.total + speed, miss: S.miss.slice(0, 6) };
+  const hits = rec.log.filter(Boolean).length, xr = addXP(30 + hits * 10);
+  unlock('diario'); if (hits === N) unlock('diario5');
+  if (ch && rec.total > ch.p) unlock('duelo');
   if (official) {
     store('noc_daily', rec);
     const st = store('noc_streak') || {};
     if (st.d !== d) store('noc_streak', { d, c: st.d === yesterday(d) ? st.c + 1 : 1 });
+    const c = (store('noc_streak') || {}).c || 1; if (c >= 3) unlock('seq3'); if (c >= 7) unlock('seq7');
     sendToday();
   }
-  result(rec, ch, !official);
+  result(rec, ch, !official, xr);
 }
 
 // Envia o resultado de hoje para o ranking (se o jogador entrou nele).
@@ -166,7 +172,7 @@ export function readChallenge() {
   return { d, p: Math.round(p), g: log, h: log.filter(Boolean).length, n: (q.get('n') || 'Um analista').replace(/\s+/g, ' ').trim().slice(0, 24) || 'Um analista' };
 }
 
-function result(rec, ch, duel) {
+function result(rec, ch, duel, xr) {
   const h = hitsOf(rec), st = store('noc_streak') || { c: 1 };
   const win = ch && (rec.total > ch.p ? 1 : rec.total < ch.p ? -1 : 0);
   modal(`<div class="tag">${duel ? 'DUELO' : 'DESAFIO DIÁRIO'} #${rec.n}</div><h2>${ch ? (win > 0 ? '🏆 Você venceu!' : win < 0 ? 'Não foi dessa vez.' : 'Empate técnico!') : h === N ? 'Plantão perfeito!' : h >= 3 ? 'Rede de pé.' : 'O Z3R0 passou perto.'}</h2>
@@ -176,6 +182,7 @@ function result(rec, ch, duel) {
     <div class="pts"><span>Bônus de velocidade</span><b>+${fmt(rec.speed)}</b></div>
     <div class="pts" style="color:var(--warn)"><span>TOTAL</span><b style="color:var(--warn)">${fmt(rec.total)} pts</b></div>
     ${duel ? '<div class="dnext">Duelo não conta para o desafio do dia nem para o ranking.</div>' : `<div class="dstreak">🔥 ${st.c} ${st.c > 1 ? 'dias seguidos' : 'dia seguido'}</div>`}
+    ${xr ? xpHTML(xr) : ''}
     ${reviewHTML(rec.miss || [])}
     ${rec.d === today() && !duel ? '<div class="dnext">Próximo desafio em <b id="dNext"></b></div>' : ''}
     <button class="btn wideb" id="dDuel">⚔️ ${ch ? 'DEVOLVER O DESAFIO' : 'DESAFIAR UM COLEGA'}</button>
