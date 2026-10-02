@@ -8,6 +8,7 @@ O jogo grava e lê o ranking direto do navegador pela API REST do [Supabase](htt
 
 - **Campanha:** a melhor soma de pontos de todas as fases de cada jogador, com as estrelas.
 - **Desafio de hoje:** a pontuação do desafio diário do dia (horário de Brasília).
+- **Equipes:** soma da melhor pontuação de campanha de cada jogador, pela equipe que ele escolheu no perfil (turma, faculdade, empresa). A equipe é opcional.
 
 Ao iniciar o primeiro turno (ou o primeiro desafio diário), o jogo pergunta nome e LinkedIn, **ambos opcionais**:
 
@@ -37,19 +38,36 @@ O top 10 aparece na tela inicial (acima das atualizações) e o ranking completo
 
 Essa chave é pública por design: ela vai para o navegador de todo jogador. **Nunca** coloque aqui a `secret key` nem a `service_role`.
 
+## Atualizar um banco já configurado
+
+Versões novas do jogo podem trazer mudanças no `tools/ranking.sql` (a v1.13 trouxe equipes e métricas). Basta colar o arquivo inteiro de novo no **SQL Editor** e clicar em **Run**: ele só acrescenta o que falta e não apaga nenhuma pontuação. Enquanto isso não for feito, o jogo continua funcionando: a aba EQUIPES mostra "Não consegui carregar" e as métricas são descartadas em silêncio.
+
+## Métricas anônimas
+
+Ao vencer ou perder uma fase da campanha, o jogo envia para a tabela `metricas`: título da fase, resultado, número de erros, integridade, segundos e se foi no modo difícil. **Sem** id do jogador, nome ou aparelho. O jogador pode desligar no perfil. O navegador só insere; ninguém de fora lê.
+
+Para ver onde o pessoal mais trava, rode no SQL Editor:
+
+```sql
+select * from metricas_resumo;
+```
+
 ## O que o navegador pode e não pode fazer
 
 O `tools/ranking.sql` deixa o papel público (`anon`) com o mínimo:
 
 | Ação | Permitido |
 |------|:-:|
-| Inserir uma pontuação (nome, LinkedIn, quadro, pontos, estrelas) | sim |
+| Inserir uma pontuação (nome, LinkedIn, equipe, quadro, pontos, estrelas) | sim |
+| Ler a visão `ranking_equipes` (equipe, membros, soma) | sim |
+| Inserir uma métrica anônima de fase | sim |
+| Ler as métricas ou a visão `metricas_resumo` | não |
 | Ler a visão `ranking_top` (melhor resultado de cada jogador, sem o id) | sim |
 | Ler a tabela crua, alterar ou apagar linhas | não |
 | Marcar uma linha como escondida | não |
 
 O banco também recusa:
-- nomes fora de 2 a 24 caracteres;
+- nomes e equipes fora de 2 a 24 caracteres;
 - LinkedIn fora do formato `https://www.linkedin.com/in/...`;
 - pontuações acima do teto possível (50.000 na campanha e 3.000 no desafio).
 

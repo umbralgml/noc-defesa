@@ -556,3 +556,39 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .pbulk{font-size:12px;padding:10px 12px}
 .tnode .tip,.topo .tlink text{paint-order:stroke;stroke:#060c16;stroke-width:3px;stroke-linejoin:round}
 .tlogbox .tlog div{white-space:pre-wrap;width:auto}
+
+/* ---------- visual do analista e acessibilidade ---------- */
+.hcap{display:none}
+.acc-cap .hcap{display:inline}
+.acc-cap .hset,.acc-none .hset{display:none}
+.lprev{height:110px;margin:6px 0 4px;border-radius:12px;overflow:hidden;position:relative;border:1px solid var(--line)}
+.lprev svg{width:100%;height:100%}
+.lsec{font:700 9px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted);margin:12px 0 6px}
+.lrow{display:flex;flex-wrap:wrap;gap:6px}
+.lopt{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:7px 10px;color:var(--text);font:600 12px system-ui}
+.lopt i{width:12px;height:12px;border-radius:50%}
+.lopt small{color:var(--muted);font-size:10px}
+.lopt.on{border-color:var(--acc);background:rgba(0,224,168,.12)}
+.lopt:disabled{opacity:.55}
+.swc{width:34px;height:34px;border-radius:50%;border:2px solid var(--line)}
+.swc.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc)}
+.fc.a11y{align-items:flex-start;margin:10px 0}
+.fc.a11y span{font-size:13px;color:#c9d6ea}
+:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+:root.hc{--muted:#c8d4e8;--line:rgba(255,255,255,.4);--panel:#0b1424;--panel2:#13203a}
+:root.hc .task,:root.hc .coach,:root.hc .opt,:root.hc .chip,:root.hc .port,:root.hc .zone{border-color:rgba(255,255,255,.5)}
+:root.hc .tlog div,:root.hc .tlog .tsys{color:#e6f1ff}
+:root.big .task,:root.big .q,:root.big .opt,:root.big .coach .ct,:root.big .lbb,:root.big .bubble,:root.big .learn,:root.big .lesson{font-size:1.15em}
+:root.big .chip,:root.big .port .t{font-size:15px}
+:root.calm *:not(.pkt):not(.tpkt),:root.calm *::before,:root.calm *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+:root.calm #fx,:root.calm #vig{display:none}
+.certb{float:right;background:var(--panel2);border:1px solid var(--acc);border-radius:8px;padding:4px 8px;color:var(--acc);font:800 9px 'Orbitron',monospace;letter-spacing:1px}
+.cprev{margin:10px 0;border-radius:10px;overflow:hidden;border:1px solid var(--line);min-height:60px}
+.cprev img{display:block;width:100%}
+.hardb{display:block;width:100%;margin:10px 0 0;border-color:var(--z)!important;color:#ffb3c1!important}
+.hardb small{display:block;font:500 11px system-ui;letter-spacing:0;color:var(--muted);margin-top:4px}
+.node .res .st.gold,.starsTot .gold{color:#ffcc33;text-shadow:0 0 8px rgba(255,204,51,.6);font-style:normal}
+.bigstars.gold span{color:#ffcc33;text-shadow:0 0 14px rgba(255,204,51,.8)}
+.goldm{text-align:center;font:800 11px 'Orbitron',monospace;letter-spacing:1.5px;color:#ffcc33;margin:-4px 0 10px}
+.goldm.off{color:var(--muted);font:500 12px system-ui;letter-spacing:0}
+.node .res .st.gold::after{content:' OURO';font:800 8px 'Orbitron',monospace;letter-spacing:1px;vertical-align:2px}

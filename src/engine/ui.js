@@ -58,6 +58,7 @@ export function toast(msg, good) {
 
 // ---------- acerto / erro ----------
 export function damage(n, at) {
+  if (S.hard) n *= 2;   // modo difícil
   S.err++; S.streak = 0; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
   sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450); vignette('bad');
   const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');

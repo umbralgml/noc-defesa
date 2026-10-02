@@ -2,7 +2,7 @@
 import { $ } from './util.js';
 
 // ---------- avatars ----------
-export const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#12324a"/><path d="M11 64c2-12 10-18 21-18s19 6 21 18z" fill="#00a884"/><path d="M26 46l6 7 6-7" fill="#0b6e57"/><rect x="38" y="53" width="8" height="6" rx="1" fill="#e6f1ff"/><circle cx="32" cy="29" r="12" fill="#d9a77f"/><path d="M20 27c0-9 6-14 12-14s12 5 12 13c-3-4-8-6-12-6s-9 2-12 7z" fill="#2b1d14"/><rect x="24" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><rect x="33" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><path d="M31 28.5h2" stroke="#0b1220" stroke-width="1.4"/><path d="M28.5 35.5q3.5 2.5 7 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M19 30a13 13 0 0 1 26 0" fill="none" stroke="#1b2a44" stroke-width="3"/><rect x="16" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><rect x="43" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><path d="M19 35c0 5 4 8 9 8" stroke="#1b2a44" stroke-width="2" fill="none"/><circle cx="29" cy="43" r="2.2" fill="#00e0a8"/></svg>`;
+export const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#12324a"/><path d="M11 64c2-12 10-18 21-18s19 6 21 18z" style="fill:var(--hs,#00a884)"/><path d="M26 46l6 7 6-7" style="fill:var(--hs3,#0b6e57)"/><rect x="38" y="53" width="8" height="6" rx="1" fill="#e6f1ff"/><circle cx="32" cy="29" r="12" style="fill:var(--hk,#d9a77f)"/><path d="M20 27c0-9 6-14 12-14s12 5 12 13c-3-4-8-6-12-6s-9 2-12 7z" style="fill:var(--hh,#2b1d14)"/><rect x="24" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><rect x="33" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><path d="M31 28.5h2" stroke="#0b1220" stroke-width="1.4"/><path d="M28.5 35.5q3.5 2.5 7 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/><g class="hset"><path d="M19 30a13 13 0 0 1 26 0" fill="none" stroke="#1b2a44" stroke-width="3"/><rect x="16" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><rect x="43" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><path d="M19 35c0 5 4 8 9 8" stroke="#1b2a44" stroke-width="2" fill="none"/><circle cx="29" cy="43" r="2.2" fill="#00e0a8"/></g></svg>`;
 export const AV_Z = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#2a0d18"/><path d="M8 64c0-22 9-42 24-46 15 4 24 24 24 46z" fill="#12050a"/><path d="M14 64c1-16 8-30 18-33 10 3 17 17 18 33z" fill="#1f0a12"/><ellipse cx="32" cy="35" rx="11" ry="13" fill="#e8e8ee"/><path d="M23 31l7 2.5-7 2.5z" fill="#ff2e63"/><path d="M41 31l-7 2.5 7 2.5z" fill="#ff2e63"/><path d="M26 42q6 4 12 0" stroke="#12050a" stroke-width="1.6" fill="none"/><path d="M28 44v2M32 45v2M36 44v2" stroke="#12050a" stroke-width="1.2"/></svg>`;
 
 export const AV_CHEFE = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#2b2547"/><path d="M10 64c2-13 10-19 22-19s20 6 22 19z" fill="#3a4d6e"/><path d="M27 45l5 8 5-8z" fill="#e6f1ff"/><path d="M31 47h2l1 9-2 3-2-3z" fill="#ff7a45"/><circle cx="32" cy="29" r="12" fill="#c98f6a"/><path d="M20 27c0-8 5-13 12-13s12 5 12 12c-2-3-6-5-12-5s-10 2-12 6z" fill="#b8c2d6"/><circle cx="27.5" cy="29" r="3.2" fill="none" stroke="#0b1220" stroke-width="1.3"/><circle cx="36.5" cy="29" r="3.2" fill="none" stroke="#0b1220" stroke-width="1.3"/><path d="M30.7 29h2.6" stroke="#0b1220" stroke-width="1.3"/><path d="M28 36q4 2.5 8 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
@@ -12,18 +12,19 @@ const HERO = `<g class="hero" id="hero"><g class="bob">
 <ellipse cx="0" cy="0" rx="11" ry="2" fill="rgba(0,0,0,.4)"/>
 <g class="legL"><rect x="-6" y="-22" width="5.5" height="21" rx="2" fill="#1b2a44"/><rect x="-7" y="-3" width="8.5" height="3" rx="1.5" fill="#05080f"/></g>
 <g class="legR"><rect x="0.5" y="-22" width="5.5" height="21" rx="2" fill="#243556"/><rect x="0.5" y="-3" width="8.5" height="3" rx="1.5" fill="#05080f"/></g>
-<g class="armL"><rect x="-12" y="-43" width="4.5" height="17" rx="2.2" fill="#008f70"/><circle cx="-9.8" cy="-25" r="2.4" fill="#d9a77f"/></g>
-<rect x="-9" y="-45" width="18" height="25" rx="5" fill="#00a884"/>
-<path d="M-4 -45 L0 -40 L4 -45" fill="#0b6e57"/>
+<g class="armL"><rect x="-12" y="-43" width="4.5" height="17" rx="2.2" style="fill:var(--hs2,#008f70)"/><circle cx="-9.8" cy="-25" r="2.4" style="fill:var(--hk,#d9a77f)"/></g>
+<rect x="-9" y="-45" width="18" height="25" rx="5" style="fill:var(--hs,#00a884)"/>
+<path d="M-4 -45 L0 -40 L4 -45" style="fill:var(--hs3,#0b6e57)"/>
 <rect x="2.5" y="-37" width="5" height="4" rx=".6" fill="#e6f1ff"/>
-<g class="armR"><rect x="7.5" y="-43" width="4.5" height="17" rx="2.2" fill="#00a884"/><circle cx="9.8" cy="-25" r="2.4" fill="#d9a77f"/></g>
-<rect x="-2.5" y="-49" width="5" height="4" fill="#d9a77f"/>
-<circle cx="0" cy="-55" r="8" fill="#d9a77f"/>
-<path d="M-8 -56 C-8 -64 -2 -66 2 -65 C6 -64 9 -61 8 -56 C5 -60 0 -60 -8 -56Z" fill="#2b1d14"/>
+<g class="armR"><rect x="7.5" y="-43" width="4.5" height="17" rx="2.2" style="fill:var(--hs,#00a884)"/><circle cx="9.8" cy="-25" r="2.4" style="fill:var(--hk,#d9a77f)"/></g>
+<rect x="-2.5" y="-49" width="5" height="4" style="fill:var(--hk,#d9a77f)"/>
+<circle cx="0" cy="-55" r="8" style="fill:var(--hk,#d9a77f)"/>
+<path d="M-8 -56 C-8 -64 -2 -66 2 -65 C6 -64 9 -61 8 -56 C5 -60 0 -60 -8 -56Z" style="fill:var(--hh,#2b1d14)"/>
 <rect x="1.5" y="-57.5" width="5.5" height="3.6" rx="1" fill="rgba(160,220,255,.35)" stroke="#0b1220" stroke-width=".9"/>
-<path d="M-8.5 -55 A8.6 8.6 0 0 1 8.2 -58.5" stroke="#1b2a44" stroke-width="1.8" fill="none"/>
+<g class="hset"><path d="M-8.5 -55 A8.6 8.6 0 0 1 8.2 -58.5" stroke="#1b2a44" stroke-width="1.8" fill="none"/>
 <rect x="-10.2" y="-58" width="3.6" height="6.5" rx="1.5" fill="#1b2a44"/>
-<path d="M-7 -52 C-6 -48 -1 -47 3 -48" stroke="#1b2a44" stroke-width="1.1" fill="none"/><circle cx="3.6" cy="-48" r="1.2" fill="#00e0a8"/>
+<path d="M-7 -52 C-6 -48 -1 -47 3 -48" stroke="#1b2a44" stroke-width="1.1" fill="none"/><circle cx="3.6" cy="-48" r="1.2" fill="#00e0a8"/></g>
+<g class="hcap"><path d="M-8.8 -57 C-8.6 -66.5 8.6 -66.5 8.8 -57 Z" style="fill:var(--hs,#00a884)"/><rect x="3" y="-58.6" width="9" height="2.4" rx="1.1" style="fill:var(--hs3,#0b6e57)"/></g>
 </g></g>`;
 const led = (x, y, c, d, cls = 'led') => `<circle class="${cls}" style="animation-delay:${d.toFixed(2)}s" cx="${x}" cy="${y}" r="1.3" fill="${c}"/>`;
 function lines(id, x, y, w, h, c) {
