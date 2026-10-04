@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.17",
+      "date": "2026-10-04",
+      "title": "Academia aberta",
+      "items": [
+        "Academia de exercícios no mapa: perguntas novas a cada rodada, sem fim",
+        "7 temas: binário, máscara e CIDR, hosts por rede, rede e broadcast, tipos de IP, portas e wildcard",
+        "Errar na Academia não tira integridade: toda resposta vem com a explicação",
+        "Acerte 10 seguidas para dominar um tema; duas conquistas novas para quem estuda"
+      ]
+    },
+    {
       "v": "1.16",
       "date": "2026-10-04",
       "title": "Escola de plantão",
