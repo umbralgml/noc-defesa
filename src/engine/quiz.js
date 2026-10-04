@@ -57,7 +57,8 @@ function answer(btn) {
   } else {
     note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
     if (!L.train) bankAdd(`${L.title}|${q.q}`, { lv: L.title, q: q.q, o: q.o, a: q.a, why: q.why });
-    damage(L.boss ? 20 : 15, at);
+    if (L.free) { S.err++; S.streak = 0; sfx.bad(); }   // Academia: errar não custa integridade
+    else damage(L.boss ? 20 : 15, at);
     if (!btn) toast('Tempo esgotado! Hahaha!', false);
     if (S.hp <= 0) return;
   }

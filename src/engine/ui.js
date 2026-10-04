@@ -7,7 +7,7 @@ import { unlock } from './ach.js';
 import { S, diffOf } from './state.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
-export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, good() {} };
+export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, good() {} };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];

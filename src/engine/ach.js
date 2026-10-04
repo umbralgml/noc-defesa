@@ -26,6 +26,8 @@ export const ACH = [
   ['seq7', '🗓️', 'Semana de plantão', 'Faça o desafio diário 7 dias seguidos.'],
   ['duelo', '⚔️', 'Duelista', 'Vença um duelo contra um colega.'],
   ['treino', '🧠', 'Aprendi com o erro', 'Tire um item do treino dos seus erros.'],
+  ['academia', '🎓', 'Aluno aplicado', 'Domine um tema da Academia (10 acertos seguidos).'],
+  ['academia_tudo', '🧑‍🏫', 'Professor do NOC', 'Domine todos os temas da Academia.'],
   ['treino10', '📚', 'Revisão em dia', 'Tire 10 itens do treino dos seus erros.'],
   ['metade', '⭐', 'Meio caminho', 'Junte metade de todas as estrelas.'],
   ['tudo', '🏆', 'Arquiteto do NOC', 'Conclua todas as fases.']

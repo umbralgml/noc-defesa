@@ -29,8 +29,9 @@ O jogo foi feito para ensinar, não só para testar:
 - **Revisão no fim da fase** com tudo o que você errou e a explicação de cada item.
 - **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar. Dá para **desafiar um colega** com um link que leva as mesmas perguntas e o seu placar.
 - **Z3R0 ativo:** a partir do nível intermediário, ele ataca durante a fase (glitch, embaralha, ataque relâmpago com contagem regressiva).
+- **Academia de exercícios:** prática sem fim, com perguntas geradas na hora: binário, máscara e CIDR, hosts, rede e broadcast, tipos de IP, portas e wildcard. Sem perder integridade; 10 acertos seguidos dominam o tema.
 - **Treino dos seus erros:** cada erro vira uma pergunta de revisão no mapa; dois acertos seguidos tiram o item da lista.
-- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 24 conquistas.
+- **Carreira e conquistas:** XP por fase, desafio e treino, cargos de Estagiário a Arquiteto de Redes e 26 conquistas.
 - **Modo difícil e estrela de ouro:** com 3 estrelas numa fase, jogue de novo com dano em dobro; sem errar, a estrela vira ouro.
 - **Seu analista:** camisas, cabelo, pele e acessórios, com visuais que destravam por estrelas.
 - **Certificado por ato:** ao concluir um ato, gere um certificado em PNG para baixar ou compartilhar.

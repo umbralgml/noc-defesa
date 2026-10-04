@@ -38,8 +38,8 @@ export function renderMap() {
     html += '</div>';
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
-  $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div>' + html;
-  flow.map(); flow.room(); flow.train();
+  $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div><div id="acadBox"></div>' + html;
+  flow.map(); flow.room(); flow.train(); flow.acad();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}${gold.length ? ` <i class="gold">★${gold.length}</i>` : ''}<small>${fmt(pts)} PTS</small>`;
   const p = profile(), r = rankOf();

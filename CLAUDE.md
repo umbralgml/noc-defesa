@@ -55,7 +55,9 @@ src/engine/
   ui.js               telas, modal, toast, partículas, HP/pontos, good()/damage(),
                       explain() (painel #coach), lessonHTML(), reviewHTML(), flow
   game.js             mapa, briefing, play(L)/intro, win/fail, botão de dica, askReset(); ENGINES por type
-  daily.js            desafio diário: sorteio com a data como semente, geradores de pergunta, sequência, compartilhar
+  daily.js            desafio diário: sorteio com a data como semente, sequência, compartilhar, duelo
+  gen.js              geradores de pergunta: GEN (desafio diário, não mexer sem querer mudar o dia) e ACAD (Academia); sem DOM
+  academy.js          Academia de exercícios: temas com perguntas geradas, sem perder integridade (quiz com `free`), domínio = 10 seguidas
   rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura
   pwa.js              registra o sw.js e controla o botão "INSTALAR APP" (pedido nativo ou instruções do iPhone)
   news.js             linha do tempo de atualizações da tela inicial; selo NOVO até o jogador iniciar o turno
@@ -113,7 +115,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Mobile primeiro:** layout máximo de 720px, toque e arrasto com Pointer Events, sem hover obrigatório. Teste em ~390px de largura.
 - **Fases novas** entram só pelo JSON sempre que possível. Rode o validador sem erros nem avisos antes de commitar.
 - **Changelog:** toda mudança que o jogador percebe ganha uma entrada no topo de `src/changelog.json` (versão `1.x`, data `AAAA-MM-DD`, título divertido curto e 3 a 5 itens em linguagem de jogador). Ela aparece na tela inicial com o selo NOVO (`localStorage` `noc_seen_ver`).
-- **Desafio diário:** o sorteio depende da data (fuso de Brasília) e do conteúdo de `LEVELS` e `GEN`. Mudar os geradores ou os quizzes muda as perguntas do dia para todo mundo; quiz novo entra com `"dailyFrom": "<amanhã>"` para não mexer no desafio em curso. Todo gerador devolve `why` na pergunta e em cada opção errada.
+- **Desafio diário:** o sorteio depende da data (fuso de Brasília) e do conteúdo de `LEVELS` e `GEN` (em `gen.js`). Gerador novo para a Academia vai em `ACAD`, nunca em `GEN`. Mudar os geradores ou os quizzes muda as perguntas do dia para todo mundo; quiz novo entra com `"dailyFrom": "<amanhã>"` para não mexer no desafio em curso. Todo gerador devolve `why` na pergunta e em cada opção errada.
 - **Duelo:** o link `?d=AAAA-MM-DD&p=pts&g=10111&n=nome` reabre as perguntas daquela data (`readChallenge()` valida tudo e limpa a URL). Só conta como desafio oficial se for de hoje e o jogador ainda não tiver jogado. Mudar quizzes ou geradores muda as perguntas de datas passadas também; duelos antigos podem divergir.
 - **Sala do NOC:** estações em `STATIONS` (`scene.js`) por `loc`; um `loc` novo precisa de estação lá e de desenho em `sceneSVG`.
 - **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. O perfil é pedido no primeiro turno (`ensureProfile`); sem nome, o jogador aparece como `Analista #XXXX` (`anonName()`). Nome e LinkedIn só saem do aparelho com consentimento marcado (`publicName()`/`publicLinkedin()`); sem ele, envia o apelido anônimo.
