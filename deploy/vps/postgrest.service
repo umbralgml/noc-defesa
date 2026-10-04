@@ -1,0 +1,20 @@
+# /etc/systemd/system/postgrest.service
+[Unit]
+Description=PostgREST: API do ranking do NOC
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+User=postgrest
+Group=postgrest
+ExecStart=/usr/local/bin/postgrest /etc/postgrest/noc.conf
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -64,7 +64,7 @@ curl -fsSL https://raw.githubusercontent.com/umbralgml/noc-defesa/main/deploy/in
   | sudo bash -s -- noc.seudominio.com.br seu@email.com
 ```
 
-Passo a passo, DNS e solução de problemas em [docs/SERVIDOR.md](docs/SERVIDOR.md).
+Passo a passo, DNS e solução de problemas em [docs/SERVIDOR.md](docs/SERVIDOR.md). Para rodar tudo no seu servidor, inclusive o ranking num PostgreSQL próprio, veja [docs/VPS.md](docs/VPS.md) (arquitetura) e [docs/VPS-CLAUDE.md](docs/VPS-CLAUDE.md) (roteiro para o Claude Code instalar).
 
 ## Estrutura
 

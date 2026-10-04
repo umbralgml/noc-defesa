@@ -19,7 +19,8 @@ export async function loadRankConfig() {
   try {
     const r = await fetch(new URL('../config.json', import.meta.url));
     const c = (await r.json()).ranking;
-    if (c && c.url && c.key) CFG = { url: c.url.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''), key: c.key.trim() };
+    // Supabase: url + key (publishable/anon). API própria (PostgREST na VPS): só a url, sem chave.
+    if (c && c.url) CFG = { url: c.url.trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''), key: (c.key || '').trim() };
   } catch (e) {}
   document.querySelectorAll('.rankBtn').forEach(b => { b.hidden = !CFG; });
   return !!CFG;
@@ -43,8 +44,9 @@ const cleanName = s => (s || '').replace(/\s+/g, ' ').trim();
 
 async function api(path, opt = {}) {
   // Chave nova (sb_publishable_...) vai só no apikey; a anon antiga (JWT) também no Authorization.
-  const h = { apikey: CFG.key, 'Content-Type': 'application/json', ...opt.headers };
-  if (!CFG.key.startsWith('sb_')) h.Authorization = 'Bearer ' + CFG.key;
+  const h = { 'Content-Type': 'application/json', ...opt.headers };
+  if (CFG.key) h.apikey = CFG.key;
+  if (CFG.key && !CFG.key.startsWith('sb_')) h.Authorization = 'Bearer ' + CFG.key;
   const r = await fetch(`${CFG.url}/rest/v1/${path}`, { ...opt, headers: h });
   if (!r.ok) throw new Error('ranking: HTTP ' + r.status);
   return r.status === 200 ? r.json() : null;

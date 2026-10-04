@@ -1,0 +1,12 @@
+# /etc/postgrest/noc.conf  (dono root, grupo postgrest, modo 640)
+# Gerado por deploy/vps/instalar-api.sh. A senha é criada na instalação e não vai para o Git.
+db-uri = "postgres://authenticator:SENHA_GERADA@127.0.0.1:5432/noc"
+db-schemas = "public"
+db-anon-role = "anon"
+db-pool = 10
+db-max-rows = 100
+# Só escuta local: o nginx é a única porta de entrada.
+server-host = "127.0.0.1"
+server-port = 3000
+# Sem documentação automática da API.
+openapi-mode = "disabled"
