@@ -32,7 +32,7 @@ export function renderMap() {
       const lock = !unlocked(i), next = i === nextI;
       const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
       html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : i + 1}</span>
-        <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
+        <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
         ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
     });
     html += '</div>';

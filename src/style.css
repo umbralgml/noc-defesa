@@ -607,3 +607,18 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
   .tlog{height:min(22vh,180px)}
   .tlogbox .tlog{height:90px}
 }
+.node .tag.nova{display:inline-block;font:800 9px 'Orbitron',monospace;letter-spacing:1px;color:#03130d;background:var(--acc);border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+
+/* ---------- destaque "jogo em atualização" na tela inicial ---------- */
+.tupd{max-width:420px;margin:0 auto 18px;text-align:left;background:linear-gradient(135deg,rgba(0,224,168,.12),rgba(77,210,255,.08));border:1px solid rgba(0,224,168,.5);border-radius:14px;padding:12px 14px;box-shadow:0 0 22px rgba(0,224,168,.12)}
+.tuh{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tuh b{font-size:15px;color:var(--text)}
+.tub{font:800 8.5px 'Orbitron',monospace;letter-spacing:1.2px;color:#03130d;background:var(--acc);border-radius:6px;padding:3px 6px;animation:tublink 2.4s ease-in-out infinite}
+@keyframes tublink{50%{box-shadow:0 0 12px var(--acc)}}
+.tupd p{margin:8px 0 6px;font-size:13px;line-height:1.5;color:#c9d6ea}
+.tur{margin:0 0 8px;padding:0;list-style:none;font-size:12.5px;line-height:1.5;color:#c9d6ea}
+.tur li::before{content:'🔜 '}
+.tur li.ok::before{content:'✅ '}
+.tur li.ok{color:var(--text)}
+.tupd .lnk{font-size:12px}
+.tupd .lnk span{color:var(--muted)}

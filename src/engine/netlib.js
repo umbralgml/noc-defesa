@@ -27,15 +27,18 @@ export function reach(level, p) {
 
 // ---------- filtro de exibição (subconjunto do Wireshark) ----------
 // Campos: protocolos (tcp, udp, icmp, dns, http, tls, ntp, ssh, arp), ip.src, ip.dst, ip.addr,
-// tcp/udp.port, .srcport, .dstport, tcp.flags.syn, tcp.flags.ack, tcp.flags.rst, http.request.method,
+// eth.src, eth.dst (MAC), tcp/udp.port, .srcport, .dstport, tcp.flags.syn, tcp.flags.ack, tcp.flags.rst, http.request.method,
 // dns.qry.name, frame.len. Operadores: == != > < >= <= e "contains"; && || ! and or not e parênteses.
 export const L4 = { http: 'tcp', tls: 'tcp', ssh: 'tcp', smtp: 'tcp', dns: 'udp', ntp: 'udp', quic: 'udp', snmp: 'udp' };
+const MAC = /^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i;
 const flag = (p, f) => (p.flags || '').split(',').map(s => s.trim().toUpperCase()).includes(f) ? 1 : 0;
 function field(p, f) {
   const pr = (p.proto || '').toLowerCase(), l4 = L4[pr] || pr;
   if (['tcp', 'udp', 'icmp', 'arp'].includes(f)) return l4 === f;
   if (f in L4 || f === 'http' || f === 'dns') return pr === f;
   switch (f) {
+    case 'eth.src': return p.esrc || (MAC.test(p.src) ? p.src : undefined);
+    case 'eth.dst': return p.edst || (MAC.test(p.dst) ? p.dst : undefined);
     case 'ip.src': return p.src; case 'ip.dst': return p.dst; case 'ip.addr': return [p.src, p.dst];
     case 'tcp.port': case 'udp.port': return l4 === f.slice(0, 3) ? [p.sport, p.dport] : undefined;
     case 'tcp.srcport': case 'udp.srcport': return l4 === f.slice(0, 3) ? p.sport : undefined;

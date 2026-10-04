@@ -1,0 +1,615 @@
+{
+  "tag": "FORMAÇÃO N1",
+  "name": "Pronto para o primeiro chamado",
+  "diff": "básico",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Sobreviveu ao primeiro plantão! Antes de te soltar no rack, vou te formar <b>N1</b>: máscara, TCP e UDP, cabos, ARP, NAT e um chamado de verdade."
+    },
+    {
+      "who": "me",
+      "t": "N1 é quem atende primeiro, né? Então preciso saber diagnosticar rápido."
+    },
+    {
+      "who": "z",
+      "t": "Treina, treina. Eu também treino. Te vejo no rack."
+    },
+    {
+      "who": "chefe",
+      "t": "Cada fase tem aula. Errou? A explicação aparece na hora e o erro vai para o seu treino. Sem pressa."
+    }
+  ],
+  "levels": [
+    {
+      "title": "Máscara na mão",
+      "tag": "MÁSCARA",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "novo": true,
+      "cap": "Abrindo a planilha de endereçamento...",
+      "goal": "Converta máscaras e ache rede, broadcast e quantidade de hosts.",
+      "intro": "Antes de dividir redes, domine a <b>máscara</b>. Ela diz quanto do IP é a <b>rede</b> e quanto é o <b>host</b>. Preencha a planilha.",
+      "z": "/24, 255.255.255.0... é tudo a mesma coisa e ninguém te contou.",
+      "me": "Contaram sim: é o número de bits 1 da máscara.",
+      "lesson": [
+        "A <b>máscara</b> tem 32 bits: os <b>1</b> marcam a parte de rede e os <b>0</b>, a parte de host. Os 1 vêm sempre juntos, à esquerda.",
+        "<b>/24</b> (CIDR) = 24 bits ligados = <b>255.255.255.0</b>. <b>/16</b> = 255.255.0.0. <b>/8</b> = 255.0.0.0.",
+        "Uma /24 tem <b>256</b> endereços (2⁸). O primeiro é a <b>rede</b> e o último é o <b>broadcast</b>: sobram <b>254</b> para hosts.",
+        "Em 192.168.5.77/24, os 3 primeiros números são a rede: <b>192.168.5.0</b>. O broadcast é <b>192.168.5.255</b>."
+      ],
+      "tip": "Conte os bits 1: /24 = 255.255.255.0. Uma /24 tem 256 endereços, 254 úteis. Rede termina em .0, broadcast em .255.",
+      "learn": "Máscara e CIDR são a mesma informação: /24 = 255.255.255.0. Endereços = 2^(bits de host); úteis = endereços − 2 (rede e broadcast). Com isso no sangue, sub-rede vira só fazer blocos menores.",
+      "html": "<div class=\"kv\">/24 em máscara<span class=\"grow\"></span>[m24]</div>\n<div class=\"kv\">/16 em máscara<span class=\"grow\"></span>[m16]</div>\n<div class=\"kv\">255.255.255.128 em CIDR<span class=\"grow\"></span>[c25]</div>\n<div class=\"kv\">Endereços numa /24<span class=\"grow\"></span>[tot]</div>\n<div class=\"kv\">Hosts úteis numa /24<span class=\"grow\"></span>[uteis]</div>\n<div class=\"kv\">Rede de 192.168.5.77/24<span class=\"grow\"></span>[rede]</div>\n<div class=\"kv\">Broadcast de 192.168.5.77/24<span class=\"grow\"></span>[bc]</div>",
+      "zones": {
+        "m24": [
+          "255.255.255.0"
+        ],
+        "m16": [
+          "255.255.0.0"
+        ],
+        "c25": [
+          "/25"
+        ],
+        "tot": [
+          "256"
+        ],
+        "uteis": [
+          "254"
+        ],
+        "rede": [
+          "192.168.5.0"
+        ],
+        "bc": [
+          "192.168.5.255"
+        ]
+      },
+      "explain": {
+        "m24": "24 bits ligados: três octetos 255 e o último 0.",
+        "m16": "16 bits ligados: dois octetos 255 e o resto 0.",
+        "c25": "255.255.255.128 = 24 bits + 1 bit (o 128) = /25.",
+        "tot": "Na /24 sobram 8 bits de host: 2⁸ = 256 endereços.",
+        "uteis": "256 − 2 (rede e broadcast) = 254 hosts.",
+        "rede": "Com /24, a rede é o IP com o último octeto zerado: 192.168.5.0.",
+        "bc": "O broadcast é o último endereço da rede: 192.168.5.255."
+      },
+      "chips": [
+        {
+          "t": "255.255.255.0",
+          "why": "Máscara da /24."
+        },
+        {
+          "t": "255.255.0.0",
+          "why": "Máscara da /16."
+        },
+        {
+          "t": "/25",
+          "why": "255.255.255.128 tem 25 bits ligados."
+        },
+        {
+          "t": "256",
+          "why": "Total de endereços de uma /24."
+        },
+        {
+          "t": "254",
+          "why": "Hosts úteis de uma /24."
+        },
+        {
+          "t": "192.168.5.0",
+          "why": "Endereço de rede de 192.168.5.77/24."
+        },
+        {
+          "t": "192.168.5.255",
+          "why": "Broadcast de 192.168.5.77/24."
+        },
+        {
+          "t": "255.0.0.0",
+          "why": "Essa é a máscara da /8: só o primeiro octeto é rede."
+        },
+        {
+          "t": "/23",
+          "why": "/23 é 255.255.254.0. O .128 no último octeto é /25."
+        },
+        {
+          "t": "255",
+          "why": "255 é o maior valor de um octeto, não a quantidade: de 0 a 255 são 256 números."
+        },
+        {
+          "t": "192.168.5.1",
+          "why": "O .1 costuma ser o gateway. O endereço de rede é o primeiro de todos, o .0."
+        }
+      ]
+    },
+    {
+      "title": "TCP ou UDP?",
+      "tag": "TRANSPORTE",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "firewall",
+      "novo": true,
+      "cap": "Olhando o tráfego por protocolo...",
+      "goal": "Separe o que usa TCP e o que usa UDP.",
+      "intro": "Na camada de transporte há dois jeitos de entregar: o <b>TCP</b>, que confirma tudo, e o <b>UDP</b>, que manda e segue. Separe cada item.",
+      "z": "TCP, UDP... pra mim é tudo pacote.",
+      "me": "Pacote com recibo e pacote sem recibo. Faz toda a diferença.",
+      "lesson": [
+        "<b>TCP</b> abre conexão antes de falar (o <b>handshake</b> SYN, SYN-ACK, ACK), numera os dados, confirma a entrega e <b>reenvia</b> o que se perdeu.",
+        "<b>UDP</b> não abre conexão nem confirma: manda e pronto. É mais leve e rápido.",
+        "Use <b>TCP</b> quando nada pode faltar: site, e-mail, SSH, arquivos.",
+        "Use <b>UDP</b> quando rapidez vale mais que perfeição, ou a mensagem é curtinha: voz, vídeo ao vivo, DNS, DHCP, NTP. Curiosidade: o HTTP/3 roda sobre UDP (QUIC)."
+      ],
+      "tip": "Precisa chegar tudo, em ordem? TCP. Tempo real ou pergunta curtinha? UDP.",
+      "learn": "TCP é entrega com recibo: handshake, confirmação e reenvio, ideal para web, e-mail, SSH e BGP. UDP é entrega sem recibo: leve, ideal para voz, DNS, DHCP e NTP. A porta sozinha não diz tudo: o DNS usa UDP 53 e também TCP 53 para respostas grandes.",
+      "buckets": [
+        {
+          "label": "TCP (COM CONFIRMAÇÃO)",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "Acesso SSH (22)",
+              "why": "No SSH, cada tecla precisa chegar, em ordem: TCP."
+            },
+            {
+              "t": "Envio de e-mail (SMTP)",
+              "why": "E-mail não pode chegar pela metade: SMTP usa TCP."
+            },
+            {
+              "t": "Handshake SYN, SYN-ACK, ACK",
+              "why": "O aperto de mão de três vias é como o TCP abre a conexão."
+            },
+            {
+              "t": "Reenvia o que se perdeu",
+              "why": "Reenvio de dados perdidos é trabalho do TCP."
+            },
+            {
+              "t": "Sessão BGP entre provedores (179)",
+              "why": "O BGP roda sobre TCP 179: rota não pode se perder no caminho."
+            }
+          ]
+        },
+        {
+          "label": "UDP (SEM CONFIRMAÇÃO)",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "Chamada de voz (VoIP)",
+              "why": "Na voz, um pedacinho perdido vale menos que um atraso. Por isso o áudio vai em UDP."
+            },
+            {
+              "t": "Consulta DNS comum (53)",
+              "why": "A pergunta e a resposta do DNS cabem num pacote só: UDP 53. Respostas grandes usam TCP 53."
+            },
+            {
+              "t": "DHCP (67 e 68)",
+              "why": "O PC ainda nem tem IP quando pede um. O DHCP usa UDP em broadcast."
+            },
+            {
+              "t": "Acertar o relógio (NTP 123)",
+              "why": "O NTP troca mensagens curtinhas em UDP 123."
+            },
+            {
+              "t": "Não confirma a entrega",
+              "why": "Mandar sem esperar recibo é a cara do UDP."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Cabo certo",
+      "tag": "CABEAMENTO",
+      "type": "wire",
+      "loc": "rack",
+      "novo": true,
+      "cap": "Abrindo o almoxarifado de cabos...",
+      "heads": [
+        "SITUAÇÃO",
+        "CABO CERTO"
+      ],
+      "goal": "Escolha o cabo certo para cada situação.",
+      "z": "Comprei cabo errado para a obra toda. Boa sorte com a câmera do estacionamento.",
+      "me": "Distância, velocidade e energia. É só ler a situação.",
+      "lesson": [
+        "Cabo de cobre (par trançado com <b>RJ45</b>) vai até <b>100 m</b>. Passou disso, é <b>fibra</b>.",
+        "<b>Cat6</b> faz 1 Gbps em 100 m (10 Gbps só em trechos curtos). <b>Cat6A</b> faz <b>10 Gbps em 100 m</b>.",
+        "<b>PoE</b> manda energia pelo próprio cabo de rede: câmera, telefone IP e access point sem tomada.",
+        "<b>Fibra multimodo</b> (OM3/OM4) serve para centenas de metros, dentro do prédio. <b>Fibra monomodo</b> vai a quilômetros."
+      ],
+      "tip": "Até 100 m e 1G: Cat6. 10G em cobre: Cat6A. Sem tomada: PoE. Centenas de metros: multimodo. Quilômetros: monomodo.",
+      "learn": "O cabo é escolhido por distância, velocidade e energia: cobre até 100 m (Cat6 para 1G, Cat6A para 10G), PoE quando o aparelho não tem tomada, fibra multimodo para centenas de metros e monomodo para quilômetros.",
+      "left": [
+        {
+          "id": "a",
+          "t": "PC até o switch do andar",
+          "s": "30 m · 1 Gbps",
+          "why": "30 m em 1 Gbps: um Cat6 comum resolve."
+        },
+        {
+          "id": "b",
+          "t": "Câmera IP no estacionamento",
+          "s": "60 m · sem tomada no poste",
+          "why": "Sem tomada perto, a câmera recebe energia pelo cabo: PoE."
+        },
+        {
+          "id": "c",
+          "t": "Servidor até o switch",
+          "s": "80 m · 10 Gbps em cobre",
+          "why": "10 Gbps em 80 m de cobre pede Cat6A."
+        },
+        {
+          "id": "d",
+          "t": "Entre dois racks do prédio",
+          "s": "250 m · 10 Gbps",
+          "why": "250 m passa do limite do cobre. Fibra multimodo OM4 leva 10G a até 400 m."
+        },
+        {
+          "id": "e",
+          "t": "Prédio do outro lado da cidade",
+          "s": "8 km",
+          "why": "Quilômetros só com fibra monomodo."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Cat6 com RJ45",
+          "s": "cobre · 1G até 100 m",
+          "ico": "rj45",
+          "why": "Cat6: o cabo padrão para PCs, 1 Gbps até 100 m."
+        },
+        {
+          "id": "b",
+          "t": "Cat6 com PoE",
+          "s": "dados e energia no mesmo cabo",
+          "ico": "rj45",
+          "why": "PoE: o switch manda energia junto com os dados."
+        },
+        {
+          "id": "c",
+          "t": "Cat6A",
+          "s": "cobre · 10G até 100 m",
+          "ico": "rj45",
+          "why": "Cat6A: 10 Gbps em cobre nos 100 m completos."
+        },
+        {
+          "id": "d",
+          "t": "Fibra multimodo OM4",
+          "s": "centenas de metros",
+          "ico": "sfp",
+          "why": "Multimodo: barata para distâncias dentro do campus."
+        },
+        {
+          "id": "e",
+          "t": "Fibra monomodo OS2",
+          "s": "quilômetros",
+          "ico": "sfp",
+          "why": "Monomodo: a luz segue um caminho só e vai longe."
+        }
+      ]
+    },
+    {
+      "title": "Quem tem esse IP?",
+      "tag": "CAPTURA",
+      "type": "pcap",
+      "loc": "desk",
+      "novo": true,
+      "cap": "Capturando o tráfego da rede local...",
+      "goal": "Classifique a captura e ache quem está mentindo no ARP.",
+      "intro": "Os PCs do RH estão lentos e estranhos. Você capturou o tráfego da rede local. O gateway de verdade é <b>192.168.1.1</b>, com MAC <b>aa:bb:cc:00:00:01</b>. Ache o impostor.",
+      "z": "Eu disse para todo mundo que EU sou o gateway. Eles acreditaram.",
+      "me": "ARP não confere nada. Mas a captura entrega você.",
+      "lesson": [
+        "Na rede local, os quadros andam por <b>MAC</b>. Para falar com um IP, o PC precisa descobrir o MAC dele: isso é o <b>ARP</b>.",
+        "O PC pergunta em <b>broadcast</b>: \"<b>Who has</b> 192.168.1.1?\". O dono responde direto: \"192.168.1.1 <b>is at</b> aa:bb:cc:00:00:01\".",
+        "O ARP não tem senha: qualquer um pode responder sem ter sido perguntado. Isso é o <b>ARP spoofing</b>, e o tráfego passa pelo atacante.",
+        "Na captura, filtre com <b>arp</b> e compare o MAC que diz ser o gateway com o MAC verdadeiro. <b>eth.src</b> filtra pelo MAC de origem."
+      ],
+      "tip": "O gateway verdadeiro é aa:bb:cc:00:00:01. Toda resposta dizendo que 192.168.1.1 está em outro MAC é falsa.",
+      "learn": "ARP traduz IP em MAC na rede local, sem nenhuma verificação. ARP spoofing é responder pelo gateway com outro MAC para o tráfego passar pelo atacante. Defesas: Dynamic ARP Inspection no switch, port security e redes segmentadas.",
+      "filters": [
+        {
+          "f": "arp",
+          "why": "Só ARP: perguntas \"Who has\" e respostas \"is at\"."
+        },
+        {
+          "f": "eth.src == 66:77:88:99:aa:bb",
+          "why": "Tudo que saiu da placa com esse MAC. É ele que diz ser o gateway."
+        },
+        {
+          "f": "icmp || tcp",
+          "why": "O tráfego normal de IP: ping e impressão."
+        }
+      ],
+      "packets": [
+        {
+          "src": "3c:22:fb:11:0a:7e",
+          "dst": "Broadcast",
+          "proto": "ARP",
+          "info": "Who has 192.168.1.1? Tell 192.168.1.50",
+          "why": "O PC procurando o MAC do gateway. A pergunta vai em broadcast: normal."
+        },
+        {
+          "src": "aa:bb:cc:00:00:01",
+          "dst": "3c:22:fb:11:0a:7e",
+          "proto": "ARP",
+          "info": "192.168.1.1 is at aa:bb:cc:00:00:01",
+          "why": "O gateway verdadeiro respondendo com o MAC certo."
+        },
+        {
+          "src": "192.168.1.50",
+          "dst": "8.8.8.8",
+          "proto": "ICMP",
+          "info": "Echo (ping) request",
+          "why": "Um ping comum para a internet."
+        },
+        {
+          "src": "8.8.8.8",
+          "dst": "192.168.1.50",
+          "proto": "ICMP",
+          "info": "Echo (ping) reply",
+          "why": "A resposta do ping: tudo normal."
+        },
+        {
+          "src": "66:77:88:99:aa:bb",
+          "dst": "Broadcast",
+          "proto": "ARP",
+          "info": "192.168.1.1 is at 66:77:88:99:aa:bb",
+          "bad": true,
+          "why": "Ninguém perguntou, e o MAC não é o do gateway: é ARP spoofing anunciado para a rede inteira."
+        },
+        {
+          "src": "3c:22:fb:11:0a:7e",
+          "dst": "Broadcast",
+          "proto": "ARP",
+          "info": "Who has 192.168.1.20? Tell 192.168.1.50",
+          "why": "O PC procurando a impressora. Pergunta normal."
+        },
+        {
+          "src": "66:77:88:99:aa:bb",
+          "dst": "3c:22:fb:11:0a:7e",
+          "proto": "ARP",
+          "info": "192.168.1.1 is at 66:77:88:99:aa:bb",
+          "bad": true,
+          "why": "O impostor respondendo direto ao PC, de novo com o MAC falso do gateway."
+        },
+        {
+          "src": "00:1a:2b:3c:4d:5e",
+          "dst": "3c:22:fb:11:0a:7e",
+          "proto": "ARP",
+          "info": "192.168.1.20 is at 00:1a:2b:3c:4d:5e",
+          "why": "A impressora respondendo com o próprio MAC. Normal."
+        },
+        {
+          "src": "192.168.1.50",
+          "dst": "192.168.1.20",
+          "proto": "TCP",
+          "sport": 51000,
+          "dport": 9100,
+          "flags": "SYN",
+          "info": "51000 → 9100 [SYN]",
+          "why": "O PC abrindo conexão na porta 9100 da impressora para imprimir."
+        },
+        {
+          "src": "66:77:88:99:aa:bb",
+          "dst": "Broadcast",
+          "proto": "ARP",
+          "info": "192.168.1.1 is at 66:77:88:99:aa:bb",
+          "bad": true,
+          "why": "O ataque repete o anúncio de tempos em tempos para manter os PCs enganados."
+        }
+      ]
+    },
+    {
+      "title": "NAT na borda",
+      "tag": "NAT",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "firewall",
+      "novo": true,
+      "cap": "Abrindo a tabela de NAT do roteador...",
+      "goal": "Complete o que acontece com o endereço do PC na ida para a internet.",
+      "intro": "O escritório tem dezenas de PCs com IP privado e <b>um único IP público</b>, <b>200.10.20.30</b>. Complete como o <b>NAT</b> faz isso funcionar.",
+      "z": "Vou acessar o PC do seu chefe direto da internet. É só saber o IP dele.",
+      "me": "O IP dele é privado. Da internet, sem redirecionamento, não tem como chegar.",
+      "lesson": [
+        "Faixas <b>privadas</b> (10.0.0.0/8, 172.16.0.0/12 e 192.168.0.0/16) não andam na internet. Para sair, o roteador troca o endereço: é o <b>NAT</b>.",
+        "Na ida, o roteador troca o IP de origem do PC pelo <b>IP público</b> e anota a troca numa <b>tabela</b>. Na volta, desfaz a troca.",
+        "Muitos PCs usam o mesmo IP público ao mesmo tempo. O roteador separa as conversas pela <b>porta de origem</b> (isso se chama PAT ou NAT overload).",
+        "De fora para dentro não há entrada na tabela. Para publicar um servidor interno, crie um <b>redirecionamento de porta</b> (port forwarding)."
+      ],
+      "tip": "Dentro: 192.168.x.x. Fora: o IP público do roteador. Quem separa os PCs é a porta de origem. Para entrar de fora: redirecionamento de porta.",
+      "learn": "O NAT troca o IP privado pelo público na saída e lembra a troca numa tabela, separando os PCs pela porta de origem. Por isso um IP público serve a rede toda, e de fora ninguém alcança um PC interno, a não ser que você crie um redirecionamento de porta.",
+      "html": "<div class=\"kv\">IP de origem do PC, dentro da rede<span class=\"grow\"></span>[ori]</div>\n<div class=\"kv\">IP de origem que o site enxerga<span class=\"grow\"></span>[pub]</div>\n<div class=\"kv\">Quem faz a troca e guarda a tabela<span class=\"grow\"></span>[quem]</div>\n<div class=\"kv\">O que separa vários PCs no mesmo IP público<span class=\"grow\"></span>[porta]</div>\n<div class=\"kv\">Faixa privada usada no escritório<span class=\"grow\"></span>[faixa]</div>\n<div class=\"kv\">Para um servidor interno receber acesso de fora<span class=\"grow\"></span>[pf]</div>",
+      "zones": {
+        "ori": [
+          "192.168.0.10"
+        ],
+        "pub": [
+          "200.10.20.30"
+        ],
+        "quem": [
+          "o roteador de borda"
+        ],
+        "porta": [
+          "a porta de origem"
+        ],
+        "faixa": [
+          "192.168.0.0/16"
+        ],
+        "pf": [
+          "redirecionamento de porta"
+        ]
+      },
+      "explain": {
+        "ori": "Dentro da rede o PC usa o IP privado dele: 192.168.0.10.",
+        "pub": "Na saída, o roteador troca a origem pelo IP público: o site só vê 200.10.20.30.",
+        "quem": "O roteador de borda faz a troca e guarda a tabela para devolver as respostas.",
+        "porta": "Cada conversa ganha uma porta de origem na tabela. É assim que a resposta volta para o PC certo.",
+        "faixa": "192.168.0.0/16 é uma das três faixas privadas da RFC 1918.",
+        "pf": "O redirecionamento de porta cria uma entrada fixa: o que chega na porta X do IP público vai para o servidor interno."
+      },
+      "chips": [
+        {
+          "t": "192.168.0.10",
+          "why": "IP privado do PC dentro do escritório."
+        },
+        {
+          "t": "200.10.20.30",
+          "why": "O IP público do roteador, o único que a internet vê."
+        },
+        {
+          "t": "o roteador de borda",
+          "why": "Quem faz o NAT é o roteador (ou firewall) na saída da rede."
+        },
+        {
+          "t": "a porta de origem",
+          "why": "A porta de origem diferencia as conversas de cada PC na tabela de NAT."
+        },
+        {
+          "t": "192.168.0.0/16",
+          "why": "Faixa privada da RFC 1918."
+        },
+        {
+          "t": "redirecionamento de porta",
+          "why": "Port forwarding: a regra que deixa a internet chegar num servidor interno."
+        },
+        {
+          "t": "o servidor DNS",
+          "why": "O DNS traduz nomes em IPs. Ele não troca o endereço dos pacotes."
+        },
+        {
+          "t": "o endereço MAC",
+          "why": "O MAC não atravessa o roteador. Quem separa as conversas no NAT é a porta."
+        },
+        {
+          "t": "172.32.0.0/16",
+          "why": "Pegadinha: a faixa privada 172.16.0.0/12 vai só até 172.31.255.255. 172.32 é público."
+        },
+        {
+          "t": "liberar todas as portas (DMZ)",
+          "why": "Expor o servidor inteiro abre tudo para o atacante. Libere só a porta do serviço."
+        }
+      ]
+    },
+    {
+      "title": "Chamado: sem internet",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "desk",
+      "novo": true,
+      "host": "pc-rh",
+      "prompt": "voce@pc-rh:~$",
+      "cap": "Atendendo o chamado do RH...",
+      "goal": "Atenda o chamado: descubra por que o PC do RH está sem rede e resolva.",
+      "intro": "Chamado aberto: \"<b>meu PC está sem internet</b>\". Os colegas do lado estão normais. É o seu primeiro chamado de verdade como N1. Vá por partes.",
+      "z": "Tirei o servidor de endereços do ar por uns minutos. Seu N1 vai ficar perdido.",
+      "me": "Primeiro o IP, depois a rota, depois o log. Procedimento é procedimento.",
+      "lesson": [
+        "Roteiro N1 para \"sem internet\": <b>1)</b> tem IP? (<b>ip a</b>) <b>2)</b> tem gateway? (<b>ip route</b>) <b>3)</b> o cabo está ligado? (<b>ip link</b>) <b>4)</b> o que o log diz?",
+        "IP <b>169.254.x.x</b> quer dizer que o DHCP não respondeu. Sem IP válido, não existe rota para o gateway.",
+        "No log, <b>DHCPDISCOVER</b> sem <b>DHCPOFFER</b> = o pedido saiu e ninguém respondeu.",
+        "<b>sudo dhclient -v eth0</b> pede um IP de novo e mostra a conversa DORA na tela."
+      ],
+      "tip": "ip a mostra 169.254: o DHCP falhou. O log confirma que ninguém ofereceu IP. Quando o servidor voltar, peça o IP de novo com dhclient.",
+      "learn": "Chamado resolvido com método: IP 169.254 (link-local) mostrou que o DHCP falhou, o ip link descartou o cabo e o log confirmou DISCOVER sem OFFER. Escalou para o N2 religar o serviço e renovou o IP no PC. Documente no chamado: sintoma, causa e o que foi feito.",
+      "cmds": [
+        {
+          "c": "ip a",
+          "alias": [
+            "ip addr",
+            "ip address"
+          ],
+          "out": "1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536\n    inet 127.0.0.1/8 scope host lo\n2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n    link/ether 3c:22:fb:11:0a:7e brd ff:ff:ff:ff:ff:ff\n    inet 169.254.23.7/16 brd 169.254.255.255 scope link eth0",
+          "why": "O IP é 169.254.23.7: link-local. O PC não conseguiu IP do DHCP e se deu um sozinho."
+        },
+        {
+          "c": "ip route",
+          "alias": [
+            "ip r"
+          ],
+          "out": "169.254.0.0/16 dev eth0 proto kernel scope link src 169.254.23.7",
+          "why": "Não há linha \"default\": sem gateway, nada sai da rede local."
+        },
+        {
+          "c": "ip link show eth0",
+          "alias": [
+            "ip link",
+            "ip l"
+          ],
+          "out": "2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000\n    link/ether 3c:22:fb:11:0a:7e brd ff:ff:ff:ff:ff:ff",
+          "why": "state UP e LOWER_UP: o cabo está conectado e o link físico está de pé."
+        },
+        {
+          "c": "ping -c 2 192.168.1.1",
+          "alias": [
+            "ping 192.168.1.1"
+          ],
+          "out": "ping: connect: Network is unreachable",
+          "why": "Sem IP da rede 192.168.1.0/24 e sem rota, o PC nem tenta: rede inalcançável."
+        },
+        {
+          "c": "grep -i dhcp /var/log/syslog | tail -4",
+          "alias": [
+            "grep dhcp /var/log/syslog",
+            "grep -i dhcp /var/log/syslog"
+          ],
+          "out": "dhclient[812]: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 8\ndhclient[812]: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 13\ndhclient[812]: DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 11\ndhclient[812]: No DHCPOFFERS received.",
+          "why": "O PC mandou vários Discover e nenhum Offer voltou. O servidor DHCP não está respondendo."
+        }
+      ],
+      "steps": [
+        {
+          "q": "O que o IP 169.254.23.7 indica?",
+          "a": 0,
+          "o": [
+            "O PC não recebeu IP do DHCP e se deu um endereço link-local",
+            {
+              "t": "É o IP público do provedor",
+              "why": "169.254 é reservado para link-local e nunca é público."
+            },
+            {
+              "t": "O PC está numa VPN",
+              "why": "VPN costuma usar faixas privadas, não 169.254."
+            }
+          ],
+          "why": "169.254.0.0/16 é link-local (APIPA): o endereço que o PC se dá quando o DHCP não responde."
+        },
+        {
+          "q": "O log mostra \"No DHCPOFFERS received\" e o cabo está UP. O que fazer?",
+          "a": 0,
+          "o": [
+            "Escalar para o N2: o servidor DHCP não está respondendo",
+            {
+              "t": "Trocar o cabo de rede",
+              "why": "O ip link mostra o link UP, e o PC conseguiu mandar o Discover. O cabo está bom."
+            },
+            {
+              "t": "Mudar o DNS do PC",
+              "why": "Sem IP válido, nem dá para chegar ao DNS. O problema vem antes."
+            }
+          ],
+          "why": "O pedido saiu e ninguém respondeu: o problema está no servidor DHCP. O N1 registra o que viu e escala."
+        },
+        {
+          "q": "O N2 religou o DHCP. Como pedir um IP de novo no PC?",
+          "a": 0,
+          "o": [
+            "sudo dhclient -v eth0",
+            {
+              "t": "ping 8.8.8.8 até voltar",
+              "why": "O ping não pede IP. Sem IP válido, ele nem sai do PC."
+            },
+            {
+              "t": "Reiniciar o roteador da empresa",
+              "why": "Não é tarefa de N1 e derrubaria todo mundo. O serviço já foi religado."
+            }
+          ],
+          "why": "O dhclient refaz a conversa DORA e o PC recebe IP, gateway e DNS.",
+          "run": "sudo dhclient -v eth0",
+          "out": "DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 3\nDHCPOFFER of 192.168.1.73 from 192.168.1.1\nDHCPREQUEST for 192.168.1.73 on eth0 to 255.255.255.255 port 67\nDHCPACK of 192.168.1.73 from 192.168.1.1\nbound to 192.168.1.73 -- renewal in 41871 seconds."
+        }
+      ]
+    }
+  ]
+}
