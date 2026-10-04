@@ -1,6 +1,6 @@
 // Service worker do NOC: deixa o jogo instalável (PWA) e jogável offline.
 // Estratégia: rede primeiro (sempre a versão mais nova quando há internet), cache como reserva.
-// O ranking (Supabase) nunca passa pelo cache. Fontes do Google: cache e atualiza em segundo plano.
+// O ranking (Supabase ou a API própria em /rest/v1/) nunca passa pelo cache. Fontes do Google: cache e atualiza em segundo plano.
 const CACHE = 'noc-app-v1', FONTS = 'noc-fonts-v1', TIMEOUT = 4000;
 const CORE = [
   './', 'index.html', 'manifest.webmanifest', 'src/style.css', 'src/main.js',
@@ -22,6 +22,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request, url = new URL(req.url);
   if (req.method !== 'GET') return;
+  if (url.pathname.includes('/rest/v1/')) return;   // API do ranking (Supabase ou própria): sempre direto na rede
   if (url.origin === location.origin) e.respondWith(networkFirst(req));
   else if (/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) e.respondWith(staleWhileRevalidate(req));
 });

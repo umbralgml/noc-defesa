@@ -102,6 +102,7 @@ ok "Versão: $(git -C "$DIR" log -1 --format='%h · %s')"
 # ---------- site ----------
 if [ "$WEB" = nginx ]; then
   V6=""; [ -s /proc/net/if_inet6 ] && V6="    listen [::]:80;"   # só se o servidor tem IPv6
+  mkdir -p /etc/nginx/snippets
   cat > "$NGINX_CONF" <<NGX
 # NOC: Última Linha de Defesa (gerado por deploy/install.sh)
 server {
@@ -127,6 +128,10 @@ $V6
     location ~* \.(png|svg|ico)$ { expires 7d; }
     # HTML, JS e JSON sempre revalidados: atualização aparece na hora.
     location / { try_files \$uri \$uri/ =404; expires -1; }
+
+    # Extras deste servidor (ex.: API do ranking, criada por deploy/vps/instalar-api.sh).
+    # Ficam fora deste arquivo para sobreviver quando o instalador roda de novo.
+    include /etc/nginx/snippets/$NAME-*.conf;
 }
 NGX
   ln -sf "$NGINX_CONF" "/etc/nginx/sites-enabled/$NAME.conf"
@@ -198,6 +203,8 @@ if [ "\$(git rev-parse HEAD)" != "\$(git rev-parse FETCH_HEAD)" ]; then
   git reset -q --hard FETCH_HEAD
   chmod -R a+rX "$DIR"
   echo "NOC atualizado: \$(git log -1 --format='%h %s')"
+  # Passos extras deste servidor (ex.: aplicar mudanças no banco do ranking).
+  if [ -x /usr/local/bin/noc-pos-atualizar ]; then /usr/local/bin/noc-pos-atualizar || echo "noc-pos-atualizar falhou" >&2; fi
 fi
 UPD
 chmod 755 /usr/local/bin/noc-atualizar

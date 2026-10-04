@@ -1,6 +1,6 @@
 # Publicar no seu servidor (Ubuntu/Debian)
 
-O jogo é só um site estático, sem banco e sem backend. O ranking fica no Supabase e funciona igual em qualquer endereço. O instalador coloca o jogo no seu domínio com HTTPS e o mantém atualizado a partir do GitHub, então o GitHub Pages e o seu servidor sempre mostram a mesma versão.
+O jogo é só um site estático, sem banco e sem backend. O ranking fica no Supabase e funciona igual em qualquer endereço. Para ter também o ranking no seu servidor (PostgreSQL próprio, backup e tudo), veja a arquitetura em [VPS.md](VPS.md) e o roteiro para o Claude Code em [VPS-CLAUDE.md](VPS-CLAUDE.md). O instalador coloca o jogo no seu domínio com HTTPS e o mantém atualizado a partir do GitHub, então o GitHub Pages e o seu servidor sempre mostram a mesma versão.
 
 ## Antes de começar
 

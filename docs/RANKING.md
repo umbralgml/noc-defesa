@@ -19,6 +19,13 @@ O perfil pode ser trocado a qualquer momento ("trocar" na tela inicial, "editar 
 
 O top 10 aparece na tela inicial (acima das atualizações) e o ranking completo abre pelo botão 🏆.
 
+## Supabase ou servidor próprio
+
+O ranking funciona de dois jeitos, com o mesmo código no jogo:
+
+- **Supabase** (grátis, sem servidor): é o que esta página descreve.
+- **Servidor próprio** (VPS com PostgreSQL + PostgREST): veja [VPS.md](VPS.md). O `src/config.json` leva só a URL do seu domínio, com `"key": ""`.
+
 ## Configurar (uma vez, uns 10 minutos)
 
 1. Crie uma conta em https://supabase.com e um projeto novo. Na região, escolha **South America (São Paulo)**.
