@@ -2,8 +2,8 @@
 import { $, fmt, center, buzz, store } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
-import { S, LEVELS, ACTS, DIFFS, K, unlocked, save, resetProgress, progress } from './state.js';
-import { flow, initScrollHints, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
+import { S, LEVELS, ACTS, DIFFS, diffOf, K, unlocked, save, resetProgress, progress } from './state.js';
+import { flow, initScrollHints, linkGloss, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
 import { submitCampaign, profile } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
 import { renderDrop, resetDrop } from './drop.js';
@@ -16,6 +16,7 @@ import { startZ3r0, stopZ3r0 } from './z3r0.js';
 import { addXP, xpHTML, rankOf } from './career.js';
 import { onLevelWin, unlock } from './ach.js';
 import { certModal } from './cert.js';
+import { cardsHTML, initCards } from './study.js';
 import { metric } from './rank.js';
 
 const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm, defense: renderDefense, topo: renderTopo, pcap: renderPcap };
@@ -38,8 +39,8 @@ export function renderMap() {
     html += '</div>';
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
-  $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div><div id="acadBox"></div>' + html;
-  flow.map(); flow.room(); flow.train(); flow.acad();
+  $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div><div id="acadBox"></div><div id="studyBox"></div>' + html;
+  flow.map(); flow.room(); flow.train(); flow.acad(); flow.study();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}${gold.length ? ` <i class="gold">★${gold.length}</i>` : ''}<small>${fmt(pts)} PTS</small>`;
   const p = profile(), r = rankOf();
@@ -77,13 +78,16 @@ function showBrief(i) {
   modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${i + 1}. ${L.title}</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${L.z}</div></div>
     <div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>${L.me}</div></div>
-    ${lessonHTML(L)}
+    ${cardsHTML(L)}
     <div class="goal"><b>Missão:</b> ${L.goal}</div>
+    ${diffOf(L) <= 1 && !L.tutorial ? '<button class="btn ghostb wideb pracb" id="mPrac">🛟 TREINO SEM PRESSÃO<small>Errar não tira integridade e a dica fica à mão. Não vale estrela: é para aprender antes de jogar valendo.</small></button>' : ''}
     ${S.prog[K(i)] === 3 && !L.tutorial ? `<button class="btn ghostb wideb hardb" id="mHard">☠ MODO DIFÍCIL${(store('noc_gold') || []).includes(L.title) ? ' · ★ OURO' : ''}<small>Dano em dobro e o Z3R0 mais agressivo. Vença sem errar para ganhar a estrela de ouro.</small></button>` : ''}
     <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="mGo">IR PARA ${GOTO[L.loc]}</button></div>`);
   $('mCancel').onclick = closeModal;
   $('mGo').onclick = () => { closeModal(); startLevel(i); };
   if ($('mHard')) $('mHard').onclick = () => { closeModal(); startLevel(i, true); };
+  if ($('mPrac')) $('mPrac').onclick = () => { closeModal(); startLevel(i, false, true); };
+  initCards(L);
 }
 
 // ---------- game core ----------
@@ -92,13 +96,13 @@ function cleanup() {
   resetDrop(); resetWire(); resetDefense(); resetTopo(); stopZ3r0();
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
-function startLevel(i, hard) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title + (hard ? ' ☠' : ''), { hard }); }
+function startLevel(i, hard, practice) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title + (hard ? ' ☠' : practice ? ' 🛟' : ''), { hard, practice }); }
 
 // Roda qualquer fase. Fases fora do mapa (S.cur = -1) não salvam estrelas e
 // podem trazer L.onWin(res) para tratar o fim do jeito delas.
 export function play(L, name, opt = {}) {
   cleanup();
-  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [], hard: !!opt.hard, t0: Date.now() });
+  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [], hard: !!opt.hard, practice: !!opt.practice, t0: Date.now() });
   $('lvName').textContent = name || L.title;
   setHP(); setScore(); hideCoach(); lessonBar(L);
   $('stage').innerHTML = ''; $('bank').style.display = 'none';
@@ -124,7 +128,7 @@ function lessonBar(L) {
   const bar = $('lbar');
   bar.hidden = !L.lesson;
   if (!L.lesson) return;
-  $('lbb').innerHTML = `<ul>${L.lesson.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  $('lbb').innerHTML = `<ul>${L.lesson.map(x => `<li>${x}</li>`).join('')}</ul>`; linkGloss($('lbb'));
   setLesson(store('noc_lesson') !== false);
 }
 function setLesson(open) {
@@ -148,6 +152,7 @@ function finishIntro() {
   if (matchMedia('(max-width:600px),(max-height:760px)').matches) sc.querySelector('svg').setAttribute('preserveAspectRatio', 'xMaxYMax meet');
   S.busy = false;
   ENGINES[L.type](L);
+  linkGloss($('stage').querySelector('.task'));
   startZ3r0(L);
   requestAnimationFrame(() => { $('stage').classList.remove('veil'); $('bank').classList.remove('veil'); });
   setTimeout(() => { if ($('wire')) drawWires(); }, 520);
@@ -161,6 +166,23 @@ function win() {
     sfx.win(); buzz([40, 60, 40]);
     if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
     setTimeout(() => L.onWin({ score: S.score, hp: S.hp, bonus, total }), 650);
+    return;
+  }
+  // Treino sem pressão: não salva estrela nem pontos; convida a jogar valendo.
+  if (S.practice) {
+    sfx.win(); if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
+    const xr = addXP(10);
+    setTimeout(() => {
+      modal(`<div class="tag">TREINO CONCLUÍDO</div><h2>${L.title}</h2>
+        <div class="pts"><span>Erros no treino</span><b>${S.err}</b></div>
+        ${xpHTML(xr)}
+        <div class="learn"><b>O QUE VOCÊ PRATICOU</b>${L.learn}</div>
+        ${reviewHTML()}
+        <div class="learn"><b>E AGORA?</b>${S.err ? 'Releia a revisão acima e jogue valendo: as estrelas só contam no jogo normal.' : 'Treino sem erros! Hora de jogar valendo e garantir as 3 estrelas.'}</div>
+        <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mReal">JOGAR VALENDO</button></div>`);
+      $('mMap').onclick = () => { closeModal(); goMap(); };
+      $('mReal').onclick = () => { closeModal(); startLevel(S.cur); };
+    }, 650);
     return;
   }
   // XP: base + estrelas, com bônus na primeira vez que a fase é concluída.

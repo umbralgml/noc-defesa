@@ -34,6 +34,22 @@
         "Uma <b>/24</b> fixa os três primeiros octetos: tudo que começa com <b>10.99.0.</b> está dentro de 10.99.0.0/24. Já 10.98.0.x está fora.",
         "Política boa é uma <b>lista de permissões</b>: o que não está escrito é negado. Na dúvida, bloqueie."
       ],
+      "check": {
+        "q": "Numa política de lista de permissões, o que acontece com o que não está escrito?",
+        "a": 0,
+        "o": [
+          "É bloqueado",
+          {
+            "t": "É liberado",
+            "why": "Liberar o que não foi pensado é o contrário da lista de permissões."
+          },
+          {
+            "t": "Vai para análise manual",
+            "why": "O firewall decide na hora: o que não está permitido é negado."
+          }
+        ],
+        "why": "Lista de permissões: só passa o que foi explicitamente liberado."
+      },
       "tip": "Confira destino, porta e, no caso do SSH, se a origem está dentro de 10.99.0.0/24 (10.99.0.0 a 10.99.0.255).",
       "learn": "Firewall bom é política escrita antes de regra. Cuidado com vizinhos parecidos: 10.98.0.15 não está em 10.99.0.0/24, e HTTPS para 10.0.0.11 não é o servidor autorizado. Porta 80 também fica fechada se a política diz só HTTPS.",
       "buckets": [
@@ -101,6 +117,22 @@
         "No fim fica o <b>deny ip any any</b>: tudo que não foi liberado antes cai nele.",
         "Vocabulário: <b>any</b> = qualquer endereço, <b>host X</b> = só aquele IP, <b>eq 443</b> = porta de destino igual a 443."
       ],
+      "check": {
+        "q": "O firewall lê as regras de cima para baixo. O que acontece na primeira que casar?",
+        "a": 0,
+        "o": [
+          "Ele aplica essa regra e para de ler",
+          {
+            "t": "Ele lê todas e aplica a mais específica",
+            "why": "Não: vale a primeira que casar. Por isso a específica precisa vir antes."
+          },
+          {
+            "t": "Ele aplica a última regra da lista",
+            "why": "A última só vale se nenhuma antes casar."
+          }
+        ],
+        "why": "Primeiro match: decidiu, parou. A ordem das regras muda o resultado."
+      },
       "tip": "Se o permit de 443 vier antes do bloqueio do atacante, ele entra pela 443. O deny any any sempre fecha a lista. Duas regras ali não fazem parte da política.",
       "learn": "Regra mais específica primeiro, deny implícito ou explícito no final. \"permit ip any any\" anula tudo abaixo dela, e SSH liberado para any quebra a exigência de só gerência.",
       "html": "<div class=\"ord\"><span class=\"n\">1</span>[r1]</div><div class=\"ord\"><span class=\"n\">2</span>[r2]</div><div class=\"ord\"><span class=\"n\">3</span>[r3]</div><div class=\"ord\"><span class=\"n\">4</span>[r4]</div>",
@@ -178,6 +210,22 @@
         "Toda ACL termina com um <b>deny implícito</b>. Sem um <b>permit</b> no final, você bloqueia todo o resto.",
         "<b>in</b> filtra o que entra na interface e <b>out</b> o que sai. O ataque vem da internet, então entra pelo uplink."
       ],
+      "check": {
+        "q": "Na reflexão NTP, como o ataque chega até você?",
+        "a": 0,
+        "o": [
+          "UDP com porta de origem 123",
+          {
+            "t": "UDP com porta de destino 123",
+            "why": "A porta de destino é aleatória: é a que o atacante forjou. O 123 é a origem, do servidor NTP."
+          },
+          {
+            "t": "TCP na porta 443",
+            "why": "NTP usa UDP, não TCP."
+          }
+        ],
+        "why": "As respostas saem da porta 123 dos servidores NTP: chegam em você com origem 123."
+      },
       "tip": "Em ACL Cisco se usa wildcard, não máscara: /22 = 0.0.3.255. A porta 123 é a de ORIGEM, então o \"eq\" vem logo depois do \"any\". Tráfego que vem da internet entra pelo uplink.",
       "learn": "Wildcard é o inverso da máscara: 255.255.252.0 vira 0.0.3.255. Em reflexão, a vítima recebe respostas vindas da porta do serviço abusado, por isso o filtro é na porta de origem. O ideal é ainda pedir ao upstream para filtrar antes do seu link.",
       "html": "<div class=\"cli\">access-list 110 [a] [b] any [c] 177.10.0.0 [d]<br>access-list 110 [e] ip any any<br><span class=\"c\">!</span><br>interface TenGigE0/0/0<br>&nbsp;description UPLINK-TRANSITO<br>&nbsp;ip access-group 110 [f]</div>",
@@ -272,6 +320,22 @@
         "Toda conexão TCP começa com o <b>handshake</b>: o cliente manda <b>SYN</b>, o servidor responde <b>SYN-ACK</b> e o cliente confirma com <b>ACK</b>.",
         "<b>SYN flood</b>: o atacante manda milhares de SYN, quase sempre com origem forjada, e nunca confirma. O servidor guarda cada conexão pela metade até lotar a fila."
       ],
+      "check": {
+        "q": "Qual é a ordem do handshake TCP?",
+        "a": 0,
+        "o": [
+          "SYN, SYN-ACK, ACK",
+          {
+            "t": "ACK, SYN, SYN-ACK",
+            "why": "O cliente começa com SYN, nunca com ACK."
+          },
+          {
+            "t": "SYN, ACK, FIN",
+            "why": "FIN encerra a conexão. A abertura termina com o ACK do cliente."
+          }
+        ],
+        "why": "O cliente pede (SYN), o servidor aceita (SYN-ACK) e o cliente confirma (ACK)."
+      },
       "tip": "Filtre SYN puro (syn == 1 && ack == 0). Um deles é do cliente 189.40.12.7, que completa o handshake e manda TLS. Os outros só mandam SYN.",
       "learn": "A assinatura do SYN flood é muito SYN sem o ACK final, vindo de origens variadas (forjadas). Mitigação: SYN cookies no servidor (ele só guarda estado depois do ACK), limite de taxa de SYN no firewall e scrubbing no provedor quando o volume é grande.",
       "filters": [
@@ -437,6 +501,22 @@
         "<b>Amplificação</b> usa servidores abertos (DNS, NTP) para multiplicar o tráfego. A resposta chega com a porta do serviço abusado como origem.",
         "<b>Spoofing</b> é forjar o IP de origem. Filtrar isso na borda (<b>BCP 38</b>, com uRPF) impede que sua rede seja usada em ataques."
       ],
+      "check": {
+        "q": "Chegam 80 Gbps num link de 10 Gbps. Onde o tráfego precisa ser descartado?",
+        "a": 0,
+        "o": [
+          "Antes do seu link, no provedor (RTBH ou scrubbing)",
+          {
+            "t": "No firewall da sua borda",
+            "why": "Quando chega na sua borda, o link já está cheio."
+          },
+          {
+            "t": "No servidor atacado",
+            "why": "O servidor nem recebe nada: o cano encheu antes."
+          }
+        ],
+        "why": "Volumétrico se resolve antes do gargalo: o upstream descarta ou limpa o tráfego."
+      },
       "tip": "Pense em onde o tráfego é descartado. Se já chegou no seu uplink, o link já está cheio.",
       "learn": "Camadas de defesa contra DDoS: SYN cookies no host, uRPF contra spoofing (BCP 38), ACL para reflexão, RTBH ou scrubbing no upstream para volumétrico.",
       "qs": [
@@ -560,6 +640,22 @@
         "<b>Reflexão NTP</b>: a resposta chega com porta de <b>origem 123</b>. <b>Telnet</b> (TCP/23) é a porta preferida das botnets. Origem conhecida de ataque se bloqueia pelo IP.",
         "Nunca bloqueie a porta do seu próprio serviço (a 443 da loja) nem a sua própria rede."
       ],
+      "check": {
+        "q": "O que é um falso positivo no firewall?",
+        "a": 0,
+        "o": [
+          "Bloquear um cliente legítimo",
+          {
+            "t": "Deixar passar um ataque",
+            "why": "Isso é falso negativo: o ataque escapou."
+          },
+          {
+            "t": "Bloquear um ataque",
+            "why": "Isso é acerto: verdadeiro positivo."
+          }
+        ],
+        "why": "Falso positivo é a regra pegar quem não devia. Regra larga demais derruba cliente."
+      },
       "tip": "Três regras resolvem: UDP com origem 123, origem 45.67.89.10 e TCP/23. Bloquear a 443 ou a 177.10.0.0/16 derruba clientes.",
       "learn": "Defesa em camadas na borda: ACL contra reflexão (UDP origem 123), bloqueio de portas que não deveriam estar expostas (Telnet) e bloqueio da origem identificada do C2. Cada regra precisa ser específica: bloquear a porta do serviço ou a própria rede é fazer o DDoS pelo atacante.",
       "server": "LOJA 177.10.0.5",

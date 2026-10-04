@@ -42,6 +42,22 @@
         "O <b>firewall</b> é o porteiro: decide o que pode entrar e sair.",
         "O <b>access point</b> (AP) é a antena do Wi-Fi. O <b>servidor</b> é a máquina que oferece um serviço, como um site."
       ],
+      "check": {
+        "q": "Qual equipamento liga redes diferentes, como a rede da empresa e a internet?",
+        "a": 0,
+        "o": [
+          "Roteador",
+          {
+            "t": "Switch",
+            "why": "O switch liga os aparelhos da mesma rede local."
+          },
+          {
+            "t": "Access point",
+            "why": "O access point leva a rede para o Wi-Fi, mas não liga redes diferentes."
+          }
+        ],
+        "why": "O roteador encaminha pacotes entre redes diferentes pelo endereço IP."
+      },
       "tip": "Switch = mesma rede. Roteador = entre redes. Firewall = porteiro. Access point = Wi-Fi. Servidor = oferece um serviço.",
       "learn": "Cada equipamento tem um papel: o switch conecta a rede local, o roteador conecta redes diferentes, o firewall filtra, o access point leva a rede para o Wi-Fi e o servidor oferece os serviços. Esse é o mapa mental de qualquer NOC.",
       "left": [
@@ -128,6 +144,22 @@
         "<b>Transporte</b>: <b>TCP</b> ou <b>UDP</b> e as <b>portas</b>, que dizem qual programa recebe.",
         "<b>Aplicação</b>: o que você usa: site (HTTP), nomes (DNS), e-mail. O modelo <b>OSI</b>, de 7 camadas, é a versão detalhada do mesmo mapa."
       ],
+      "check": {
+        "q": "Em que camada fica a porta (como a 443)?",
+        "a": 0,
+        "o": [
+          "Transporte",
+          {
+            "t": "Enlace",
+            "why": "No enlace ficam o cabo, o Wi-Fi e o MAC."
+          },
+          {
+            "t": "Aplicação",
+            "why": "A aplicação é o serviço (HTTP, DNS). A porta é da camada de transporte, junto com TCP e UDP."
+          }
+        ],
+        "why": "Portas, TCP e UDP formam a camada de transporte: entregam a conversa ao programa certo."
+      },
       "tip": "Cabo, Wi-Fi, MAC e switch = enlace. IP, roteador e ping = internet. TCP, UDP e portas = transporte. Site, DNS e e-mail = aplicação.",
       "learn": "Cada camada tem um trabalho: enlace leva o sinal até a próxima placa (MAC), internet leva o pacote entre redes (IP), transporte entrega ao programa certo (porta, TCP/UDP) e aplicação é o serviço que você usa. Quando algo quebra, pensar em camadas diz por onde começar.",
       "buckets": [
@@ -226,6 +258,22 @@
         "<b>Porta</b> é um número só, de 0 a 65535. Algumas são famosas: <b>80</b> (site), <b>443</b> (site seguro), <b>22</b> (SSH).",
         "<b>MAC</b> é o \"RG\" da placa de rede, gravado de fábrica: 6 pares em hexadecimal, como <b>3c:22:fb:11:0a:7e</b>."
       ],
+      "check": {
+        "q": "Qual destes é um endereço MAC?",
+        "a": 0,
+        "o": [
+          "3c:22:fb:11:0a:7e",
+          {
+            "t": "192.168.1.10",
+            "why": "Quatro números com ponto: é endereço IPv4."
+          },
+          {
+            "t": "443",
+            "why": "Um número só é porta."
+          }
+        ],
+        "why": "MAC tem 6 pares em hexadecimal, separados por dois-pontos ou hífen."
+      },
       "tip": "Quatro números com ponto = IP. Um número só = porta. Seis pares com dois-pontos ou hífen = MAC.",
       "learn": "Endereço IP diz qual máquina, a porta diz qual programa dentro dela e o MAC identifica a placa de rede no cabo ou no Wi-Fi. São três camadas diferentes da mesma conversa.",
       "buckets": [
@@ -307,6 +355,22 @@
         "Para converter, some o valor das posições que têm <b>1</b>. Exemplo: <b>00000101</b> = 4 + 1 = <b>5</b>.",
         "Tudo ligado, <b>11111111</b>, dá 128+64+32+16+8+4+2+1 = <b>255</b>. Por isso nenhum número do IP passa de 255."
       ],
+      "check": {
+        "q": "Quanto vale 10000001 em decimal?",
+        "a": 0,
+        "o": [
+          "129",
+          {
+            "t": "2",
+            "why": "Contou só quantos 1 existem. Cada 1 vale a sua posição: 128 e 1."
+          },
+          {
+            "t": "128",
+            "why": "Faltou somar o último bit, que vale 1."
+          }
+        ],
+        "why": "O primeiro bit vale 128 e o último vale 1: 128 + 1 = 129."
+      },
       "tip": "Posições: 128 64 32 16 8 4 2 1. Some só onde tem 1. 11000000 = 128+64.",
       "learn": "Binário é soma de posições: 128, 64, 32, 16, 8, 4, 2 e 1. Um octeto vai de 0 (00000000) a 255 (11111111), e o IPv4 tem 4 octetos, 32 bits. É essa conta que vai fazer a máscara e as sub-redes fazerem sentido.",
       "html": "<div class=\"kv\">Bits em um octeto<span class=\"grow\"></span>[b]</div>\n<div class=\"kv\">Bits em um endereço IPv4<span class=\"grow\"></span>[ip]</div>\n<div class=\"kv\">11000000 em decimal<span class=\"grow\"></span>[a]</div>\n<div class=\"kv\">10101000 em decimal<span class=\"grow\"></span>[c]</div>\n<div class=\"kv\">00001010 em decimal<span class=\"grow\"></span>[d]</div>\n<div class=\"kv\">255 em binário<span class=\"grow\"></span>[e]</div>",
@@ -397,6 +461,22 @@
         "O <b>gateway</b> é a porta de saída da sua rede, normalmente o roteador.",
         "<b>DNS</b> traduz nomes (google.com) em endereços IP. Se o ping no IP funciona mas no nome não, o problema é DNS."
       ],
+      "check": {
+        "q": "O ping no gateway responde, mas no 8.8.8.8 não. Onde está o problema?",
+        "a": 0,
+        "o": [
+          "Na saída para a internet",
+          {
+            "t": "Na placa de rede do seu PC",
+            "why": "Se fosse a placa, nem o gateway responderia."
+          },
+          {
+            "t": "No DNS",
+            "why": "O 8.8.8.8 é um IP: o teste nem usa DNS."
+          }
+        ],
+        "why": "A rede local funciona (gateway responde); o que falha é do gateway para fora."
+      },
       "tip": "Timeout = sem resposta. ms = tempo de ida e volta. Gateway = saída da rede. IP responde e nome não = DNS.",
       "learn": "O ping mede se algo responde e em quanto tempo. Com ele você separa os problemas: sem resposta do gateway é rede local, sem resposta da internet é saída, e nome que não resolve é DNS.",
       "qs": [
@@ -500,6 +580,22 @@
         "O IP é emprestado por um tempo, o <b>lease</b>. Antes de vencer, o PC pede para renovar.",
         "Se nenhum servidor responde, o PC se dá um IP <b>169.254.x.x</b> (link-local). Com ele não se chega à internet: é sinal de DHCP fora do ar."
       ],
+      "check": {
+        "q": "O PC ficou com IP 169.254.10.5. O que aconteceu?",
+        "a": 0,
+        "o": [
+          "O DHCP não respondeu e o PC se deu um IP link-local",
+          {
+            "t": "O provedor deu um IP público novo",
+            "why": "169.254 é reservado para link-local e nunca é público."
+          },
+          {
+            "t": "O DNS mudou",
+            "why": "O DNS traduz nomes. Quem entrega o IP é o DHCP."
+          }
+        ],
+        "why": "Sem resposta do DHCP, o aparelho se autoconfigura em 169.254.0.0/16."
+      },
       "tip": "DORA: Discover, Offer, Request, Ack. Sem resposta do DHCP, o PC fica com 169.254.x.x.",
       "learn": "O DHCP conversa em 4 passos (Discover, Offer, Request, Ack) usando UDP 67 no servidor e 68 no cliente, e entrega IP, máscara, gateway e DNS por um tempo (lease). Viu 169.254.x.x? O PC não achou nenhum servidor DHCP.",
       "html": "<div class=\"kv\">1. O PC sem IP pergunta em broadcast: \"tem servidor DHCP aí?\"<span class=\"grow\"></span>[s1]</div>\n<div class=\"kv\">2. O servidor oferece um IP livre<span class=\"grow\"></span>[s2]</div>\n<div class=\"kv\">3. O PC pede o IP oferecido<span class=\"grow\"></span>[s3]</div>\n<div class=\"kv\">4. O servidor confirma e empresta o IP<span class=\"grow\"></span>[s4]</div>\n<div class=\"kv\">Além do IP, o DHCP entrega<span class=\"grow\"></span>[gw]</div>\n<div class=\"kv\">IP que o PC se dá quando ninguém responde<span class=\"grow\"></span>[apipa]</div>",
@@ -588,6 +684,22 @@
         "<b>ping</b> testa se outro equipamento responde. No Linux, <b>-c 4</b> manda só 4 tentativas.",
         "<b>cat</b> mostra o conteúdo de um arquivo. Em <b>/etc/resolv.conf</b> fica o servidor DNS que a máquina usa."
       ],
+      "check": {
+        "q": "Qual comando mostra o gateway no Linux?",
+        "a": 0,
+        "o": [
+          "ip route",
+          {
+            "t": "ip a",
+            "why": "O ip a mostra os endereços das interfaces, não o gateway."
+          },
+          {
+            "t": "cat /etc/resolv.conf",
+            "why": "Esse arquivo mostra o servidor DNS."
+          }
+        ],
+        "why": "No ip route, a linha \"default via\" é o gateway."
+      },
       "tip": "Teste em camadas: ping no gateway, ping num IP da internet e ping num nome. Se só o nome falha, é DNS.",
       "learn": "Diagnóstico em camadas: rede local (gateway), internet (IP público) e nomes (DNS). O ip a mostra o seu IP, o ip route mostra o gateway e o /etc/resolv.conf mostra o DNS em uso.",
       "cmds": [
@@ -732,6 +844,22 @@
         "<b>getent hosts</b> mostra o que o sistema realmente usa (hosts e depois DNS), igual ao ping e ao navegador.",
         "Se o dig dá um IP e o getent dá outro, o culpado está no <b>/etc/hosts</b>."
       ],
+      "check": {
+        "q": "O dig mostra um IP e o ping usa outro. Onde olhar primeiro?",
+        "a": 0,
+        "o": [
+          "No /etc/hosts",
+          {
+            "t": "No servidor DNS",
+            "why": "O dig já mostra a resposta do DNS. A diferença vem de algo que o dig ignora."
+          },
+          {
+            "t": "No cabo de rede",
+            "why": "Cabo não muda qual IP o nome vira."
+          }
+        ],
+        "why": "O sistema consulta o /etc/hosts antes do DNS; o dig ignora esse arquivo."
+      },
       "tip": "Compare dig (só DNS) com getent hosts (o que o PC usa). Se forem diferentes, olhe o /etc/hosts.",
       "learn": "O Linux resolve nomes primeiro pelo /etc/hosts e depois pelo DNS (ordem do /etc/nsswitch.conf). Uma linha esquecida no hosts passa na frente do DNS só naquela máquina. dig e nslookup testam o DNS; getent hosts mostra o que o sistema realmente usa.",
       "cmds": [

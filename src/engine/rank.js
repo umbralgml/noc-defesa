@@ -63,7 +63,7 @@ export async function submit(board, score, stars) {
 // Métricas anônimas por fase (sem id, nome ou aparelho): ajudam a achar fase difícil demais.
 // Desliga no perfil. Falha em silêncio (o banco pode não ter a tabela).
 export function metric(event) {
-  if (!CFG || S.cur < 0 || ls('noc_metricas') === false || ls('noc_teste')) return;
+  if (!CFG || S.cur < 0 || S.practice || ls('noc_metricas') === false || ls('noc_teste')) return;
   const secs = Math.min(7200, Math.round((Date.now() - (S.t0 || Date.now())) / 1000));
   api('metricas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ level: S.lv.title.slice(0, 60), event, err: Math.min(99, S.err), hp: S.hp, secs, hard: !!S.hard }) }).catch(() => {});
 }
