@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.18",
+      "date": "2026-10-04",
+      "title": "Aula que fica",
+      "items": [
+        "A aula da fase agora vem em cartões, com uma pergunta de checagem no fim (sem custo, e vale XP)",
+        "Toque nos termos sublinhados para ver o significado: o NOC ganhou glossário",
+        "Sala de estudo no mapa: todas as aulas que você já liberou e o glossário completo, com busca",
+        "Treino sem pressão nas fases para iniciantes: jogue sem perder integridade antes de valer estrela"
+      ]
+    },
+    {
       "v": "1.17",
       "date": "2026-10-04",
       "title": "Academia aberta",

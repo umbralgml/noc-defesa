@@ -5,16 +5,40 @@ import { AV_ME, AV_Z, heroState, sceneFx } from './scene.js';
 import { sfx } from './audio.js';
 import { unlock } from './ach.js';
 import { S, diffOf } from './state.js';
+import { findGloss } from './glossary.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
-export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, good() {} };
+export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, good() {} };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
 export const ZHURT = ['Argh! Sorte sua.', 'Isso não vai durar.', 'Como você sabia?!', 'Meu C2 está caindo...'];
 
 export function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); }
-export function modal(html) { $('mcard').innerHTML = html; $('modal').classList.add('on'); $('mcard').scrollTop = 0; }
+export function modal(html) { $('mcard').innerHTML = html; $('modal').classList.add('on'); $('mcard').scrollTop = 0; linkGloss($('mcard')); }
+
+// ---------- glossário tocável ----------
+// Negritos que batem com um termo do glossário viram botões; tocar mostra a definição embaixo da tela.
+export function linkGloss(root) {
+  if (!root) return;
+  root.querySelectorAll('b:not(.gl)').forEach(b => {
+    if (b.closest('button,a,.gl') || !findGloss(b.textContent)) return;
+    b.classList.add('gl'); b.tabIndex = 0; b.setAttribute('role', 'button'); b.title = 'Ver no glossário';
+  });
+}
+function glossPop(b) {
+  const g = findGloss(b.textContent); if (!g) return;
+  let p = $('glpop');
+  if (!p) { p = document.createElement('div'); p.id = 'glpop'; p.className = 'glpop'; p.setAttribute('role', 'dialog'); document.body.append(p); }
+  p.innerHTML = '<span class="glk">📘 GLOSSÁRIO</span><b></b><span class="gld"></span><button class="lnk" type="button">fechar</button>';
+  p.querySelector('b').textContent = g[0]; p.querySelector('.gld').textContent = g[2];
+  p.querySelector('button').onclick = () => p.classList.remove('on');
+  p.classList.remove('on'); void p.offsetWidth; p.classList.add('on');
+  const seen = new Set(JSON.parse(localStorage.getItem('noc_gloss') || '[]')); seen.add(g[0]);
+  try { localStorage.setItem('noc_gloss', JSON.stringify([...seen])); } catch (e) {}
+}
+document.addEventListener('click', e => { const b = e.target.closest('.gl'); if (b) { e.stopPropagation(); glossPop(b); } else if (!e.target.closest('#glpop')) $('glpop')?.classList.remove('on'); }, true);
+document.addEventListener('keydown', e => { const b = e.target.closest && e.target.closest('.gl'); if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); glossPop(b); } });
 export function closeModal() { $('modal').classList.remove('on'); }
 
 // ---------- fx ----------
@@ -59,13 +83,14 @@ export function toast(msg, good) {
 // ---------- acerto / erro ----------
 export function damage(n, at) {
   if (S.hard) n *= 2;   // modo difícil
+  if (S.practice) n = 0;   // treino sem pressão: o erro conta, mas não tira integridade
   S.err++; S.streak = 0; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
   sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450); vignette('bad');
   const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');
-  if (at) floatTxt(at.x, at.y, '-' + n + '%', '#ff4d6d');
+  if (at) floatTxt(at.x, at.y, n ? '-' + n + '%' : 'TREINO', n ? '#ff4d6d' : '#ffd166');
   toast(TAUNT[Math.random() * TAUNT.length | 0], false);
   // Iniciante/básico: depois do 2º erro, a dica da fase aparece sozinha no painel.
-  if (S.err === 2 && S.lv && S.lv.tip && diffOf(S.lv) <= 1) setTimeout(() => hint(S.lv.tip), 900);
+  if ((S.err === 2 || (S.practice && S.err === 1)) && S.lv && S.lv.tip && diffOf(S.lv) <= 1) setTimeout(() => hint(S.lv.tip), 900);
   if (S.hp <= 0) { S.busy = true; clearInterval(S.timer); setTimeout(() => flow.fail('A integridade da rede chegou a zero. O Z3R0 assumiu o controle.'), 650); }
 }
 export function good(at, color) {

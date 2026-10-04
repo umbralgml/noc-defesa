@@ -57,6 +57,8 @@ src/engine/
   game.js             mapa, briefing, play(L)/intro, win/fail, botão de dica, askReset(); ENGINES por type
   daily.js            desafio diário: sorteio com a data como semente, sequência, compartilhar, duelo
   gen.js              geradores de pergunta: GEN (desafio diário, não mexer sem querer mudar o dia) e ACAD (Academia); sem DOM
+  glossary.js         GLOSS: termo, apelidos e definição; findGloss(texto)
+  study.js            aula em cartões com a pergunta "check" no briefing; sala de estudo (biblioteca de aulas + glossário)
   academy.js          Academia de exercícios: temas com perguntas geradas, sem perder integridade (quiz com `free`), domínio = 10 seguidas
   rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura
   pwa.js              registra o sw.js e controla o botão "INSTALAR APP" (pedido nativo ou instruções do iPhone)
@@ -119,6 +121,8 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Duelo:** o link `?d=AAAA-MM-DD&p=pts&g=10111&n=nome` reabre as perguntas daquela data (`readChallenge()` valida tudo e limpa a URL). Só conta como desafio oficial se for de hoje e o jogador ainda não tiver jogado. Mudar quizzes ou geradores muda as perguntas de datas passadas também; duelos antigos podem divergir.
 - **Sala do NOC:** estações em `STATIONS` (`scene.js`) por `loc`; um `loc` novo precisa de estação lá e de desenho em `sceneSVG`.
 - **Ranking:** a chave em `src/config.json` é a publishable/anon (pública). Nunca commite a secret/service_role. Permissões e moderação em `tools/ranking.sql` e `docs/RANKING.md`. O perfil é pedido no primeiro turno (`ensureProfile`); sem nome, o jogador aparece como `Analista #XXXX` (`anonName()`). Nome e LinkedIn só saem do aparelho com consentimento marcado (`publicName()`/`publicLinkedin()`); sem ele, envia o apelido anônimo.
+- **Aula e checagem:** o briefing mostra a `lesson` em cartões e, no fim, a pergunta `check` (sem custo; +5 XP no primeiro acerto). Fase iniciante/básico sem `check` gera aviso no validador. Negritos das aulas que batem com o glossário viram tocáveis (`linkGloss()` em `ui.js`); termo novo entra em `glossary.js`.
+- **Treino sem pressão:** em iniciante/básico o briefing oferece jogar com `S.practice`: o erro conta e explica, mas `damage()` não tira integridade, a dica aparece no 1º erro e nada é salvo.
 - **Modo difícil:** liberado no briefing da fase com 3 estrelas. `S.hard` dobra o dano (`damage()`) e soma um evento do Z3R0. Vencer sem erro grava o título em `noc_gold` (estrela de ouro, destrava a camisa dourada).
 - **Acessibilidade:** todo elemento jogável precisa funcionar com Tab + Enter/espaço. Animação nova deve respeitar a classe `calm` (o CSS já zera animações; pacotes que se movem por transição ficam de fora).
 - **Métricas:** `metric('win'|'fail')` em `rank.js` envia só dados anônimos da fase, e só se o jogador não desligou no perfil (`noc_metricas`).

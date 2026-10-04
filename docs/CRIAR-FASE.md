@@ -48,6 +48,7 @@ python3 -m http.server 8000   # e abra http://localhost:8000
 | `miniboss` | não | `true` | Chefe intermediário: telão do Z3R0, música de chefe e animação de derrota, sem encerrar a campanha. Use com `loc: "war"`. |
 | `z` | sim | HTML | Fala do Z3R0 no briefing. |
 | `me` | sim | HTML | Resposta do analista no briefing. |
+| `check` | iniciante/básico | `{ "q", "o", "a", "why" }` como uma pergunta de quiz | Pergunta "verifique se entendeu" mostrada depois dos cartões da aula, sem custo. Opções erradas com `why`. |
 | `lesson` | recomendado | lista de HTML | **Aula rápida**: 3 a 6 tópicos com o conceito necessário para a fase. Aparece no briefing e no botão **?**. |
 | `tip` | sim | texto | Dica técnica do botão **?** e da tela de derrota. |
 | `learn` | sim | texto | Resumo "O QUE VOCÊ DEFENDEU" na tela de vitória. |

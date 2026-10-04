@@ -39,6 +39,22 @@
         "Uma /24 tem <b>256</b> endereços (2⁸). O primeiro é a <b>rede</b> e o último é o <b>broadcast</b>: sobram <b>254</b> para hosts.",
         "Em 192.168.5.77/24, os 3 primeiros números são a rede: <b>192.168.5.0</b>. O broadcast é <b>192.168.5.255</b>."
       ],
+      "check": {
+        "q": "Qual a máscara da /24?",
+        "a": 0,
+        "o": [
+          "255.255.255.0",
+          {
+            "t": "255.255.0.0",
+            "why": "Essa é a /16: só 16 bits ligados."
+          },
+          {
+            "t": "255.255.255.255",
+            "why": "Essa é a /32: um único endereço."
+          }
+        ],
+        "why": "24 bits ligados = três octetos 255 e o último 0."
+      },
       "tip": "Conte os bits 1: /24 = 255.255.255.0. Uma /24 tem 256 endereços, 254 úteis. Rede termina em .0, broadcast em .255.",
       "learn": "Máscara e CIDR são a mesma informação: /24 = 255.255.255.0. Endereços = 2^(bits de host); úteis = endereços − 2 (rede e broadcast). Com isso no sangue, sub-rede vira só fazer blocos menores.",
       "html": "<div class=\"kv\">/24 em máscara<span class=\"grow\"></span>[m24]</div>\n<div class=\"kv\">/16 em máscara<span class=\"grow\"></span>[m16]</div>\n<div class=\"kv\">255.255.255.128 em CIDR<span class=\"grow\"></span>[c25]</div>\n<div class=\"kv\">Endereços numa /24<span class=\"grow\"></span>[tot]</div>\n<div class=\"kv\">Hosts úteis numa /24<span class=\"grow\"></span>[uteis]</div>\n<div class=\"kv\">Rede de 192.168.5.77/24<span class=\"grow\"></span>[rede]</div>\n<div class=\"kv\">Broadcast de 192.168.5.77/24<span class=\"grow\"></span>[bc]</div>",
@@ -139,6 +155,22 @@
         "Use <b>TCP</b> quando nada pode faltar: site, e-mail, SSH, arquivos.",
         "Use <b>UDP</b> quando rapidez vale mais que perfeição, ou a mensagem é curtinha: voz, vídeo ao vivo, DNS, DHCP, NTP. Curiosidade: o HTTP/3 roda sobre UDP (QUIC)."
       ],
+      "check": {
+        "q": "Qual protocolo confirma a entrega e reenvia o que se perdeu?",
+        "a": 0,
+        "o": [
+          "TCP",
+          {
+            "t": "UDP",
+            "why": "O UDP manda sem confirmar: o que se perde, perdeu."
+          },
+          {
+            "t": "ICMP",
+            "why": "O ICMP é para mensagens de controle, como o ping."
+          }
+        ],
+        "why": "O TCP numera, confirma e reenvia: entrega com recibo."
+      },
       "tip": "Precisa chegar tudo, em ordem? TCP. Tempo real ou pergunta curtinha? UDP.",
       "learn": "TCP é entrega com recibo: handshake, confirmação e reenvio, ideal para web, e-mail, SSH e BGP. UDP é entrega sem recibo: leve, ideal para voz, DNS, DHCP e NTP. A porta sozinha não diz tudo: o DNS usa UDP 53 e também TCP 53 para respostas grandes.",
       "buckets": [
@@ -216,6 +248,22 @@
         "<b>PoE</b> manda energia pelo próprio cabo de rede: câmera, telefone IP e access point sem tomada.",
         "<b>Fibra multimodo</b> (OM3/OM4) serve para centenas de metros, dentro do prédio. <b>Fibra monomodo</b> vai a quilômetros."
       ],
+      "check": {
+        "q": "Qual a distância máxima de um cabo de rede de cobre (RJ45)?",
+        "a": 0,
+        "o": [
+          "100 metros",
+          {
+            "t": "10 metros",
+            "why": "Cabo de cobre vai bem além disso: até 100 m no padrão Ethernet."
+          },
+          {
+            "t": "2 quilômetros",
+            "why": "Quilômetros só com fibra."
+          }
+        ],
+        "why": "O par trançado Ethernet é especificado para até 100 m. Passou disso, fibra."
+      },
       "tip": "Até 100 m e 1G: Cat6. 10G em cobre: Cat6A. Sem tomada: PoE. Centenas de metros: multimodo. Quilômetros: monomodo.",
       "learn": "O cabo é escolhido por distância, velocidade e energia: cobre até 100 m (Cat6 para 1G, Cat6A para 10G), PoE quando o aparelho não tem tomada, fibra multimodo para centenas de metros e monomodo para quilômetros.",
       "left": [
@@ -305,6 +353,22 @@
         "O ARP não tem senha: qualquer um pode responder sem ter sido perguntado. Isso é o <b>ARP spoofing</b>, e o tráfego passa pelo atacante.",
         "Na captura, filtre com <b>arp</b> e compare o MAC que diz ser o gateway com o MAC verdadeiro. <b>eth.src</b> filtra pelo MAC de origem."
       ],
+      "check": {
+        "q": "Para que serve o ARP?",
+        "a": 0,
+        "o": [
+          "Descobrir o MAC de um IP na rede local",
+          {
+            "t": "Traduzir nomes em IPs",
+            "why": "Isso é o DNS."
+          },
+          {
+            "t": "Entregar IP automaticamente",
+            "why": "Isso é o DHCP."
+          }
+        ],
+        "why": "O ARP pergunta em broadcast \"quem tem este IP?\" e o dono responde com o MAC."
+      },
       "tip": "O gateway verdadeiro é aa:bb:cc:00:00:01. Toda resposta dizendo que 192.168.1.1 está em outro MAC é falsa.",
       "learn": "ARP traduz IP em MAC na rede local, sem nenhuma verificação. ARP spoofing é responder pelo gateway com outro MAC para o tráfego passar pelo atacante. Defesas: Dynamic ARP Inspection no switch, port security e redes segmentadas.",
       "filters": [
@@ -418,6 +482,22 @@
         "Muitos PCs usam o mesmo IP público ao mesmo tempo. O roteador separa as conversas pela <b>porta de origem</b> (isso se chama PAT ou NAT overload).",
         "De fora para dentro não há entrada na tabela. Para publicar um servidor interno, crie um <b>redirecionamento de porta</b> (port forwarding)."
       ],
+      "check": {
+        "q": "Como a internet enxerga um PC com IP 192.168.0.10 atrás do NAT?",
+        "a": 0,
+        "o": [
+          "Com o IP público do roteador",
+          {
+            "t": "Com o 192.168.0.10",
+            "why": "IPs privados não andam na internet: o roteador troca a origem na saída."
+          },
+          {
+            "t": "Com o MAC do PC",
+            "why": "O MAC não passa do roteador."
+          }
+        ],
+        "why": "O NAT troca o IP privado pelo público na saída e desfaz a troca na volta."
+      },
       "tip": "Dentro: 192.168.x.x. Fora: o IP público do roteador. Quem separa os PCs é a porta de origem. Para entrar de fora: redirecionamento de porta.",
       "learn": "O NAT troca o IP privado pelo público na saída e lembra a troca numa tabela, separando os PCs pela porta de origem. Por isso um IP público serve a rede toda, e de fora ninguém alcança um PC interno, a não ser que você crie um redirecionamento de porta.",
       "html": "<div class=\"kv\">IP de origem do PC, dentro da rede<span class=\"grow\"></span>[ori]</div>\n<div class=\"kv\">IP de origem que o site enxerga<span class=\"grow\"></span>[pub]</div>\n<div class=\"kv\">Quem faz a troca e guarda a tabela<span class=\"grow\"></span>[quem]</div>\n<div class=\"kv\">O que separa vários PCs no mesmo IP público<span class=\"grow\"></span>[porta]</div>\n<div class=\"kv\">Faixa privada usada no escritório<span class=\"grow\"></span>[faixa]</div>\n<div class=\"kv\">Para um servidor interno receber acesso de fora<span class=\"grow\"></span>[pf]</div>",
@@ -511,6 +591,22 @@
         "No log, <b>DHCPDISCOVER</b> sem <b>DHCPOFFER</b> = o pedido saiu e ninguém respondeu.",
         "<b>sudo dhclient -v eth0</b> pede um IP de novo e mostra a conversa DORA na tela."
       ],
+      "check": {
+        "q": "Qual é a primeira coisa a conferir num chamado \"sem internet\"?",
+        "a": 0,
+        "o": [
+          "Se o PC tem um IP válido (ip a)",
+          {
+            "t": "Reiniciar o roteador da empresa",
+            "why": "Derruba todo mundo e não é o primeiro passo de um N1."
+          },
+          {
+            "t": "Trocar o navegador",
+            "why": "Se nem IP há, o navegador não é o problema."
+          }
+        ],
+        "why": "Comece de baixo: IP, depois gateway, depois o resto. Sem IP válido, nada funciona."
+      },
       "tip": "ip a mostra 169.254: o DHCP falhou. O log confirma que ninguém ofereceu IP. Quando o servidor voltar, peça o IP de novo com dhclient.",
       "learn": "Chamado resolvido com método: IP 169.254 (link-local) mostrou que o DHCP falhou, o ip link descartou o cabo e o log confirmou DISCOVER sem OFFER. Escalou para o N2 religar o serviço e renovou o IP no PC. Documente no chamado: sintoma, causa e o que foi feito.",
       "cmds": [

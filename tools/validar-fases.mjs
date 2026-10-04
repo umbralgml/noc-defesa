@@ -18,11 +18,16 @@ const txt = x => typeof x === 'string' ? x : x.t;
 const val = x => typeof x === 'string' ? x : (x.v ?? x.t);
 const hasWhy = x => typeof x === 'object' && !!x.why;
 
-function check(L, where) {
+function check(L, where, diffN = 9) {
   const err = m => errors.push(`${where}: ${m}`), warn = m => warns.push(`${where}: ${m}`);
   REQ.forEach(k => { if (L[k] === undefined || L[k] === '') err(`campo obrigatório "${k}" ausente`); });
   if (L.loc && !LOCS.includes(L.loc)) err(`loc "${L.loc}" inválido (use ${LOCS.join(', ')})`);
   if (!L.lesson || !L.lesson.length) warn('sem "lesson" (aula rápida do briefing)');
+  if (L.check) {
+    const q = L.check;
+    if (!q.q || !q.why || !Array.isArray(q.o) || q.o.length < 2 || !(q.a >= 0 && q.a < q.o.length)) err('"check" precisa de "q", "o" (2+), "a" e "why"');
+    else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`check: opção errada "${txt(o)}" sem "why"`); });
+  } else if (diffN <= 1 && !L.tutorial) warn('fase iniciante/básico sem "check" (pergunta de checagem depois da aula)');
   if (L.dailyFrom !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(L.dailyFrom)) err('"dailyFrom" precisa ser AAAA-MM-DD');
 
   if (L.type === 'wire') {
@@ -137,7 +142,7 @@ for (const f of read('index.json').acts) {
     const where = `${f} #${i + 1} "${L.title}"`;
     if (titles.has(L.title)) errors.push(`${where}: título repetido (já usado em ${titles.get(L.title)}). O progresso salvo usa o título como chave.`);
     titles.set(L.title, where);
-    check(L, where);
+    check(L, where, ['iniciante', 'básico'].indexOf(a.diff) >= 0 ? 1 : 2);
   });
 }
 

@@ -14,6 +14,7 @@ import { initRoom } from './engine/room.js';
 import { initZ3r0 } from './engine/z3r0.js';
 import { initTrain } from './engine/train.js';
 import { initAcademy } from './engine/academy.js';
+import { initStudy } from './engine/study.js';
 import { rankOf, RANKS } from './engine/career.js';
 import { achHTML, achCount, ACH } from './engine/ach.js';
 import { initDrop } from './engine/drop.js';
@@ -40,7 +41,7 @@ function showProgress() {
   el.innerHTML = p.done ? `Seu plantão: <b>★ ${p.stars}/${p.max}</b> · ${p.done}/${p.max / 3} fases` : '';
 }
 
-initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy();
+initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy(); initStudy();
 loadRankConfig().then(on => { $('rkBox').hidden = !on; if (on) titleRanking(dailyBoard()); });
 // Cargo e XP na tela inicial.
 function showRank() {

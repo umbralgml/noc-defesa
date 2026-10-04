@@ -637,3 +637,47 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .acm i{display:block;height:100%;background:var(--acc);border-radius:3px}
 .acs{font:800 9px 'Orbitron',monospace;letter-spacing:1px;color:var(--muted);white-space:nowrap}
 .acb.ok .acs{color:var(--acc)}
+
+/* ---------- aula em cartões, glossário e sala de estudo ---------- */
+.lcards{background:var(--panel2);border:1px solid rgba(255,209,102,.35);border-radius:14px;padding:12px 14px;margin:12px 0}
+.lch{display:flex;justify-content:space-between;align-items:center;font:700 9px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted)}
+.lch .lh{color:var(--warn)}
+.lcb{min-height:96px;display:flex;align-items:center;margin:8px 0}
+.lcc{font-size:15px;line-height:1.55;color:#d7e3f5;animation:optin .3s both}
+.lcc b{color:var(--text)}
+.lcq{width:100%}
+.lcq .lh{font:700 9px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--acc)}
+.lcq .q{font-size:15px;margin:6px 0 10px}
+.lcw{font-size:13px;line-height:1.5;color:#c9d6ea;min-height:1em}
+.lcnav{display:flex;align-items:center;gap:8px}
+.lcnav .btn{padding:10px 14px;font-size:12px}
+.lcnav #lcNext{margin-left:auto}
+.lcdots{display:flex;gap:5px;flex-wrap:wrap}
+.lcdots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.lcdots i.done{background:rgba(255,209,102,.5)}
+.lcdots i.on{background:var(--warn);box-shadow:0 0 6px var(--warn)}
+.lcall{display:block;margin:8px auto 0;font-size:12px}
+.gl{cursor:help;text-decoration:underline dotted rgba(77,210,255,.8);text-underline-offset:3px}
+.glpop{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);width:min(92vw,420px);z-index:200;background:#0c1a2c;border:1px solid #4dd2ff;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.6);transition:transform .25s;display:flex;flex-direction:column;gap:4px}
+.glpop.on{transform:translate(-50%,0)}
+.glk{font:800 9px 'Orbitron',monospace;letter-spacing:1.5px;color:#4dd2ff}
+.glpop b{font-size:15px}
+.gld{font-size:13.5px;line-height:1.5;color:#c9d6ea}
+.glpop .lnk{align-self:flex-end;font-size:12px}
+.pracb{display:block;width:100%;margin:10px 0 0;border-color:rgba(255,209,102,.6)!important;color:var(--warn)!important}
+.pracb small{display:block;font:500 11px system-ui;letter-spacing:0;color:var(--muted);margin-top:4px}
+.daily.studyc{border-color:rgba(255,122,217,.45);background:linear-gradient(90deg,rgba(255,122,217,.1),var(--panel));margin-top:8px}
+.daily.studyc .di{background:#ff7ad9}
+.lib{background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:8px 10px}
+.lib>summary{cursor:pointer;font-weight:700;font-size:14px}
+.lib>summary span{font:800 9px 'Orbitron',monospace;letter-spacing:1px;color:var(--acc)}
+.libl{border-top:1px solid var(--line);padding:8px 2px;font-size:13px}
+.libl>summary{cursor:pointer;color:var(--text)}
+.libl ul{margin:6px 0;padding-left:18px;color:#c9d6ea;line-height:1.5}
+.libl.lock{color:var(--muted)}
+.libk{font-size:12.5px;color:#c9d6ea;line-height:1.5}
+.glsearch{width:100%;margin:10px 0 6px;background:#03070d;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--text);font:14px system-ui;user-select:text;-webkit-user-select:text}
+.gllist{margin:0;max-height:48vh;overflow-y:auto}
+.gllist>div{border-bottom:1px solid var(--line);padding:8px 2px}
+.gllist dt{font-weight:700;font-size:14px}
+.gllist dd{margin:2px 0 0;font-size:13px;color:#c9d6ea;line-height:1.45}

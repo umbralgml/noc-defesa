@@ -24,7 +24,9 @@ São 46 fases, do zero ao avançado: um Prólogo para quem nunca viu rede, a For
 
 O jogo foi feito para ensinar, não só para testar:
 
-- **Aula rápida** no briefing de cada fase, com o conceito que você vai precisar. Ela também aparece no botão **?** durante a fase.
+- **Aula em cartões** no briefing de cada fase, com uma pergunta de checagem no fim (sem custo). A aula também fica fixa durante a fase e no botão **?**.
+- **Glossário tocável:** termos sublinhados nas aulas mostram a definição na hora. A **Sala de estudo** no mapa reúne todas as aulas liberadas e o glossário.
+- **Treino sem pressão:** nas fases iniciante e básico, jogue antes sem perder integridade; depois jogue valendo.
 - **Explicação na hora** de cada jogada, certa ou errada: por que aquele IP é público, por que aquela regra vem primeiro, por que aquela opção do quiz não serve.
 - **Revisão no fim da fase** com tudo o que você errou e a explicação de cada item.
 - **Desafio diário:** 5 perguntas por dia, iguais para todo mundo, com cronômetro, sequência de dias e resultado para compartilhar. Dá para **desafiar um colega** com um link que leva as mesmas perguntas e o seu placar.

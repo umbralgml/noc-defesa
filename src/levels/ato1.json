@@ -39,6 +39,22 @@
         "<b>DAC</b>: cabo twinax de cobre com os módulos já presos nas pontas. Barato e sem óptica, mas só serve para poucos metros, dentro do mesmo rack.",
         "<b>RJ45 + Cat6</b>: cobre de par trançado, até 100 m. A rede <b>GPON</b> usa conector <b>SC/APC</b> (verde), com ponta polida em ângulo."
       ],
+      "check": {
+        "q": "Um transceiver 10GBASE-LR combina com qual cabo?",
+        "a": 0,
+        "o": [
+          "Fibra monomodo",
+          {
+            "t": "Fibra multimodo",
+            "why": "Multimodo é o par do SR, de curta distância."
+          },
+          {
+            "t": "Cabo DAC",
+            "why": "DAC é cobre twinax com os módulos já presos, para poucos metros."
+          }
+        ],
+        "why": "LR é longa distância (até 10 km): pede fibra monomodo."
+      },
       "tip": "LR = longa distância em fibra monomodo (amarela). SR = curta distância em multimodo (aqua). SFP28 no mesmo rack = DAC. RJ45 = cobre. PON da OLT vai para o splitter óptico.",
       "learn": "Monomodo OS2 (amarela) atende LR/ER, quilômetros. Multimodo OM4 (aqua) atende SR, até uns 400 m em 10G. DAC é twinax de cobre com transceiver embutido, ideal até ~5 m. GPON usa SC/APC (verde) pelo polimento angular que reduz reflexão.",
       "left": [
@@ -134,6 +150,22 @@
         "A <b>RFC 6598</b> reserva <b>100.64.0.0/10</b> para <b>CGNAT</b>: o provedor dá esse IP ao cliente e faz NAT para um IP público compartilhado. Vai de <b>100.64</b> até <b>100.127</b>.",
         "Qualquer endereço fora das faixas reservadas é <b>público</b>: roteado na internet e com dono registrado."
       ],
+      "check": {
+        "q": "O endereço 172.20.5.1 é:",
+        "a": 0,
+        "o": [
+          "Privado",
+          {
+            "t": "Público",
+            "why": "172.16.0.0/12 vai de 172.16 a 172.31: o 172.20 está dentro."
+          },
+          {
+            "t": "CGNAT",
+            "why": "CGNAT é 100.64.0.0/10."
+          }
+        ],
+        "why": "172.20 cai dentro de 172.16.0.0/12, uma das faixas privadas da RFC 1918."
+      },
       "tip": "Privado: 10.0.0.0/8, 172.16.0.0/12 (172.16 a 172.31), 192.168.0.0/16. CGNAT: 100.64.0.0/10 (100.64 a 100.127). O resto aqui é público.",
       "learn": "Pegadinhas clássicas: 172.32.x.x já é público porque o /12 vai só até 172.31. 100.128.x.x é público porque o /10 do CGNAT termina em 100.127. 192.169.x.x também é público.",
       "buckets": [
@@ -222,6 +254,22 @@
         "Tamanho do bloco = <b>256 − último octeto da máscara</b>. A /26 é 255.255.255.<b>192</b>, então os blocos têm <b>64</b> endereços: .0, .64, .128, .192.",
         "Em cada bloco, o <b>primeiro</b> endereço é a rede e o <b>último</b> é o broadcast. Hosts úteis = tamanho − 2."
       ],
+      "check": {
+        "q": "Para dividir uma /24 em 4 sub-redes iguais, qual a nova máscara?",
+        "a": 0,
+        "o": [
+          "/26",
+          {
+            "t": "/25",
+            "why": "/25 divide a /24 em só 2 sub-redes."
+          },
+          {
+            "t": "/28",
+            "why": "/28 dá 16 sub-redes, mais do que o pedido."
+          }
+        ],
+        "why": "4 sub-redes = 2 bits emprestados: /24 + 2 = /26, blocos de 64."
+      },
       "tip": "4 sub-redes = 2 bits a mais: /24 vira /26. Cada /26 tem 64 endereços (62 úteis). Os blocos andam de 64 em 64.",
       "learn": "/26 = 255.255.255.192, blocos de 64 endereços. Rede é o primeiro, broadcast é o último: .0-.63, .64-.127, .128-.191, .192-.255. Úteis = 2^6 - 2 = 62.",
       "html": "<div class=\"kv\">Máscara<span class=\"grow\"></span>[m]</div>\n<div class=\"kv\">Hosts úteis por sub-rede<span class=\"grow\"></span>[h]</div>\n<div class=\"grid3\"><div class=\"h\">SUB</div><div class=\"h\">REDE 192.168.10.x</div><div class=\"h\">BROADCAST</div>\n<div class=\"h\">A</div>[a1][a2]<div class=\"h\">B</div>[b1][b2]<div class=\"h\">C</div>[c1][c2]<div class=\"h\">D</div>[d1][d2]</div>",
@@ -356,6 +404,22 @@
         "O <b>traceroute</b> lista os roteadores (saltos) até o destino. Switches trabalham na camada 2 e não aparecem nele.",
         "Comece pela <b>camada física</b>: LED apagado, cabo solto e porta desligada explicam muita queda."
       ],
+      "check": {
+        "q": "O ping até o roteador volta, mas até o servidor não. Onde procurar?",
+        "a": 0,
+        "o": [
+          "Entre o roteador e o servidor",
+          {
+            "t": "No PC de onde saiu o ping",
+            "why": "O roteador respondeu: o PC e o caminho até ele estão bons."
+          },
+          {
+            "t": "Na internet",
+            "why": "O servidor é interno. A internet nem entra nesse caminho."
+          }
+        ],
+        "why": "A falha fica entre o último ponto que responde e o primeiro que não responde."
+      },
       "tip": "Pingue a internet (responde?) e um servidor (falha?). O que os servidores têm em comum que a internet não tem? O SW-DC e o cabo que liga o roteador a ele.",
       "learn": "Isolar a falha comparando testes é a base do troubleshooting. Internet ok e servidores fora = problema no trecho que só os servidores usam: o uplink entre o roteador e o SW-DC. Camada física primeiro: o cabo estava solto.",
       "from": "pc",
@@ -525,6 +589,22 @@
         "As portas de <b>0 a 1023</b> são as bem conhecidas, reservadas pela IANA para serviços padrão.",
         "No firewall, saber a porta é saber o que você está expondo. Porta aberta sem necessidade é porta de entrada."
       ],
+      "check": {
+        "q": "Qual a porta padrão do HTTPS?",
+        "a": 0,
+        "o": [
+          "TCP 443",
+          {
+            "t": "TCP 80",
+            "why": "80 é o HTTP sem criptografia."
+          },
+          {
+            "t": "TCP 22",
+            "why": "22 é o SSH."
+          }
+        ],
+        "why": "HTTPS é HTTP sobre TLS, na porta TCP 443."
+      },
       "tip": "SSH 22, DNS 53, BGP 179, SNMP 161, HTTPS 443, RDP 3389.",
       "learn": "BGP roda sobre TCP 179. SNMP usa UDP 161 (traps na 162). DNS usa UDP 53 e cai pra TCP 53 em respostas grandes e transferência de zona. RDP exposto na 3389 é um dos alvos favoritos de ransomware.",
       "left": [
