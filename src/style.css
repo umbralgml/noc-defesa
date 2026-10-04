@@ -112,7 +112,10 @@ button{font-family:inherit;cursor:pointer}
   #app:has(#title.on){max-width:1120px}
   #title{flex-direction:row;overflow:hidden}
   #title .tmain{flex:1;min-width:0;min-height:0}
-  #title .content{flex:1;overflow-y:auto;justify-content:center}
+  /* centraliza sem cortar: margens automáticas não escondem o topo quando o conteúdo passa da altura */
+  #title .content{flex:1;overflow-y:auto}
+  #title .content>:first-child{margin-top:auto}
+  #title .content>:last-child{margin-bottom:auto}
   .news{flex:0 0 360px;overflow-y:auto;border-top:none;border-left:1px solid var(--line)}
   #newsBtn{display:none}
 }
