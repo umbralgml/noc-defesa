@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.16",
+      "date": "2026-10-04",
+      "title": "Escola de plantão",
+      "items": [
+        "Prólogo maior: camadas da rede, binário sem medo, DHCP e DNS no terminal Linux",
+        "Ato novo, Formação N1: máscara, TCP x UDP, cabos, ARP spoofing, NAT e o seu primeiro chamado de verdade",
+        "Fases novas aparecem com o selo NOVA no mapa",
+        "Na tela inicial: o que já chegou e o que vem por aí para aprender, revisar e praticar"
+      ]
+    },
+    {
       "v": "1.15",
       "date": "2026-10-02",
       "title": "Instala de qualquer jeito",

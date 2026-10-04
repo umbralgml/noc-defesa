@@ -61,9 +61,11 @@ function pick(i, quiet) {
   sel = i; if (!quiet) sfx.sel(); rows();
   const p = L.packets[i], d = $('pdet');
   const l4 = (L4[(p.proto || '').toLowerCase()] || (p.proto || '').toLowerCase()).toUpperCase();
-  const tree = [`Frame ${i + 1}: ${p.len || 60} bytes`, `Internet Protocol, Src: ${p.src}, Dst: ${p.dst}`];
+  const arp = /^arp$/i.test(p.proto || '');
+  const tree = [`Frame ${i + 1}: ${p.len || 60} bytes`, arp ? `Ethernet II, Src: ${p.src}, Dst: ${p.dst}` : `Internet Protocol, Src: ${p.src}, Dst: ${p.dst}`];
   if (p.sport || p.dport) tree.push(`${l4}, Src Port: ${p.sport}, Dst Port: ${p.dport}${p.flags ? `, Flags: [${p.flags}]` : ''}`);
-  if (p.proto && !['TCP', 'UDP', 'ICMP'].includes(p.proto.toUpperCase())) tree.push(`${p.proto}: ${p.info}`);
+  if (arp) tree.push(`Address Resolution Protocol: ${p.info}`);
+  else if (p.proto && !['TCP', 'UDP', 'ICMP'].includes(p.proto.toUpperCase())) tree.push(`${p.proto}: ${p.info}`);
   d.innerHTML = `<div class="ptree"></div>${i in done ? '' : '<div class="row"><button class="opt pbtn" id="pN">✓ NORMAL</button><button class="opt pbtn bad" id="pS">⚠ SUSPEITO</button></div>'}`;
   d.querySelector('.ptree').textContent = tree.join('\n');
   if (!(i in done)) { $('pN').onclick = e => mark([i], false, e.currentTarget); $('pS').onclick = e => mark([i], true, e.currentTarget); }

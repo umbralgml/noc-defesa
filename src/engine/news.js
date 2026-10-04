@@ -16,7 +16,8 @@ export async function loadNews() {
     <div class="vh"><span class="vn">v${esc(v.v)}</span><span class="vd">${fmtDate(v.date)}</span>${!i && fresh ? '<span class="vnew">NOVO</span>' : ''}</div>
     <b class="vt">${esc(v.title)}</b><ul>${v.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('');
   $('newsDot').classList.toggle('on', fresh);
-  $('newsBtn').onclick = () => $('news').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('newsBtn').onclick = $('tUpdBtn').onclick = () => $('news').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('tUpdLast').textContent = `(última: v${versions[0].v}, ${versions[0].title})`;
 }
 
 // Chamado ao iniciar o turno: o jogador já viu as novidades desta versão.

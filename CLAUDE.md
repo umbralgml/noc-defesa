@@ -4,7 +4,7 @@ Guia para trabalhar neste repositório.
 
 ## O projeto
 
-"NOC: Última Linha de Defesa" é um jogo **educativo** de redes e segurança, em português do Brasil, que roda no navegador (celular primeiro). O jogador é o analista de plantão contra o hacker Z3R0 ao longo de 30 fases: um Prólogo para iniciantes e 7 atos de dificuldade crescente (inclui um ato de Linux). É publicado no GitHub Pages: https://umbralgml.github.io/noc-defesa/
+"NOC: Última Linha de Defesa" é um jogo **educativo** de redes e segurança, em português do Brasil, que roda no navegador (celular primeiro). O jogador é o analista de plantão contra o hacker Z3R0 ao longo de 46 fases: um Prólogo para iniciantes, a Formação N1 e 7 atos de dificuldade crescente (inclui um ato de Linux). É publicado no GitHub Pages: https://umbralgml.github.io/noc-defesa/
 
 O objetivo principal é **ensinar**. Diversão é o veículo. Toda mudança de conteúdo precisa manter isto: aula antes (`lesson`), explicação a cada jogada (`why`/`explain`) e revisão dos erros no fim.
 
@@ -45,7 +45,7 @@ src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mai
 src/config.json       { "ranking": { "url", "key" } } do Supabase; vazio = ranking desligado (botões .rankBtn escondidos)
 src/levels/
   index.json          { "acts": ["ato1.json", ...] } na ordem do mapa
-  prologo.json, atoN.json, linux.json   { "tag", "name", "diff", "story", "levels": [ ... ] }
+  prologo.json, formacao.json, atoN.json, linux.json   { "tag", "name", "diff", "story", "levels": [ ... ] }
 src/engine/
   util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON); sem dependências
   state.js            S (estado da partida; S.lv = fase atual), LEVELS, ACTS, save, K, unlocked, resetProgress, progress
@@ -122,6 +122,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Métricas:** `metric('win'|'fail')` em `rank.js` envia só dados anônimos da fase, e só se o jogador não desligou no perfil (`noc_metricas`).
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
 - **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`) puxa a `main` a cada 15 minutos. Não há outro passo de publicação.
+- **Fase nova no meio da campanha:** marque com `"novo": true`. Ela ganha o selo NOVA no mapa e fica liberada para quem já tem estrela em alguma fase depois dela (`unlocked()` em `state.js`), então ninguém trava no meio do caminho.
 - **Dificuldade gradativa:** o jogo é para quem nunca viu rede até quem trabalha num NOC. Cada ato tem `diff` (iniciante → avançado, só sobe). Iniciante/básico: analogias, sem cronômetro, dica automática no 2º erro (`hint()` em `ui.js`). Pressão (tempo, eventos do Z3R0) só a partir de intermediário. A primeira fase tem `"tutorial": true`.
 - **Linux:** muita coisa de rede roda em Linux, então há um ato próprio e o Prólogo já apresenta o terminal (`ip a`, `ping`). Fases `term` com `prompt` Linux. Saídas de comando realistas (copie de um sistema de verdade).
 - **História:** `story` no ato, mostrada uma vez (`noc_story`) com o chefe do NOC (`AV_CHEFE`), o analista e o Z3R0.

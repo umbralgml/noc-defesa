@@ -44,6 +44,7 @@ python3 -m http.server 8000   # e abra http://localhost:8000
 | `cap` | sim | texto | Legenda digitada enquanto o analista anda até o local. |
 | `goal` | sim | HTML | Missão, mostrada no briefing (e no topo da fase `wire`). |
 | `intro` | não | HTML | Enunciado no topo da fase (`drop`, `term`, `defense`, `topo`, `pcap`). |
+| `novo` | não | `true` | Fase acrescentada no meio da campanha: mostra o selo NOVA no mapa e já fica liberada para quem tem estrela em alguma fase depois dela. |
 | `miniboss` | não | `true` | Chefe intermediário: telão do Z3R0, música de chefe e animação de derrota, sem encerrar a campanha. Use com `loc: "war"`. |
 | `z` | sim | HTML | Fala do Z3R0 no briefing. |
 | `me` | sim | HTML | Resposta do analista no briefing. |
@@ -383,10 +384,10 @@ Uma captura no estilo Wireshark. O jogador filtra com filtros de exibição (chi
 
 | Campo | Formato |
 |-------|---------|
-| `packets` | `{ "src", "dst", "proto", "info", "sport"?, "dport"?, "flags"?, "method"?, "qname"?, "len"?, "bad"?, "why" }`. `proto` como no Wireshark (`TCP`, `UDP`, `DNS`, `HTTP`, `TLS`, `NTP`, `ICMP`); `flags` como `"SYN"` ou `"SYN,ACK"`. |
+| `packets` | Em pacote `ARP`, `src` e `dst` são MACs (ou `Broadcast`). `{ "src", "dst", "proto", "info", "sport"?, "dport"?, "flags"?, "method"?, "qname"?, "len"?, "bad"?, "why" }`. `proto` como no Wireshark (`TCP`, `UDP`, `DNS`, `HTTP`, `TLS`, `NTP`, `ICMP`); `flags` como `"SYN"` ou `"SYN,ACK"`. |
 | `filters` | `{ "f", "why" }`: chips de filtro. O `why` aparece na primeira vez que o filtro é aplicado. |
 
-Filtros aceitos (subconjunto do Wireshark, em `src/engine/netlib.js`): protocolos (`tcp`, `udp`, `icmp`, `dns`, `http`, `tls`, `ntp`, `ssh`), `ip.src`, `ip.dst`, `ip.addr` (aceitam prefixo `/8`, `/16`, `/24`), `tcp.port`, `udp.port`, `tcp.srcport`, `tcp.dstport`, `udp.srcport`, `udp.dstport`, `tcp.flags.syn`, `tcp.flags.ack`, `tcp.flags.rst`, `http.request`, `http.request.method`, `dns.qry.name`, `frame.len`. Operadores `== != > < >= <=` e `contains`, combinados com `&&`, `||`, `!` (ou `and`, `or`, `not`) e parênteses. O validador compila cada chip e avisa se ele não mostra nenhum pacote.
+Filtros aceitos (subconjunto do Wireshark, em `src/engine/netlib.js`): protocolos (`tcp`, `udp`, `icmp`, `arp`, `dns`, `http`, `tls`, `ntp`, `ssh`), `eth.src`, `eth.dst` (MAC), `ip.src`, `ip.dst`, `ip.addr` (aceitam prefixo `/8`, `/16`, `/24`), `tcp.port`, `udp.port`, `tcp.srcport`, `tcp.dstport`, `udp.srcport`, `udp.dstport`, `tcp.flags.syn`, `tcp.flags.ack`, `tcp.flags.rst`, `http.request`, `http.request.method`, `dns.qry.name`, `frame.len`. Operadores `== != > < >= <=` e `contains`, combinados com `&&`, `||`, `!` (ou `and`, `or`, `not`) e parênteses. O validador compila cada chip e avisa se ele não mostra nenhum pacote.
 
 ---
 

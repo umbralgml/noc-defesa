@@ -1,6 +1,7 @@
 {
   "acts": [
     "prologo.json",
+    "formacao.json",
     "ato1.json",
     "ato2.json",
     "linux.json",

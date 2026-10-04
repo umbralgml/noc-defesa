@@ -8,11 +8,12 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 36 fases, do zero ao avançado: um Prólogo para quem nunca viu rede e 7 atos de dificuldade crescente.
+São 46 fases, do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente.
 
 | Parte | Nível | Tema | Fases |
 |-------|-------|------|-------|
-| Prólogo | iniciante | Primeiros passos | equipamentos e o que fazem, IP x porta x MAC, ping/gateway/DNS, primeiro terminal Linux (com tutorial) |
+| Prólogo | iniciante | Primeiros passos | equipamentos e o que fazem, camadas da rede, IP x porta x MAC, binário, ping, DHCP, primeiro terminal Linux (com tutorial), DNS e /etc/hosts |
+| Formação N1 | básico | Pronto para o primeiro chamado | máscara e CIDR, TCP x UDP, cabo certo, ARP spoofing, NAT e um chamado "sem internet" do começo ao fim |
 | 1 | básico | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, achar a falha na topologia com ping e traceroute, portas de serviço |
 | 2 | básico | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, SYN flood no Wireshark, mitigação de DDoS e a botnet ao vivo |
 | 3 | intermediário | Linux no NOC | comandos de rede no Linux, serviço exposto (ss, ufw), resolvedor DNS aberto (tcpdump, dig), SSH sob ataque (journalctl, last), boas práticas |

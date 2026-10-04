@@ -110,6 +110,106 @@
       ]
     },
     {
+      "title": "Camadas da rede",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "novo": true,
+      "cap": "Abrindo o quadro branco do NOC...",
+      "goal": "Coloque cada peça da rede na camada onde ela trabalha.",
+      "intro": "Toda conversa na rede passa por <b>camadas</b>, como uma carta: o texto, o envelope, o endereço e o carteiro. Separe cada item na camada certa.",
+      "z": "Rede é uma bagunça só. Ninguém entende isso.",
+      "me": "Bagunça nada. São camadas, e cada uma tem um trabalho.",
+      "lesson": [
+        "O modelo <b>TCP/IP</b> divide a rede em 4 camadas. Cada uma resolve um problema e entrega o resultado para a de cima.",
+        "<b>Enlace/física</b>: o meio (cabo, Wi-Fi) e o endereço da placa, o <b>MAC</b>. O <b>switch</b> trabalha aqui.",
+        "<b>Internet</b> (rede): o endereço <b>IP</b> e o caminho entre redes. O <b>roteador</b> trabalha aqui.",
+        "<b>Transporte</b>: <b>TCP</b> ou <b>UDP</b> e as <b>portas</b>, que dizem qual programa recebe.",
+        "<b>Aplicação</b>: o que você usa: site (HTTP), nomes (DNS), e-mail. O modelo <b>OSI</b>, de 7 camadas, é a versão detalhada do mesmo mapa."
+      ],
+      "tip": "Cabo, Wi-Fi, MAC e switch = enlace. IP, roteador e ping = internet. TCP, UDP e portas = transporte. Site, DNS e e-mail = aplicação.",
+      "learn": "Cada camada tem um trabalho: enlace leva o sinal até a próxima placa (MAC), internet leva o pacote entre redes (IP), transporte entrega ao programa certo (porta, TCP/UDP) e aplicação é o serviço que você usa. Quando algo quebra, pensar em camadas diz por onde começar.",
+      "buckets": [
+        {
+          "label": "ENLACE / FÍSICA",
+          "c": "#ff7ad9",
+          "a": [
+            {
+              "t": "Cabo de rede Cat6",
+              "why": "O cabo é o meio físico: leva o sinal elétrico de uma placa até a outra."
+            },
+            {
+              "t": "Sinal do Wi-Fi",
+              "why": "O rádio do Wi-Fi é o meio físico sem fio, como um cabo invisível."
+            },
+            {
+              "t": "Endereço MAC",
+              "why": "O MAC identifica a placa de rede no enlace local. Ele não atravessa roteador."
+            },
+            {
+              "t": "Switch",
+              "why": "O switch encaminha quadros pelo endereço MAC dentro da mesma rede local."
+            }
+          ]
+        },
+        {
+          "label": "INTERNET (REDE)",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "Endereço IP",
+              "why": "O IP identifica a máquina entre redes diferentes. É a camada de internet."
+            },
+            {
+              "t": "Roteador",
+              "why": "O roteador lê o IP de destino e escolhe o caminho entre redes."
+            },
+            {
+              "t": "Ping (ICMP)",
+              "why": "O ping usa o ICMP, que viaja junto com o IP para testar se o destino responde."
+            }
+          ]
+        },
+        {
+          "label": "TRANSPORTE",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "Porta 443",
+              "why": "A porta diz qual programa recebe a conversa. Portas são da camada de transporte."
+            },
+            {
+              "t": "TCP",
+              "why": "O TCP confirma a entrega e reenvia o que se perdeu: protocolo de transporte."
+            },
+            {
+              "t": "UDP",
+              "why": "O UDP manda sem confirmar, mais rápido: também é protocolo de transporte."
+            }
+          ]
+        },
+        {
+          "label": "APLICAÇÃO",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "Site (HTTP)",
+              "why": "HTTP é a língua dos sites: camada de aplicação."
+            },
+            {
+              "t": "DNS",
+              "why": "O DNS traduz nomes em IPs. É um serviço, então fica na aplicação."
+            },
+            {
+              "t": "E-mail (SMTP)",
+              "why": "O SMTP envia e-mails: mais um serviço da camada de aplicação."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "Endereço, porta e MAC",
       "tag": "CLASSIFICAÇÃO",
       "type": "drop",
@@ -186,6 +286,98 @@
               "why": "Também é MAC: 6 pares de 00 a ff."
             }
           ]
+        }
+      ]
+    },
+    {
+      "title": "Binário sem medo",
+      "tag": "BINÁRIO",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "novo": true,
+      "cap": "Ligando a calculadora mental...",
+      "goal": "Converta os números entre binário e decimal.",
+      "intro": "Por dentro, o IP é só uma fileira de <b>0</b> e <b>1</b>. Cada pedaço de 8 bits (um <b>octeto</b>) vira um número de 0 a 255. Use a tabela da aula e preencha.",
+      "z": "11000000. Aposto que você nem sabe o que isso significa.",
+      "me": "128 mais 64. Dá 192. Próxima.",
+      "lesson": [
+        "Um <b>bit</b> é 0 ou 1. <b>8 bits</b> formam um <b>octeto</b>. O IPv4 tem 4 octetos: <b>32 bits</b>.",
+        "Cada posição do octeto vale um número. Da esquerda para a direita: <b>128, 64, 32, 16, 8, 4, 2, 1</b>.",
+        "Para converter, some o valor das posições que têm <b>1</b>. Exemplo: <b>00000101</b> = 4 + 1 = <b>5</b>.",
+        "Tudo ligado, <b>11111111</b>, dá 128+64+32+16+8+4+2+1 = <b>255</b>. Por isso nenhum número do IP passa de 255."
+      ],
+      "tip": "Posições: 128 64 32 16 8 4 2 1. Some só onde tem 1. 11000000 = 128+64.",
+      "learn": "Binário é soma de posições: 128, 64, 32, 16, 8, 4, 2 e 1. Um octeto vai de 0 (00000000) a 255 (11111111), e o IPv4 tem 4 octetos, 32 bits. É essa conta que vai fazer a máscara e as sub-redes fazerem sentido.",
+      "html": "<div class=\"kv\">Bits em um octeto<span class=\"grow\"></span>[b]</div>\n<div class=\"kv\">Bits em um endereço IPv4<span class=\"grow\"></span>[ip]</div>\n<div class=\"kv\">11000000 em decimal<span class=\"grow\"></span>[a]</div>\n<div class=\"kv\">10101000 em decimal<span class=\"grow\"></span>[c]</div>\n<div class=\"kv\">00001010 em decimal<span class=\"grow\"></span>[d]</div>\n<div class=\"kv\">255 em binário<span class=\"grow\"></span>[e]</div>",
+      "zones": {
+        "b": [
+          "8"
+        ],
+        "ip": [
+          "32"
+        ],
+        "a": [
+          "192"
+        ],
+        "c": [
+          "168"
+        ],
+        "d": [
+          "10"
+        ],
+        "e": [
+          "11111111"
+        ]
+      },
+      "explain": {
+        "b": "Um octeto tem 8 bits. Daí o nome: octo = oito.",
+        "ip": "4 octetos × 8 bits = 32 bits no IPv4.",
+        "a": "11000000: os dois primeiros bits valem 128 e 64. 128 + 64 = 192.",
+        "c": "10101000: 128 + 32 + 8 = 168. Por isso 192.168 aparece tanto.",
+        "d": "00001010: só as posições 8 e 2 estão ligadas. 8 + 2 = 10.",
+        "e": "255 é tudo ligado: 128+64+32+16+8+4+2+1."
+      },
+      "chips": [
+        {
+          "t": "8",
+          "why": "Um octeto tem 8 bits."
+        },
+        {
+          "t": "32",
+          "why": "O IPv4 tem 32 bits: 4 octetos de 8."
+        },
+        {
+          "t": "192",
+          "why": "128 + 64 = 192."
+        },
+        {
+          "t": "168",
+          "why": "128 + 32 + 8 = 168."
+        },
+        {
+          "t": "10",
+          "why": "8 + 2 = 10."
+        },
+        {
+          "t": "11111111",
+          "why": "Todos os 8 bits ligados: 255."
+        },
+        {
+          "t": "4",
+          "why": "4 é o número de octetos do IPv4, não de bits."
+        },
+        {
+          "t": "256",
+          "why": "Com 8 bits dá para contar 256 valores, mas eles vão de 0 a 255. O maior número é 255."
+        },
+        {
+          "t": "160",
+          "why": "10100000 seria 160. No 10101000 o bit do 8 também está ligado: 168."
+        },
+        {
+          "t": "11111110",
+          "why": "11111110 é 254: falta o último bit, que vale 1."
         }
       ]
     },
@@ -287,6 +479,94 @@
             }
           ],
           "why": "Se o IP responde, a conexão funciona. O que falhou foi traduzir o nome: DNS."
+        }
+      ]
+    },
+    {
+      "title": "Quem me deu esse IP?",
+      "tag": "DHCP",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "novo": true,
+      "cap": "Ligando um notebook novo na rede...",
+      "goal": "Monte a conversa do DHCP, do pedido à confirmação.",
+      "intro": "Você liga o notebook e, em segundos, ele tem IP, gateway e DNS. Quem fez isso foi o <b>DHCP</b>. Coloque cada passo da conversa no lugar certo.",
+      "z": "Desliguei o DHCP de um andar inteiro. Quero ver alguém trabalhar com IP 169.254.",
+      "me": "169.254 é o PC avisando que ninguém respondeu. Já sei onde olhar.",
+      "lesson": [
+        "O <b>DHCP</b> entrega a configuração de rede automaticamente: <b>IP</b>, <b>máscara</b>, <b>gateway</b> e <b>DNS</b>.",
+        "A conversa tem 4 passos (<b>DORA</b>): <b>Discover</b> (o PC procura em broadcast), <b>Offer</b> (o servidor oferece um IP), <b>Request</b> (o PC aceita) e <b>Ack</b> (o servidor confirma).",
+        "O IP é emprestado por um tempo, o <b>lease</b>. Antes de vencer, o PC pede para renovar.",
+        "Se nenhum servidor responde, o PC se dá um IP <b>169.254.x.x</b> (link-local). Com ele não se chega à internet: é sinal de DHCP fora do ar."
+      ],
+      "tip": "DORA: Discover, Offer, Request, Ack. Sem resposta do DHCP, o PC fica com 169.254.x.x.",
+      "learn": "O DHCP conversa em 4 passos (Discover, Offer, Request, Ack) usando UDP 67 no servidor e 68 no cliente, e entrega IP, máscara, gateway e DNS por um tempo (lease). Viu 169.254.x.x? O PC não achou nenhum servidor DHCP.",
+      "html": "<div class=\"kv\">1. O PC sem IP pergunta em broadcast: \"tem servidor DHCP aí?\"<span class=\"grow\"></span>[s1]</div>\n<div class=\"kv\">2. O servidor oferece um IP livre<span class=\"grow\"></span>[s2]</div>\n<div class=\"kv\">3. O PC pede o IP oferecido<span class=\"grow\"></span>[s3]</div>\n<div class=\"kv\">4. O servidor confirma e empresta o IP<span class=\"grow\"></span>[s4]</div>\n<div class=\"kv\">Além do IP, o DHCP entrega<span class=\"grow\"></span>[gw]</div>\n<div class=\"kv\">IP que o PC se dá quando ninguém responde<span class=\"grow\"></span>[apipa]</div>",
+      "zones": {
+        "s1": [
+          "DISCOVER"
+        ],
+        "s2": [
+          "OFFER"
+        ],
+        "s3": [
+          "REQUEST"
+        ],
+        "s4": [
+          "ACK"
+        ],
+        "gw": [
+          "máscara, gateway e DNS"
+        ],
+        "apipa": [
+          "169.254.x.x"
+        ]
+      },
+      "explain": {
+        "s1": "Discover: o PC ainda não tem IP, então grita para a rede toda (broadcast).",
+        "s2": "Offer: o servidor separa um IP livre e oferece.",
+        "s3": "Request: o PC diz \"quero esse\". Se houver dois servidores, os dois ficam sabendo qual foi escolhido.",
+        "s4": "Ack: o servidor confirma e o IP fica emprestado pelo tempo do lease.",
+        "gw": "Junto com o IP vêm a máscara, o gateway (saída da rede) e o DNS.",
+        "apipa": "Sem resposta, o PC se dá um 169.254.x.x (link-local). Ele só fala com vizinhos na mesma situação."
+      },
+      "chips": [
+        {
+          "t": "DISCOVER",
+          "why": "Primeiro passo: o PC procura um servidor DHCP em broadcast."
+        },
+        {
+          "t": "OFFER",
+          "why": "Segundo passo: o servidor oferece um IP."
+        },
+        {
+          "t": "REQUEST",
+          "why": "Terceiro passo: o PC pede o IP oferecido."
+        },
+        {
+          "t": "ACK",
+          "why": "Quarto passo: o servidor confirma."
+        },
+        {
+          "t": "máscara, gateway e DNS",
+          "why": "O DHCP entrega a configuração completa, não só o IP."
+        },
+        {
+          "t": "169.254.x.x",
+          "why": "Link-local: o IP automático de quando o DHCP não responde."
+        },
+        {
+          "t": "NAK",
+          "why": "NAK é a recusa do servidor, por exemplo quando o PC pede um IP que não vale nesta rede. Não faz parte da conversa normal."
+        },
+        {
+          "t": "127.0.0.1",
+          "why": "127.0.0.1 é o loopback, a própria máquina. Ele existe sempre, com ou sem DHCP."
+        },
+        {
+          "t": "a senha do Wi-Fi",
+          "why": "A senha do Wi-Fi é digitada no aparelho. O DHCP só entra depois que a conexão já existe."
         }
       ]
     },
@@ -430,6 +710,118 @@
           "why": "Com um servidor DNS que responde, os nomes voltam a funcionar. Depois, vale descobrir por que o 192.168.1.250 caiu.",
           "run": "sudo resolvectl dns eth0 1.1.1.1\nping -c 2 google.com",
           "out": "PING google.com (142.250.79.46) 56(84) bytes of data.\n64 bytes from 142.250.79.46: icmp_seq=1 ttl=117 time=15.1 ms\n64 bytes from 142.250.79.46: icmp_seq=2 ttl=117 time=14.8 ms"
+        }
+      ]
+    },
+    {
+      "title": "Nomes viram números",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "desk",
+      "novo": true,
+      "host": "pc-financeiro",
+      "prompt": "voce@pc-financeiro:~$",
+      "cap": "Abrindo o terminal do PC do financeiro...",
+      "goal": "Descubra por que só este PC não abre o ERP e conserte.",
+      "intro": "Todo mundo abre o ERP (<b>erp.empresa.com.br</b>), menos o PC do financeiro. A internet dele funciona. Investigue como esse PC transforma o nome em IP.",
+      "z": "Deixei um bilhetinho num arquivo do seu colega. O ERP dele agora vai para outro lugar.",
+      "me": "Nome vira número em dois lugares: no DNS e no /etc/hosts. Vou olhar os dois.",
+      "lesson": [
+        "O <b>DNS</b> traduz nomes em IPs. Antes de perguntar ao DNS, o Linux olha o arquivo <b>/etc/hosts</b>, uma lista local de nome e IP.",
+        "<b>dig</b> e <b>nslookup</b> perguntam direto ao servidor DNS e <b>ignoram</b> o /etc/hosts.",
+        "<b>getent hosts</b> mostra o que o sistema realmente usa (hosts e depois DNS), igual ao ping e ao navegador.",
+        "Se o dig dá um IP e o getent dá outro, o culpado está no <b>/etc/hosts</b>."
+      ],
+      "tip": "Compare dig (só DNS) com getent hosts (o que o PC usa). Se forem diferentes, olhe o /etc/hosts.",
+      "learn": "O Linux resolve nomes primeiro pelo /etc/hosts e depois pelo DNS (ordem do /etc/nsswitch.conf). Uma linha esquecida no hosts passa na frente do DNS só naquela máquina. dig e nslookup testam o DNS; getent hosts mostra o que o sistema realmente usa.",
+      "cmds": [
+        {
+          "c": "dig +short erp.empresa.com.br",
+          "alias": [
+            "dig erp.empresa.com.br"
+          ],
+          "out": "10.0.0.10",
+          "why": "O dig pergunta direto ao servidor DNS: o ERP está em 10.0.0.10."
+        },
+        {
+          "c": "getent hosts erp.empresa.com.br",
+          "out": "10.0.0.99       erp.empresa.com.br",
+          "why": "O getent mostra o que o sistema usa de verdade. Ele achou 10.0.0.99, diferente do DNS."
+        },
+        {
+          "c": "ping -c 2 erp.empresa.com.br",
+          "alias": [
+            "ping erp.empresa.com.br"
+          ],
+          "out": "PING erp.empresa.com.br (10.0.0.99) 56(84) bytes of data.\nFrom 10.0.5.31 icmp_seq=1 Destination Host Unreachable\nFrom 10.0.5.31 icmp_seq=2 Destination Host Unreachable\n\n--- erp.empresa.com.br ping statistics ---\n2 packets transmitted, 0 received, +2 errors, 100% packet loss",
+          "why": "O ping foi para 10.0.0.99, que não existe mais. O IP certo, pelo DNS, é 10.0.0.10."
+        },
+        {
+          "c": "cat /etc/hosts",
+          "out": "127.0.0.1       localhost\n127.0.1.1       pc-financeiro\n10.0.0.99       erp.empresa.com.br    # teste do servidor antigo",
+          "why": "Achou: uma linha antiga aponta o ERP para 10.0.0.99. O /etc/hosts vem antes do DNS."
+        },
+        {
+          "c": "nslookup erp.empresa.com.br",
+          "out": "Server:         10.0.0.53\nAddress:        10.0.0.53#53\n\nName:   erp.empresa.com.br\nAddress: 10.0.0.10",
+          "why": "Outra forma de perguntar ao DNS. O servidor 10.0.0.53 responde 10.0.0.10, o IP certo."
+        },
+        {
+          "c": "cat /etc/resolv.conf",
+          "out": "nameserver 10.0.0.53",
+          "why": "O DNS configurado é o 10.0.0.53, o mesmo dos outros PCs. O DNS não é o problema."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Qual IP o servidor DNS responde para erp.empresa.com.br?",
+          "a": 0,
+          "o": [
+            "10.0.0.10",
+            {
+              "t": "10.0.0.99",
+              "why": "Esse vem do /etc/hosts. O dig pergunta direto ao DNS e ignora o arquivo."
+            },
+            {
+              "t": "10.0.0.53",
+              "why": "Esse é o endereço do servidor DNS, não a resposta dele."
+            }
+          ],
+          "why": "dig e nslookup mostram a resposta do DNS: 10.0.0.10."
+        },
+        {
+          "q": "Por que o ping deste PC vai para 10.0.0.99?",
+          "a": 0,
+          "o": [
+            "Uma linha antiga no /etc/hosts passa na frente do DNS",
+            {
+              "t": "O servidor DNS está com o IP errado",
+              "why": "O dig e o nslookup mostram 10.0.0.10, o certo. O DNS está bom."
+            },
+            {
+              "t": "O cabo de rede está solto",
+              "why": "Com cabo solto, nem o DNS responderia ao dig."
+            }
+          ],
+          "why": "O sistema consulta o /etc/hosts antes do DNS. A linha de teste esquecida desvia o nome só neste PC."
+        },
+        {
+          "q": "Como resolver?",
+          "a": 0,
+          "o": [
+            "Apagar a linha do ERP no /etc/hosts",
+            {
+              "t": "Trocar o DNS do PC para 8.8.8.8",
+              "why": "O DNS já responde certo. E o /etc/hosts continuaria na frente de qualquer DNS."
+            },
+            {
+              "t": "Reiniciar o roteador",
+              "why": "O problema é um arquivo deste PC. Reiniciar o roteador derruba todo mundo à toa."
+            }
+          ],
+          "why": "Sem a linha antiga, o PC pergunta ao DNS e recebe o IP certo.",
+          "run": "sudo sed -i '/erp.empresa.com.br/d' /etc/hosts && getent hosts erp.empresa.com.br",
+          "out": "10.0.0.10       erp.empresa.com.br"
         }
       ]
     }

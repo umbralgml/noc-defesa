@@ -26,8 +26,8 @@ export async function drawCert(name, ai) {
   x.fillStyle = '#e6f1ff'; x.font = "800 58px Orbitron, sans-serif"; x.fillText('CERTIFICADO DE PLANTÃO', W / 2, 212);
   x.fillStyle = '#8a9bb8'; x.font = '28px system-ui, sans-serif'; x.fillText('Certificamos que', W / 2, 282);
   x.fillStyle = '#ffd166'; fit(x, name, W - 260, 64, '800'); x.fillText(name, W / 2, 362);
-  x.fillStyle = '#c9d6ea'; fit(x, `concluiu o ${a[0]} · ${a[1]}${a[2] ? ` (nível ${a[2]})` : ''}, defendendo a rede em:`, W - 220, 28, '500');
-  x.fillText(`concluiu o ${a[0]} · ${a[1]}${a[2] ? ` (nível ${a[2]})` : ''}, defendendo a rede em:`, W / 2, 422);
+  x.fillStyle = '#c9d6ea'; fit(x, `concluiu ${a[0]} · ${a[1]}${a[2] ? ` (nível ${a[2]})` : ''}, defendendo a rede em:`, W - 220, 28, '500');
+  x.fillText(`concluiu ${a[0]} · ${a[1]}${a[2] ? ` (nível ${a[2]})` : ''}, defendendo a rede em:`, W / 2, 422);
   // fases do ato, em uma ou duas colunas
   const two = lv.length > 4, colW = two ? 520 : 760, rows = two ? Math.ceil(lv.length / 2) : lv.length;
   lv.forEach(([L, i], k) => {
