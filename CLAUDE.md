@@ -82,6 +82,10 @@ src/engine/
   cert.js             certificado PNG por ato concluído (canvas), baixar ou compartilhar
   room.js             sala do NOC no topo do mapa: herói anda (toque/setas), câmera acompanha, estação abre os incidentes do `loc`
 tools/validar-fases.mjs
+privacidade.html      política de privacidade (URL exigida pela Play Store)
+app-android/          app Android com Capacitor: copia o jogo para www/ e empacota no APK (offline). Único lugar com package.json;
+                      o jogo continua sem build. Guia de publicação em app-android/PUBLICAR.md
+.github/workflows/android.yml  compila APK de teste e AAB da Play Store (assinado com os segredos NOC_*)
 docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 ```
 
@@ -127,6 +131,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Modo difícil:** liberado no briefing da fase com 3 estrelas. `S.hard` dobra o dano (`damage()`) e soma um evento do Z3R0. Vencer sem erro grava o título em `noc_gold` (estrela de ouro, destrava a camisa dourada).
 - **Acessibilidade:** todo elemento jogável precisa funcionar com Tab + Enter/espaço. Animação nova deve respeitar a classe `calm` (o CSS já zera animações; pacotes que se movem por transição ficam de fora).
 - **Métricas:** `metric('win'|'fail')` em `rank.js` envia só dados anônimos da fase, e só se o jogador não desligou no perfil (`noc_metricas`).
+- **App Android:** dentro do app (`window.Capacitor`), o `pwa.js` não registra service worker nem mostra "INSTALAR APP", e o botão voltar do Android fecha modal, sai da fase, volta ao início e só então fecha o app. Arquivo novo na raiz que o jogo usa precisa entrar na lista de `app-android/scripts/copiar-web.mjs`.
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
 - **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`, arquitetura completa em `docs/VPS.md`) puxa a `main` a cada 15 minutos e roda o `noc-pos-atualizar` (aplica o `tools/ranking.sql` se ele mudou, com backup antes). Não há outro passo de publicação.
 - **Banco do ranking:** `tools/ranking.sql` precisa ser idempotente (roda de novo a cada mudança, no Supabase e na VPS). O cliente fala com a API REST (PostgREST/Supabase) em `/rest/v1/`; o `sw.js` nunca guarda esse caminho em cache.
