@@ -14,7 +14,7 @@ export function startTrain() {
   const items = bankItems().slice(0, N);
   if (!items.length) return;
   play({ title: 'Treino dos seus erros', tag: 'TREINO', type: 'quiz', loc: 'desk', train: true,
-    qs: items.map(({ q, o, a, why }) => ({ q, o, a, why })), cap: 'Revisando os seus erros...',
+    qs: items.map(({ q, o, a, why, v }) => ({ q, o, a, why, v })), cap: 'Revisando os seus erros...',
     tip: 'Leia a explicação de cada resposta: é ela que fixa o conteúdo. Dois acertos seguidos tiram o item da lista.',
     onWin: () => finish(items) }, 'Treino dos seus erros');
 }

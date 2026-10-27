@@ -87,6 +87,10 @@
       "steps": [
         {
           "q": "Por que o andar 2 está sem rede?",
+          "v": [
+            "O que deixou o andar 2 sem rede?",
+            "Pelo que você viu no terminal, qual a causa da queda do andar 2?"
+          ],
           "a": 0,
           "o": [
             "A Gi1/0/2 foi desligada com shutdown",
@@ -107,6 +111,10 @@
         },
         {
           "q": "Dentro de \"interface Gi1/0/2\", qual comando religa a porta?",
+          "v": [
+            "Já em \"interface Gi1/0/2\", qual comando ativa a porta?",
+            "Qual comando, dentro da interface Gi1/0/2, coloca a porta de volta no ar?"
+          ],
           "a": 0,
           "o": [
             "no shutdown",
@@ -129,6 +137,10 @@
         },
         {
           "q": "Rede de pé. O que impede o Z3R0 de repetir isso?",
+          "v": [
+            "A rede voltou. Como evitar que o Z3R0 faça isso de novo?",
+            "Porta religada. O que fazer para o Z3R0 não entrar no switch outra vez?"
+          ],
           "a": 0,
           "o": [
             "Restringir o acesso VTY com ACL, trocar as credenciais e salvar",
@@ -224,6 +236,10 @@
       "steps": [
         {
           "q": "Por que a internet caiu para todo mundo?",
+          "v": [
+            "Qual o motivo de a internet cair para todos?",
+            "Pelo que você viu no terminal, por que ninguém sai para a internet?"
+          ],
           "a": 0,
           "o": [
             "O roteador não tem mais rota padrão",
@@ -244,6 +260,10 @@
         },
         {
           "q": "Qual comando restaura a saída para a internet?",
+          "v": [
+            "Qual comando devolve a saída para a internet?",
+            "Como recriar a rota padrão para o provedor?"
+          ],
           "a": 0,
           "o": [
             "ip route 0.0.0.0 0.0.0.0 200.1.1.1",
@@ -266,6 +286,10 @@
         },
         {
           "q": "Por que o ping no 200.1.1.1 funcionava mesmo sem rota padrão?",
+          "v": [
+            "Sem rota padrão, por que o ping no 200.1.1.1 ainda respondia?",
+            "Como o 200.1.1.1 respondia ao ping mesmo sem rota padrão configurada?"
+          ],
           "a": 0,
           "o": [
             "Ele está numa rede diretamente conectada (a /30 com o provedor)",

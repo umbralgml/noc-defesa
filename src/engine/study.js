@@ -1,6 +1,6 @@
 // Estudo: aula em cartões com checagem no briefing, e o modal de estudo do mapa
 // (biblioteca com as aulas das fases liberadas + glossário completo).
-import { $, store, esc } from './util.js';
+import { $, store, esc, shuffle, vary, missN, missInc } from './util.js';
 import { LEVELS, ACTS, unlocked } from './state.js';
 import { flow, modal, closeModal, linkGloss } from './ui.js';
 import { GLOSS } from './glossary.js';
@@ -30,23 +30,31 @@ export function initCards(L) {
     } else check();
   };
   const check = () => {
-    const q = L.check;
     $('lcNext').hidden = true;
     $('lcB').innerHTML = `<div class="lcq"><span class="lh">VERIFIQUE SE ENTENDEU</span><div class="q"></div><div class="lco"></div><div class="lcw" id="lcW"></div></div>`;
-    $('lcB').querySelector('.q').textContent = q.q;
     let tries = 0;
-    q.o.map((o, i) => ({ ...opt(o), ok: i === q.a })).sort(() => Math.random() - .5).forEach(o => {
-      const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.t;
-      b.onclick = () => {
-        tries++;
-        if (!o.ok) { b.disabled = true; b.classList.add('wrong'); sfx.bad(); $('lcW').textContent = (o.why || q.why) + ' Tente de novo.'; return; }
-        $('lcB').querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x === b) x.classList.add('right'); });
-        $('lcW').textContent = q.why; sfx.ok(1);
-        const done = store('noc_check') || {};
-        if (tries === 1 && !done[L.title]) { done[L.title] = 1; store('noc_check', done); addXP(5); $('lcW').textContent += ' +5 XP'; }
-      };
-      $('lcB').querySelector('.lco').append(b);
-    });
+    const bad = new Set(), key = `${L.title}|check`;
+    // Errou: a pergunta volta reescrita (campo "v") e com as opções em outra ordem.
+    const draw = () => {
+      const box = $('lcB') && $('lcB').querySelector('.lco'); if (!box) return;
+      const q = vary(L.check, missN(key));
+      $('lcB').querySelector('.q').textContent = q.q; box.innerHTML = '';
+      shuffle(q.o.map((o, i) => ({ ...opt(o), ok: i === q.a }))).forEach(o => {
+        const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.t;
+        if (bad.has(o.t)) { b.disabled = true; b.classList.add('wrong'); }
+        b.onclick = () => {
+          tries++;
+          box.querySelectorAll('.opt').forEach(x => { x.disabled = true; });
+          if (!o.ok) { b.classList.add('wrong'); bad.add(o.t); missInc(key); sfx.bad(); $('lcW').textContent = (o.why || q.why) + ' Tente de novo: a pergunta mudou um pouco e as opções trocaram de lugar.'; setTimeout(draw, 900); return; }
+          b.classList.add('right');
+          $('lcW').textContent = q.why; sfx.ok(1);
+          const done = store('noc_check') || {};
+          if (tries === 1 && !done[L.title]) { done[L.title] = 1; store('noc_check', done); addXP(5); $('lcW').textContent += ' +5 XP'; }
+        };
+        box.append(b);
+      });
+    };
+    draw();
   };
   $('lcPrev').onclick = () => { if (k > 0) { k--; show(); } };
   $('lcNext').onclick = () => { if (k < total - 1) { k++; show(); } };

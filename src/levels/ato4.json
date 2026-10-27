@@ -490,6 +490,10 @@
       "qs": [
         {
           "q": "Quantos hosts úteis tem uma /27?",
+          "v": [
+            "Uma /27 tem quantos endereços utilizáveis por hosts?",
+            "Quantos hosts cabem numa sub-rede /27?"
+          ],
           "o": [
             "30",
             {
@@ -510,6 +514,10 @@
         },
         {
           "q": "Qual a wildcard de uma /22?",
+          "v": [
+            "Qual a máscara curinga (wildcard) de uma /22?",
+            "Para uma ACL de /22, qual wildcard usar?"
+          ],
           "o": [
             "0.0.3.255",
             {
@@ -530,6 +538,10 @@
         },
         {
           "q": "O BGP estabelece sessão em qual porta?",
+          "v": [
+            "Qual protocolo e porta o BGP usa para formar a sessão?",
+            "A sessão BGP sobe em qual porta?"
+          ],
           "o": [
             "TCP 179",
             {
@@ -550,6 +562,10 @@
         },
         {
           "q": "Qual flag TCP inicia uma conexão?",
+          "v": [
+            "Qual flag TCP abre uma conexão?",
+            "O primeiro segmento de uma conexão TCP leva qual flag?"
+          ],
           "o": [
             "SYN",
             {
@@ -570,6 +586,10 @@
         },
         {
           "q": "Um switch L2 encaminha quadros em qual camada OSI?",
+          "v": [
+            "Em qual camada do modelo OSI o switch L2 encaminha quadros?",
+            "Switch de camada 2 trabalha em qual camada OSI?"
+          ],
           "o": [
             "Enlace (2)",
             {
@@ -590,6 +610,10 @@
         },
         {
           "q": "Qual é a faixa reservada para CGNAT?",
+          "v": [
+            "Qual bloco foi reservado para CGNAT?",
+            "Que faixa de endereços é destinada ao CGNAT (RFC 6598)?"
+          ],
           "o": [
             "100.64.0.0/10",
             {
@@ -610,6 +634,10 @@
         },
         {
           "q": "Qual protocolo descobre o MAC a partir do IP no IPv4?",
+          "v": [
+            "No IPv4, qual protocolo descobre o MAC de um IP?",
+            "Qual protocolo do IPv4 traduz IP em endereço MAC na rede local?"
+          ],
           "o": [
             "ARP",
             {
@@ -630,6 +658,10 @@
         },
         {
           "q": "E no IPv6, quem faz esse papel?",
+          "v": [
+            "No IPv6, qual protocolo substitui o ARP?",
+            "Qual mecanismo descobre o MAC dos vizinhos no IPv6?"
+          ],
           "o": [
             "NDP (Neighbor Discovery)",
             {
@@ -650,6 +682,10 @@
         },
         {
           "q": "Melhor prática para acesso de gerência aos equipamentos?",
+          "v": [
+            "Qual a melhor prática para acessar a gerência dos equipamentos?",
+            "Como liberar o acesso de gerência aos equipamentos com segurança?"
+          ],
           "o": [
             "SSH com chave e ACL restringindo a origem",
             {
@@ -670,6 +706,10 @@
         },
         {
           "q": "Qual ataque envenena a tabela ARP para ficar no meio do tráfego?",
+          "v": [
+            "Qual ataque falsifica respostas ARP para se colocar no meio da comunicação?",
+            "Envenenar a tabela ARP para interceptar o tráfego é qual ataque?"
+          ],
           "o": [
             "ARP spoofing (MITM)",
             {

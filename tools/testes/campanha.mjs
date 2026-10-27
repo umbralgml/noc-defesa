@@ -93,7 +93,13 @@ try {
       await p.click('.cmd >> nth=0'); await p.click('.cmd >> nth=1');
       for (const [k, q] of L.steps.entries()) {
         await p.waitForSelector('#tstep .opt:not([disabled])');
-        if (mistake && k === 0) await p.evaluate(t => [...document.querySelectorAll('#tstep .opt')].find(b => b.textContent !== t).click(), txt(q.o[q.a]));
+        if (mistake && k === 0) {
+          await p.evaluate(t => [...document.querySelectorAll('#tstep .opt')].find(b => b.textContent !== t).click(), txt(q.o[q.a]));
+          // depois do erro a pergunta volta reescrita (campo "v"), com a opção errada riscada
+          await p.waitForTimeout(1300); await p.waitForSelector('#tstep .opt:not([disabled])');
+          const shown = await p.textContent('#tstep .q');
+          if (q.v && shown === q.q) throw new Error(`"${L.title}": a pergunta não mudou depois do erro`);
+        }
         await p.evaluate(t => [...document.querySelectorAll('#tstep .opt')].find(b => b.textContent === t).click(), txt(q.o[q.a]));
         await p.waitForTimeout(1000);
       }

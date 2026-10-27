@@ -190,6 +190,10 @@
       "steps": [
         {
           "q": "Qual serviço está exposto para a internet sem precisar?",
+          "v": [
+            "Qual serviço está aberto para a internet sem necessidade?",
+            "Pela saída, qual serviço ficou acessível de fora sem precisar?"
+          ],
           "a": 0,
           "o": [
             "MySQL na porta 3306, escutando em 0.0.0.0",
@@ -210,6 +214,10 @@
         },
         {
           "q": "Por que o Redis, na 6379, não é problema aqui?",
+          "v": [
+            "Por que o Redis na porta 6379 não representa risco aqui?",
+            "O Redis está na 6379. Por que ele não está exposto?"
+          ],
           "a": 0,
           "o": [
             "Ele escuta só em 127.0.0.1, então só a própria máquina acessa",
@@ -230,6 +238,10 @@
         },
         {
           "q": "Como fechar o MySQL para a internet sem derrubar o site?",
+          "v": [
+            "Como tirar o MySQL da internet sem derrubar o site?",
+            "Qual ajuste fecha o MySQL para fora e mantém o site funcionando?"
+          ],
           "a": 0,
           "o": [
             "Configurar bind-address = 127.0.0.1 e reiniciar o MySQL",
@@ -252,6 +264,10 @@
         },
         {
           "q": "E a segunda camada de defesa?",
+          "v": [
+            "Qual seria a segunda camada de proteção?",
+            "Além de ajustar o serviço, que defesa adicional colocar?"
+          ],
           "a": 0,
           "o": [
             "Ligar o ufw negando entrada por padrão e liberando só 22, 80 e 443",
@@ -335,6 +351,10 @@
       "steps": [
         {
           "q": "O que está acontecendo?",
+          "v": [
+            "Pelo que o terminal mostra, o que está acontecendo?",
+            "Pelo que você viu no terminal, qual é a situação do dns01?"
+          ],
           "a": 0,
           "o": [
             "O dns01 é um resolvedor aberto usado para amplificar um DDoS contra 203.0.113.77",
@@ -355,6 +375,10 @@
         },
         {
           "q": "Qual correção resolve na origem?",
+          "v": [
+            "Qual correção resolve o problema na origem?",
+            "O que mudar no dns01 para ele parar de servir de amplificador?"
+          ],
           "a": 0,
           "o": [
             "Limitar a recursão à rede interna: allow-recursion { 127.0.0.1; 10.0.0.0/8; };",
@@ -377,6 +401,10 @@
         },
         {
           "q": "Por que a vítima recebe o tráfego, se as perguntas vieram \"dela\"?",
+          "v": [
+            "As perguntas parecem vir da vítima. Por que ela recebe as respostas?",
+            "Se quem perguntou foi \"a vítima\", por que ela é atacada pelas respostas?"
+          ],
           "a": 0,
           "o": [
             "O atacante forjou o IP de origem, e as respostas vão para o dono desse IP",
@@ -457,6 +485,10 @@
       "steps": [
         {
           "q": "O que aconteceu?",
+          "v": [
+            "Pelas evidências, o que aconteceu no servidor?",
+            "Pelo que você investigou no terminal, qual foi o ataque?"
+          ],
           "a": 0,
           "o": [
             "A força bruta descobriu a senha da conta deploy, e o Z3R0 deixou uma chave para voltar",
@@ -477,6 +509,10 @@
         },
         {
           "q": "Qual é a primeira ação de contenção?",
+          "v": [
+            "Qual a primeira medida de contenção?",
+            "O invasor ainda está lá. O que fazer primeiro para contê-lo?"
+          ],
           "a": 0,
           "o": [
             "Derrubar a sessão do invasor e bloquear o IP 45.67.89.10",
@@ -499,6 +535,10 @@
         },
         {
           "q": "E para fechar a porta de vez?",
+          "v": [
+            "Como impedir que ele volte?",
+            "Contido o ataque, o que fazer para fechar o acesso de vez?"
+          ],
           "a": 0,
           "o": [
             "Remover a chave z3r0@kali, travar a senha do deploy e desligar login por senha e de root",

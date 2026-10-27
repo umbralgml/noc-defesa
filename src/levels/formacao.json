@@ -41,6 +41,10 @@
       ],
       "check": {
         "q": "Qual a máscara da /24?",
+        "v": [
+          "A máscara /24 equivale a qual máscara decimal?",
+          "Escrita em decimal, como fica a máscara de uma rede /24?"
+        ],
         "a": 0,
         "o": [
           "255.255.255.0",
@@ -157,6 +161,10 @@
       ],
       "check": {
         "q": "Qual protocolo confirma a entrega e reenvia o que se perdeu?",
+        "v": [
+          "Qual protocolo de transporte garante a entrega e retransmite o que se perdeu?",
+          "Qual protocolo confirma o recebimento dos dados e reenvia o que faltou?"
+        ],
         "a": 0,
         "o": [
           "TCP",
@@ -250,6 +258,10 @@
       ],
       "check": {
         "q": "Qual a distância máxima de um cabo de rede de cobre (RJ45)?",
+        "v": [
+          "Qual o comprimento máximo de um cabo de par trançado com conector RJ45?",
+          "Até quantos metros pode ir um cabo de rede de cobre (RJ45) sem equipamento no meio?"
+        ],
         "a": 0,
         "o": [
           "100 metros",
@@ -355,6 +367,10 @@
       ],
       "check": {
         "q": "Para que serve o ARP?",
+        "v": [
+          "Qual a função do ARP?",
+          "O que o ARP faz na rede local?"
+        ],
         "a": 0,
         "o": [
           "Descobrir o MAC de um IP na rede local",
@@ -484,6 +500,10 @@
       ],
       "check": {
         "q": "Como a internet enxerga um PC com IP 192.168.0.10 atrás do NAT?",
+        "v": [
+          "Um PC com 192.168.0.10 navega atrás do NAT. Qual IP a internet vê?",
+          "Atrás do NAT, com qual endereço o PC 192.168.0.10 aparece para os sites na internet?"
+        ],
         "a": 0,
         "o": [
           "Com o IP público do roteador",
@@ -593,6 +613,10 @@
       ],
       "check": {
         "q": "Qual é a primeira coisa a conferir num chamado \"sem internet\"?",
+        "v": [
+          "Chamado \"sem internet\": qual a primeira verificação a fazer?",
+          "O usuário diz que está sem internet. O que conferir antes de tudo?"
+        ],
         "a": 0,
         "o": [
           "Se o PC tem um IP válido (ip a)",
@@ -657,6 +681,10 @@
       "steps": [
         {
           "q": "O que o IP 169.254.23.7 indica?",
+          "v": [
+            "O que significa o PC estar com o IP 169.254.23.7?",
+            "Um IP 169.254.x.x no PC indica o quê?"
+          ],
           "a": 0,
           "o": [
             "O PC não recebeu IP do DHCP e se deu um endereço link-local",
@@ -673,6 +701,10 @@
         },
         {
           "q": "O log mostra \"No DHCPOFFERS received\" e o cabo está UP. O que fazer?",
+          "v": [
+            "Cabo UP, mas o log mostra \"No DHCPOFFERS received\". Qual o próximo passo?",
+            "Ninguém respondeu ao pedido de DHCP e o link físico está ok. O que você faz?"
+          ],
           "a": 0,
           "o": [
             "Escalar para o N2: o servidor DHCP não está respondendo",
@@ -689,6 +721,10 @@
         },
         {
           "q": "O N2 religou o DHCP. Como pedir um IP de novo no PC?",
+          "v": [
+            "Com o DHCP de volta, qual comando faz o PC pedir um IP de novo?",
+            "O servidor DHCP voltou. Como renovar o IP do PC agora?"
+          ],
           "a": 0,
           "o": [
             "sudo dhclient -v eth0",

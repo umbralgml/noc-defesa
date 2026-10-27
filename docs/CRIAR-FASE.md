@@ -233,9 +233,16 @@ Perguntas de múltipla escolha. As opções são embaralhadas na tela.
 | `o` | opções: `"texto"` ou `{ "t": "texto", "why": "por que está errada" }` |
 | `a` | índice da opção correta em `o` (começa em 0) |
 | `why` | explicação da resposta certa, mostrada sempre |
+| `v` | opcional, recomendado: lista de variações da pergunta. Cada item é um texto (só reescreve o `q`) ou `{ "q", "o"?, "a"?, "why"? }` para trocar também opções e resposta. Cada vez que o jogador erra a pergunta, ela volta na variação seguinte |
 | `dailyFrom` | opcional, `AAAA-MM-DD`: as perguntas só entram no sorteio do desafio diário a partir dessa data (use o dia seguinte ao da publicação, para não mudar o desafio do dia) |
 | `boss` | opcional, `true` transforma em chefe: barra de vida do Z3R0, precisa acertar 70% e cada erro custa 20% |
 | `time` | obrigatório com `boss`: segundos por pergunta |
+
+As perguntas da fase também mudam de ordem a cada partida (menos no desafio diário e no treino). O campo `v` vale igual para os passos de diagnóstico (`steps` do `term` e do `topo`) e para o `check` da aula: nesses, depois de um erro a mesma pergunta volta reescrita, com as opções em outra ordem e a errada riscada.
+
+```json
+{ "q": "Qual a porta padrão do HTTPS?", "v": ["O HTTPS usa qual porta por padrão?", "Qual protocolo e porta padrão o HTTPS usa?"], "o": ["TCP 443", { "t": "TCP 80", "why": "80 é o HTTP sem criptografia." }], "a": 0, "why": "HTTPS é HTTP sobre TLS, na porta TCP 443." }
+```
 
 Quando o jogador erra, aparece o `why` da pergunta e, embaixo, **"Sobre a sua resposta"** com o `why` da opção escolhida. Toda opção errada deve ter um `why`.
 

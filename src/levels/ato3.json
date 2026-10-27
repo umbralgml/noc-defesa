@@ -250,6 +250,10 @@
       "steps": [
         {
           "q": "Por que o enlace reserva (Gi0/2) não salvou o andar 3?",
+          "v": [
+            "Se havia enlace reserva (Gi0/2), por que o andar 3 caiu?",
+            "O andar 3 tinha um segundo uplink. Por que ele não assumiu?"
+          ],
           "o": [
             "A porta reserva estava em shutdown: redundância desligada não protege",
             {
@@ -266,6 +270,10 @@
         },
         {
           "q": "Pelo cabo de console do SW-ANDAR3, como religar a porta reserva Gi0/2?",
+          "v": [
+            "No console do SW-ANDAR3, quais comandos religam a Gi0/2?",
+            "Conectado pelo console do SW-ANDAR3, como reativar a porta reserva Gi0/2?"
+          ],
           "o": [
             "interface gi0/2 e depois no shutdown",
             {
@@ -284,6 +292,10 @@
         },
         {
           "q": "Para o próximo corte não derrubar o andar, o certo é:",
+          "v": [
+            "Para um próximo corte não derrubar o andar, qual a melhor prática?",
+            "Como deixar o andar 3 protegido de verdade contra a queda de um uplink?"
+          ],
           "o": [
             "Deixar os dois uplinks ligados com STP (ou agregação LACP) e monitorar os dois",
             {
@@ -400,6 +412,10 @@
       "qs": [
         {
           "q": "Você anuncia 177.10.0.0/22. O Z3R0 anuncia 177.10.1.0/24 de outro AS. Para onde vai o tráfego destinado a 177.10.1.5?",
+          "v": [
+            "Você anuncia 177.10.0.0/22 e o Z3R0 anuncia 177.10.1.0/24 de outro AS. O tráfego para 177.10.1.5 vai para onde?",
+            "Seu /22 contra o /24 do Z3R0 dentro dele. Quem recebe o tráfego para 177.10.1.5?"
+          ],
           "o": [
             "Para o Z3R0, porque o /24 é mais específico",
             {
@@ -420,6 +436,10 @@
         },
         {
           "q": "O Z3R0 pode forjar o seu AS como origem. Qual ROA faz um /24 dentro do seu /22 ser marcado como inválido mesmo assim?",
+          "v": [
+            "Mesmo com o Z3R0 forjando seu AS de origem, qual ROA torna inválido um /24 dentro do seu /22?",
+            "Qual ROA faz qualquer /24 tirado do seu /22 ser marcado inválido, mesmo com o seu AS forjado na origem?"
+          ],
           "o": [
             "ROA 177.10.0.0/22 com maxLength /22",
             {
@@ -440,6 +460,10 @@
         },
         {
           "q": "Se o Z3R0 anunciar o /22 forjando o SEU AS como origem, o RPKI ROV detecta?",
+          "v": [
+            "O Z3R0 anuncia o seu /22 com o SEU AS forjado como origem. O RPKI ROV pega isso?",
+            "Rota com prefixo e AS de origem iguais aos seus, mas vinda pelo Z3R0. O ROV marca como inválida?"
+          ],
           "o": [
             "Não. ROV só valida origem e tamanho, não o caminho",
             {
@@ -460,6 +484,10 @@
         },
         {
           "q": "Seu cliente BGP vazou a tabela completa (900 mil rotas) pra você. O que teria derrubado a sessão antes do estrago?",
+          "v": [
+            "Um cliente BGP te mandou a tabela completa (900 mil rotas) por engano. Que configuração teria derrubado a sessão antes?",
+            "Vazamento de tabela inteira por um cliente BGP. Qual proteção na sessão teria evitado o estrago?"
+          ],
           "o": [
             "maximum-prefix na sessão do cliente",
             {

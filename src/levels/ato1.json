@@ -41,6 +41,10 @@
       ],
       "check": {
         "q": "Um transceiver 10GBASE-LR combina com qual cabo?",
+        "v": [
+          "Qual tipo de cabo usar com um transceiver 10GBASE-LR?",
+          "O módulo 10GBASE-LR foi feito para qual meio físico?"
+        ],
         "a": 0,
         "o": [
           "Fibra monomodo",
@@ -152,6 +156,10 @@
       ],
       "check": {
         "q": "O endereço 172.20.5.1 é:",
+        "v": [
+          "Como se classifica o endereço 172.20.5.1?",
+          "O IP 172.20.5.1 é público ou privado?"
+        ],
         "a": 0,
         "o": [
           "Privado",
@@ -256,6 +264,10 @@
       ],
       "check": {
         "q": "Para dividir uma /24 em 4 sub-redes iguais, qual a nova máscara?",
+        "v": [
+          "Dividindo uma /24 em 4 sub-redes do mesmo tamanho, qual máscara cada uma terá?",
+          "Uma /24 precisa virar 4 sub-redes iguais. Qual o novo prefixo?"
+        ],
         "a": 0,
         "o": [
           "/26",
@@ -406,6 +418,10 @@
       ],
       "check": {
         "q": "O ping até o roteador volta, mas até o servidor não. Onde procurar?",
+        "v": [
+          "O roteador responde ao ping, o servidor não. Em que trecho procurar a falha?",
+          "O ping chega até o roteador, mas não até o servidor. Onde investigar?"
+        ],
         "a": 0,
         "o": [
           "Entre o roteador e o servidor",
@@ -537,6 +553,10 @@
       "steps": [
         {
           "q": "Roteador e internet respondem; SW-DC e servidores não. O que isso indica?",
+          "v": [
+            "Roteador e internet respondem, mas SW-DC e servidores não. Onde está a falha?",
+            "O ping para no SW-DC: tudo depois dele cai, tudo antes responde. O que isso mostra?"
+          ],
           "o": [
             "A falha está entre o roteador e o SW-DC",
             {
@@ -553,6 +573,10 @@
         },
         {
           "q": "No rack, o LED da porta do uplink está apagado. Qual o primeiro passo?",
+          "v": [
+            "O LED do uplink no rack está apagado. O que fazer primeiro?",
+            "Porta do uplink sem luz no rack. Qual a primeira ação?"
+          ],
           "o": [
             "Conferir o cabo e reconectar: camada física primeiro",
             {
@@ -591,6 +615,10 @@
       ],
       "check": {
         "q": "Qual a porta padrão do HTTPS?",
+        "v": [
+          "O HTTPS usa qual porta por padrão?",
+          "Qual protocolo e porta padrão o HTTPS usa?"
+        ],
         "a": 0,
         "o": [
           "TCP 443",
