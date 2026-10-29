@@ -25,6 +25,7 @@ function check(L, where, diffN = 9) {
   if (!L.lesson || !L.lesson.length) warn('sem "lesson" (aula rápida do briefing)');
   if (L.check) {
     const q = L.check;
+    checkVar(q, 'check', err);
     if (!q.q || !q.why || !Array.isArray(q.o) || q.o.length < 2 || !(q.a >= 0 && q.a < q.o.length)) err('"check" precisa de "q", "o" (2+), "a" e "why"');
     else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`check: opção errada "${txt(o)}" sem "why"`); });
   } else if (diffN <= 1 && !L.tutorial) warn('fase iniciante/básico sem "check" (pergunta de checagem depois da aula)');
@@ -60,6 +61,7 @@ function check(L, where, diffN = 9) {
     if ((L.boss || L.miniboss) && L.type === 'quiz' && !L.time) err('chefe precisa de "time" (segundos por pergunta)');
     (L.qs || []).forEach((q, i) => {
       if (!q.q || !q.why) err(`pergunta ${i + 1} sem "q" ou "why"`);
+      checkVar(q, `pergunta ${i + 1}`, err);
       if (!Array.isArray(q.o) || q.o.length < 2) err(`pergunta ${i + 1} precisa de 2+ opções`);
       else if (!(q.a >= 0 && q.a < q.o.length)) err(`pergunta ${i + 1}: "a" = ${q.a} fora das opções`);
       else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`pergunta ${i + 1}: opção errada "${txt(o)}" sem "why"`); });
@@ -115,9 +117,22 @@ function check(L, where, diffN = 9) {
   } else err(`tipo "${L.type}"${L.mode ? '/' + L.mode : ''} desconhecido`);
 }
 
+// Campo "v": variações da pergunta, mostradas depois de um erro. Texto ou { q, o?, a?, why? }.
+function checkVar(q, lab, err) {
+  if (q.v === undefined) return;
+  if (!Array.isArray(q.v) || !q.v.length) { err(`${lab}: "v" precisa ser uma lista de variações`); return; }
+  q.v.forEach((x, k) => {
+    const t = typeof x === 'string' ? x : x && x.q;
+    if (!t || !String(t).trim()) err(`${lab}: variação ${k + 1} sem texto`);
+    if (t === q.q) err(`${lab}: variação ${k + 1} igual à pergunta original`);
+    if (x && typeof x === 'object' && x.o !== undefined && (!Array.isArray(x.o) || x.o.length < 2 || !(x.a >= 0 && x.a < x.o.length))) err(`${lab}: variação ${k + 1} com "o" precisa de 2+ opções e "a" válido`);
+  });
+}
+
 function checkSteps(steps, err, warn) {
     steps.forEach((q, i) => {
       if (!q.q || !q.why) err(`passo ${i + 1} sem "q" ou "why"`);
+      checkVar(q, `passo ${i + 1}`, err);
       if (!Array.isArray(q.o) || q.o.length < 2 || !(q.a >= 0 && q.a < q.o.length)) err(`passo ${i + 1}: opções ou "a" inválidos`);
       else q.o.forEach((o, k) => { if (k !== q.a && !hasWhy(o)) warn(`passo ${i + 1}: opção errada "${txt(o)}" sem "why"`); });
     });

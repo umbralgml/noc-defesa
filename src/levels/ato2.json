@@ -36,6 +36,10 @@
       ],
       "check": {
         "q": "Numa política de lista de permissões, o que acontece com o que não está escrito?",
+        "v": [
+          "Num firewall com lista de permissões, o que acontece com o tráfego que não está nas regras?",
+          "Política de lista de permissões: o que não foi liberado explicitamente é..."
+        ],
         "a": 0,
         "o": [
           "É bloqueado",
@@ -119,6 +123,10 @@
       ],
       "check": {
         "q": "O firewall lê as regras de cima para baixo. O que acontece na primeira que casar?",
+        "v": [
+          "As regras do firewall são lidas de cima para baixo. Quando uma casa com o pacote, o que acontece?",
+          "O pacote casou com a terceira regra da lista. O que o firewall faz?"
+        ],
         "a": 0,
         "o": [
           "Ele aplica essa regra e para de ler",
@@ -212,6 +220,10 @@
       ],
       "check": {
         "q": "Na reflexão NTP, como o ataque chega até você?",
+        "v": [
+          "Num ataque de reflexão NTP, como o tráfego chega na vítima?",
+          "Na reflexão NTP, qual o protocolo e a porta de origem do tráfego que inunda a vítima?"
+        ],
         "a": 0,
         "o": [
           "UDP com porta de origem 123",
@@ -322,6 +334,10 @@
       ],
       "check": {
         "q": "Qual é a ordem do handshake TCP?",
+        "v": [
+          "Em que sequência acontece o handshake de três vias do TCP?",
+          "Para abrir uma conexão TCP, qual a ordem das mensagens?"
+        ],
         "a": 0,
         "o": [
           "SYN, SYN-ACK, ACK",
@@ -503,6 +519,10 @@
       ],
       "check": {
         "q": "Chegam 80 Gbps num link de 10 Gbps. Onde o tráfego precisa ser descartado?",
+        "v": [
+          "80 Gbps de ataque contra um link de 10 Gbps. Em que ponto o tráfego tem que ser descartado?",
+          "O ataque é 8 vezes maior que o seu link. Onde ele precisa ser barrado?"
+        ],
         "a": 0,
         "o": [
           "Antes do seu link, no provedor (RTBH ou scrubbing)",
@@ -522,6 +542,10 @@
       "qs": [
         {
           "q": "O servidor recebe milhões de SYN sem completar o handshake e a tabela de conexões lotou. Mitigação mais direta no host?",
+          "v": [
+            "Milhões de SYN sem handshake completo lotaram a tabela de conexões do servidor. O que fazer no próprio host?",
+            "SYN flood: o servidor não aguenta mais conexões pela metade. Qual a mitigação mais direta nele?"
+          ],
           "o": [
             "Habilitar SYN cookies",
             {
@@ -542,6 +566,10 @@
         },
         {
           "q": "Chegam 80 Gbps de lixo contra um único IP de cliente num uplink de 10G. O que salva o resto da rede?",
+          "v": [
+            "Um uplink de 10G recebe 80 Gbps de lixo mirando um único IP de cliente. O que protege o resto da rede?",
+            "Ataque de 80 Gbps contra um só cliente num uplink de 10G. Qual ação salva os demais clientes?"
+          ],
           "o": [
             "RTBH: anunciar o /32 com community de blackhole pro upstream",
             {
@@ -562,6 +590,10 @@
         },
         {
           "q": "Qual community BGP padronizada pela RFC 7999 sinaliza blackhole?",
+          "v": [
+            "A RFC 7999 padronizou qual community BGP para blackhole?",
+            "Qual community BGP bem conhecida pede blackhole ao upstream (RFC 7999)?"
+          ],
           "o": [
             "65535:666",
             {
@@ -582,6 +614,10 @@
         },
         {
           "q": "Numa amplificação DNS, qual a porta de ORIGEM do tráfego que chega na vítima?",
+          "v": [
+            "Na amplificação DNS, o tráfego que atinge a vítima vem de qual porta de origem?",
+            "Amplificação DNS: qual a porta de ORIGEM das respostas que chegam à vítima?"
+          ],
           "o": [
             "UDP 53",
             {
@@ -602,6 +638,10 @@
         },
         {
           "q": "Que recurso descarta pacotes com IP de origem forjado, sem rota de volta pela interface de entrada?",
+          "v": [
+            "Qual recurso descarta pacotes com origem falsificada, verificando se há rota de volta pela interface de entrada?",
+            "Qual recurso do roteador barra IP de origem forjado checando a rota de volta pela interface onde o pacote entrou?"
+          ],
           "o": [
             "uRPF",
             {
@@ -642,6 +682,10 @@
       ],
       "check": {
         "q": "O que é um falso positivo no firewall?",
+        "v": [
+          "No firewall, o que é um falso positivo?",
+          "Quando o firewall erra contra quem não devia, temos um falso positivo. O que é isso?"
+        ],
         "a": 0,
         "o": [
           "Bloquear um cliente legítimo",

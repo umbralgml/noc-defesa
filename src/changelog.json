@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "v": "1.19",
+      "date": "2026-10-27",
+      "title": "Decoreba não passa",
+      "items": [
+        "Errou uma pergunta? Ela volta reescrita: entender o conceito vale mais que lembrar a frase",
+        "No terminal e na topologia, depois de um erro as opções trocam de lugar e a errada fica riscada",
+        "As perguntas dos quizzes mudam de ordem a cada partida",
+        "A pergunta de checagem da aula também muda depois de um erro",
+        "O treino dos seus erros usa as perguntas reescritas"
+      ]
+    },
+    {
       "v": "1.18",
       "date": "2026-10-04",
       "title": "Aula que fica",

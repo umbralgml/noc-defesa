@@ -44,6 +44,10 @@
       ],
       "check": {
         "q": "Qual equipamento liga redes diferentes, como a rede da empresa e a internet?",
+        "v": [
+          "Qual equipamento conecta a rede da empresa à internet, ligando redes diferentes?",
+          "Para sair da rede local e chegar a outra rede, como a internet, os pacotes passam por qual equipamento?"
+        ],
         "a": 0,
         "o": [
           "Roteador",
@@ -146,6 +150,10 @@
       ],
       "check": {
         "q": "Em que camada fica a porta (como a 443)?",
+        "v": [
+          "Um número de porta, como o 443, pertence a qual camada?",
+          "O HTTPS usa a porta 443. Essa informação de porta é tratada em qual camada?"
+        ],
         "a": 0,
         "o": [
           "Transporte",
@@ -260,6 +268,10 @@
       ],
       "check": {
         "q": "Qual destes é um endereço MAC?",
+        "v": [
+          "Entre as opções, qual tem o formato de um endereço MAC?",
+          "Endereço MAC é o endereço físico da placa de rede. Qual destes é um?"
+        ],
         "a": 0,
         "o": [
           "3c:22:fb:11:0a:7e",
@@ -357,6 +369,10 @@
       ],
       "check": {
         "q": "Quanto vale 10000001 em decimal?",
+        "v": [
+          "Convertendo o binário 10000001 para decimal, qual o resultado?",
+          "O octeto 10000001 vale quanto em decimal?"
+        ],
         "a": 0,
         "o": [
           "129",
@@ -463,6 +479,10 @@
       ],
       "check": {
         "q": "O ping no gateway responde, mas no 8.8.8.8 não. Onde está o problema?",
+        "v": [
+          "O gateway responde ao ping, mas o 8.8.8.8 não. Em que parte está a falha?",
+          "A rede local está ok (gateway responde), mas nada na internet responde. Onde está o problema?"
+        ],
         "a": 0,
         "o": [
           "Na saída para a internet",
@@ -482,6 +502,10 @@
       "qs": [
         {
           "q": "Você deu ping no servidor e recebeu \"Request timed out\" (tempo esgotado). O que isso indica?",
+          "v": [
+            "O ping no servidor só mostra \"Request timed out\". O que isso quer dizer?",
+            "Todas as linhas do ping retornaram \"tempo esgotado\". O que aconteceu com os pacotes?"
+          ],
           "a": 0,
           "o": [
             "Nenhuma resposta voltou: o servidor pode estar desligado, fora da rede ou bloqueando ping",
@@ -502,6 +526,10 @@
         },
         {
           "q": "Num resultado de ping aparece \"time=15 ms\". O que é esse número?",
+          "v": [
+            "O ping mostra \"time=15 ms\". O que esses 15 ms medem?",
+            "No resultado do ping, o que significa o valor \"time=15 ms\"?"
+          ],
           "a": 0,
           "o": [
             "O tempo que o pacote levou para ir e voltar",
@@ -522,6 +550,10 @@
         },
         {
           "q": "O que é o gateway padrão de um computador?",
+          "v": [
+            "Na configuração de rede do PC, o que é o gateway padrão?",
+            "Quando o PC precisa falar com outra rede, para qual equipamento ele envia os pacotes? Esse é o gateway padrão, que é:"
+          ],
           "a": 0,
           "o": [
             "O equipamento, geralmente o roteador, por onde saem os pacotes para outras redes",
@@ -542,6 +574,10 @@
         },
         {
           "q": "ping 8.8.8.8 responde, mas ping google.com dá erro. Onde está o problema mais provável?",
+          "v": [
+            "O ping no IP 8.8.8.8 funciona, mas ping google.com falha. Qual a causa mais provável?",
+            "Pelo IP a internet responde; pelo nome, não. O que provavelmente está com problema?"
+          ],
           "a": 0,
           "o": [
             "No DNS, que traduz o nome em IP",
@@ -582,6 +618,10 @@
       ],
       "check": {
         "q": "O PC ficou com IP 169.254.10.5. O que aconteceu?",
+        "v": [
+          "Um PC aparece com o IP 169.254.10.5. O que isso indica?",
+          "Endereço 169.254.x.x no PC significa o quê?"
+        ],
         "a": 0,
         "o": [
           "O DHCP não respondeu e o PC se deu um IP link-local",
@@ -686,6 +726,10 @@
       ],
       "check": {
         "q": "Qual comando mostra o gateway no Linux?",
+        "v": [
+          "No Linux, qual comando exibe o gateway padrão?",
+          "Para ver por onde o Linux sai para outras redes (o gateway), qual comando usar?"
+        ],
         "a": 0,
         "o": [
           "ip route",
@@ -763,6 +807,10 @@
       "steps": [
         {
           "q": "Qual é o endereço IP desta máquina?",
+          "v": [
+            "Pela saída do terminal, qual o IP desta máquina?",
+            "Qual endereço IP está configurado neste computador?"
+          ],
           "a": 0,
           "o": [
             "192.168.1.50",
@@ -783,6 +831,10 @@
         },
         {
           "q": "Por que o Google não abre, se o ping no 8.8.8.8 funciona?",
+          "v": [
+            "O ping no 8.8.8.8 responde, mas o Google não abre. Por quê?",
+            "A internet funciona por IP, mas os sites não abrem pelo nome. O que está falhando?"
+          ],
           "a": 0,
           "o": [
             "O DNS configurado (192.168.1.250) não responde, então o nome não vira IP",
@@ -803,6 +855,10 @@
         },
         {
           "q": "Como resolver agora?",
+          "v": [
+            "Qual a solução imediata para voltar a abrir os sites?",
+            "O que fazer agora para os nomes voltarem a resolver?"
+          ],
           "a": 0,
           "o": [
             "Apontar a máquina para um DNS que funciona, como o 1.1.1.1",
@@ -846,6 +902,10 @@
       ],
       "check": {
         "q": "O dig mostra um IP e o ping usa outro. Onde olhar primeiro?",
+        "v": [
+          "O IP que o dig mostra é diferente do que o ping usa. Qual o primeiro lugar a verificar?",
+          "O DNS responde um IP, mas o PC usa outro para o mesmo nome. Onde olhar primeiro?"
+        ],
         "a": 0,
         "o": [
           "No /etc/hosts",
@@ -903,6 +963,10 @@
       "steps": [
         {
           "q": "Qual IP o servidor DNS responde para erp.empresa.com.br?",
+          "v": [
+            "Segundo o servidor DNS, qual o IP de erp.empresa.com.br?",
+            "Qual endereço o DNS devolve para o nome erp.empresa.com.br?"
+          ],
           "a": 0,
           "o": [
             "10.0.0.10",
@@ -919,6 +983,10 @@
         },
         {
           "q": "Por que o ping deste PC vai para 10.0.0.99?",
+          "v": [
+            "O que faz o ping deste PC ir para 10.0.0.99?",
+            "O DNS diz 10.0.0.10, mas o ping vai para 10.0.0.99. Qual o motivo?"
+          ],
           "a": 0,
           "o": [
             "Uma linha antiga no /etc/hosts passa na frente do DNS",
@@ -935,6 +1003,10 @@
         },
         {
           "q": "Como resolver?",
+          "v": [
+            "Qual a correção para o PC usar o IP certo do ERP?",
+            "O que fazer para este PC voltar a usar o DNS para o ERP?"
+          ],
           "a": 0,
           "o": [
             "Apagar a linha do ERP no /etc/hosts",

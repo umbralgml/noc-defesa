@@ -325,6 +325,10 @@
       "qs": [
         {
           "q": "Em que ordem acontecem as mensagens do DHCP?",
+          "v": [
+            "Qual a sequência das mensagens DHCP?",
+            "Do pedido à confirmação, em que ordem o DHCP troca mensagens?"
+          ],
           "a": 0,
           "o": [
             "Discover, Offer, Request, Ack",
@@ -345,6 +349,10 @@
         },
         {
           "q": "Alguém ligou um roteador doméstico na rede e ele está distribuindo IP errado por DHCP. O que bloqueia isso no switch?",
+          "v": [
+            "Um roteador doméstico ligado na rede está entregando IP errado por DHCP. Qual recurso do switch impede isso?",
+            "DHCP falso na rede: qual proteção no switch bloqueia servidores DHCP não autorizados?"
+          ],
           "a": 0,
           "o": [
             "DHCP snooping",
@@ -365,6 +373,10 @@
         },
         {
           "q": "Qual registro DNS aponta um nome para um endereço IPv6?",
+          "v": [
+            "Qual tipo de registro DNS liga um nome a um IPv6?",
+            "Para um nome resolver para endereço IPv6, qual registro criar?"
+          ],
           "a": 0,
           "o": [
             "AAAA",
@@ -385,6 +397,10 @@
         },
         {
           "q": "Você trocou o IP do site no DNS, mas metade dos usuários ainda cai no IP antigo. O que explica?",
+          "v": [
+            "O IP do site mudou no DNS, mas parte dos usuários ainda acessa o antigo. Por quê?",
+            "Depois de trocar o registro DNS, metade do pessoal continua no IP velho. O que explica isso?"
+          ],
           "a": 0,
           "o": [
             "O TTL: os resolvers guardam a resposta antiga até ela expirar",
@@ -405,6 +421,10 @@
         },
         {
           "q": "Os logs de dois servidores estão com 7 minutos de diferença. Por que isso atrapalha a investigação, e o que resolve?",
+          "v": [
+            "Dois servidores têm 7 minutos de diferença no relógio. Qual o problema para a investigação e a solução?",
+            "Logs com horários desencontrados em 7 minutos entre servidores. Por que isso atrapalha e como corrigir?"
+          ],
           "a": 0,
           "o": [
             "Fica impossível correlacionar os eventos; o NTP sincroniza os relógios",

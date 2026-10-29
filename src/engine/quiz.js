@@ -1,6 +1,6 @@
 // Motor "quiz": perguntas de múltipla escolha. Com "boss": true vira o chefe final,
 // com cronômetro por pergunta e barra de vida do Z3R0 (precisa acertar 70%).
-import { $, shuffle, center } from './util.js';
+import { $, shuffle, center, vary, missN, missInc } from './util.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
 import { good, damage, toast, note, ZHURT, flow } from './ui.js';
@@ -16,12 +16,15 @@ export function renderQuiz(level) {
   $('bank').style.display = 'none';
   S.qi = 0; S.hits = 0; S.needHits = L.boss ? Math.ceil(L.qs.length * .7) : L.qs.length;
   S.qlog = []; S.left = 0;   // acerto de cada pergunta e segundos que sobraram nos acertos
+  // Fase da campanha: perguntas em ordem nova a cada partida. Desafio diário e treino mantêm a ordem (qlog por posição).
+  const idx = L.qs.map((_, i) => i);
+  S.qord = L.onWin ? idx : shuffle(idx);
   showQ();
 }
 
 function showQ() {
-  const q = L.qs[S.qi];
-  // A resposta certa é q.o[q.a]; as opções são embaralhadas na tela.
+  // Pergunta errada antes volta reescrita (campo "v"). A resposta certa é q.o[q.a]; as opções são embaralhadas.
+  const base = S.qbase = L.qs[S.qord[S.qi]], q = S.cq = vary(base, missN(`${L.title}|${base.q}`));
   const opts = shuffle(q.o.map((o, i) => ({ ...opt(o), ok: i === q.a })));
   const st = $('stage');
   st.innerHTML = (L.boss ? `<div class="bossbar"><div class="b"><span>Z3R0 · CONEXÃO C2</span><div class="bb"><div id="bossFill" style="width:${bossPct()}%"></div></div></div></div>` : '')
@@ -46,7 +49,7 @@ function showQ() {
 function answer(btn) {
   if (S.busy) return;
   clearInterval(S.timer);
-  const q = L.qs[S.qi], ok = !!(btn && btn._ok);
+  const q = S.cq, base = S.qbase, ok = !!(btn && btn._ok);
   S.qlog.push(ok); if (ok && L.time) S.left += Math.max(0, Math.ceil(left / 1000));
   document.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (b._ok) b.classList.add('right'); });
   if (btn && !ok) btn.classList.add('wrong');
@@ -56,7 +59,8 @@ function answer(btn) {
     if (L.boss) { sfx.zap(); toast(ZHURT[Math.random() * ZHURT.length | 0], false); const f = $('bossFill'); if (f) f.style.width = bossPct() + '%'; }
   } else {
     note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
-    if (!L.train) bankAdd(`${L.title}|${q.q}`, { lv: L.title, q: q.q, o: q.o, a: q.a, why: q.why });
+    missInc(`${L.title}|${base.q}`);
+    if (!L.train) bankAdd(`${L.title}|${base.q}`, { lv: L.title, q: base.q, o: base.o, a: base.a, why: base.why, v: base.v });
     if (L.free) { S.err++; S.streak = 0; sfx.bad(); }   // Academia: errar não custa integridade
     else damage(L.boss ? 20 : 15, at);
     if (!btn) toast('Tempo esgotado! Hahaha!', false);
