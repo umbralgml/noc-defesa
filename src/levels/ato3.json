@@ -318,9 +318,9 @@
       "type": "drop",
       "mode": "buckets",
       "loc": "desk",
-      "cap": "Abrindo a sessão BGP do cliente AS65010...",
-      "goal": "Decida o que aceitar do cliente BGP AS65010, dono do bloco 45.160.0.0/22.",
-      "intro": "Cliente <b>AS65010</b> tem o bloco <b>45.160.0.0/22</b> com ROA até <b>/24</b>. Aceite só o que é dele. O resto é leak ou sequestro.",
+      "cap": "Abrindo a sessão BGP do cliente AS64500...",
+      "goal": "Decida o que aceitar do cliente BGP AS64500, dono do bloco 45.160.0.0/22.",
+      "intro": "Cliente <b>AS64500</b> tem o bloco <b>45.160.0.0/22</b> com ROA até <b>/24</b>. Aceite só o que é dele. O resto é leak ou sequestro.",
       "z": "Vou anunciar pelo seu cliente o que eu quiser. Você aceita tudo mesmo.",
       "me": "Cliente BGP só anuncia o que é dele. Prefix-list estrita.",
       "lesson": [
