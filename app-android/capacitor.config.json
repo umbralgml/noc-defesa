@@ -1,0 +1,8 @@
+{
+  "appId": "br.com.zioncore.noc",
+  "appName": "NOC: Última Linha de Defesa",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#070d18"
+  }
+}

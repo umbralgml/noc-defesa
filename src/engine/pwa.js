@@ -4,6 +4,9 @@
 import { $ } from './util.js';
 import { modal, closeModal } from './ui.js';
 
+// Dentro do app Android (Capacitor) não há o que instalar nem service worker: o jogo já vem no APK.
+const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
 const ua = navigator.userAgent;
 const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOS = () => /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -36,7 +39,20 @@ function steps() {
     'Ou abra o menu <b>⋮</b> e escolha <b>Instalar NOC</b> (no Edge: <b>Apps → Instalar este site como app</b>).']];
 }
 
+// Botão voltar do Android: fecha o modal, sai da fase, volta ao início e só então fecha o app.
+function nativeBack() {
+  const A = window.Capacitor.Plugins && window.Capacitor.Plugins.App; if (!A) return;
+  A.addListener('backButton', () => {
+    if ($('modal').classList.contains('on')) return closeModal();
+    const on = (document.querySelector('.screen.on') || {}).id;
+    if (on === 'game') return $('backBtn').click();
+    if (on === 'map') return $('homeBtn').click();
+    A.exitApp();
+  });
+}
+
 export function initPWA() {
+  if (NATIVE) { nativeBack(); return; }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(e => console.warn('service worker:', e));
   const btn = $('installBtn');
   if (standalone()) return;

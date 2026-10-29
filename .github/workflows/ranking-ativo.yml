@@ -1,0 +1,22 @@
+# Mantém o projeto gratuito do Supabase ativo: ele pausa depois de ~7 dias sem requisições.
+# Uma consulta leve por dia ao ranking (leitura pública, mesma chave publishable do jogo).
+name: Ranking ativo
+
+on:
+  schedule:
+    - cron: '17 11 * * *'   # todo dia, 08:17 em Brasília
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { sparse-checkout: src/config.json, sparse-checkout-cone-mode: false }
+      - name: Consultar o ranking
+        run: |
+          URL=$(jq -r .ranking.url src/config.json); KEY=$(jq -r .ranking.key src/config.json)
+          if [ -z "$URL" ] || [ "$URL" = null ]; then echo "Ranking desligado no config.json"; exit 0; fi
+          code=$(curl -s -o /dev/null -w '%{http_code}' -H "apikey: $KEY" -H "Authorization: Bearer $KEY" "$URL/rest/v1/ranking_top?limit=1")
+          echo "HTTP $code"
+          [ "$code" = 200 ] || { echo "::error::Ranking respondeu $code. Se o projeto pausou, reative no painel do Supabase."; exit 1; }

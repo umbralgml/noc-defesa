@@ -1,0 +1,20 @@
+{
+  "name": "noc-defesa-android",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Empacota o jogo como app Android (Capacitor). O jogo em si continua sem build na raiz do repositório.",
+  "scripts": {
+    "web": "node scripts/copiar-web.mjs",
+    "sync": "npm run web && npx cap sync android",
+    "icones": "npx capacitor-assets generate --android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3"
+  }
+}
