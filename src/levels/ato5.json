@@ -161,7 +161,7 @@
         "lan": "Toda LAN IPv6 é /64: é o que o SLAAC precisa.",
         "n": "De /48 para /64 sobram 16 bits: 2^16 = 65.536 redes.",
         "v10": "O 4º grupo numera a rede dentro do /48: cafe:10 é a VLAN 10.",
-        "short": "0db8 vira db8, e os seis grupos zerados viram ::.",
+        "short": "0db8 vira db8, e os cinco grupos zerados do meio viram ::.",
         "ll": "fe80::/10 é link-local, presente em toda interface IPv6.",
         "res": "Prática comum para casa: /56, que dá 256 redes /64."
       },

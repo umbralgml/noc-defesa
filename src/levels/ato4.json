@@ -25,7 +25,7 @@
       "wide": true,
       "loc": "desk",
       "cap": "Abrindo o plano de resposta a incidente...",
-      "goal": "Monte as fases de resposta a incidente na ordem do NIST SP 800-61.",
+      "goal": "Monte as fases de resposta a incidente na ordem do ciclo clássico do NIST SP 800-61.",
       "intro": "Um servidor foi comprometido. A diretoria quer saber o plano. Ordene as fases de <b>resposta a incidente</b>.",
       "z": "Já estou dentro. Vai fazer o quê, desligar tudo no desespero?",
       "me": "Não. Vou seguir o processo, passo a passo.",
@@ -34,10 +34,10 @@
         "<b>Preparação</b> acontece antes do incidente: runbooks, backups testados, lista de contatos. <b>Detecção e análise</b> confirma o que aconteceu e o tamanho do estrago.",
         "<b>Contenção</b> estanca o problema (isolar a máquina, bloquear o C2). <b>Erradicação</b> remove a causa (backdoor, contas, malware). <b>Recuperação</b> volta à produção sob monitoramento.",
         "<b>Lições aprendidas</b> fecham o ciclo: o que falhou e o que muda para não se repetir.",
-        "No documento (revisão 2), contenção, erradicação e recuperação formam uma fase só, mas na prática seguem essa ordem."
+        "Esse ciclo vem da revisão 2 (2012), onde contenção, erradicação e recuperação formam uma fase só, mas seguem essa ordem. A revisão 3, de 2025, reorganizou o guia pelas funções do NIST CSF 2.0 (Governar, Identificar, Proteger, Detectar, Responder e Recuperar). Os planos de resposta continuam usando essas fases no dia a dia."
       ],
       "tip": "Primeiro se prepara, depois detecta. Isolar vem antes de limpar, e limpar vem antes de voltar pra produção. Aprender fica no final.",
-      "learn": "Ciclo do NIST: preparação, detecção e análise, contenção, erradicação, recuperação e atividades pós-incidente. Formatar sem análise destrói evidência e não diz por onde o invasor entrou, então ele volta.",
+      "learn": "Ciclo clássico do NIST (SP 800-61, revisão 2): preparação, detecção e análise, contenção, erradicação, recuperação e atividades pós-incidente. Formatar sem análise destrói evidência e não diz por onde o invasor entrou, então ele volta.",
       "html": "<div class=\"ord\"><span class=\"n\">1</span>[s1]</div><div class=\"ord\"><span class=\"n\">2</span>[s2]</div><div class=\"ord\"><span class=\"n\">3</span>[s3]</div><div class=\"ord\"><span class=\"n\">4</span>[s4]</div><div class=\"ord\"><span class=\"n\">5</span>[s5]</div><div class=\"ord\"><span class=\"n\">6</span>[s6]</div>",
       "zones": {
         "s1": [

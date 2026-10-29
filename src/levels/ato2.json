@@ -170,9 +170,9 @@
           "why": "Libera HTTPS de qualquer origem para o servidor web. Vem depois do bloqueio do atacante."
         },
         {
-          "t": "permit tcp 10.99.0.0/24 host 10.0.0.10 eq 22",
+          "t": "permit tcp 10.99.0.0 0.0.0.255 host 10.0.0.10 eq 22",
           "v": "ssh",
-          "why": "Libera SSH só da rede de gerência. Vem depois do bloqueio do atacante."
+          "why": "Libera SSH só da rede de gerência (10.99.0.0/24, que na ACL Cisco vira 10.99.0.0 0.0.0.255). Vem depois do bloqueio do atacante."
         },
         {
           "t": "deny ip any any",
@@ -227,8 +227,8 @@
         "why": "As respostas saem da porta 123 dos servidores NTP: chegam em você com origem 123."
       },
       "tip": "Em ACL Cisco se usa wildcard, não máscara: /22 = 0.0.3.255. A porta 123 é a de ORIGEM, então o \"eq\" vem logo depois do \"any\". Tráfego que vem da internet entra pelo uplink.",
-      "learn": "Wildcard é o inverso da máscara: 255.255.252.0 vira 0.0.3.255. Em reflexão, a vítima recebe respostas vindas da porta do serviço abusado, por isso o filtro é na porta de origem. O ideal é ainda pedir ao upstream para filtrar antes do seu link.",
-      "html": "<div class=\"cli\">access-list 110 [a] [b] any [c] 177.10.0.0 [d]<br>access-list 110 [e] ip any any<br><span class=\"c\">!</span><br>interface TenGigE0/0/0<br>&nbsp;description UPLINK-TRANSITO<br>&nbsp;ip access-group 110 [f]</div>",
+      "learn": "Wildcard é o inverso da máscara: 255.255.252.0 vira 0.0.3.255. Em reflexão, a vítima recebe respostas vindas da porta do serviço abusado, por isso o filtro é na porta de origem. O ideal é ainda pedir ao upstream para filtrar antes do seu link. Na vida real, esse filtro também barra quem acerta o relógio em servidores NTP de fora: use NTP interno ou filtre só as respostas grandes, típicas do monlist.",
+      "html": "<div class=\"cli\">access-list 110 [a] [b] any [c] 177.10.0.0 [d]<br>access-list 110 [e] ip any any<br><span class=\"c\">!</span><br>interface TenGigabitEthernet0/0/0<br>&nbsp;description UPLINK-TRANSITO<br>&nbsp;ip access-group 110 [f]</div>",
       "zones": {
         "a": [
           "deny"
