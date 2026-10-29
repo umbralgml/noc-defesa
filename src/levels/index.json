@@ -8,6 +8,59 @@
     "ato3.json",
     "ato4.json",
     "ato5.json",
-    "ato6.json"
+    "ato6.json",
+    "provedor.json"
+  ],
+  "trilhas": [
+    {
+      "id": "inicial",
+      "name": "Trilha inicial",
+      "icon": "🧭",
+      "desc": "Visão geral de tudo, do cabo ao incidente: redes, firewall, Linux, BGP, resposta a incidente e IPv6. Comece por aqui.",
+      "acts": [
+        "prologo.json",
+        "formacao.json",
+        "ato1.json",
+        "ato2.json",
+        "linux.json",
+        "ato3.json",
+        "ato4.json",
+        "ato5.json",
+        "ato6.json"
+      ]
+    },
+    {
+      "id": "redes",
+      "name": "Redes",
+      "icon": "🌐",
+      "desc": "Plantão de provedor em vários fabricantes (Huawei, Juniper, MikroTik e Cisco): BGP, STP, MPLS, CGNAT e IPv6. Nível intermediário: recomendada depois da trilha inicial.",
+      "acts": [
+        "provedor.json"
+      ]
+    },
+    {
+      "id": "linux",
+      "name": "Linux",
+      "icon": "🐧",
+      "desc": "Administração de servidores Linux no dia a dia do NOC.",
+      "soon": "Em breve",
+      "acts": []
+    },
+    {
+      "id": "servidores",
+      "name": "Servidores",
+      "icon": "🖥️",
+      "desc": "DNS, DHCP, web, virtualização e backup.",
+      "soon": "Em breve",
+      "acts": []
+    },
+    {
+      "id": "seguranca",
+      "name": "Segurança",
+      "icon": "🛡️",
+      "desc": "Firewall, hardening, detecção e resposta a incidentes.",
+      "soon": "Em breve",
+      "acts": []
+    }
   ]
 }

@@ -45,12 +45,12 @@ src/main.js           entrada: cena do título, botões do título, init dos mot
 src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mais recente primeiro
 src/config.json       { "ranking": { "url", "key" } }: Supabase (url + key publishable) ou API própria na VPS (só url, key vazia); url vazia = ranking desligado
 src/levels/
-  index.json          { "acts": ["ato1.json", ...] } na ordem do mapa
+  index.json          { "acts": [...], "trilhas": [{ "id", "name", "icon", "desc", "soon"?, "acts": [...] }] }: "acts" é a soma das trilhas, na mesma ordem
   prologo.json, formacao.json, atoN.json, linux.json   { "tag", "name", "diff", "story", "levels": [ ... ] }
 src/engine/
   util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON); sem dependências
   state.js            S (estado da partida; S.lv = fase atual), LEVELS, ACTS, save, K, unlocked, resetProgress, progress
-  levels.js           loadLevels(): fetch dos JSON; cada fase recebe .act = índice do ato
+  levels.js           loadLevels(): fetch dos JSON por trilha; cada fase recebe .act (índice do ato) e .trail (índice da trilha)
   scene.js            SVG das cenas por `loc`, herói animado, avatares, MEDIA (cabos) e ícones
   audio.js            Web Audio: au() (desbloqueia no 1º gesto), sfx, music(), setMute()
   ui.js               telas, modal, toast, partículas, HP/pontos, good()/damage(),
@@ -137,6 +137,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.
 - **Deploy:** o GitHub Pages publica a `main`; o servidor próprio (`docs/SERVIDOR.md`, arquitetura completa em `docs/VPS.md`) puxa a `main` a cada 15 minutos e roda o `noc-pos-atualizar` (aplica o `tools/ranking.sql` se ele mudou, com backup antes). Não há outro passo de publicação.
 - **Banco do ranking:** `tools/ranking.sql` precisa ser idempotente (roda de novo a cada mudança, no Supabase e na VPS). O cliente fala com a API REST (PostgREST/Supabase) em `/rest/v1/`; o `sw.js` nunca guarda esse caminho em cache.
+- **Trilhas:** o mapa mostra uma trilha por vez (abas no topo, `localStorage` `noc_trail`). A Trilha inicial é a visão geral; Redes, Linux, Servidores e Segurança aprofundam. Cada trilha começa liberada, a numeração das fases é por trilha (`num(i)` em `state.js`) e o botão PRÓXIMA não atravessa trilhas. Trilha sem atos entra com `"soon"` e aparece como EM BREVE. A dificuldade só sobe dentro de cada trilha. Ato novo entra no `"acts"` e na trilha dele, no `sw.js` e passa no validador.
 - **Fase nova no meio da campanha:** marque com `"novo": true`. Ela ganha o selo NOVA no mapa e fica liberada para quem já tem estrela em alguma fase depois dela (`unlocked()` em `state.js`), então ninguém trava no meio do caminho.
 - **Dificuldade gradativa:** o jogo é para quem nunca viu rede até quem trabalha num NOC. Cada ato tem `diff` (iniciante → avançado, só sobe). Iniciante/básico: analogias, sem cronômetro, dica automática no 2º erro (`hint()` em `ui.js`). Pressão (tempo, eventos do Z3R0) só a partir de intermediário. A primeira fase tem `"tutorial": true`.
 - **Linux:** muita coisa de rede roda em Linux, então há um ato próprio e o Prólogo já apresenta o terminal (`ip a`, `ping`). Fases `term` com `prompt` Linux. Saídas de comando realistas (copie de um sistema de verdade).

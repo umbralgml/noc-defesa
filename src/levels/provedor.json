@@ -1,0 +1,1541 @@
+{
+  "tag": "ATO 1",
+  "name": "Plantão no provedor",
+  "diff": "intermediário",
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Bem-vindo ao NOC do provedor. Aqui a rede tem milhares de assinantes e equipamento de quatro fabricantes: Huawei, Juniper, MikroTik e Cisco."
+    },
+    {
+      "who": "z",
+      "t": "Provedor pequeno, BGP com duas operadoras, CGNAT lotado e switch sem STP. Meu parque de diversões."
+    },
+    {
+      "who": "me",
+      "t": "Cada fabricante tem o seu sotaque, mas o protocolo é o mesmo. Bora pro plantão."
+    }
+  ],
+  "levels": [
+    {
+      "title": "IPv6 no provedor",
+      "tag": "QUIZ",
+      "type": "quiz",
+      "loc": "desk",
+      "dailyFrom": "2026-10-30",
+      "cap": "Revisando o IPv6 dos assinantes...",
+      "goal": "Responda o básico de IPv6 que todo plantão de provedor usa: RA, DHCPv6-PD, ICMPv6 e MTU.",
+      "z": "Metade dos seus assinantes está sem IPv6 e a outra metade não abre site nenhum. Adivinha por quê.",
+      "me": "IPv6 não é IPv4 com mais dígitos. Vamos pelo básico: RA, PD e ICMPv6.",
+      "lesson": [
+        "O roteador anuncia a rede com o <b>RA</b> (Router Advertisement). A flag <b>M</b> manda o cliente pedir endereço ao <b>DHCPv6</b>; sem ela, o cliente monta o próprio endereço pelo <b>SLAAC</b>.",
+        "O roteador do assinante recebe um bloco inteiro para distribuir nas redes dele: é o <b>DHCPv6-PD</b> (prefix delegation), geralmente uma /56 ou /60.",
+        "O <b>NDP</b> (descoberta de vizinhos) e o aviso <b>Packet Too Big</b> são mensagens <b>ICMPv6</b>. Bloquear todo ICMPv6 quebra o IPv6.",
+        "Roteador IPv6 não fragmenta pacote: se não cabe no enlace, descarta e avisa a origem com Packet Too Big. No PPPoE o MTU é 1492.",
+        "Entre roteadores, as rotas IPv6 apontam para o endereço <b>link-local</b> (fe80::) do vizinho."
+      ],
+      "tip": "M ligada = DHCPv6. Bloco para o roteador do cliente = PD. NDP e PMTUD vivem no ICMPv6. Roteador IPv6 não fragmenta. Próximo salto = link-local.",
+      "learn": "IPv6 de provedor em cinco linhas: o RA diz se o cliente usa SLAAC ou DHCPv6, o DHCPv6-PD entrega a /56 do assinante, o ICMPv6 precisa passar (NDP e Packet Too Big), quem ajusta o tamanho do pacote é a origem (PMTUD) e os vizinhos se falam por link-local.",
+      "qs": [
+        {
+          "q": "O roteador manda RA com a flag M (Managed) ligada. O que o computador do cliente faz?",
+          "v": [
+            "No RA, a flag M veio ligada. Como o host consegue o endereço IPv6?"
+          ],
+          "o": [
+            "Pede o endereço a um servidor DHCPv6",
+            {
+              "t": "Monta o endereço sozinho pelo SLAAC e ignora o DHCPv6",
+              "why": "Esse é o comportamento com a flag M desligada. Com M ligada, o endereço vem do DHCPv6."
+            },
+            {
+              "t": "Usa o endereço do roteador como se fosse dele",
+              "why": "Cada host precisa de um endereço próprio. O RA só informa a rede e o gateway."
+            },
+            {
+              "t": "Desliga o IPv6 e volta para o IPv4",
+              "why": "A flag M não desliga nada: só diz de onde vem o endereço."
+            }
+          ],
+          "a": 0,
+          "why": "M (Managed) = o endereço vem do DHCPv6. Sem M, o host usa SLAAC. A flag O (Other) pede só os outros dados, como o DNS."
+        },
+        {
+          "q": "No PPPoE, como o roteador do assinante recebe a /56 para distribuir nas redes de casa?",
+          "v": [
+            "Qual mecanismo entrega um bloco IPv6 inteiro, como uma /56, para o roteador do cliente?"
+          ],
+          "o": [
+            "DHCPv6-PD (prefix delegation)",
+            {
+              "t": "SLAAC",
+              "why": "SLAAC só monta um endereço dentro de uma /64. Ele não entrega bloco para o cliente redistribuir."
+            },
+            {
+              "t": "NAT66",
+              "why": "NAT66 traduz endereços. Em IPv6 o assinante recebe bloco público próprio, sem NAT."
+            },
+            {
+              "t": "ARP",
+              "why": "ARP é do IPv4 e só descobre MAC. No IPv6 nem existe."
+            }
+          ],
+          "a": 0,
+          "why": "O DHCPv6-PD delega um prefixo ao roteador do cliente, que divide em /64 para as redes dele (Wi-Fi, LAN, visitantes)."
+        },
+        {
+          "q": "Por que não se pode bloquear todo ICMPv6 na borda?",
+          "v": [
+            "Um firewall bloqueando todo ICMPv6 vai quebrar o quê?"
+          ],
+          "o": [
+            "NDP e Packet Too Big são ICMPv6: sem eles os vizinhos não se acham e o PMTUD quebra",
+            {
+              "t": "Porque o ICMPv6 carrega o tráfego dos sites",
+              "why": "Os sites trafegam em TCP e UDP. O ICMPv6 é controle, mas é controle de que o IPv6 depende."
+            },
+            {
+              "t": "Porque o ping é obrigatório pela RFC",
+              "why": "O problema não é o ping, e sim o NDP e o Packet Too Big, que também são ICMPv6."
+            },
+            {
+              "t": "Não tem problema bloquear: o IPv6 não usa ICMP",
+              "why": "Usa, e muito: o NDP inteiro é feito com mensagens ICMPv6."
+            }
+          ],
+          "a": 0,
+          "why": "No IPv6 o ICMPv6 faz o papel do ARP (NDP) e avisa quando o pacote é grande demais (Packet Too Big). Filtre por tipo, seguindo a RFC 4890, mas não bloqueie tudo."
+        },
+        {
+          "q": "Um roteador recebe um pacote IPv6 de 1500 bytes para mandar num enlace PPPoE de MTU 1492. O que ele faz?",
+          "v": [
+            "Pacote IPv6 de 1500 bytes, enlace de saída com MTU 1492. Qual a atitude do roteador?"
+          ],
+          "o": [
+            "Descarta e manda ICMPv6 Packet Too Big para a origem",
+            {
+              "t": "Fragmenta o pacote em dois",
+              "why": "No IPv6 só a origem pode fragmentar. O roteador do caminho nunca fragmenta."
+            },
+            {
+              "t": "Corta os 8 bytes que sobram",
+              "why": "Cortar corromperia o pacote. O roteador descarta e avisa."
+            },
+            {
+              "t": "Manda assim mesmo, porque o MTU é só uma sugestão",
+              "why": "O MTU é o limite físico do enlace. Um pacote maior não passa."
+            }
+          ],
+          "a": 0,
+          "why": "Roteador IPv6 não fragmenta: avisa a origem com Packet Too Big (com o MTU certo) e ela reenvia menor. Se esse ICMPv6 for bloqueado, a conexão trava: é o buraco negro de PMTUD."
+        },
+        {
+          "q": "Numa rota IPv6 entre dois roteadores vizinhos, qual endereço costuma aparecer como próximo salto?",
+          "v": [
+            "No OSPFv3 ou numa rota IPv6 aprendida do vizinho, o next-hop normalmente é qual endereço?"
+          ],
+          "o": [
+            "O link-local (fe80::) do vizinho",
+            {
+              "t": "O endereço global da loopback do vizinho",
+              "why": "A loopback é usada pelo iBGP, mas o próximo salto no enlace é o link-local."
+            },
+            {
+              "t": "O ::1",
+              "why": "::1 é o loopback da própria máquina. Nunca é próximo salto."
+            },
+            {
+              "t": "O endereço multicast ff02::1",
+              "why": "ff02::1 é todos os nós do enlace: serve para anúncios, não como próximo salto."
+            }
+          ],
+          "a": 0,
+          "why": "Toda interface IPv6 tem link-local, e é ele que os protocolos de roteamento usam como próximo salto dentro do enlace. Por isso o roteador sempre sabe por qual interface sair."
+        }
+      ]
+    },
+    {
+      "title": "Cliente sem /56",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "BNG-MK01",
+      "prompt": "[noc@BNG-MK01] >",
+      "cap": "Abrindo o terminal do concentrador MikroTik...",
+      "goal": "Descubra por que os assinantes do PPPoE recebem IPv6 só no enlace e não na rede de casa, e corrija.",
+      "intro": "O suporte avisa: os roteadores dos clientes do plano novo pegam IPv6 na WAN, mas a rede de casa fica sem IPv6. Você está no <b>BNG-MK01</b>, um MikroTik com RouterOS 7 fazendo PPPoE.",
+      "z": "Mexi no perfil do plano novo. O cliente conecta, vê IPv6 na WAN e acha que está tudo bem.",
+      "me": "Se a WAN tem IPv6 e a casa não, faltou a delegação. Vou olhar o pool e o perfil.",
+      "lesson": [
+        "No PPPoE, o assinante recebe dois prefixos IPv6: um para o enlace (a WAN, via RA) e um bloco para a casa, via <b>DHCPv6-PD</b>.",
+        "No RouterOS, o bloco do PD sai de um <b>/ipv6 pool</b> (ex.: uma /40 dividida em /56) e o <b>/ppp profile</b> diz qual pool usar em <b>dhcpv6-pd-pool</b>.",
+        "Perfil com dhcpv6-pd-pool vazio = o cliente conecta, ganha IPv6 na WAN e nenhum bloco para a LAN.",
+        "Uma /40 dividida em /56 rende 2^(56−40) = 65.536 assinantes."
+      ],
+      "tip": "Compare o perfil do plano com o pool que existe. Sem dhcpv6-pd-pool no perfil, não há PD.",
+      "learn": "O assinante conectava e ganhava IPv6 na WAN, mas o perfil do plano estava sem dhcpv6-pd-pool, então ninguém recebia a /56. Com o pool no perfil e a reconexão, cada cliente volta com o bloco para a casa.",
+      "cmds": [
+        {
+          "c": "/ppp active print",
+          "alias": [
+            "ppp active print"
+          ],
+          "out": "Columns: NAME, SERVICE, CALLER-ID, ADDRESS, UPTIME\n#  NAME          SERVICE  CALLER-ID          ADDRESS       UPTIME\n0  joao.silva    pppoe    3C:22:FB:11:0A:7E  100.64.12.77  2h14m\n1  maria.costa   pppoe    D8:47:32:9A:10:01  100.64.12.78  1d3h\n2  padaria.sol   pppoe    98:DA:C4:22:5E:3B  100.64.12.79  5h40m",
+          "why": "Lista as sessões PPPoE de pé: o assinante está conectado e recebeu IPv4 (CGNAT). A conexão em si funciona."
+        },
+        {
+          "c": "/ipv6 pool print",
+          "alias": [
+            "ipv6 pool print"
+          ],
+          "out": "Columns: NAME, PREFIX, PREFIX-LENGTH\n#  NAME         PREFIX              PREFIX-LENGTH\n0  pd-clientes  2001:db8:4000::/40             56",
+          "why": "O pool de delegação existe: uma /40 que é cortada em /56, uma para cada assinante."
+        },
+        {
+          "c": "/ppp profile print detail where name=plano-500m",
+          "alias": [
+            "/ppp profile print detail",
+            "ppp profile print detail",
+            "/ppp profile print"
+          ],
+          "out": "Flags: * - default\n 1   name=\"plano-500m\" local-address=100.64.0.1 remote-address=pool-cgnat\n     remote-ipv6-prefix-pool=pool-wan6 dhcpv6-pd-pool=\"\" use-ipv6=yes\n     change-tcp-mss=yes only-one=yes rate-limit=250M/500M",
+          "why": "O perfil do plano novo entrega o prefixo da WAN (remote-ipv6-prefix-pool), mas o dhcpv6-pd-pool está vazio: nenhum bloco para a rede da casa."
+        },
+        {
+          "c": "/ipv6 dhcp-server binding print",
+          "alias": [
+            "ipv6 dhcp-server binding print"
+          ],
+          "out": "Columns: ADDRESS, DUID, SERVER, STATUS\n# ADDRESS  DUID  SERVER  STATUS",
+          "why": "Nenhuma delegação ativa: ninguém recebeu bloco por DHCPv6-PD."
+        },
+        {
+          "c": "/log print where topics~\"ppp\"",
+          "alias": [
+            "/log print",
+            "log print"
+          ],
+          "out": "03:11:02 system,info,account user noc logged in via ssh\n03:12:40 system,info changed ppp profile <plano-500m> by z3r0\n03:13:05 pppoe,ppp,info <pppoe-joao.silva>: connected",
+          "why": "O log mostra quem mexeu no perfil e quando. Sempre confira o log antes de corrigir."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que a rede de casa ficou sem IPv6?",
+          "v": [
+            "O que impede os roteadores dos clientes de receber o bloco IPv6 da LAN?"
+          ],
+          "o": [
+            "O perfil plano-500m está sem dhcpv6-pd-pool, então ninguém recebe a /56",
+            {
+              "t": "O pool pd-clientes não existe",
+              "why": "O pool existe: 2001:db8:4000::/40, cortado em /56."
+            },
+            {
+              "t": "O PPPoE caiu",
+              "why": "As sessões estão de pé, com IPv4 e IPv6 na WAN."
+            },
+            {
+              "t": "Falta IPv6 na WAN do cliente",
+              "why": "A WAN recebe prefixo pelo remote-ipv6-prefix-pool. O que falta é o bloco da LAN."
+            }
+          ],
+          "a": 0,
+          "why": "remote-ipv6-prefix-pool dá IPv6 à WAN; dhcpv6-pd-pool dá o bloco da casa. Sem o segundo, não há delegação."
+        },
+        {
+          "q": "Qual comando corrige o perfil?",
+          "v": [
+            "Como apontar o plano novo para o pool de delegação?"
+          ],
+          "o": [
+            "/ppp profile set plano-500m dhcpv6-pd-pool=pd-clientes",
+            {
+              "t": "/ipv6 pool add name=pd-clientes prefix=2001:db8:4000::/40",
+              "why": "O pool já existe. Criar de novo dá erro de nome duplicado."
+            },
+            {
+              "t": "/ppp profile set plano-500m use-ipv6=no",
+              "why": "Isso desliga o IPv6 do plano inteiro."
+            },
+            {
+              "t": "/system reboot",
+              "why": "Reiniciar o BNG derruba todos os assinantes e o perfil continua errado."
+            }
+          ],
+          "a": 0,
+          "why": "O perfil passa a delegar uma /56 do pool pd-clientes para cada sessão.",
+          "run": "/ppp profile set plano-500m dhcpv6-pd-pool=pd-clientes",
+          "out": ""
+        },
+        {
+          "q": "Os clientes já conectados recebem o bloco na hora?",
+          "v": [
+            "Depois de corrigir o perfil, o que acontece com as sessões que já estavam de pé?"
+          ],
+          "o": [
+            "Não: o perfil vale na próxima conexão, então é preciso reconectar as sessões (em horário de baixo uso)",
+            {
+              "t": "Sim, o RouterOS aplica em todas as sessões na hora",
+              "why": "O perfil é lido quando a sessão sobe. As sessões abertas seguem com o perfil antigo."
+            },
+            {
+              "t": "Só depois de reiniciar o roteador do cliente",
+              "why": "Basta derrubar a sessão PPPoE: o roteador do cliente reconecta sozinho."
+            },
+            {
+              "t": "Nunca: cada cliente precisa ligar para o suporte",
+              "why": "Derrubar as sessões resolve para todos de uma vez."
+            }
+          ],
+          "a": 0,
+          "why": "Configurações de perfil valem no próximo login. Derrube as sessões afetadas, de preferência de madrugada, e confira as delegações no binding.",
+          "run": "/ppp active remove [find where service=pppoe]",
+          "out": "03:21:44 dhcp,info dhcpv6 server: prefix 2001:db8:4000:4d00::/56 delegated to joao.silva"
+        },
+        {
+          "q": "Quantos assinantes cabem no pool de /40 entregando uma /56 para cada?",
+          "v": [
+            "Uma /40 cortada em /56: quantas delegações?"
+          ],
+          "o": [
+            "65.536",
+            {
+              "t": "256",
+              "why": "256 é o número de /64 dentro de uma /56, a rede de casa de um único cliente."
+            },
+            {
+              "t": "16",
+              "why": "16 é a diferença em bits (56 − 40). O número de blocos é 2 elevado a 16."
+            },
+            {
+              "t": "4.096",
+              "why": "4.096 seriam /52 dentro da /40 (12 bits)."
+            }
+          ],
+          "a": 0,
+          "why": "De /40 para /56 são 16 bits: 2^16 = 65.536 blocos /56."
+        }
+      ]
+    },
+    {
+      "title": "Sessão BGP em Active",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "RT-BORDA",
+      "prompt": "<RT-BORDA>",
+      "cap": "Conectando no roteador de borda Huawei...",
+      "goal": "Descubra por que a sessão com a operadora B não sobe e restaure sem abrir a borda.",
+      "intro": "Alarme no Zabbix: a sessão BGP com a <b>operadora B</b> (200.2.2.1) caiu depois de uma janela de \"hardening\". Você está no <b>RT-BORDA</b>, um Huawei NE com VRP. A operadora A segue de pé.",
+      "z": "Fiz um hardening caprichado na sua borda. Ficou tão seguro que nem a operadora entra.",
+      "me": "Active quer dizer que o TCP não fecha. Vou ver se é físico, rota ou filtro.",
+      "lesson": [
+        "O BGP fala sobre <b>TCP 179</b>. Estado <b>Idle</b>: nem tenta. <b>Active</b>: tenta abrir o TCP e não consegue. <b>Established</b>: sessão de pé.",
+        "No Huawei VRP, <b>display bgp peer</b> resume os vizinhos; <b>display current-configuration interface</b> mostra a configuração da porta.",
+        "<b>traffic-filter inbound acl</b> aplica uma ACL no que entra pela interface. ACL avançada (3000 a 3999) filtra por protocolo e porta.",
+        "Ping funcionando e BGP em Active é sinal clássico de filtro deixando passar ICMP e barrando o TCP 179.",
+        "A ACL é lida pela ordem das regras (rule 5, 10, 15...): o permit do BGP precisa vir antes do deny."
+      ],
+      "tip": "Ping ok + Active = algo barra o TCP 179. Olhe a interface do trânsito B e a ACL aplicada nela.",
+      "learn": "A janela de hardening aplicou a ACL 3001 na entrada do trânsito B liberando só ICMP e SSH. O ping passava, mas o TCP 179 caía no deny. Liberar o BGP do vizinho (porta 179 nos dois sentidos) antes do deny trouxe a sessão de volta.",
+      "cmds": [
+        {
+          "c": "display bgp peer",
+          "alias": [
+            "dis bgp peer",
+            "disp bgp peer"
+          ],
+          "out": " BGP local router ID : 177.10.0.1\n Local AS number : 64510\n Total number of peers : 2                 Peers in established state : 1\n\n  Peer            V          AS  MsgRcvd  MsgSent  OutQ  Up/Down       State  PrefRcv\n\n  200.1.1.1       4       64496  1294512  1280034     0 0047h03m Established  950211\n  200.2.2.1       4       64497        0       17     0 00:41:09        Active       0",
+          "why": "A operadora A (200.1.1.1) está Established. A B (200.2.2.1) está em Active: o roteador tenta abrir o TCP 179 e não consegue."
+        },
+        {
+          "c": "ping -c 3 200.2.2.1",
+          "alias": [
+            "ping 200.2.2.1"
+          ],
+          "out": "  PING 200.2.2.1: 56  data bytes, press CTRL_C to break\n    Reply from 200.2.2.1: bytes=56 Sequence=1 ttl=255 time=1 ms\n    Reply from 200.2.2.1: bytes=56 Sequence=2 ttl=255 time=1 ms\n    Reply from 200.2.2.1: bytes=56 Sequence=3 ttl=255 time=1 ms\n\n  --- 200.2.2.1 ping statistics ---\n    3 packet(s) transmitted\n    3 packet(s) received\n    0.00% packet loss\n    round-trip min/avg/max = 1/1/1 ms",
+          "why": "O vizinho responde: o enlace físico e a /30 com a operadora B estão de pé."
+        },
+        {
+          "c": "display current-configuration interface GigabitEthernet0/1/1",
+          "alias": [
+            "dis cur int g0/1/1",
+            "display current-configuration interface g0/1/1",
+            "dis current-configuration interface GigabitEthernet0/1/1"
+          ],
+          "out": "#\ninterface GigabitEthernet0/1/1\n description TRANSITO-B\n ip address 200.2.2.2 255.255.255.252\n traffic-filter inbound acl 3001\n#\nreturn",
+          "why": "A interface do trânsito B tem uma ACL aplicada na entrada: traffic-filter inbound acl 3001."
+        },
+        {
+          "c": "display acl 3001",
+          "alias": [
+            "dis acl 3001"
+          ],
+          "out": "Advanced ACL 3001, 3 rules\nAcl's step is 5\n rule 5 permit icmp (812 matches)\n rule 10 permit tcp destination-port eq 22 (43 matches)\n rule 15 deny ip (2296 matches)",
+          "why": "A ACL libera ICMP e SSH e nega todo o resto. O TCP 179 do BGP cai no rule 15: por isso o ping passa e a sessão não."
+        },
+        {
+          "c": "display logbuffer | include BGP",
+          "alias": [
+            "dis logbuffer | include BGP",
+            "display logbuffer"
+          ],
+          "out": "Oct 30 2026 02:50:31 RT-BORDA %%01BGP/3/STATE_CHG_UPDOWN(l)[44]:The status of the peer 200.2.2.1 changed from ESTABLISHED to IDLE. (InstanceName=Public, StateChangeReason=Hold Timer Expired)\nOct 30 2026 02:47:30 RT-BORDA %%01SHELL/5/CMDRECORD(s)[43]:Recorded command information. (Task=VT1, Ip=45.67.89.10, VpnName=, User=z3r0, Command=\"traffic-filter inbound acl 3001\")",
+          "why": "O log mostra a ordem: a ACL foi aplicada às 02:47 e, três minutos depois, o hold timer da sessão estourou (no Huawei o padrão é 180 s)."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que a sessão com a operadora B não sobe?",
+          "v": [
+            "Ping responde e o BGP fica em Active. O que explica?"
+          ],
+          "o": [
+            "A ACL 3001 na entrada do trânsito B barra o TCP 179",
+            {
+              "t": "O enlace com a operadora caiu",
+              "why": "O ping no 200.2.2.1 responde: o enlace está de pé."
+            },
+            {
+              "t": "O AS da operadora mudou",
+              "why": "AS errado derruba a sessão depois do OPEN, com erro de AS. Aqui nem o TCP abre."
+            },
+            {
+              "t": "A tabela de rotas encheu",
+              "why": "A sessão A recebe a tabela completa normalmente. O problema é só no caminho da B."
+            }
+          ],
+          "a": 0,
+          "why": "Active = o TCP não fecha. A ACL deixa passar ICMP (rule 5) e cai no deny (rule 15) para o TCP 179."
+        },
+        {
+          "q": "Qual a correção mais segura?",
+          "v": [
+            "Como devolver o BGP sem desfazer o hardening?"
+          ],
+          "o": [
+            "Liberar na ACL o TCP 179 só do vizinho 200.2.2.1, nas portas de origem e destino, antes do rule 15",
+            {
+              "t": "Remover a ACL da interface",
+              "why": "Volta o BGP, mas joga fora a proteção da borda inteira."
+            },
+            {
+              "t": "Trocar o rule 15 por permit ip",
+              "why": "Aí a ACL não filtra mais nada."
+            },
+            {
+              "t": "Liberar o TCP 179 de qualquer origem",
+              "why": "Qualquer um na internet poderia tentar sessão e derrubar a sua com TCP RST forjado. Libere só o vizinho."
+            }
+          ],
+          "a": 0,
+          "why": "O BGP pode abrir a conexão dos dois lados, então o vizinho chega com destino 179 ou com origem 179. As duas regras entram antes do deny e só para o IP do vizinho.",
+          "run": "system-view\nacl 3001\n rule 6 permit tcp source 200.2.2.1 0 destination-port eq bgp\n rule 7 permit tcp source 200.2.2.1 0 source-port eq bgp\n quit\ncommit",
+          "out": "Oct 30 2026 03:24:57 RT-BORDA %%01BGP/3/STATE_CHG_UPDOWN(l)[51]:The status of the peer 200.2.2.1 changed from OPENCONFIRM to ESTABLISHED. (InstanceName=Public, StateChangeReason=Up)"
+        },
+        {
+          "q": "O log mostra o usuário z3r0 vindo de 45.67.89.10 pelo VTY. E agora?",
+          "v": [
+            "A ACL foi aplicada por um login externo na gerência. Qual o próximo passo?"
+          ],
+          "o": [
+            "Tratar como incidente: bloquear a origem, trocar credenciais e restringir a gerência com ACL no VTY",
+            {
+              "t": "Nada, a sessão BGP já voltou",
+              "why": "Alguém de fora configurou a sua borda. Isso é um incidente, não só um alarme."
+            },
+            {
+              "t": "Apagar o logbuffer",
+              "why": "O log é a evidência do incidente."
+            },
+            {
+              "t": "Desligar o SSH de vez",
+              "why": "Sem gerência remota o NOC fica cego. Restrinja a origem com ACL em vez de desligar."
+            }
+          ],
+          "a": 0,
+          "why": "A causa raiz é o acesso indevido à gerência. Corrigir a ACL resolve o sintoma; o incidente só fecha com o acesso contido."
+        }
+      ]
+    },
+    {
+      "title": "BGP oscilando",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "MX-BORDA",
+      "prompt": "noc@MX-BORDA>",
+      "cap": "Abrindo o Junos do roteador de borda...",
+      "goal": "Descubra por que a sessão com a operadora C cai e volta várias vezes por hora e decida o que fazer.",
+      "intro": "Os assinantes reclamam de travadas de alguns segundos ao longo do dia. No <b>MX-BORDA</b> (Juniper MX, Junos), a sessão com a <b>operadora C</b> (200.3.3.1) está oscilando.",
+      "z": "Não derrubei nada. Só deixei a sua sessão BGP indecisa. Sobe, cai, sobe, cai.",
+      "me": "Oscilação tem causa. Vou ver o contador de flaps, o motivo da queda e a camada física.",
+      "lesson": [
+        "Os vizinhos BGP trocam <b>keepalive</b>. Se nada chegar dentro do <b>hold time</b> (90 s no padrão), a sessão cai com <b>Hold Timer Expired</b>.",
+        "Cada queda apaga as rotas daquele vizinho e o tráfego muda de caminho: o usuário sente travadas.",
+        "No Junos: <b>show bgp summary</b> mostra os flaps, <b>show log messages</b> o motivo e <b>show interfaces extensive</b> os erros da porta.",
+        "Erro de CRC e potência óptica baixa indicam problema físico: conector sujo, fibra dobrada ou transceptor ruim.",
+        "<b>BFD</b> detecta a queda em milissegundos e tira o caminho ruim rápido. Ele não corrige a causa: só deixa a falha mais curta."
+      ],
+      "tip": "Flaps + Hold Timer Expired + CRC + potência de recepção baixa = problema físico no enlace, não configuração do BGP.",
+      "learn": "A sessão caía por Hold Timer Expired porque os keepalives se perdiam num enlace com milhares de erros de CRC e potência de recepção em -20,5 dBm. A correção é física (limpar conector, medir a fibra com a operadora). Aumentar o hold time só esconderia o problema; BFD ajuda a sair rápido do caminho ruim.",
+      "cmds": [
+        {
+          "c": "show bgp summary",
+          "alias": [
+            "sh bgp summary",
+            "show bgp sum"
+          ],
+          "out": "Threading mode: BGP I/O\nGroups: 2 Peers: 2 Down peers: 0\nTable          Tot Paths  Act Paths Suppressed    History Damp State    Pending\ninet.0\n                 1900422     950201          0          0          0          0\nPeer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...\n200.1.1.1             64496    3812044    3710022       0       0     47w3d 1:12:40 Establ\n  inet.0: 950190/950211/950211/0\n200.3.3.1             64498       1520       1488       0      37        4:12 Establ\n  inet.0: 11/950211/950211/0",
+          "why": "A sessão com 200.3.3.1 está de pé há só 4 minutos e já caiu 37 vezes (coluna Flaps). A outra operadora não tem nenhum flap."
+        },
+        {
+          "c": "show log messages | match 200.3.3.1",
+          "alias": [
+            "show log messages",
+            "show log messages | match bgp"
+          ],
+          "out": "Oct 30 03:02:11 MX-BORDA rpd[2310]: bgp_hold_timeout:4091: NOTIFICATION sent to 200.3.3.1 (External AS 64498): code 4 (Hold Timer Expired Error), Reason: holdtime expired for 200.3.3.1 (External AS 64498)\nOct 30 03:02:11 MX-BORDA rpd[2310]: BGP_IO_ERROR_CLOSE_SESSION: BGP peer 200.3.3.1 (External AS 64498): Error event Operation timed out(60) for I/O session - closing it\nOct 30 03:03:40 MX-BORDA rpd[2310]: bgp_event: peer 200.3.3.1 (External AS 64498) old state OpenConfirm event RecvKeepAlive new state Established",
+          "why": "O motivo da queda é Hold Timer Expired: os keepalives da operadora pararam de chegar por mais de 90 segundos."
+        },
+        {
+          "c": "show interfaces xe-0/0/1 extensive | match \"errors|CRC\"",
+          "alias": [
+            "show interfaces xe-0/0/1 extensive"
+          ],
+          "out": "  Input errors:\n    Errors: 18734, Drops: 0, Framing errors: 18734, Runts: 0, Policed discards: 0, L3 incompletes: 0, L2 channel errors: 0, L2 mismatch timeouts: 0, FIFO errors: 0, Resource errors: 0\n  Output errors:\n    Carrier transitions: 2, Errors: 0, Drops: 0, Collisions: 0, Aged packets: 0, FIFO errors: 0, HS link CRC errors: 0, MTU errors: 0, Resource errors: 0\n    CRC/Align errors                 18734                0",
+          "why": "Quase 19 mil erros de CRC na recepção: quadros chegando corrompidos. Parte deles eram os keepalives do BGP."
+        },
+        {
+          "c": "show interfaces diagnostics optics xe-0/0/1",
+          "alias": [
+            "show interfaces diagnostics optics"
+          ],
+          "out": "Physical interface: xe-0/0/1\n    Laser bias current                        :  38.120 mA\n    Laser output power                        :  0.5120 mW / -2.91 dBm\n    Module temperature                        :  41 degrees C / 106 degrees F\n    Module voltage                            :  3.2950 V\n    Receiver signal average optical power     :  0.0089 mW / -20.51 dBm\n    Laser rx power low alarm                  :  On\n    Laser rx power low warning                :  On",
+          "why": "A potência de recepção está em -20,51 dBm, com alarme de rx baixo ligado. Um 10GBASE-LR costuma pedir algo acima de uns -14 dBm: a luz chega fraca demais."
+        },
+        {
+          "c": "show configuration protocols bgp group TRANSITO-C",
+          "alias": [
+            "show configuration protocols bgp"
+          ],
+          "out": "type external;\nimport IMPORT-TRANSITO;\nexport EXPORT-TRANSITO;\npeer-as 64498;\nneighbor 200.3.3.1;",
+          "why": "A configuração do grupo está normal e não mudou. Nada aqui explica as quedas."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Qual a causa das oscilações?",
+          "v": [
+            "Por que a sessão com a operadora C cai e volta?"
+          ],
+          "o": [
+            "Problema físico no enlace: CRC e potência óptica baixa fazem os keepalives se perderem",
+            {
+              "t": "Configuração errada do BGP",
+              "why": "A configuração não mudou e a sessão chega a Established. O problema aparece de tempos em tempos."
+            },
+            {
+              "t": "A operadora C está mandando rotas demais",
+              "why": "Excesso de rotas derrubaria por maximum-prefix, com outra mensagem no log."
+            },
+            {
+              "t": "CPU alta no MX",
+              "why": "Nada no log aponta CPU. O motivo registrado é hold timer, junto com erros de CRC na porta."
+            }
+          ],
+          "a": 0,
+          "why": "Hold Timer Expired + 18 mil erros de CRC + rx em -20,5 dBm: quadros corrompidos na fibra, inclusive os keepalives."
+        },
+        {
+          "q": "Um colega sugere subir o hold time para 240 s. Boa ideia?",
+          "v": [
+            "Aumentar o hold time resolve as oscilações?"
+          ],
+          "o": [
+            "Não: esconde a falha e deixa o tráfego mais tempo num caminho ruim. Corrija o físico",
+            {
+              "t": "Sim, a sessão para de cair e está resolvido",
+              "why": "A sessão para de cair, mas o enlace continua perdendo pacotes de assinante. O problema só some do alarme."
+            },
+            {
+              "t": "Sim, e também é bom desligar o keepalive",
+              "why": "Sem keepalive a sessão nunca perceberia uma queda real."
+            },
+            {
+              "t": "Tanto faz, o hold time não influencia",
+              "why": "Influencia: é ele que decide quando a sessão cai."
+            }
+          ],
+          "a": 0,
+          "why": "Hold time maior não conserta a fibra. O tráfego dos assinantes continua passando por um enlace com erro."
+        },
+        {
+          "q": "E o que fazer agora?",
+          "v": [
+            "Qual o encaminhamento correto para o enlace da operadora C?"
+          ],
+          "o": [
+            "Abrir chamado com a operadora, limpar e conferir conectores e medir a fibra; se precisar, desativar a sessão até corrigir",
+            {
+              "t": "Trocar o roteador de borda",
+              "why": "O roteador funciona. A falha está na luz que chega pela fibra."
+            },
+            {
+              "t": "Apagar a sessão com a operadora C da configuração",
+              "why": "Some a redundância. Desative temporariamente, sem perder a configuração."
+            },
+            {
+              "t": "Esperar a oscilação parar sozinha",
+              "why": "Fibra degradada costuma piorar, não melhorar."
+            }
+          ],
+          "a": 0,
+          "why": "Problema óptico se resolve no físico: conector, cordão, fibra ou transceptor. Enquanto isso, tirar a sessão de produção evita as travadas.",
+          "run": "configure\ndeactivate protocols bgp group TRANSITO-C neighbor 200.3.3.1\ncommit comment \"enlace C com rx baixo, chamado aberto\"",
+          "out": "commit complete"
+        },
+        {
+          "q": "Para a próxima falha física, o que deixaria a troca de caminho mais rápida?",
+          "v": [
+            "Qual recurso detecta em milissegundos que o vizinho parou de responder?"
+          ],
+          "o": [
+            "BFD na sessão BGP",
+            {
+              "t": "Aumentar o keepalive para 120 s",
+              "why": "Mais lento ainda para perceber a queda."
+            },
+            {
+              "t": "Route reflector",
+              "why": "Route reflector é para iBGP dentro do seu AS. Não acelera a detecção de queda."
+            },
+            {
+              "t": "Community no-export",
+              "why": "Community controla para onde as rotas vão. Não mede se o vizinho está vivo."
+            }
+          ],
+          "a": 0,
+          "why": "O BFD troca pacotes curtos a cada poucos milissegundos e derruba a sessão em menos de um segundo quando o enlace falha, em vez de esperar os 90 s do hold time."
+        }
+      ]
+    },
+    {
+      "title": "Tempestade na agregação",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "SW-AGREG-01",
+      "prompt": "<SW-AGREG-01>",
+      "cap": "Console no switch de agregação Huawei...",
+      "goal": "Ache o loop que derrubou a agregação, estanque e evite que se repita.",
+      "intro": "Às 03:12 a agregação do bairro parou: OLTs com perda, CPU do switch no teto e assinantes caindo. Você está no console do <b>SW-AGREG-01</b>, um Huawei da linha S.",
+      "z": "Um cliente seu ligou dois cabos no mesmo switchzinho de 50 reais. Eu só achei engraçado.",
+      "me": "MAC pulando entre duas portas é a assinatura do loop. Vou achar as portas.",
+      "lesson": [
+        "Loop em camada 2: um quadro de broadcast fica girando para sempre e se multiplica. Em segundos vira uma <b>tempestade de broadcast</b> que derruba a rede.",
+        "Sintomas: CPU alta, portas no limite de banda e o mesmo MAC aparecendo ora numa porta, ora em outra (<b>MAC flapping</b>).",
+        "Muitos provedores desligam o STP na agregação. Sem ele, nada bloqueia o caminho duplicado.",
+        "Primeiro estanca (desliga uma das portas do loop), depois previne: <b>loop detection</b>, <b>storm control</b> e STP com proteção nas portas de cliente."
+      ],
+      "tip": "display mac-address flapping record mostra entre quais portas o MAC pula. Desligue uma delas para parar a tempestade.",
+      "learn": "O cliente ligou as portas GE0/0/5 e GE0/0/7 no mesmo switch e, com o STP desligado na agregação, o broadcast girou sem fim. Desligar uma porta estancou; loop detection, storm control e STP com proteção nas portas de cliente impedem a próxima.",
+      "cmds": [
+        {
+          "c": "display cpu-usage",
+          "alias": [
+            "dis cpu-usage",
+            "dis cpu"
+          ],
+          "out": "CPU Usage Stat. Cycle: 60 (Second)\nCPU Usage            : 98% Max: 99%\nCPU Usage Stat. Time : 2026-10-30  03:14:22\nCPU utilization for five seconds: 98%: one minute: 97%: five minutes: 91%",
+          "why": "CPU quase no máximo: o switch está processando broadcast sem parar."
+        },
+        {
+          "c": "display interface brief",
+          "alias": [
+            "dis int brief",
+            "dis interface brief"
+          ],
+          "out": "Interface                   PHY   Protocol  InUti OutUti   inErrors  outErrors\nGigabitEthernet0/0/1        up    up        4.10% 38.20%          0          0\nGigabitEthernet0/0/2        up    up        3.85% 41.05%          0          0\nGigabitEthernet0/0/5        up    up        99.71% 99.83%         0          0\nGigabitEthernet0/0/7        up    up        99.69% 99.80%         0          0\nXGigabitEthernet0/0/1       up    up        12.40% 61.37%          0          0",
+          "why": "GE0/0/5 e GE0/0/7 estão com quase 100% de uso nos dois sentidos, sem motivo de negócio. Nenhum cliente pequeno usa isso."
+        },
+        {
+          "c": "display mac-address flapping record",
+          "alias": [
+            "dis mac-address flapping record"
+          ],
+          "out": "S  : start time\nE  : end time\n(Q) : quit vlan\n(D) : error down\n-------------------------------------------------------------------------------\nMove-Time             VLAN MAC-Address    Original-Port  Move-Ports    MoveNum\n-------------------------------------------------------------------------------\nS:2026-10-30 03:12:40 206  3c22-fb11-0a7e GE0/0/5        GE0/0/7       8743\nE:2026-10-30 03:14:20\nS:2026-10-30 03:12:40 206  d847-329a-1001 GE0/0/7        GE0/0/5       8611\nE:2026-10-30 03:14:21\n-------------------------------------------------------------------------------\nTotal items on slot 0: 2",
+          "why": "Os mesmos MACs pulando milhares de vezes entre GE0/0/5 e GE0/0/7: as duas portas estão ligadas no mesmo lugar, fechando um loop."
+        },
+        {
+          "c": "display stp | include Status",
+          "alias": [
+            "display stp",
+            "dis stp"
+          ],
+          "out": " Protocol Status     :Disabled",
+          "why": "O STP está desligado no switch. Nada bloqueia o caminho duplicado."
+        },
+        {
+          "c": "display current-configuration interface GigabitEthernet0/0/7",
+          "alias": [
+            "dis cur int g0/0/7",
+            "display current-configuration interface g0/0/7"
+          ],
+          "out": "#\ninterface GigabitEthernet0/0/7\n description CLIENTE-PADARIA-SOL-2\n port link-type access\n port default vlan 206\n#\nreturn",
+          "why": "A GE0/0/7 é o segundo link da Padaria Sol, a mesma cliente da GE0/0/5. Os dois cabos chegam ao mesmo switch dela."
+        }
+      ],
+      "steps": [
+        {
+          "q": "O que derrubou a agregação?",
+          "v": [
+            "Qual a causa da tempestade?"
+          ],
+          "o": [
+            "Um loop entre GE0/0/5 e GE0/0/7 (os dois links da mesma cliente), com STP desligado",
+            {
+              "t": "Um ataque DDoS vindo da internet",
+              "why": "O tráfego não entra pelo uplink (XGE0/0/1): gira entre duas portas de cliente."
+            },
+            {
+              "t": "Uma OLT com defeito",
+              "why": "As OLTs sofrem porque a agregação está entupida. A origem está nas portas 5 e 7."
+            },
+            {
+              "t": "Falta de memória no switch",
+              "why": "Nada indica memória. A CPU está alta por processar broadcast em loop."
+            }
+          ],
+          "a": 0,
+          "why": "MAC flapping entre duas portas da mesma cliente, ambas com 100% de uso, e STP desligado: é um loop de camada 2."
+        },
+        {
+          "q": "O que fazer primeiro?",
+          "v": [
+            "Como parar a tempestade agora?"
+          ],
+          "o": [
+            "Desligar uma das portas do loop (shutdown na GE0/0/7)",
+            {
+              "t": "Reiniciar o switch",
+              "why": "O loop volta assim que as portas subirem, e todo mundo cai junto durante o reboot."
+            },
+            {
+              "t": "Ligar o STP no switch inteiro agora, no meio da tempestade",
+              "why": "Mudar o STP de toda a agregação em plena crise pode causar reconvergência em outras portas. Primeiro estanque cortando o loop."
+            },
+            {
+              "t": "Ligar para a cliente e esperar ela desconectar",
+              "why": "Cada minuto derruba o bairro inteiro. Corte pelo seu lado."
+            }
+          ],
+          "a": 0,
+          "why": "Cortar um dos caminhos quebra o loop na hora. Depois você avisa a cliente e previne.",
+          "run": "system-view\ninterface GigabitEthernet0/0/7\n shutdown\n quit",
+          "out": "Oct 30 2026 03:16:02 SW-AGREG-01 %%01PHY/1/PHY(l)[12]:    GigabitEthernet0/0/7: change status to down\nCPU utilization for five seconds: 9%"
+        },
+        {
+          "q": "Como evitar que outro cliente faça o mesmo?",
+          "v": [
+            "Qual proteção impede que um loop de cliente derrube a agregação de novo?"
+          ],
+          "o": [
+            "Loop detection e storm control nas portas de cliente, e STP com proteção (BPDU ou root protection) na borda",
+            {
+              "t": "Proibir os clientes de usar switch",
+              "why": "Não dá para controlar o que o cliente pluga. A proteção tem que estar do seu lado."
+            },
+            {
+              "t": "Aumentar a velocidade das portas para 10G",
+              "why": "O loop enche qualquer velocidade. Mais banda só leva mais tráfego para o loop."
+            },
+            {
+              "t": "Colocar cada cliente numa VLAN só dele e mais nada",
+              "why": "Isola o broadcast do cliente, mas o loop ainda enche as portas e a CPU do seu switch."
+            }
+          ],
+          "a": 0,
+          "why": "Loop detection desliga a porta quando o próprio quadro de teste volta, storm control limita o broadcast e o STP com proteção bloqueia caminhos duplicados."
+        }
+      ]
+    },
+    {
+      "title": "Quem manda no STP",
+      "tag": "CLI",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "cap": "Revisando o Spanning Tree da agregação...",
+      "goal": "Fixe o core Huawei como root do STP e impeça que o switch de um cliente assuma.",
+      "intro": "Com o STP ligado, o root eleito virou um <b>MikroTik de cliente</b>: o tráfego da agregação passa pela casa dele. Fixe o <b>SW-CORE-01</b> como root, o <b>SW-CORE-02</b> como reserva e proteja as portas de cliente.",
+      "z": "Meu MikroTik de 200 reais virou o chefe do seu Spanning Tree. Todo mundo passa por mim agora.",
+      "me": "Prioridade padrão é 32768 e o desempate é pelo MAC. Vou tirar a sorte da eleição.",
+      "lesson": [
+        "O STP elege um <b>root bridge</b>: ganha o menor bridge ID, que é a prioridade seguida do MAC. Os caminhos são calculados a partir dele.",
+        "Todo switch sai de fábrica com prioridade <b>32768</b>. Empatou, ganha o menor MAC, e pode ser o equipamento de um cliente.",
+        "No Huawei, <b>stp root primary</b> põe prioridade 0 e <b>stp root secondary</b> põe 4096: o root e o reserva ficam fixos.",
+        "<b>stp root-protection</b> na porta que vai para o cliente descarta BPDU que tente virar root por ali. <b>stp edged-port enable</b> é para porta de host, que nunca deve mandar BPDU.",
+        "<b>stp bpdu-protection</b> (global) desliga a porta de borda que receber BPDU."
+      ],
+      "tip": "Root = stp root primary. Reserva = stp root secondary. Porta para switch de cliente = root-protection. Porta de host = edged-port, com bpdu-protection global.",
+      "learn": "Com todas as prioridades em 32768, o MikroTik do cliente venceu pelo MAC. Agora o core é root (prioridade 0), o segundo core é o reserva (4096), a porta do cliente tem root protection e as portas de host são edged com BPDU protection.",
+      "html": "<div class=\"cli\"><span class=\"c\"># SW-CORE-01</span><br>stp mode rstp<br>stp [a]<br><br><span class=\"c\"># SW-CORE-02</span><br>stp [b]<br><br><span class=\"c\"># SW-AGREG-01, porta que vai para o switch do cliente</span><br>interface GigabitEthernet0/0/5<br>&nbsp;stp [c]<br><br><span class=\"c\"># SW-AGREG-01, porta da câmera do POP (host)</span><br>interface GigabitEthernet0/0/20<br>&nbsp;stp [d]<br><span class=\"c\"># global</span><br>stp [e]</div><div class=\"kv\">Prioridade padrão de fábrica<span class=\"grow\"></span>[f]</div><div class=\"kv\">Critério de desempate na eleição<span class=\"grow\"></span>[g]</div>",
+      "zones": {
+        "a": [
+          "root primary"
+        ],
+        "b": [
+          "root secondary"
+        ],
+        "c": [
+          "root-protection"
+        ],
+        "d": [
+          "edged-port enable"
+        ],
+        "e": [
+          "bpdu-protection"
+        ],
+        "f": [
+          "32768"
+        ],
+        "g": [
+          "menor MAC"
+        ]
+      },
+      "chips": [
+        {
+          "t": "root primary",
+          "why": "Prioridade 0 no SW-CORE-01: ele vence qualquer switch com prioridade padrão."
+        },
+        {
+          "t": "root secondary",
+          "why": "Prioridade 4096: assume se o core principal cair."
+        },
+        {
+          "t": "root-protection",
+          "why": "Na porta para o cliente, descarta BPDU que tente fazer do cliente o root."
+        },
+        {
+          "t": "edged-port enable",
+          "why": "Porta de host: sobe direto, sem esperar o STP."
+        },
+        {
+          "t": "bpdu-protection",
+          "why": "Desliga a porta de borda que receber BPDU, como um switch plugado no lugar da câmera."
+        },
+        {
+          "t": "32768",
+          "why": "Prioridade padrão de quase todo switch."
+        },
+        {
+          "t": "menor MAC",
+          "why": "Com prioridades iguais, vence o menor MAC."
+        },
+        {
+          "t": "priority 61440",
+          "why": "61440 é a pior prioridade possível: o switch nunca seria root."
+        },
+        {
+          "t": "disable",
+          "why": "Desligar o STP é o que deixou a agregação vulnerável a loop."
+        },
+        {
+          "t": "maior MAC",
+          "why": "É ao contrário: em tudo no STP, o menor valor vence."
+        },
+        {
+          "t": "4096",
+          "why": "4096 é o que o stp root secondary configura. O padrão de fábrica é 32768."
+        }
+      ],
+      "explain": {
+        "a": "stp root primary deixa o SW-CORE-01 com prioridade 0: ninguém com prioridade padrão ganha dele.",
+        "b": "stp root secondary deixa o SW-CORE-02 com 4096: é o próximo da fila se o core principal cair.",
+        "c": "Na porta para o switch do cliente, root-protection ignora BPDU melhor que o root atual. O cliente pode ter STP, mas não manda na sua rede.",
+        "d": "Porta de host vira edged: sobe na hora e não participa da eleição.",
+        "e": "bpdu-protection desliga uma porta edged que receber BPDU: alguém trocou a câmera por um switch.",
+        "f": "Prioridade padrão 32768: por isso, sem configurar, a eleição vai para o desempate.",
+        "g": "Empate de prioridade: vence o menor MAC. Foi assim que o MikroTik do cliente virou root."
+      }
+    },
+    {
+      "title": "Vocabulário MPLS",
+      "tag": "LIGAÇÃO",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo o desenho do backbone MPLS...",
+      "heads": [
+        "TERMO",
+        "O QUE É NO BACKBONE"
+      ],
+      "goal": "Ligue cada termo de MPLS ao papel dele no backbone do provedor.",
+      "z": "PE, P, CE, LSP, LDP... É sopa de letrinhas. Aposto que você só decora.",
+      "me": "Cada sigla é uma peça do backbone. Monto o desenho de cabeça.",
+      "lesson": [
+        "No MPLS, o pacote ganha um <b>rótulo</b> (label) na entrada do backbone e os roteadores do meio encaminham olhando só o rótulo, sem consultar o IP.",
+        "<b>CE</b> é o equipamento do cliente. <b>PE</b> é o roteador do provedor na borda, onde o cliente se liga. <b>P</b> é o roteador do núcleo, que só troca rótulos.",
+        "O <b>LDP</b> distribui os rótulos entre vizinhos. O caminho rotulado de um PE até outro é o <b>LSP</b>.",
+        "Em cima do MPLS o provedor vende L2VPN: <b>VPWS</b> é um circuito ponto a ponto, <b>VPLS</b> junta vários pontos numa mesma rede local."
+      ],
+      "tip": "CE = cliente. PE = borda do provedor. P = núcleo. LDP = distribui rótulos. LSP = caminho rotulado. VPWS = ponto a ponto. VPLS = multiponto.",
+      "learn": "O backbone MPLS separa quem fala com o cliente (PE) de quem só transporta (P). O LDP distribui os rótulos, o LSP é o caminho entre os PEs, e em cima dele rodam os serviços L2VPN: VPWS ponto a ponto e VPLS multiponto.",
+      "left": [
+        {
+          "id": "ce",
+          "t": "CE",
+          "s": "Customer Edge",
+          "why": "CE é o roteador ou switch do cliente. Ele não fala MPLS: só entrega o tráfego ao PE."
+        },
+        {
+          "id": "pe",
+          "t": "PE",
+          "s": "Provider Edge",
+          "why": "O PE recebe o tráfego do cliente, põe o rótulo na entrada e tira na saída."
+        },
+        {
+          "id": "p",
+          "t": "P",
+          "s": "Provider",
+          "why": "O P fica no núcleo e só troca um rótulo por outro. Nem sabe quais clientes existem."
+        },
+        {
+          "id": "ldp",
+          "t": "LDP",
+          "s": "Label Distribution Protocol",
+          "why": "O LDP anuncia aos vizinhos qual rótulo usar para chegar em cada destino (FEC)."
+        },
+        {
+          "id": "lsp",
+          "t": "LSP",
+          "s": "Label Switched Path",
+          "why": "O LSP é o caminho de rótulos de um PE até outro, montado a partir do IGP e do LDP."
+        },
+        {
+          "id": "vpws",
+          "t": "VPWS",
+          "s": "L2VPN",
+          "why": "VPWS (pseudowire) liga duas pontas como se fosse um cabo: ponto a ponto."
+        },
+        {
+          "id": "vpls",
+          "t": "VPLS",
+          "s": "L2VPN",
+          "why": "VPLS junta várias pontas numa mesma rede local, com aprendizado de MAC no PE."
+        }
+      ],
+      "right": [
+        {
+          "id": "ce",
+          "t": "Equipamento do cliente",
+          "s": "não roda MPLS",
+          "why": "Essa ponta é do cliente: ela não sabe nada de rótulos."
+        },
+        {
+          "id": "pe",
+          "t": "Borda do provedor",
+          "s": "põe e tira o rótulo",
+          "why": "Aqui é onde o rótulo entra e sai: a borda do backbone."
+        },
+        {
+          "id": "p",
+          "t": "Núcleo do backbone",
+          "s": "só troca rótulos",
+          "why": "Aqui fica o roteador que só comuta rótulos, sem olhar o cliente."
+        },
+        {
+          "id": "ldp",
+          "t": "Distribui os rótulos",
+          "s": "entre vizinhos",
+          "why": "Isso é trabalho de um protocolo de distribuição de rótulos."
+        },
+        {
+          "id": "lsp",
+          "t": "Caminho rotulado",
+          "s": "de um PE a outro",
+          "why": "Aqui vai o caminho que os rótulos formam, não um equipamento."
+        },
+        {
+          "id": "vpws",
+          "t": "Circuito ponto a ponto",
+          "s": "como um cabo",
+          "why": "Serviço que liga só duas pontas."
+        },
+        {
+          "id": "vpls",
+          "t": "Rede local multiponto",
+          "s": "várias filiais",
+          "why": "Serviço que junta várias pontas numa LAN."
+        }
+      ]
+    },
+    {
+      "title": "LSP que não sobe",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "PE-01",
+      "prompt": "<PE-01>",
+      "cap": "Conectando no PE-01 do backbone...",
+      "goal": "Descubra por que o circuito L2VPN do cliente entre PE-01 e PE-03 não sobe.",
+      "intro": "Ativação nova: um VPWS do cliente Atacadão entre o <b>PE-01</b> e o <b>PE-03</b> (loopback 10.255.0.3) não sobe. O PE-02 funciona normal. Você está no PE-01 (Huawei VRP).",
+      "z": "O circuito do seu cliente novo não sobe. Só esqueci uma linha num PE que você nem está olhando.",
+      "me": "O VPWS precisa de LSP até a loopback do outro PE. Sem rota /32, sem LSP.",
+      "lesson": [
+        "Num backbone MPLS, cada PE tem uma <b>loopback /32</b>. É para ela que o LDP cria o LSP, e é ela que o serviço L2VPN usa como destino.",
+        "O LDP só monta o LSP para um destino que esteja na tabela de rotas do IGP (OSPF ou IS-IS), com a máscara exata /32.",
+        "Se a loopback de um PE não for anunciada no IGP, a sessão LDP até pode existir com os vizinhos, mas não há LSP até ele.",
+        "O VPWS também usa uma sessão LDP remota (targeted) entre os dois PEs, para combinar o rótulo do circuito. Ela também depende da rota até a loopback.",
+        "No Huawei: <b>display mpls ldp session</b>, <b>display mpls lsp</b> e <b>display ip routing-table</b>."
+      ],
+      "tip": "Compare 10.255.0.2 (funciona) com 10.255.0.3 (não funciona) na tabela de rotas e na lista de LSPs.",
+      "learn": "O PE-03 não anunciava a loopback 10.255.0.3/32 no OSPF. Sem rota, o LDP não montou o LSP e o VPWS ficou down. Anunciar a loopback no IGP do PE-03 trouxe a rota, o LSP e o circuito.",
+      "cmds": [
+        {
+          "c": "display mpls l2vc brief",
+          "alias": [
+            "dis mpls l2vc brief",
+            "display mpls l2vc"
+          ],
+          "out": "Total LDP VC : 2     1 up       1 down\n\n *Client Interface     : GigabitEthernet0/2/3.120\n  Administrator PW      : no\n  AC status             : up\n  VC State              : down\n  VC ID                 : 120\n  VC Type               : VLAN\n  session state         : down\n  Destination           : 10.255.0.3\n  link state            : down",
+          "why": "O VC 120 (o VPWS do cliente) está down, com destino 10.255.0.3, a loopback do PE-03. O lado do cliente (AC) está up."
+        },
+        {
+          "c": "display mpls ldp session",
+          "alias": [
+            "dis mpls ldp session"
+          ],
+          "out": " LDP Session(s) in Public Network\n Codes: LAM(Label Advertisement Mode), SsnAge Unit(DDDD:HH:MM)\n ------------------------------------------------------------------------------\n PeerID             Status      LAM  SsnRole  SsnAge       KASent/Rcv\n ------------------------------------------------------------------------------\n 10.255.0.2:0       Operational DU   Passive  0012:04:51   112380/112379\n 10.255.0.10:0      Operational DU   Passive  0012:04:51   112377/112381\n ------------------------------------------------------------------------------\n TOTAL: 2 session(s) Found.",
+          "why": "O PE-01 tem LDP com o PE-02 e com o P (10.255.0.10). Não há sessão com o 10.255.0.3, que o VPWS precisa."
+        },
+        {
+          "c": "display ip routing-table 10.255.0.3",
+          "alias": [
+            "dis ip routing-table 10.255.0.3"
+          ],
+          "out": "Route Flags: R - relay, D - download to fib\n------------------------------------------------------------------------------\nRouting Table : Public\nSummary Count : 0",
+          "why": "Nenhuma rota para 10.255.0.3: o OSPF não conhece a loopback do PE-03."
+        },
+        {
+          "c": "display ip routing-table 10.255.0.2",
+          "alias": [
+            "dis ip routing-table 10.255.0.2"
+          ],
+          "out": "Route Flags: R - relay, D - download to fib\n------------------------------------------------------------------------------\nRouting Table : Public\nSummary Count : 1\nDestination/Mask    Proto   Pre  Cost      Flags NextHop         Interface\n\n     10.255.0.2/32  OSPF    10   2           D   10.0.0.6        GigabitEthernet0/1/0",
+          "why": "Para comparar: a loopback do PE-02 está na tabela, aprendida pelo OSPF como /32. Por isso o circuito dele funciona."
+        },
+        {
+          "c": "display mpls lsp",
+          "alias": [
+            "dis mpls lsp"
+          ],
+          "out": "-------------------------------------------------------------------------------\n                 LSP Information: LDP LSP\n-------------------------------------------------------------------------------\nFEC                In/Out Label  In/Out IF                      Vrf Name\n10.255.0.1/32      3/NULL        -/-\n10.255.0.2/32      NULL/1027     -/GE0/1/0\n10.255.0.10/32     NULL/3        -/GE0/1/0",
+          "why": "Há LSP para o PE-02 e para o P, mas nenhum para 10.255.0.3/32."
+        },
+        {
+          "c": "display ospf peer brief",
+          "alias": [
+            "dis ospf peer brief"
+          ],
+          "out": " OSPF Process 1 with Router ID 10.255.0.1\n  Peer Statistic Information\n ----------------------------------------------------------------------------\n Area Id          Interface                        Neighbor id      State\n 0.0.0.0          GigabitEthernet0/1/0             10.255.0.10      Full\n ----------------------------------------------------------------------------",
+          "why": "A adjacência OSPF com o P está Full. O OSPF funciona; só não recebe a loopback do PE-03."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que o VPWS para o PE-03 não sobe?",
+          "v": [
+            "O que falta para existir LSP até o PE-03?"
+          ],
+          "o": [
+            "Não há rota /32 para a loopback 10.255.0.3, então não existe LSP até o PE-03",
+            {
+              "t": "O LDP está desligado no PE-01",
+              "why": "O PE-01 tem duas sessões LDP operacionais."
+            },
+            {
+              "t": "A porta do cliente (AC) está down",
+              "why": "AC status: up. O problema está do lado do backbone."
+            },
+            {
+              "t": "O OSPF do PE-01 caiu",
+              "why": "A adjacência com o P está Full e a rota do PE-02 chega normal."
+            }
+          ],
+          "a": 0,
+          "why": "O LDP só cria LSP para destinos que o IGP conhece. Sem 10.255.0.3/32 na tabela, não há LSP, e o pseudowire não sobe."
+        },
+        {
+          "q": "Onde e o que corrigir?",
+          "v": [
+            "Qual a correção certa para a loopback do PE-03?"
+          ],
+          "o": [
+            "No PE-03: anunciar a loopback 10.255.0.3/32 no OSPF",
+            {
+              "t": "No PE-01: criar uma rota estática para 10.255.0.3",
+              "why": "Estática no meio de um backbone com IGP é remendo: some a convergência e o LDP pode não seguir o caminho certo."
+            },
+            {
+              "t": "No PE-01: reiniciar o LDP",
+              "why": "O LDP está bom. Falta o destino na tabela de rotas."
+            },
+            {
+              "t": "No P: desligar o MPLS",
+              "why": "Derruba todos os circuitos do backbone."
+            }
+          ],
+          "a": 0,
+          "why": "A loopback de todo PE precisa estar no IGP, como /32. Com o anúncio, todos os roteadores aprendem a rota e o LDP monta o LSP.",
+          "run": "# no PE-03\nsystem-view\nospf 1\n area 0.0.0.0\n  network 10.255.0.3 0.0.0.0\n  quit\n quit",
+          "out": "# de volta ao PE-01\nTotal LDP VC : 2     2 up       0 down\n  VC ID                 : 120\n  VC State              : up\n  Destination           : 10.255.0.3"
+        },
+        {
+          "q": "Por que a loopback precisa ser /32 e não uma /24 resumida?",
+          "v": [
+            "Se o PE-03 anunciasse 10.255.0.0/24 em vez da /32, o LSP subiria?"
+          ],
+          "o": [
+            "Porque o LDP, por padrão, exige rota com a máscara exata do destino (FEC) para montar o LSP",
+            {
+              "t": "Porque /24 não existe em loopback",
+              "why": "Existe, mas aí a FEC do LDP não bate com a rota resumida."
+            },
+            {
+              "t": "Porque o OSPF não anuncia /24",
+              "why": "O OSPF anuncia qualquer máscara. O problema é o LDP casar a FEC."
+            },
+            {
+              "t": "Tanto faz a máscara",
+              "why": "Faz diferença: o LDP casa a FEC pela rota exata."
+            }
+          ],
+          "a": 0,
+          "why": "O LDP casa o rótulo com a rota exata na tabela (a FEC /32). Resumir as loopbacks no IGP é um erro clássico que quebra LSPs."
+        }
+      ]
+    },
+    {
+      "title": "CGNAT sem portas",
+      "tag": "TERMINAL",
+      "type": "term",
+      "loc": "rack",
+      "host": "CGNAT-ASR",
+      "cap": "Conectando no concentrador CGNAT...",
+      "goal": "Descubra por que parte dos assinantes não abre sites e ajuste o CGNAT.",
+      "intro": "Desde a tarde, alguns assinantes conseguem conectar no PPPoE mas \"a internet não abre\" de vez em quando. O CGNAT é um <b>Cisco ASR (IOS-XE)</b> com 16 IPs públicos para 4.000 assinantes.",
+      "z": "Meus bots dentro da sua rede abrem conexão sem parar. Seu pool de portas acaba antes da janta.",
+      "me": "No CGNAT, IP público é dividido por porta. Vou ver quem está comendo as portas.",
+      "lesson": [
+        "No <b>CGNAT</b> vários assinantes saem pelo mesmo IP público, separados pela <b>porta de origem</b>. Cada IP público tem por volta de <b>64.512</b> portas úteis (1024 a 65535).",
+        "Se um assinante abre conexões demais (malware, torrent, bot), ele consome as portas que eram dos outros: quem chega depois não consegue sair.",
+        "Conta de capacidade: IPs públicos × 64.512 ÷ assinantes = portas por assinante.",
+        "No IOS-XE, <b>show ip nat statistics</b> mostra o uso do pool e <b>ip nat translation max-entries all-host</b> limita quantas traduções cada IP interno pode ter."
+      ],
+      "tip": "Pool em 100% e misses subindo = sem portas. Ache o IP interno com dezenas de milhares de traduções e limite por assinante.",
+      "learn": "Um assinante infectado abria dezenas de milhares de conexões e esgotava as portas do pool. Limitar as traduções por IP interno (max-entries all-host) devolveu as portas para os outros, e a conta IPs × 64.512 ÷ assinantes diz quando é hora de aumentar o pool.",
+      "cmds": [
+        {
+          "c": "show ip nat statistics",
+          "alias": [
+            "sh ip nat statistics",
+            "sh ip nat stat"
+          ],
+          "out": "Total active translations: 1031684 (0 static, 1031684 dynamic; 1031684 extended)\nOutside interfaces:\n  TenGigabitEthernet0/1/0\nInside interfaces:\n  TenGigabitEthernet0/1/1\nHits: 2291044712  Misses: 48211\nExpired translations: 98122301\nDynamic mappings:\n-- Inside Source\n[Id: 1] access-list CGNAT pool POOL-CGNAT refcount 1031684\n pool POOL-CGNAT: id 1, netmask 255.255.255.240\n\tstart 177.10.4.0 end 177.10.4.15\n\ttype generic, total addresses 16, allocated 16 (100%), misses 48211",
+          "why": "O pool tem 16 IPs e está 100% alocado, com 1,03 milhão de traduções e 48 mil misses: conexões que não conseguiram porta."
+        },
+        {
+          "c": "show ip nat translations | count 100.64.12.77",
+          "alias": [
+            "sh ip nat translations | count 100.64.12.77",
+            "sh ip nat tr | count 100.64.12.77"
+          ],
+          "out": "Number of lines which match regexp = 61377",
+          "why": "Um único assinante (100.64.12.77) tem mais de 61 mil traduções: quase um IP público inteiro só para ele."
+        },
+        {
+          "c": "show ip nat translations | count 100.64.12.78",
+          "alias": [
+            "sh ip nat translations | count 100.64.12.78",
+            "sh ip nat tr | count 100.64.12.78"
+          ],
+          "out": "Number of lines which match regexp = 143",
+          "why": "Para comparar: um assinante normal usa algumas centenas de portas."
+        },
+        {
+          "c": "show running-config | include ip nat",
+          "alias": [
+            "sh run | i ip nat",
+            "show run | include ip nat"
+          ],
+          "out": "ip nat settings mode cgn\nip nat pool POOL-CGNAT 177.10.4.0 177.10.4.15 netmask 255.255.255.240\nip nat inside source list CGNAT pool POOL-CGNAT overload\n ip nat outside\n ip nat inside",
+          "why": "Não há nenhum limite de traduções por assinante: qualquer um pode consumir quantas portas quiser."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que parte dos assinantes não abre sites?",
+          "v": [
+            "O que esgotou o CGNAT?"
+          ],
+          "o": [
+            "As portas do pool acabaram, e um assinante sozinho consome mais de 61 mil traduções",
+            {
+              "t": "O link com a operadora está cheio",
+              "why": "Os misses são do NAT: a conexão nem consegue porta para sair."
+            },
+            {
+              "t": "O DNS dos assinantes caiu",
+              "why": "O PPPoE e o DNS respondem; a falha é na tradução de saída."
+            },
+            {
+              "t": "O PPPoE está recusando login",
+              "why": "Os assinantes conectam no PPPoE. O problema vem depois, no NAT."
+            }
+          ],
+          "a": 0,
+          "why": "Pool em 100%, misses subindo e um IP interno com 61 mil traduções: o assinante infectado esgota as portas dos outros."
+        },
+        {
+          "q": "Qual a correção no CGNAT?",
+          "v": [
+            "Como impedir que um assinante sozinho esgote o pool?"
+          ],
+          "o": [
+            "Limitar as traduções por assinante com ip nat translation max-entries all-host",
+            {
+              "t": "Tirar o overload do NAT",
+              "why": "Sem overload, cada assinante precisaria de um IP público inteiro. Com 16 IPs, só 16 sairiam."
+            },
+            {
+              "t": "Reiniciar o CGNAT de hora em hora",
+              "why": "Derruba todo mundo e o assinante infectado volta a lotar o pool em minutos."
+            },
+            {
+              "t": "Bloquear o assinante na OLT para sempre",
+              "why": "Ele precisa ser avisado e tratado, mas o CGNAT tem que se proteger de qualquer um que faça o mesmo."
+            }
+          ],
+          "a": 0,
+          "why": "Com um teto por IP interno, nenhum assinante consegue sozinho mais do que a parte dele. Depois, avise o cliente sobre a máquina infectada.",
+          "run": "configure terminal\nip nat translation max-entries all-host 2000\nend",
+          "out": "Total active translations: 412907\n\ttype generic, total addresses 16, allocated 16 (100%), misses 0"
+        },
+        {
+          "q": "Com 16 IPs públicos e 1.024 portas por assinante, quantos assinantes cabem?",
+          "v": [
+            "Reservando 1.024 portas para cada cliente, 16 IPs públicos atendem quantos assinantes?"
+          ],
+          "o": [
+            "Cerca de 1.008",
+            {
+              "t": "16",
+              "why": "Seria 1 assinante por IP, sem compartilhar portas: isso não é CGNAT."
+            },
+            {
+              "t": "4.000",
+              "why": "4.000 assinantes × 1.024 portas = 4 milhões de portas. 16 IPs só têm uns 1 milhão."
+            },
+            {
+              "t": "65.536",
+              "why": "65.536 é o total de portas de um único IP, e nem todas são utilizáveis."
+            }
+          ],
+          "a": 0,
+          "why": "16 × 64.512 = 1.032.192 portas. Dividindo por 1.024 por assinante: uns 1.008 assinantes. Para 4.000 assinantes com 1.024 portas, seriam necessários 64 IPs."
+        }
+      ]
+    },
+    {
+      "title": "Ofício judicial",
+      "tag": "PERÍCIA",
+      "type": "drop",
+      "mode": "slots",
+      "loc": "desk",
+      "cap": "Abrindo o ofício e os logs do CGNAT...",
+      "goal": "Responda ao ofício identificando o assinante certo a partir dos logs do CGNAT.",
+      "intro": "Chegou um ofício: <b>\"identificar o usuário do IP 177.10.4.9, porta 40213, em 30/10/2026 às 14:32:07 (horário de Brasília)\"</b>. O servidor de logs do CGNAT grava em <b>UTC</b>. Os registros mais próximos são:<div class=\"cli\">17:32:04 NAT ADD 100.64.12.77:49817 -> 177.10.4.9:40213<br>17:32:05 NAT ADD 100.64.13.4:60001 -> 177.10.4.9:40214<br>17:32:06 NAT ADD 100.64.12.31:51234 -> 177.10.4.9:40210</div>",
+      "z": "Fiz besteira atrás do seu CGNAT. Junto comigo, mais 250 assinantes usam o mesmo IP. Boa sorte achando qual sou eu.",
+      "me": "IP, porta e horário com fuso. Com os três, só sobra um assinante.",
+      "lesson": [
+        "Atrás do CGNAT, centenas de assinantes saem pelo mesmo IP público. Só o <b>IP + porta de origem + data e hora</b> apontam para um assinante.",
+        "O <b>Marco Civil da Internet</b> (art. 13) obriga o provedor de conexão a guardar os registros de conexão por 1 ano, em sigilo.",
+        "Logs costumam ficar em <b>UTC</b>. Brasília é UTC−3: 14:32 em Brasília são 17:32 UTC. Errar o fuso aponta para o assinante errado.",
+        "O log do CGNAT dá o IP interno (100.64.x.x). Quem tinha esse IP naquele horário está no <b>accounting do RADIUS</b> (login do PPPoE).",
+        "A <b>RFC 6302</b> recomenda que os sites também registrem a porta de origem: sem ela, o ofício chega incompleto."
+      ],
+      "tip": "Converta o horário para UTC (+3 h), ache a linha com o mesmo IP e a mesma porta e cruze o IP interno com o RADIUS.",
+      "learn": "14:32:07 em Brasília são 17:32:07 UTC. A tradução para 177.10.4.9:40213 foi criada às 17:32:04 para o IP interno 100.64.12.77, e o accounting do RADIUS diz qual login PPPoE tinha esse IP. Sem a porta, o IP público sozinho aponta para centenas de assinantes.",
+      "html": "<div class=\"kv\">Horário do ofício em UTC<span class=\"grow\"></span>[utc]</div><div class=\"kv\">IP interno (CGNAT) que usava a porta 40213<span class=\"grow\"></span>[ip]</div><div class=\"kv\">Onde descobrir o assinante dono desse IP interno<span class=\"grow\"></span>[rad]</div><div class=\"kv\">Dado que, faltando, torna impossível identificar<span class=\"grow\"></span>[porta]</div><div class=\"kv\">Lei que obriga guardar os registros de conexão<span class=\"grow\"></span>[lei]</div><div class=\"kv\">Por quanto tempo<span class=\"grow\"></span>[tempo]</div>",
+      "zones": {
+        "utc": [
+          "17:32:07"
+        ],
+        "ip": [
+          "100.64.12.77"
+        ],
+        "rad": [
+          "accounting do RADIUS"
+        ],
+        "porta": [
+          "porta de origem"
+        ],
+        "lei": [
+          "Marco Civil da Internet"
+        ],
+        "tempo": [
+          "1 ano"
+        ]
+      },
+      "chips": [
+        {
+          "t": "17:32:07",
+          "why": "14:32:07 em Brasília (UTC−3) são 17:32:07 em UTC."
+        },
+        {
+          "t": "11:32:07",
+          "why": "Subtraiu em vez de somar: de Brasília para UTC se somam 3 horas."
+        },
+        {
+          "t": "100.64.12.77",
+          "why": "A linha das 17:32:04 liga 100.64.12.77 à porta 40213."
+        },
+        {
+          "t": "100.64.13.4",
+          "why": "Esse usava a porta 40214, não a 40213."
+        },
+        {
+          "t": "100.64.12.31",
+          "why": "Esse usava a porta 40210, não a 40213."
+        },
+        {
+          "t": "accounting do RADIUS",
+          "why": "O RADIUS registra qual login PPPoE recebeu cada IP e quando."
+        },
+        {
+          "t": "tabela ARP do BNG",
+          "why": "A ARP só mostra o momento atual e some em minutos. Não serve para um horário passado."
+        },
+        {
+          "t": "porta de origem",
+          "why": "Sem a porta, o IP público aponta para todos os assinantes que dividem esse IP."
+        },
+        {
+          "t": "MAC do roteador do cliente",
+          "why": "O MAC não atravessa a internet: o site nunca vê o MAC do assinante."
+        },
+        {
+          "t": "Marco Civil da Internet",
+          "why": "Lei 12.965/2014. O art. 13 trata da guarda dos registros de conexão."
+        },
+        {
+          "t": "LGPD",
+          "why": "A LGPD trata da proteção de dados pessoais, não da obrigação de guardar registros de conexão."
+        },
+        {
+          "t": "1 ano",
+          "why": "O art. 13 do Marco Civil fixa 1 ano para os registros de conexão."
+        },
+        {
+          "t": "6 meses",
+          "why": "6 meses é o prazo dos registros de acesso a aplicações (art. 15), que é obrigação dos sites, não do provedor de conexão."
+        }
+      ],
+      "explain": {
+        "utc": "O ofício usa horário de Brasília (UTC−3) e o log está em UTC: some 3 horas.",
+        "ip": "17:32:04 NAT ADD 100.64.12.77:49817 -> 177.10.4.9:40213: a tradução da porta 40213 era desse IP interno, e ela ainda valia às 17:32:07.",
+        "rad": "O accounting do RADIUS liga o IP interno ao login PPPoE e ao horário da sessão.",
+        "porta": "Com CGNAT, IP sem porta de origem não identifica ninguém.",
+        "lei": "O Marco Civil (Lei 12.965/2014) obriga a guarda dos registros de conexão.",
+        "tempo": "Art. 13: 1 ano, em ambiente controlado e de segurança."
+      }
+    },
+    {
+      "title": "Madrugada no provedor",
+      "tag": "CHEFE",
+      "type": "defense",
+      "loc": "war",
+      "miniboss": true,
+      "cap": "Alerta vermelho no NOC do provedor...",
+      "goal": "Ligue as 4 regras certas na borda e segure as duas ondas sem derrubar o BGP, o DNS dos assinantes nem o ICMP.",
+      "intro": "Ataque misto contra a borda <b>177.10.0.0/22</b>. Os pacotes chegam sem cor: a cor só aparece depois que o firewall decide.",
+      "z": "Tudo de uma vez: reflexão de roteador de cliente, IP forjado e o meu C2 batendo na sua porta 179. Escolha bem.",
+      "me": "Reflexão se barra pela porta de origem, spoofing pela faixa e o C2 pela origem. O resto passa.",
+      "lesson": [
+        "<b>SSDP</b> (UDP 1900) e <b>CLDAP</b> (UDP 389) são protocolos de reflexão muito usados contra provedores: roteadores e servidores mal configurados respondem com pacotes enormes.",
+        "Anti-spoofing (BCP 38): da internet não chega origem privada. 192.168.x.x vindo de fora é forjado.",
+        "A sessão BGP com a operadora (TCP 179) e as respostas DNS que os assinantes pediram (UDP com origem 53) são tráfego legítimo.",
+        "Bloquear todo ICMP quebra o ping de monitoramento e o PMTUD, inclusive o Packet Too Big do IPv6."
+      ],
+      "tip": "Quatro regras: origem 192.168.0.0/16, UDP com origem 1900, UDP com origem 389 e origem 45.67.89.0/24. TCP 179, UDP de origem 53 e ICMP têm tráfego legítimo.",
+      "learn": "Borda de provedor bem filtrada: anti-spoofing, reflexão barrada pela porta de origem do serviço abusado (SSDP 1900, CLDAP 389) e a faixa do atacante bloqueada pela origem. Sem tocar no BGP com a operadora, nas respostas DNS dos assinantes e no ICMP essencial.",
+      "server": "BORDA 177.10.0.0/22",
+      "start": 3000,
+      "rules": [
+        {
+          "id": "spoof",
+          "t": "Bloquear origem 192.168.0.0/16 vinda da internet",
+          "match": {
+            "src": "192.168.0.0/16"
+          },
+          "good": true,
+          "why": "Anti-spoofing: 192.168 é faixa privada. Vindo da internet, é origem forjada."
+        },
+        {
+          "id": "ssdp",
+          "t": "Bloquear UDP com origem 1900 (SSDP)",
+          "match": {
+            "proto": "udp",
+            "sport": 1900
+          },
+          "good": true,
+          "why": "Reflexão SSDP: roteadores domésticos com UPnP exposto respondendo para a vítima. Ninguém da sua borda pediu isso."
+        },
+        {
+          "id": "cldap",
+          "t": "Bloquear UDP com origem 389 (CLDAP)",
+          "match": {
+            "proto": "udp",
+            "sport": 389
+          },
+          "good": true,
+          "why": "Reflexão CLDAP: servidores de diretório expostos devolvendo respostas grandes. Nenhum assinante consulta LDAP sem conexão na internet."
+        },
+        {
+          "id": "c2",
+          "t": "Bloquear origem 45.67.89.0/24 (rede do C2)",
+          "match": {
+            "src": "45.67.89.0/24"
+          },
+          "good": true,
+          "why": "A faixa do C2 do Z3R0. Bloqueie a origem, qualquer que seja a porta."
+        },
+        {
+          "id": "bgp",
+          "t": "Bloquear TCP/179 (BGP)",
+          "match": {
+            "proto": "tcp",
+            "port": 179
+          },
+          "why": "Armadilha: derruba a sessão BGP com a operadora e tira o provedor do ar."
+        },
+        {
+          "id": "dns",
+          "t": "Bloquear UDP com origem 53 (DNS)",
+          "match": {
+            "proto": "udp",
+            "sport": 53
+          },
+          "why": "Armadilha: são as respostas DNS que os resolvedores pediram para os assinantes. Sem elas, ninguém abre site."
+        },
+        {
+          "id": "icmp",
+          "t": "Bloquear todo ICMP",
+          "match": {
+            "proto": "icmp"
+          },
+          "why": "Armadilha: quebra o monitoramento e o PMTUD. Filtre ICMP com critério, nunca por inteiro."
+        }
+      ],
+      "waves": [
+        {
+          "msg": "Primeira onda: reflexão e tráfego de assinante misturados.",
+          "packets": [
+            {
+              "src": "200.1.1.1",
+              "proto": "tcp",
+              "port": 179,
+              "why": "Keepalive da sessão BGP com a operadora A. Sem ela, as rotas do provedor somem."
+            },
+            {
+              "src": "187.45.3.9",
+              "proto": "udp",
+              "sport": 1900,
+              "port": 41000,
+              "bad": true,
+              "why": "Resposta SSDP que ninguém pediu: reflexão vinda de roteador doméstico exposto."
+            },
+            {
+              "src": "8.8.8.8",
+              "proto": "udp",
+              "sport": 53,
+              "port": 40100,
+              "why": "Resposta DNS para o resolvedor do provedor. Tráfego legítimo de assinante."
+            },
+            {
+              "src": "192.168.88.1",
+              "proto": "udp",
+              "sport": 1900,
+              "port": 41000,
+              "bad": true,
+              "why": "Origem 192.168 vinda da internet: forjada. E ainda com cara de SSDP."
+            },
+            {
+              "src": "45.67.89.33",
+              "proto": "tcp",
+              "port": 179,
+              "bad": true,
+              "why": "A faixa do C2 tentando abrir sessão na sua porta 179. Só a regra de origem pega sem derrubar o BGP de verdade."
+            },
+            {
+              "src": "201.17.40.2",
+              "proto": "icmp",
+              "why": "Ping do monitoramento externo. Bloquear todo ICMP esconde a borda e quebra o PMTUD."
+            }
+          ]
+        },
+        {
+          "msg": "Segunda onda: CLDAP entrando forte.",
+          "packets": [
+            {
+              "src": "52.14.7.90",
+              "proto": "udp",
+              "sport": 389,
+              "port": 40000,
+              "bad": true,
+              "why": "Resposta CLDAP que ninguém pediu: reflexão com amplificação de dezenas de vezes."
+            },
+            {
+              "src": "1.1.1.1",
+              "proto": "udp",
+              "sport": 53,
+              "port": 40122,
+              "why": "Outra resposta DNS legítima, do resolvedor da Cloudflare."
+            },
+            {
+              "src": "103.20.8.14",
+              "proto": "udp",
+              "sport": 389,
+              "port": 40000,
+              "bad": true,
+              "why": "Mais reflexão CLDAP."
+            },
+            {
+              "src": "45.67.89.10",
+              "proto": "tcp",
+              "port": 22,
+              "bad": true,
+              "why": "O C2 do Z3R0 tentando SSH na borda."
+            },
+            {
+              "src": "200.1.1.1",
+              "proto": "tcp",
+              "port": 179,
+              "why": "Mais um keepalive do BGP com a operadora."
+            },
+            {
+              "src": "177.32.11.5",
+              "proto": "udp",
+              "sport": 1900,
+              "port": 41002,
+              "bad": true,
+              "why": "SSDP refletido de outro roteador doméstico."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

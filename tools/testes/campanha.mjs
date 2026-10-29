@@ -16,7 +16,8 @@ import { matches, path, reach, compile } from '../../src/engine/netlib.js';
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const LV = join(ROOT, 'src/levels/');
 const read = f => JSON.parse(readFileSync(LV + f, 'utf8'));
-const levels = read('index.json').acts.flatMap(f => read(f).levels);
+const IDX = read('index.json'), TRILHAS = IDX.trilhas || [{ acts: IDX.acts }];
+const levels = TRILHAS.flatMap((t, ti) => t.acts.flatMap(f => read(f).levels.map(L => ({ ...L, trail: ti }))));
 const txt = x => typeof x === 'string' ? x : x.t, val = x => typeof x === 'string' ? x : (x.v ?? x.t);
 
 // Playwright local ou global, sem exigir package.json no projeto.
@@ -27,7 +28,7 @@ async function loadPlaywright() {
 }
 
 // Servidor estático mínimo (o jogo usa ES modules e fetch, então precisa de HTTP).
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.woff2': 'font/woff2' };
 function serve() {
   const srv = createServer((req, res) => {
     let p = normalize(decodeURIComponent(req.url.split('?')[0])).replace(/^(\.\.[/\\])+/, '');
@@ -145,7 +146,14 @@ try {
     const ok = await p.waitForSelector('#mMap', { timeout: L.type === 'defense' ? 45000 : 9000 }).then(() => true, () => false);
     if (!ok) { falhas++; await p.screenshot({ path: join(ROOT, 'teste-falha.png') }); console.log(`✗ ${i + 1}. ${L.title} travou (print em teste-falha.png)`); break; }
     console.log(`✓ ${String(i + 1).padStart(2)}. ${L.title.padEnd(26)} ${(L.type + (L.mode ? '/' + L.mode : '')).padEnd(13)} ${await p.$eval('.bigstars', e => e.textContent)}${mistake ? '  (com erro de propósito)' : ''}`);
-    if (i < levels.length - 1) await p.click('#mNext');
+    if (i < levels.length - 1) {
+      if (levels[i + 1].trail === L.trail) await p.click('#mNext');
+      else {   // fim da trilha: volta ao mapa, abre a próxima trilha e a primeira fase dela
+        if (await p.$('#mNext')) throw new Error(`"${L.title}" oferece PRÓXIMA no fim da trilha`);
+        await p.click('#mMap'); await p.waitForSelector('#map.on');
+        await p.click(`.trail[data-t="${levels[i + 1].trail}"]`); await p.click(`.node[data-i="${i + 1}"]`);
+      }
+    }
   }
 } catch (e) { falhas++; console.log('✗ erro no teste:', e.message); }
 if (errs.length) { falhas++; console.log('✗ erros no console:', errs); }

@@ -1,7 +1,7 @@
 // Estudo: aula em cartões com checagem no briefing, e o modal de estudo do mapa
 // (biblioteca com as aulas das fases liberadas + glossário completo).
 import { $, store, esc, shuffle, vary, missN, missInc } from './util.js';
-import { LEVELS, ACTS, unlocked } from './state.js';
+import { LEVELS, ACTS, num, unlocked } from './state.js';
 import { flow, modal, closeModal, linkGloss } from './ui.js';
 import { GLOSS } from './glossary.js';
 import { addXP } from './career.js';
@@ -74,8 +74,8 @@ export function openStudy(tab = 0) {
     box.innerHTML = ACTS.map((a, ai) => {
       const lv = LEVELS.map((L, i) => [L, i]).filter(([L]) => L.act === ai);
       return `<details class="lib"${ai === 0 ? ' open' : ''}><summary><span>${esc(a[0])}</span> ${esc(a[1])}</summary>${lv.map(([L, i]) => unlocked(i)
-        ? `<details class="libl"><summary>${i + 1}. ${esc(L.title)}</summary><ul>${(L.lesson || []).map(x => `<li>${x}</li>`).join('')}</ul><div class="libk"><b>Resumo:</b> ${L.learn}</div></details>`
-        : `<div class="libl lock">🔒 ${i + 1}. ${esc(L.title)}</div>`).join('')}</details>`;
+        ? `<details class="libl"><summary>${num(i)}. ${esc(L.title)}</summary><ul>${(L.lesson || []).map(x => `<li>${x}</li>`).join('')}</ul><div class="libk"><b>Resumo:</b> ${L.learn}</div></details>`
+        : `<div class="libl lock">🔒 ${num(i)}. ${esc(L.title)}</div>`).join('')}</details>`;
     }).join('') + '<div class="fnote">As aulas aparecem aqui conforme as fases são liberadas no mapa.</div>';
     linkGloss(box);
   } else {

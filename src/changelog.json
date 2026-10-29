@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "v": "1.21",
+      "date": "2026-10-29",
+      "title": "Plantão no provedor",
+      "items": [
+        "O mapa agora tem trilhas: a Trilha inicial (tudo que já existia) e as trilhas Redes, Linux, Servidores e Segurança",
+        "Trilha Redes no ar: 11 fases de provedor com terminais Huawei, Juniper, MikroTik e Cisco",
+        "BGP em Active e oscilando, loop na agregação, STP com root errado, MPLS e LSP, CGNAT sem portas e ofício judicial com logs",
+        "Reforço de IPv6 de provedor: RA, DHCPv6-PD, ICMPv6 e PMTUD",
+        "Linux, Servidores e Segurança aparecem como EM BREVE"
+      ]
+    },
+    {
       "v": "1.20",
       "date": "2026-10-29",
       "title": "Achou erro? Avisa o NOC",

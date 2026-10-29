@@ -1,5 +1,6 @@
-// Carrega as fases de src/levels/. O index.json lista os arquivos de ato na ordem do mapa.
-import { LEVELS, ACTS } from './state.js';
+// Carrega as fases de src/levels/. O index.json lista as trilhas e, em cada uma, os arquivos de ato na ordem do mapa.
+// "acts" (lista plana de todos os atos) continua lá para o validador e o teste; a ordem é a mesma das trilhas.
+import { LEVELS, ACTS, TRAILS } from './state.js';
 
 const BASE = new URL('../levels/', import.meta.url);
 
@@ -10,10 +11,16 @@ async function get(file) {
 }
 
 export async function loadLevels() {
-  const { acts } = await get('index.json');
-  const data = await Promise.all(acts.map(get));
-  data.forEach((a, ai) => {
-    ACTS.push([a.tag, a.name, a.diff || '', a.story || null]);
-    a.levels.forEach(L => LEVELS.push({ ...L, act: ai }));
+  const idx = await get('index.json');
+  const trails = idx.trilhas || [{ id: 'inicial', name: 'Trilha inicial', icon: '🧭', desc: '', acts: idx.acts }];
+  const data = await Promise.all(trails.map(t => Promise.all(t.acts.map(get))));
+  trails.forEach((t, ti) => {
+    TRAILS.push({ id: t.id, name: t.name, icon: t.icon || '', desc: t.desc || '', soon: t.soon || '', acts: [] });
+    data[ti].forEach(a => {
+      const ai = ACTS.length;
+      ACTS.push([a.tag, a.name, a.diff || '', a.story || null, ti]);
+      TRAILS[ti].acts.push(ai);
+      a.levels.forEach(L => LEVELS.push({ ...L, act: ai, trail: ti }));
+    });
   });
 }

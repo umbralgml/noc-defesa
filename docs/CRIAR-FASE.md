@@ -55,7 +55,28 @@ python3 -m http.server 8000   # e abra http://localhost:8000
 
 Em campos HTML use só marcação simples, como `<b>`. Em `tip` e `learn` não use `<b>`, porque ele vira título dentro da caixa. Os campos `t`, `s`, `why`, `q` e as opções do quiz são exibidos como texto puro.
 
-### O campo `why`: ensinar em cada jogada
+### Trilhas
+
+O `src/levels/index.json` organiza os atos em trilhas de treinamento:
+
+```json
+{
+  "acts": ["prologo.json", "...", "provedor.json"],
+  "trilhas": [
+    { "id": "inicial", "name": "Trilha inicial", "icon": "🧭", "desc": "Visão geral de tudo.", "acts": ["prologo.json", "..."] },
+    { "id": "redes", "name": "Redes", "icon": "🌐", "desc": "Plantão de provedor.", "acts": ["provedor.json"] },
+    { "id": "linux", "name": "Linux", "icon": "🐧", "desc": "Em breve.", "soon": "Em breve", "acts": [] }
+  ]
+}
+```
+
+- `acts` continua existindo: é a soma dos atos de todas as trilhas, na mesma ordem (o validador confere).
+- Cada trilha começa liberada; dentro dela, a fase seguinte libera quando a anterior ganha estrela.
+- Trilha sem atos precisa de `soon` e aparece no mapa como EM BREVE.
+- A dificuldade (`diff`) só sobe dentro de cada trilha.
+- Ato novo: crie o arquivo, inclua em `acts` e na trilha, e acrescente em `CORE` no `sw.js`.
+
+## O campo `why`: ensinar em cada jogada
 
 Quase todo item jogável aceita um `why`, que aparece no painel de explicação logo depois da jogada. Os erros também vão para a lista **PARA REVISAR** no fim da fase. Escreva o `why` como explicação do próprio item: diga **o que ele é** e **por que vai onde vai**. Assim o mesmo texto serve tanto para o acerto quanto para o erro.
 
