@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "v": "1.20",
+      "date": "2026-10-29",
+      "title": "Achou erro? Avisa o NOC",
+      "items": [
+        "Novo botão ⚑ ERRO? em cada explicação, no quiz e no fim da fase: conte o que está errado e a correção entra numa próxima versão",
+        "As fontes do jogo agora vêm junto com ele: o visual fica igual mesmo sem internet, no site e no app",
+        "Revisão técnica do conteúdo: ACLs Cisco com wildcard, NIST 800-61 revisão 3 e outros ajustes"
+      ]
+    },
+    {
       "v": "1.19",
       "date": "2026-10-27",
       "title": "Decoreba não passa",

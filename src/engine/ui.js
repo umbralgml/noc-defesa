@@ -8,7 +8,7 @@ import { S, diffOf } from './state.js';
 import { findGloss } from './glossary.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
-export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, good() {} };
+export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, good() {}, report: null };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
@@ -137,6 +137,8 @@ export function explain(ok, label, why, rec = true) {
   c.innerHTML = `<span class="k">${ok ? '✓ CERTO' : '✗ ERRADO'}</span><span class="ct"><b></b> <span></span></span>`;
   c.querySelector('b').textContent = label + ':';
   c.querySelector('.ct span').textContent = why;
+  // Botão de reportar erro (report.js). Na defesa em tempo real fica só no fim da fase.
+  if (flow.report && why !== GENERIC && !(S.lv && S.lv.type === 'defense')) c.append(flow.report({ item: label, shown: why }));
   c.scrollTop = 0;
   if (rec && !ok && why !== GENERIC) note(label, why);
 }

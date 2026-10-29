@@ -3,6 +3,7 @@ import { $, fmt, center, buzz, store } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
 import { S, LEVELS, ACTS, DIFFS, diffOf, K, unlocked, save, resetProgress, progress } from './state.js';
+import { reportBtn } from './report.js';
 import { flow, initScrollHints, linkGloss, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
 import { submitCampaign, profile } from './rank.js';
 import { renderWire, resetWire, drawWires } from './wire.js';
@@ -179,7 +180,7 @@ function win() {
         <div class="learn"><b>O QUE VOCÊ PRATICOU</b>${L.learn}</div>
         ${reviewHTML()}
         <div class="learn"><b>E AGORA?</b>${S.err ? 'Releia a revisão acima e jogue valendo: as estrelas só contam no jogo normal.' : 'Treino sem erros! Hora de jogar valendo e garantir as 3 estrelas.'}</div>
-        <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mReal">JOGAR VALENDO</button></div>`);
+        <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mReal">JOGAR VALENDO</button></div>`); addReport();
       $('mMap').onclick = () => { closeModal(); goMap(); };
       $('mReal').onclick = () => { closeModal(); startLevel(S.cur); };
     }, 650);
@@ -224,20 +225,27 @@ function win() {
       ${reviewHTML()}
       ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}
       ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
-      <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`);
+      <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`); addReport();
     $('mMap').onclick = () => { closeModal(); goMap(); };
     if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${location.origin + location.pathname}`, e.currentTarget); };
     if (more) $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
     else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
   }, delay);
 }
+// Botão de reportar erro no fim da fase, acima dos botões do modal.
+function addReport() {
+  const rows = $('mcard').querySelectorAll('.row'), r = rows[rows.length - 1]; if (!r) return;
+  const b = reportBtn({ item: 'Fase inteira (aula, enunciado ou jogadas)' }, '⚑ REPORTAR ERRO NESTA FASE'); b.classList.add('repend');
+  r.before(b);
+}
+
 function fail(msg) {
   metric('fail'); cleanup(); sfx.lose(); stopMusic(); setTimeout(() => music('menu'), 2500);
   modal(`<div class="tag">FALHA NA DEFESA</div><h2>Rede comprometida</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${msg} Hahaha!</div></div>
     <div class="learn"><b>DICA</b>${S.lv.tip}</div>
     ${reviewHTML()}
-    <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mRetry">TENTAR DE NOVO</button></div>`);
+    <div class="row"><button class="btn ghostb" id="mMap">MAPA</button><button class="btn" id="mRetry">TENTAR DE NOVO</button></div>`); addReport();
   $('mMap').onclick = () => { closeModal(); goMap(); };
   $('mRetry').onclick = () => { closeModal(); if (S.cur >= 0) startLevel(S.cur, S.hard); else goMap(); };
 }

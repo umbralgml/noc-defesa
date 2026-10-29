@@ -59,6 +59,18 @@ Para ver onde o pessoal mais trava, rode no SQL Editor:
 select * from metricas_resumo;
 ```
 
+## Reportes de erro
+
+O botão **⚑ ERRO?** aparece no painel de explicação de cada jogada, na explicação do quiz e no fim de cada fase. O jogador escolhe o tipo (resposta errada, explicação, digitação ou outro), escreve um comentário e, se quiser, um contato. O reporte vai para a tabela `reportes` com a fase, o item que estava na tela, a explicação mostrada, a versão e a plataforma (web ou android). Sem o ranking configurado, sem a tabela ou sem internet, o jogo abre o e-mail já preenchido.
+
+Para ler: **Table Editor > reportes**, ou no SQL Editor:
+
+```sql
+select * from reportes_abertos;
+```
+
+Depois de tratar, mude a coluna `status` para `corrigido` ou `descartado` (no Table Editor, clique na célula). Ele some da visão `reportes_abertos`.
+
 ## O que o navegador pode e não pode fazer
 
 O `tools/ranking.sql` deixa o papel público (`anon`) com o mínimo:
@@ -69,6 +81,8 @@ O `tools/ranking.sql` deixa o papel público (`anon`) com o mínimo:
 | Ler a visão `ranking_equipes` (equipe, membros, soma) | sim |
 | Inserir uma métrica anônima de fase | sim |
 | Ler as métricas ou a visão `metricas_resumo` | não |
+| Inserir um reporte de erro (o status fica sempre `novo`) | sim |
+| Ler os reportes ou a visão `reportes_abertos` | não |
 | Ler a visão `ranking_top` (melhor resultado de cada jogador, sem o id) | sim |
 | Ler a tabela crua, alterar ou apagar linhas | não |
 | Marcar uma linha como escondida | não |
