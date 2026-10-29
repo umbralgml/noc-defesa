@@ -11,7 +11,7 @@ O objetivo principal é **ensinar**. Diversão é o veículo. Toda mudança de c
 ## Restrições que não mudam
 
 - **Sem build e sem framework.** HTML, CSS e JavaScript puro com ES modules nativos. O GitHub Pages serve o repositório como está. Não adicione bundler, TypeScript, npm dependencies nem `package.json` obrigatório.
-- **Sem dependências externas em runtime**, além das fontes do Google Fonts no `index.html`. Áudio é sintetizado com Web Audio e gráficos são SVG gerado em código.
+- **Sem dependências externas em runtime.** As fontes (Orbitron e JetBrains Mono, licença OFL) ficam em `src/fonts/` e são declaradas no topo do `style.css`; não volte a usar o Google Fonts, porque o app Android precisa funcionar sem internet. Áudio é sintetizado com Web Audio e gráficos são SVG gerado em código.
 - **O progresso salvo usa o título da fase como chave** (`localStorage` `noc_prog` e `noc_best`, ver `K()` em `state.js`). Nunca renomeie o `title` de uma fase publicada sem migrar o progresso.
 - Precisa de servidor HTTP para rodar (módulos e `fetch` não funcionam em `file://`).
 
@@ -59,6 +59,7 @@ src/engine/
   daily.js            desafio diário: sorteio com a data como semente, sequência, compartilhar, duelo
   gen.js              geradores de pergunta: GEN (desafio diário, não mexer sem querer mudar o dia) e ACAD (Academia); sem DOM
   glossary.js         GLOSS: termo, apelidos e definição; findGloss(texto)
+  report.js           botão "⚑ ERRO?" e painel de reporte de erro de conteúdo (tabela reportes; sem banco, abre e-mail). Outros módulos chamam flow.report(ctx)
   study.js            aula em cartões com a pergunta "check" no briefing; sala de estudo (biblioteca de aulas + glossário)
   academy.js          Academia de exercícios: temas com perguntas geradas, sem perder integridade (quiz com `free`), domínio = 10 seguidas
   rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura
@@ -93,7 +94,7 @@ docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 
 `util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `steps` ← `term`, `topo`, `defense`, `pcap` (+ `netlib`) ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa`, `prefs` ← `main`; `rank` ← `cert` ← `game`)
 
-Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js`, `flow.room()` (placas da sala) pelo `room.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
+Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js`, `flow.room()` (placas da sala) pelo `room.js`, `flow.report()` (botão de reportar erro) pelo `report.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
 
 ### Fases fora do mapa
 
@@ -130,6 +131,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Treino sem pressão:** em iniciante/básico o briefing oferece jogar com `S.practice`: o erro conta e explica, mas `damage()` não tira integridade, a dica aparece no 1º erro e nada é salvo.
 - **Modo difícil:** liberado no briefing da fase com 3 estrelas. `S.hard` dobra o dano (`damage()`) e soma um evento do Z3R0. Vencer sem erro grava o título em `noc_gold` (estrela de ouro, destrava a camisa dourada).
 - **Acessibilidade:** todo elemento jogável precisa funcionar com Tab + Enter/espaço. Animação nova deve respeitar a classe `calm` (o CSS já zera animações; pacotes que se movem por transição ficam de fora).
+- **Reportes de erro:** o painel de explicação (`explain()`), a explicação do quiz e o fim da fase têm o botão de reportar. Tipo de fase novo que mostra explicação fora do `explain()` precisa chamar `flow.report({ item, shown })`. Leitura e status dos reportes em `docs/RANKING.md`.
 - **Métricas:** `metric('win'|'fail')` em `rank.js` envia só dados anônimos da fase, e só se o jogador não desligou no perfil (`noc_metricas`).
 - **App Android:** dentro do app (`window.Capacitor`), o `pwa.js` não registra service worker nem mostra "INSTALAR APP", e o botão voltar do Android fecha modal, sai da fase, volta ao início e só então fecha o app. Arquivo novo na raiz que o jogo usa precisa entrar na lista de `app-android/scripts/copiar-web.mjs`.
 - **PWA/offline:** módulo novo em `src/engine/` ou ato novo em `src/levels/` precisa entrar na lista `CORE` do `sw.js` (o validador acusa). Todos os caminhos são relativos (`./`), porque o jogo roda em `/noc-defesa/` no GitHub Pages e na raiz do domínio próprio.

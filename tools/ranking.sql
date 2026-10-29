@@ -104,3 +104,33 @@ from public.metricas
 group by level
 order by pct_derrota desc;
 revoke all on public.metricas_resumo from anon, authenticated;
+
+-- Reportes de erro de conteúdo (v1.20): o botão "⚑ REPORTAR ERRO" do jogo grava aqui.
+-- O navegador só insere. Para ler: Table Editor > reportes (ou a visão reportes_abertos).
+-- Depois de tratar um reporte, mude "status" para 'corrigido' ou 'descartado'.
+create table if not exists public.reportes (
+  id         bigint generated always as identity primary key,
+  level      text        not null check (char_length(level) between 1 and 60),
+  item       text        check (item is null or char_length(item) <= 300),
+  shown      text        check (shown is null or char_length(shown) <= 1000),
+  kind       text        not null check (kind in ('resposta', 'explicacao', 'texto', 'outro')),
+  comment    text        check (comment is null or char_length(comment) <= 1000),
+  contact    text        check (contact is null or char_length(contact) <= 100),
+  version    text        check (version is null or char_length(version) <= 10),
+  platform   text        check (platform in ('web', 'android')),
+  status     text        not null default 'novo' check (status in ('novo', 'corrigido', 'descartado')),
+  created_at timestamptz not null default now()
+);
+alter table public.reportes enable row level security;
+drop policy if exists "qualquer um insere" on public.reportes;
+create policy "qualquer um insere" on public.reportes for insert to anon with check (status = 'novo');
+revoke all on public.reportes from anon, authenticated;
+grant insert (level, item, shown, kind, comment, contact, version, platform) on public.reportes to anon;
+
+-- Só para você (painel do Supabase): reportes ainda não tratados, do mais novo para o mais antigo.
+create or replace view public.reportes_abertos as
+select id, created_at, level, kind, item, comment, shown, contact, version, platform
+from public.reportes
+where status = 'novo'
+order by created_at desc;
+revoke all on public.reportes_abertos from anon, authenticated;

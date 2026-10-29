@@ -1,3 +1,8 @@
+/* Fontes embutidas (SIL OFL, licenças em src/fonts/): funcionam sem internet, no app e no site. */
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/orbitron-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Orbitron';font-style:normal;font-weight:800;font-display:swap;src:url(fonts/orbitron-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/jetbrains-mono-latin-700-normal.woff2) format('woff2')}
 :root{
   --bg:#070d18;--panel:#0f1a2c;--panel2:#15233a;--line:rgba(255,255,255,.1);
   --text:#e6f1ff;--muted:#8a9bb8;--acc:#00e0a8;--bad:#ff4d6d;--warn:#ffd166;--z:#ff2e63;
@@ -684,3 +689,18 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .gllist>div{border-bottom:1px solid var(--line);padding:8px 2px}
 .gllist dt{font-weight:700;font-size:14px}
 .gllist dd{margin:2px 0 0;font-size:13px;color:#c9d6ea;line-height:1.45}
+
+/* Reportar erro (report.js): botão discreto e painel por cima de tudo, inclusive do modal */
+.repbtn{flex:0 0 auto;align-self:flex-start;margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted);font:700 9px 'Orbitron',monospace;letter-spacing:1px;cursor:pointer}
+.repbtn:hover,.repbtn:focus-visible{color:var(--warn);border-color:var(--warn)}
+.why .repbtn{display:block;margin:10px 0 0}
+.repbtn.repend{display:block;margin:12px auto 0}
+.repwrap{position:fixed;inset:0;z-index:150;background:rgba(3,6,12,.86);display:flex;align-items:center;justify-content:center;padding:18px}
+.repcard{width:min(100%,460px);max-height:100%;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.repcard .tag{font:700 10px 'Orbitron',monospace;letter-spacing:1.5px;color:var(--muted)}
+.repcard h2{margin:0;font:800 18px 'Orbitron',monospace}
+.repctx{font-size:12.5px;color:var(--muted)}.repctx b{color:var(--text)}
+.repk{display:flex;flex-direction:column;gap:6px;font-size:13.5px}.repk label{display:flex;gap:8px;align-items:center}
+.repcard textarea,.repcard input:not([type]){width:100%;box-sizing:border-box;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font:14px system-ui,sans-serif;resize:vertical}
+.repcard textarea,.repcard input{user-select:text;-webkit-user-select:text}
+.repmsg{font-size:12.5px;color:var(--warn);min-height:1em}.repmsg a{color:var(--acc)}

@@ -62,6 +62,9 @@ export async function submit(board, score, stars) {
   return true;
 }
 
+// Reporte de erro de conteúdo (report.js). Rejeita sem ranking configurado, para cair no e-mail.
+export const sendReport = row => CFG ? api('reportes', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(row) }) : Promise.reject(new Error('sem ranking'));
+
 // Métricas anônimas por fase (sem id, nome ou aparelho): ajudam a achar fase difícil demais.
 // Desliga no perfil. Falha em silêncio (o banco pode não ter a tabela).
 export function metric(event) {

@@ -72,6 +72,7 @@ function answer(btn) {
   wb.querySelector('span').textContent = q.why;
   const wn = wb.querySelector('.whyno');
   if (wn) { wn.innerHTML = '<b>Sobre a sua resposta:</b> <span></span>'; wn.querySelector('span').textContent = btn._why; }
+  if (flow.report) wb.querySelector('.why').insertBefore(flow.report({ item: q.q, shown: `Resposta: ${opt(q.o[q.a]).t}. ${q.why}` }, '⚑ REPORTAR ERRO'), $('qNext'));
   wb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   $('qNext').onclick = () => {
     if (bossDown) { flow.win(); return; }
