@@ -2,7 +2,7 @@
 import { $, fmt, center, buzz, store } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
-import { S, LEVELS, ACTS, DIFFS, diffOf, K, unlocked, save, resetProgress, progress } from './state.js';
+import { S, LEVELS, ACTS, TRAILS, DIFFS, diffOf, K, num, unlocked, save, resetProgress, progress } from './state.js';
 import { reportBtn } from './report.js';
 import { flow, initScrollHints, linkGloss, show, modal, closeModal, burst, setHP, setScore, stars, hideCoach, lessonHTML, reviewHTML, share } from './ui.js';
 import { submitCampaign, profile } from './rank.js';
@@ -23,17 +23,31 @@ import { metric } from './rank.js';
 const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm, defense: renderDefense, topo: renderTopo, pcap: renderPcap };
 
 // ---------- map ----------
+// Trilha aberta no mapa (localStorage noc_trail). Trilha sem fases aparece como "em breve".
+const curTrail = () => { const id = store('noc_trail'), t = TRAILS.findIndex(x => x.id === id && x.acts.length); return t < 0 ? 0 : t; };
+function trailsHTML(ct) {
+  if (TRAILS.length < 2) return '';
+  return `<div class="trails" role="tablist" aria-label="Trilhas de treinamento">${TRAILS.map((t, ti) => {
+    const lv = LEVELS.filter(L => L.trail === ti), st = lv.reduce((s, L) => s + (S.prog[L.title] || 0), 0), soon = !lv.length;
+    return `<button class="trail${ti === ct ? ' on' : ''}${soon ? ' soon' : ''}" role="tab" aria-selected="${ti === ct}" data-t="${ti}"${soon ? ' aria-disabled="true"' : ''}>
+      <span class="ti">${t.icon}</span><b>${t.name}</b><small>${soon ? 'EM BREVE' : `${lv.length} fases · ★ ${st}/${lv.length * 3}`}</small></button>`;
+  }).join('')}</div><div class="traild">${TRAILS[ct].desc}</div>`;
+}
+
 export function renderMap() {
-  let html = '', tot = 0, pts = 0, gold = store('noc_gold') || [], nextI = LEVELS.findIndex((L, i) => unlocked(i) && !S.prog[K(i)]);
+  const ct = curTrail();
+  let html = trailsHTML(ct), tot = 0, pts = 0, gold = store('noc_gold') || [], nextI = LEVELS.findIndex((L, i) => L.trail === ct && unlocked(i) && !S.prog[K(i)]);
+  LEVELS.forEach((L, i) => { tot += S.prog[K(i)] || 0; pts += S.best[K(i)] || 0; });
   ACTS.forEach((a, ai) => {
+    if (a[4] !== ct) return;
     const done = LEVELS.every((L, i) => L.act !== ai || S.prog[K(i)]);
     html += `<div class="acth"><span>${a[0]}</span>${a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div><div class="path">`;
     LEVELS.forEach((L, i) => {
       if (L.act !== ai) return;
-      const st = S.prog[K(i)] || 0; tot += st; pts += S.best[K(i)] || 0;
+      const st = S.prog[K(i)] || 0;
       const lock = !unlocked(i), next = i === nextI;
       const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
-      html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : i + 1}</span>
+      html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : num(i)}</span>
         <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
         ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
     });
@@ -76,7 +90,7 @@ export function brief(i) { story(LEVELS[i], () => showBrief(i)); }
 // Diálogo, aula rápida e missão.
 function showBrief(i) {
   const L = LEVELS[i];
-  modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${i + 1}. ${L.title}</h2>
+  modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${num(i)}. ${L.title}</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${L.z}</div></div>
     <div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>${L.me}</div></div>
     ${cardsHTML(L)}
@@ -97,7 +111,7 @@ function cleanup() {
   resetDrop(); resetWire(); resetDefense(); resetTopo(); stopZ3r0();
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
-function startLevel(i, hard, practice) { play(LEVELS[i], (i + 1) + '. ' + LEVELS[i].title + (hard ? ' ☠' : practice ? ' 🛟' : ''), { hard, practice }); }
+function startLevel(i, hard, practice) { play(LEVELS[i], num(i) + '. ' + LEVELS[i].title + (hard ? ' ☠' : practice ? ' 🛟' : ''), { hard, practice }); }
 
 // Roda qualquer fase. Fases fora do mapa (S.cur = -1) não salvam estrelas e
 // podem trazer L.onWin(res) para tratar o fim do jeito delas.
@@ -197,7 +211,7 @@ function win() {
   const xr = addXP(20 + st * 15 + (first ? 50 : 0) + (gold ? 40 : 0));
   onLevelWin(L, st); metric('win');
   // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
-  const last = !!L.boss, more = S.cur < LEVELS.length - 1;
+  const last = !!L.boss, more = S.cur < LEVELS.length - 1 && LEVELS[S.cur + 1].trail === L.trail;   // a seguinte, só dentro da mesma trilha
   let delay = 650;
   if (L.boss || L.miniboss) {
     delay = 3600; stopMusic();
@@ -256,6 +270,8 @@ export function initGame() {
   flow.win = win; flow.fail = fail;
   $('mapList').addEventListener('click', e => {
     const c = e.target.closest('.certb'); if (c) { au(); certModal(+c.dataset.a); return; }
+    const t = e.target.closest('.trail');
+    if (t) { if (t.classList.contains('soon')) { buzz(30); return; } au(); store('noc_trail', TRAILS[+t.dataset.t].id); renderMap(); return; }
     const b = e.target.closest('.node'); if (!b) return;
     const i = +b.dataset.i;
     if (!unlocked(i)) { buzz(30); return; }

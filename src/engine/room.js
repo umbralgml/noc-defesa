@@ -3,7 +3,7 @@
 import { $, store } from './util.js';
 import { sfx, au } from './audio.js';
 import { ROOM_W, STATIONS, LOCNAME, roomSVG } from './scene.js';
-import { S, LEVELS, K, unlocked } from './state.js';
+import { S, LEVELS, K, num, unlocked } from './state.js';
 import { flow, modal, closeModal } from './ui.js';
 import { brief } from './game.js';
 
@@ -57,7 +57,7 @@ function openStation(t) {
     <div class="stlist">${list.map(({ L, i }) => {
       const st = S.prog[K(i)] || 0, lock = !unlocked(i);
       return `<button class="stl${lock ? ' lock' : ''}${i === nextI ? ' next' : ''}" data-i="${i}" ${lock ? 'disabled' : ''}>
-        <span class="stln">${lock ? '🔒' : i + 1}</span><span class="stt">${L.title}<small>${L.tag}</small></span>
+        <span class="stln">${lock ? '🔒' : num(i)}</span><span class="stt">${L.title}<small>${L.tag}</small></span>
         <span class="sts">${i === nextI ? 'PRÓXIMO' : '★'.repeat(st) + '☆'.repeat(3 - st)}</span></button>`;
     }).join('')}</div>
     <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button></div>`);

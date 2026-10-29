@@ -139,10 +139,17 @@ function checkSteps(steps, err, warn) {
 }
 
 const idxActs = () => read('index.json').acts;
-// A dificuldade só pode subir ao longo da campanha (progressão para quem está começando).
+// Trilhas: cada ato em exatamente uma trilha, na mesma ordem da lista "acts" (o teste e o sw.js usam a lista plana).
+const trilhas = read('index.json').trilhas || [{ id: 'inicial', acts: idxActs() }];
 {
-  const D = ['iniciante', 'básico', 'intermediário', 'avançado']; let prev = 0;
-  idxActs().forEach(f => { const d = D.indexOf(read(f).diff); if (d >= 0 && d < prev) warns.push(`${f}: dificuldade "${D[d]}" depois de um ato mais difícil`); if (d >= 0) prev = d; });
+  const flat = trilhas.flatMap(t => t.acts), ids = new Set();
+  if (JSON.stringify(flat) !== JSON.stringify(idxActs())) errors.push('index.json: "acts" precisa ser a soma dos atos das trilhas, na mesma ordem');
+  trilhas.forEach(t => { if (!t.id || !t.name) errors.push('index.json: trilha sem "id" ou "name"'); if (ids.has(t.id)) errors.push(`index.json: trilha "${t.id}" repetida`); ids.add(t.id); if (!t.acts.length && !t.soon) warns.push(`index.json: trilha "${t.id}" vazia sem "soon"`); });
+}
+// A dificuldade só pode subir dentro de cada trilha (progressão para quem está começando).
+{
+  const D = ['iniciante', 'básico', 'intermediário', 'avançado'];
+  trilhas.forEach(t => { let prev = 0; t.acts.forEach(f => { const d = D.indexOf(read(f).diff); if (d >= 0 && d < prev) warns.push(`${f}: dificuldade "${D[d]}" depois de um ato mais difícil na trilha "${t.id}"`); if (d >= 0) prev = d; }); });
 }
 const titles = new Map();
 let total = 0;

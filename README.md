@@ -8,7 +8,7 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 46 fases, do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente.
+São 57 fases organizadas em trilhas de treinamento. A **Trilha inicial** (46 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** (já no ar), **Linux**, **Servidores** e **Segurança** (em breve).
 
 | Parte | Nível | Tema | Fases |
 |-------|-------|------|-------|
@@ -21,6 +21,12 @@ São 46 fases, do zero ao avançado: um Prólogo para quem nunca viu rede, a For
 | 5 | intermediário | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM, rastro do C2 numa captura e o chefe final |
 | 6 | avançado | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
 | 7 | avançado | Troubleshooting no terminal | investigar switch e roteador com comandos IOS (porta em shutdown, rota padrão apagada) e o contra-ataque final na borda |
+
+Trilha **Redes**:
+
+| Ato | Nível | Tema | Fases |
+|-----|-------|------|-------|
+| 1 | intermediário | Plantão no provedor | IPv6 de provedor (RA, DHCPv6-PD, ICMPv6, PMTUD), PD no PPPoE do MikroTik, BGP em Active no Huawei, BGP oscilando no Junos, loop na agregação, STP com root errado, MPLS e LSP que não sobe, CGNAT sem portas no Cisco, ofício judicial com logs de CGNAT e o chefe na borda |
 
 O jogo foi feito para ensinar, não só para testar:
 
