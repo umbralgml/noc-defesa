@@ -84,8 +84,10 @@ src/engine/
   room.js             sala do NOC no topo do mapa: herói anda (toque/setas), câmera acompanha, estação abre os incidentes do `loc`
 tools/validar-fases.mjs
 privacidade.html      política de privacidade (URL exigida pela Play Store)
+testar.html           convite do teste fechado da Play Store (links nas constantes GRUPO e TESTE)
 app-android/          app Android com Capacitor: copia o jogo para www/ e empacota no APK (offline). Único lugar com package.json;
-                      o jogo continua sem build. Guia de publicação em app-android/PUBLICAR.md
+                      o jogo continua sem build. Guia de publicação em app-android/PUBLICAR.md;
+                      textos, respostas do Console e imagens da loja em app-android/loja/
 .github/workflows/android.yml  compila APK de teste e AAB da Play Store (assinado com os segredos NOC_*)
 docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 ```

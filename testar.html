@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste o app · NOC: Última Linha de Defesa</title>
+<meta name="description" content="Ajude a lançar o NOC na Play Store: entre no teste fechado do app Android.">
+<meta property="og:title" content="Teste o app NOC na Play Store">
+<meta property="og:description" content="Ajude a lançar o jogo de redes e segurança no Android: 14 dias de teste fechado.">
+<meta property="og:image" content="https://umbralgml.github.io/noc-defesa/og-image.png">
+<link rel="icon" href="src/icons/icon.svg" type="image/svg+xml">
+<style>
+  :root { --bg: #070d18; --panel: #0f1a2c; --fg: #e6f1ff; --dim: #8a9bb8; --acc: #00e0a8; --warn: #ffd166; --line: rgba(255,255,255,.1); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+  .top { display: flex; align-items: center; gap: 14px; }
+  .top img { width: 56px; height: 56px; border-radius: 12px; }
+  h1 { font-size: 1.4rem; color: var(--acc); margin: 0; line-height: 1.2; }
+  h2 { font-size: 1.05rem; margin: 2rem 0 .5rem; }
+  p, li { color: var(--fg); }
+  small, .dim { color: var(--dim); }
+  ol { padding-left: 1.3rem; }
+  li { margin: .5rem 0; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 1.5rem; }
+  .btn { display: block; text-align: center; background: var(--acc); color: #04201a; font-weight: 700; text-decoration: none; border-radius: 12px; padding: 14px; margin-top: 12px; }
+  .btn.off { background: transparent; color: var(--dim); border: 1px dashed var(--line); pointer-events: none; }
+  .warn { color: var(--warn); }
+  a { color: var(--acc); }
+</style>
+</head>
+<body>
+<main>
+<div class="top"><img src="src/icons/icon-192.png" alt=""><h1>Ajude o NOC a chegar na Play Store</h1></div>
+
+<p>O jogo já roda no navegador. Para virar app na Play Store, o Google exige um teste fechado: pelo menos 12 pessoas com o app instalado por 14 dias seguidos. Se você tem um celular Android, pode ser uma delas.</p>
+
+<div class="box">
+  <b>O que você precisa</b>
+  <ul>
+    <li>Celular Android com a Play Store</li>
+    <li>A conta Google (Gmail) que você usa nesse celular</li>
+    <li>Manter o app instalado por 14 dias e abrir de vez em quando</li>
+  </ul>
+</div>
+
+<h2>Como entrar</h2>
+<ol>
+  <li>Entre no grupo de testadores com o mesmo Gmail da Play Store do seu celular.<a class="btn" id="bGrupo" href="#">ENTRAR NO GRUPO</a></li>
+  <li>Depois de entrar no grupo, abra o link do teste e toque em "Tornar-se testador".<a class="btn" id="bTeste" href="#">ABRIR O LINK DO TESTE</a></li>
+  <li>Na mesma página, toque em "Fazer o download no Google Play" e instale o app.</li>
+  <li>Não desinstale por 14 dias. Jogar algumas fases e mandar sua opinião ajuda muito.</li>
+</ol>
+<p class="warn" id="aviso" hidden>Os links abrem em meados de novembro. Volte aqui ou acompanhe o LinkedIn do Marcos.</p>
+
+<h2>Achou um problema?</h2>
+<p>Use o botão "⚑ ERRO?" dentro do jogo ou escreva para <a href="mailto:marcos.anjosarth@gmail.com?subject=NOC%20-%20teste%20fechado">marcos.anjosarth@gmail.com</a>.</p>
+
+<p class="dim">Enquanto isso, dá para jogar no navegador: <a href="./">umbralgml.github.io/noc-defesa</a>. Privacidade: <a href="privacidade.html">o que o jogo coleta</a>.</p>
+</main>
+<script>
+  // Preencha quando criar o grupo e a faixa de teste fechado no Play Console.
+  const GRUPO = ''; // ex.: https://groups.google.com/g/noc-testadores
+  const TESTE = ''; // ex.: https://play.google.com/apps/testing/br.com.zioncore.noc
+  const set = (id, url) => { const a = document.getElementById(id); if (url) a.href = url; else { a.classList.add('off'); a.textContent += ' (em breve)'; } };
+  set('bGrupo', GRUPO); set('bTeste', TESTE);
+  if (!GRUPO || !TESTE) document.getElementById('aviso').hidden = false;
+</script>
+</body>
+</html>
