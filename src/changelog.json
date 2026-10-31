@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.22",
+      "date": "2026-10-31",
+      "title": "Plantão no servidor Linux",
+      "items": [
+        "Trilha Linux no ar: 5 fases de servidor no dia a dia do plantão",
+        "Permissões em número: 644, 600, 755, 700, 640 e o setuid",
+        "Disco cheio, nginx que não sobe e o OOM killer derrubando o banco, tudo no terminal",
+        "Quiz da agenda do cron, com a pegadinha do /etc/cron.d"
+      ]
+    },
+    {
       "v": "1.21",
       "date": "2026-10-29",
       "title": "Plantão no provedor",

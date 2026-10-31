@@ -9,7 +9,8 @@
     "ato4.json",
     "ato5.json",
     "ato6.json",
-    "provedor.json"
+    "provedor.json",
+    "linux-plantao.json"
   ],
   "trilhas": [
     {
@@ -42,9 +43,10 @@
       "id": "linux",
       "name": "Linux",
       "icon": "🐧",
-      "desc": "Administração de servidores Linux no dia a dia do NOC.",
-      "soon": "Em breve",
-      "acts": []
+      "desc": "Servidor Linux no dia a dia do plantão: permissões, disco cheio, serviço que não sobe, memória que acaba e cron. Nível intermediário: recomendada depois da trilha inicial.",
+      "acts": [
+        "linux-plantao.json"
+      ]
     },
     {
       "id": "servidores",
