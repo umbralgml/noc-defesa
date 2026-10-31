@@ -26,11 +26,11 @@ base64 -w0 noc-upload.jks > noc-upload.b64
 
 8 - Preencher Painel > Configurar o app: política de privacidade com a URL https://umbralgml.github.io/noc-defesa/privacidade.html (publicada pelo GitHub Pages após o merge na main), acesso ao app (todo liberado, sem login), anúncios (não contém), classificação de conteúdo (questionário IARC, categoria jogo educativo, sem violência realista), público-alvo (13 anos ou mais evita as regras de apps infantis), segurança dos dados (coleta opcional: nome e LinkedIn do ranking com consentimento, dados de uso anônimos de desempenho nas fases; nada compartilhado com terceiros; dados criptografados em trânsito via HTTPS; usuário pode pedir exclusão por e-mail), categoria do app (Jogos > Educativo) e e-mail de contato.
 
-9 - Montar a página da loja em Crescer > Presença na loja > Página principal: descrição curta (até 80 caracteres, ex.: "Defenda a rede contra o hacker Z3R0 e aprenda redes e segurança jogando."), descrição completa, ícone 512x512 (src/icons/icon-512.png), imagem de destaque 1024x500 e de 2 a 8 capturas de tela do celular.
+9 - Montar a página da loja em Crescer > Presença na loja > Página principal: descrição curta, descrição completa, ícone 512x512 (src/icons/icon-512.png), imagem de destaque 1024x500 e as 8 capturas de tela. Textos prontos, respostas do Conteúdo do app e imagens estão em app-android/loja/ (comece pelo LOJA.md).
 
 10 - Ativar a Assinatura de apps do Google Play quando o Console pedir no primeiro envio (o Google guarda a chave final; a sua é só a de upload).
 
-11 - Teste fechado obrigatório para conta pessoal nova: em Teste e lançamento > Teste fechado, crie uma faixa, envie o .aab, adicione uma lista com pelo menos 12 e-mails de testadores (contas Google que usam Android) e publique na faixa. Mande o link de participação para eles; os 12 precisam ficar inscritos por 14 dias seguidos. Se cair abaixo de 12, o prazo recomeça.
+11 - Teste fechado obrigatório para conta pessoal nova: em Teste e lançamento > Teste fechado, crie uma faixa, envie o .aab, adicione como testadores um grupo do Google (passo a passo no app-android/loja/LOJA.md, seção 7) ou uma lista com pelo menos 12 e-mails de contas Google que usam Android, e publique na faixa. A página https://umbralgml.github.io/noc-defesa/testar.html explica o teste para quem vai participar. Mande o link de participação para eles; os 12 precisam ficar inscritos por 14 dias seguidos. Se cair abaixo de 12, o prazo recomeça.
 
 12 - Depois dos 14 dias: Painel > Solicitar acesso à produção, responder o questionário sobre o teste (quantos testaram, o que mudou com o feedback) e aguardar a análise (geralmente alguns dias).
 
