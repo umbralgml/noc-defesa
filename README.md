@@ -8,7 +8,7 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 57 fases organizadas em trilhas de treinamento. A **Trilha inicial** (46 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** (já no ar), **Linux**, **Servidores** e **Segurança** (em breve).
+São 62 fases organizadas em trilhas de treinamento. A **Trilha inicial** (46 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** e **Linux** (já no ar), **Servidores** e **Segurança** (em breve).
 
 | Parte | Nível | Tema | Fases |
 |-------|-------|------|-------|
@@ -27,6 +27,12 @@ Trilha **Redes**:
 | Ato | Nível | Tema | Fases |
 |-----|-------|------|-------|
 | 1 | intermediário | Plantão no provedor | IPv6 de provedor (RA, DHCPv6-PD, ICMPv6, PMTUD), PD no PPPoE do MikroTik, BGP em Active no Huawei, BGP oscilando no Junos, loop na agregação, STP com root errado, MPLS e LSP que não sobe, CGNAT sem portas no Cisco, ofício judicial com logs de CGNAT e o chefe na borda |
+
+Trilha **Linux**:
+
+| Ato | Nível | Tema | Fases |
+|-----|-------|------|-------|
+| 1 | intermediário | Servidor Linux de plantão | permissões em número (chmod e setuid), disco cheio com log em DEBUG (df, du, lsof +L1, truncate, logrotate), nginx que não sobe com a porta 80 ocupada (systemctl, journalctl, ss), OOM killer derrubando o MySQL (free, dmesg, php-fpm) e agenda do cron |
 
 O jogo foi feito para ensinar, não só para testar:
 
