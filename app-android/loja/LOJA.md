@@ -120,7 +120,7 @@ Feito por um analista de redes brasileiro para quem quer entrar ou crescer na á
 ## 6 - Notas da versão para o teste fechado (até 500 caracteres)
 
 Primeira versão de teste do NOC no Android.
-- Jogo completo offline, com 57 fases em trilhas
+- Jogo completo offline, com todas as fases em trilhas
 - Desafio diário, academia de exercícios e treino dos seus erros
 - Use o botão ⚑ ERRO? se encontrar algo errado
 Obrigado por testar! Mantenha o app instalado por 14 dias e jogue quando puder.
