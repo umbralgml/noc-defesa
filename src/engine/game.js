@@ -36,7 +36,7 @@ function trailsHTML(ct) {
 
 export function renderMap() {
   const ct = curTrail();
-  let html = trailsHTML(ct), tot = 0, pts = 0, gold = store('noc_gold') || [], nextI = LEVELS.findIndex((L, i) => L.trail === ct && unlocked(i) && !S.prog[K(i)]);
+  let html = '', tot = 0, pts = 0, gold = store('noc_gold') || [], nextI = LEVELS.findIndex((L, i) => L.trail === ct && unlocked(i) && !S.prog[K(i)]);
   LEVELS.forEach((L, i) => { tot += S.prog[K(i)] || 0; pts += S.best[K(i)] || 0; });
   ACTS.forEach((a, ai) => {
     if (a[4] !== ct) return;
@@ -49,13 +49,14 @@ export function renderMap() {
       const lock = !unlocked(i), next = i === nextI;
       const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
       html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : num(i)}</span>
-        <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${LOCNAME[L.loc]} · ${L.tag}</small></span>
+        <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${L.tag}</small></span>
         ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
     });
     html += '</div>';
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
-  $('mapList').innerHTML = '<div id="dailyBox"></div><div id="trainBox"></div><div id="acadBox"></div><div id="studyBox"></div>' + html;
+  // Trilhas no topo; desafio, treino, academia e sala de estudo num bloco compacto logo abaixo.
+  $('mapList').innerHTML = trailsHTML(ct) + '<div class="hub"><div id="dailyBox"></div><div id="trainBox"></div><div id="acadBox"></div><div id="studyBox"></div></div>' + html;
   flow.map(); flow.room(); flow.train(); flow.acad(); flow.study();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}${gold.length ? ` <i class="gold">★${gold.length}</i>` : ''}<small>${fmt(pts)} PTS</small>`;

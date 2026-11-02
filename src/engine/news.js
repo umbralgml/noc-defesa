@@ -17,12 +17,13 @@ export async function loadNews() {
     <b class="vt">${esc(v.title)}</b><ul>${v.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('');
   $('newsDot').classList.toggle('on', fresh);
   $('newsBtn').onclick = $('tUpdBtn').onclick = () => $('news').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  $('tUpdLast').textContent = `(última: v${versions[0].v}, ${versions[0].title})`;
+  $('tUpdLast').textContent = `v${versions[0].v}: ${versions[0].title}`;
+  $('tUpdBtn').classList.toggle('fresh', fresh);
 }
 
 // Chamado ao iniciar o turno: o jogador já viu as novidades desta versão.
 export function markNewsSeen() {
   if (!latest) return;
   try { localStorage.setItem('noc_seen_ver', latest); } catch (e) {}
-  $('newsDot').classList.remove('on');
+  $('newsDot').classList.remove('on'); $('tUpdBtn')?.classList.remove('fresh');
 }
