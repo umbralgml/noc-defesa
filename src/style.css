@@ -865,3 +865,5 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tplay.live{cursor:pointer;background:linear-gradient(135deg,#00e0a8,#00b98a);color:#03130d;border-color:transparent}
 .tplay.live small{color:#03130d}
 .tplay.live .tpi path{fill:#03130d}
+/* No computador a coluna da tela inicial rola: nenhum item pode encolher (o selo era espremido e cortado) */
+#title .content>*{flex-shrink:0}
