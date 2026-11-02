@@ -2,6 +2,7 @@
   "tag": "PRÓLOGO",
   "name": "Primeiros passos na rede",
   "diff": "iniciante",
+  "nivel": true,
   "story": [
     {
       "who": "chefe",

@@ -41,7 +41,8 @@ export function renderMap() {
   ACTS.forEach((a, ai) => {
     if (a[4] !== ct) return;
     const done = LEVELS.every((L, i) => L.act !== ai || S.prog[K(i)]);
-    html += `<div class="acth"><span>${a[0]}</span>${a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div><div class="path">`;
+    html += `<div class="acth"><span>${a[0]}</span>${a[5] ? '<i class="diff nivel">NIVELAMENTO</i>' : a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div>`
+      + (a[5] ? '<div class="nivn">Para quem está começando. Já trabalha com isso? O próximo ato já está liberado.</div>' : '') + '<div class="path">';
     LEVELS.forEach((L, i) => {
       if (L.act !== ai) return;
       const st = S.prog[K(i)] || 0;

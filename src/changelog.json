@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "v": "1.23",
+      "date": "2026-11-02",
+      "title": "Linux do zero",
+      "items": [
+        "Nova introdução na trilha Linux: 6 fases para quem nunca abriu um terminal",
+        "Onde estou, pastas do Linux, ler logs, permissões e instalar um serviço",
+        "Toque no ? ao lado de cada comando para abrir o cartão explicando o que ele faz",
+        "Já trabalha com Linux? O Ato 1 da trilha já vem liberado, dá para pular a introdução",
+        "Glossário maior: termos de Linux, IPv6, provedor e cartões de comandos"
+      ]
+    },
+    {
       "v": "1.22",
       "date": "2026-10-31",
       "title": "Plantão no servidor Linux",

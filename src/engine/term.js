@@ -4,7 +4,8 @@
 import { $ } from './util.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
-import { info, flow } from './ui.js';
+import { info, flow, glossCard } from './ui.js';
+import { cmdGloss } from './glossary.js';
 import { runSteps } from './steps.js';
 import { stat, unlock } from './ach.js';
 
@@ -23,9 +24,18 @@ export function renderTerm(level) {
   print(`${L.host}: digite um comando ou toque num dos sugeridos abaixo. "?" lista os comandos.`, 'tsys');
   $('tform').onsubmit = e => { e.preventDefault(); if ($('tin').value.trim() && stat('typed') >= 10) unlock('teclado'); run($('tin').value); $('tin').value = ''; };
   const bank = $('bank');
-  bank.innerHTML = `<div class="bankh"><span>COMANDOS · TOQUE PARA EXECUTAR</span><span id="bankCnt">0/${MIN_CMDS}</span></div>`;
+  const cards = L.cmds.some(c => cmdGloss(c.c));
+  bank.innerHTML = `<div class="bankh"><span>COMANDOS · TOQUE PARA EXECUTAR${cards ? ' · ? EXPLICA' : ''}</span><span id="bankCnt">0/${MIN_CMDS}</span></div>`;
   bank.style.display = 'flex';
-  L.cmds.forEach(c => { const b = document.createElement('button'); b.className = 'cmd'; b.textContent = c.c; b.onclick = () => run(c.c); bank.append(b); });
+  L.cmds.forEach(c => {
+    const b = document.createElement('button'); b.className = 'cmd'; b.textContent = c.c; b.onclick = () => run(c.c);
+    const g = cmdGloss(c.c);
+    if (!g) { bank.append(b); return; }
+    // Comando com cartão: o "?" abre o que ele é, sem rodar nada.
+    const w = document.createElement('span'), q = document.createElement('button');
+    w.className = 'cmdw'; q.className = 'cmdi'; q.type = 'button'; q.textContent = '?'; q.setAttribute('aria-label', 'O que é ' + g[0]);
+    q.onclick = () => glossCard(g, '⌨ COMANDO'); w.append(b, q); bank.append(w);
+  });
   showStep();
 }
 

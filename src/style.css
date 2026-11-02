@@ -433,6 +433,10 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tlock{background:var(--panel2);border:1px dashed #3a5680;border-radius:12px;padding:12px 14px;font-size:13px;color:#c9d6ea}
 .cmd{background:#0c1a2b;border:1px solid #2d4670;border-radius:10px;padding:8px 11px;color:#9fe8d5;font:600 12px 'JetBrains Mono',monospace;text-align:left}
 .cmd.done{border-color:var(--acc);color:var(--muted)}
+.cmdw{display:inline-flex;align-items:stretch}
+.cmdw .cmd{border-top-right-radius:0;border-bottom-right-radius:0}
+.cmdi{min-width:34px;background:#0c1a2b;border:1px solid #2d4670;border-left:0;border-radius:0 10px 10px 0;color:#4dd2ff;font:700 13px 'JetBrains Mono',monospace}
+.cmdi:active{background:#14304f}
 .cmd.done::before{content:'✓ ';color:var(--acc)}
 
 /* ---------- dificuldade, tutorial, dica, chefe ---------- */
@@ -665,6 +669,8 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .lcdots i.done{background:rgba(255,209,102,.5)}
 .lcdots i.on{background:var(--warn);box-shadow:0 0 6px var(--warn)}
 .lcall{display:block;margin:8px auto 0;font-size:12px}
+.diff.nivel{background:rgba(77,210,255,.14);color:#4dd2ff;border-color:rgba(77,210,255,.5)}
+.nivn{margin:-4px 0 10px;font-size:12px;line-height:1.4;color:var(--muted)}
 .gl{cursor:help;text-decoration:underline dotted rgba(77,210,255,.8);text-underline-offset:3px}
 .glpop{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);width:min(92vw,420px);z-index:200;background:#0c1a2c;border:1px solid #4dd2ff;border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.6);transition:transform .25s;display:flex;flex-direction:column;gap:4px}
 .glpop.on{transform:translate(-50%,0)}

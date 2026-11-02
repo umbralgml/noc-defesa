@@ -22,6 +22,7 @@ src/levels/
 | `name` | texto | Nome do ato. |
 | `diff` | `iniciante`, `básico`, `intermediário` ou `avançado` | Selo no mapa. Iniciante e básico ganham dica automática depois do 2º erro. A dificuldade só pode subir ao longo da campanha (o validador avisa). |
 | `story` | lista de `{ "who": "z" \| "me" \| "chefe", "t": "HTML" }` | Cena com o Z3R0, o analista e o chefe do NOC, mostrada uma vez antes da primeira fase do ato. |
+| `nivel` | `true` | Ato de nivelamento: selo NIVELAMENTO no mapa e a primeira fase do ato seguinte já liberada, para quem domina o básico pular. Toda trilha começa com um. |
 
 **Pense em quem está começando.** O Prólogo assume zero conhecimento: analogias, nenhuma pressão de tempo e um tutorial guiado. Conteúdo novo entra no ato do nível certo; se for básico demais para o ato, vai para um ato anterior.
 
@@ -316,6 +317,7 @@ O jogador investiga um equipamento num terminal: digita comandos (aceita os apel
 - `"?"` lista os comandos e `"clear"` limpa a tela; comando fora da lista mostra erro de terminal, sem perder vida.
 - A saída é mostrada exatamente como está (`\n` quebra linha, espaços alinham tabelas). Copie de um equipamento real sempre que puder.
 - O `why` de cada comando aparece no painel na primeira vez que ele roda: é a aula do comando.
+- Comando com item `'cmd'` no `glossary.js` ganha um **?** ao lado, que abre o cartão explicando o que ele faz, sem rodar. O cartão é achado pelas duas primeiras palavras (`systemctl status`) ou pela primeira (`ls`), ignorando o `sudo`. Em ato de nivelamento, todo comando precisa de cartão.
 
 ```json
 {
