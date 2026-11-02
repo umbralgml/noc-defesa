@@ -9,7 +9,8 @@ import { initGame, renderMap, askReset } from './engine/game.js';
 import { progress } from './engine/state.js';
 import { loadNews, markNewsSeen } from './engine/news.js';
 import { initDaily, startDaily, dailyBoard, readChallenge } from './engine/daily.js';
-import { loadRankConfig, openRanking, ensureProfile, profileForm, profile, anonName, titleRanking, hooks } from './engine/rank.js';
+import { loadRankConfig, ensureProfile, profileForm, profile, anonName, hooks } from './engine/rank.js';
+import { openBoard } from './engine/board.js';
 import { initPWA } from './engine/pwa.js';
 import { initRoom } from './engine/room.js';
 import { initZ3r0 } from './engine/z3r0.js';
@@ -44,7 +45,7 @@ function showProgress() {
 }
 
 initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy(); initStudy(); initReport();
-loadRankConfig().then(on => { $('rkBox').hidden = !on; if (on) titleRanking(dailyBoard()); });
+loadRankConfig();
 // Cargo e XP na tela inicial.
 function showRank() {
   const r = rankOf();
@@ -66,13 +67,14 @@ function showWho() {
   const p = profile(); $('tWho').hidden = !p;
   if (p) $('tWhoName').textContent = p.name || anonName();
 }
-hooks.profile = () => { showWho(); titleRanking(dailyBoard()); };
+hooks.profile = () => { showWho(); };
 showWho();
 $('tWhoEdit').onclick = () => profileForm();
 // Mapa → tela inicial, com resumo e ranking atualizados.
-$('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); titleRanking(dailyBoard()); show('title'); };
-document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openRanking(dailyBoard()); });
-loadNews().catch(e => { console.error(e); $('news').hidden = true; $('newsBtn').hidden = true; });
+$('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); show('title'); };
+document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openBoard('rank'); });
+$('newsBtn').onclick = $('tUpdBtn').onclick = () => { au(); openBoard('news'); };
+loadNews().catch(e => { console.error(e); $('tUpdBtn').hidden = true; });
 
 const go = $('goMap'), daily = $('dailyT');
 go.disabled = daily.disabled = true;

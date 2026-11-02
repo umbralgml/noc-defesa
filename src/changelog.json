@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "v": "1.27",
+      "date": "2026-11-02",
+      "title": "NOC em alta definição",
+      "items": [
+        "Cenas das fases repaginadas: rack, terminal, firewall, servidor e telão com visual novo e luzes de status",
+        "Analista redesenhado, com o mesmo vestiário de sempre",
+        "Tela inicial ainda mais viva: câmera lenta, varredura no telão e alerta vermelho quando o Z3R0 entra",
+        "Ranking e log de mudanças agora ficam juntos, em abas, no botão Ranking",
+        "Tela inicial numa coluna só, sem o painel da direita"
+      ]
+    },
+    {
       "v": "1.26",
       "date": "2026-11-02",
       "title": "NOC de cara nova",

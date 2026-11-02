@@ -130,27 +130,19 @@ const top = (board, n) => board === 'equipes'
 const tabsHTML = tab => `<div class="tabs">${BOARDS.map((b, i) => `<button class="tabb${i === tab ? ' on' : ''}" data-t="${i}">${b[1]}</button>`).join('')}</div>`;
 const failMsg = el => { if (el) el.innerHTML = '<div class="rmsg">Não consegui carregar o ranking agora. Tente de novo mais tarde.</div>'; };
 
-export function openRanking(dailyBoard, tab = 0) {
+// head: abas do painel (board.js); after: liga essas abas depois que o modal monta.
+export function openRanking(dailyBoard, tab = 0, head = '', after = null) {
   if (!CFG) return;
-  modal(`<div class="tag">QUADRO DE PLANTÃO</div><h2>Ranking</h2>${tabsHTML(tab)}
+  modal(`${head}<div class="tag">QUADRO DE PLANTÃO</div><h2>Ranking</h2>${tabsHTML(tab)}
     <div class="rlist" id="rList"><div class="rmsg">Carregando...</div></div>
     <div class="rme">Você aparece como <b></b>. <button class="lnk" id="rEdit">editar perfil</button></div>
     <div class="row"><button class="btn ghostb" id="mOk">FECHAR</button></div>`);
   $('mcard').querySelector('.rme b').textContent = publicName();
   $('mOk').onclick = closeModal;
-  $('rEdit').onclick = () => profileForm(() => openRanking(dailyBoard, tab));
-  $('mcard').querySelectorAll('.tabb').forEach(b => b.onclick = () => openRanking(dailyBoard, +b.dataset.t));
+  $('rEdit').onclick = () => profileForm(() => openRanking(dailyBoard, tab, head, after));
+  $('mcard').querySelectorAll('.tabb').forEach(b => b.onclick = () => openRanking(dailyBoard, +b.dataset.t, head, after));
+  if (after) after();
   top(BOARDS[tab][0] || dailyBoard, 50).then(rows => renderRows($('rList'), rows, !!BOARDS[tab][0], BOARDS[tab][0] === 'equipes')).catch(e => { console.error(e); failMsg($('rList')); });
-}
-
-// Quadro compacto (top 10) na tela inicial.
-export function titleRanking(dailyBoard, tab = 0) {
-  const box = $('rkBox'); if (!CFG || !box) return;
-  $('rkTabs').innerHTML = tabsHTML(tab);
-  $('rkTabs').querySelectorAll('.tabb').forEach(b => b.onclick = () => titleRanking(dailyBoard, +b.dataset.t));
-  $('rkAll').onclick = () => openRanking(dailyBoard, tab);
-  $('rkList').innerHTML = '<div class="rmsg">Carregando...</div>';
-  top(BOARDS[tab][0] || dailyBoard, 10).then(rows => renderRows($('rkList'), rows, !!BOARDS[tab][0], BOARDS[tab][0] === 'equipes')).catch(e => { console.error(e); failMsg($('rkList')); });
 }
 
 function renderRows(l, rows, campaign, teams) {
