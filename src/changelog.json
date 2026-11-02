@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.24",
+      "date": "2026-11-02",
+      "title": "IPv6 sem medo",
+      "items": [
+        "Trilha inicial com mais IPv6: aprenda a escrever e encurtar endereços já no Ato 1",
+        "Nova fase de terminal: de onde vem o IPv6 que ninguém configurou (RA, SLAAC e NDP)",
+        "Trilha Redes ganhou nivelamento: vocabulário de provedor, um comando em quatro fabricantes e blocos IPv6",
+        "Já trabalha em provedor? O Ato 1 da trilha Redes continua liberado"
+      ]
+    },
+    {
       "v": "1.23",
       "date": "2026-11-02",
       "title": "Linux do zero",

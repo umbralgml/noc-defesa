@@ -152,6 +152,8 @@ const trilhas = read('index.json').trilhas || [{ id: 'inicial', acts: idxActs() 
   const D = ['iniciante', 'básico', 'intermediário', 'avançado'];
   trilhas.forEach(t => { let prev = 0; t.acts.forEach(f => { const d = D.indexOf(read(f).diff); if (d >= 0 && d < prev) warns.push(`${f}: dificuldade "${D[d]}" depois de um ato mais difícil na trilha "${t.id}"`); if (d >= 0) prev = d; }); });
 }
+// Toda trilha começa com um ato de nivelamento ("nivel": true): o jogo é para quem nunca viu o assunto e para quem já trabalha com ele.
+trilhas.forEach(t => { if (t.acts.length && !read(t.acts[0]).nivel) warns.push(`index.json: a trilha "${t.id}" precisa começar com um ato de nivelamento ("nivel": true)`); });
 const titles = new Map();
 let total = 0;
 for (const f of read('index.json').acts) {

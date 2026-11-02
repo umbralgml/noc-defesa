@@ -1,0 +1,375 @@
+{
+  "tag": "INTRODUÇÃO",
+  "name": "Nivelamento de provedor",
+  "diff": "básico",
+  "nivel": true,
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Plantão de provedor tem vocabulário próprio e quatro fabricantes diferentes no mesmo rack. Antes de pegar incidente, nivela o básico."
+    },
+    {
+      "who": "z",
+      "t": "BNG, CGNAT, display, show, /ip... você vai se perder antes de eu começar."
+    },
+    {
+      "who": "me",
+      "t": "Um comando muda de nome em cada fabricante, mas a ideia é a mesma. Vou montar o meu dicionário."
+    }
+  ],
+  "levels": [
+    {
+      "title": "Vocabulário de provedor",
+      "tag": "VOCABULÁRIO",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo o diagrama do provedor...",
+      "heads": [
+        "SIGLA",
+        "O QUE FAZ NO PROVEDOR"
+      ],
+      "goal": "Ligue cada palavra do dia a dia do provedor ao que ela faz.",
+      "z": "Seu chefe falou em trânsito, peering e BNG na mesma frase. Você só balançou a cabeça.",
+      "me": "Do cliente até a internet: OLT, BNG, CGNAT, e na borda trânsito e peering.",
+      "lesson": [
+        "Siga o caminho do cliente: a fibra chega na <b>OLT</b>, a sessão <b>PPPoE</b> termina no <b>BNG</b> e, se falta IPv4, o <b>CGNAT</b> divide um IP público entre vários clientes.",
+        "Na borda, o provedor é um <b>AS</b>: uma rede com número próprio que troca rotas por <b>BGP</b>.",
+        "<b>Trânsito</b> é o link pago com uma operadora maior, que entrega a internet inteira.",
+        "<b>Peering</b> é a troca direta com outras redes, sem pagar trânsito, muitas vezes num ponto de troca como o IX.br.",
+        "Toque nas palavras sublinhadas para abrir o cartão do glossário."
+      ],
+      "check": {
+        "q": "Em qual equipamento termina a sessão PPPoE do cliente?",
+        "v": [
+          "Quem recebe a autenticação PPPoE dos clientes?",
+          "A sessão PPPoE do assinante chega até qual equipamento?"
+        ],
+        "a": 0,
+        "o": [
+          "No BNG",
+          {
+            "t": "Na OLT",
+            "why": "A OLT cuida da fibra até a casa do cliente. A sessão PPPoE passa por ela e termina no BNG."
+          },
+          {
+            "t": "No roteador de borda",
+            "why": "A borda fala BGP com trânsito e peering. Os clientes terminam no BNG."
+          }
+        ],
+        "why": "O BNG (ou BRAS, ou concentrador) autentica o cliente, aplica o plano de velocidade e entrega o IP."
+      },
+      "tip": "OLT = fibra do cliente. BNG = termina o PPPoE. CGNAT = divide IP público. AS = a rede com número. Trânsito = pago, internet inteira. Peering = troca direta.",
+      "learn": "O caminho do assinante passa pela OLT (fibra), pelo BNG (PPPoE, plano e IP) e pelo CGNAT (IP público dividido). Na borda, o AS do provedor troca rotas por BGP com o trânsito, que é pago, e com o peering, que é direto.",
+      "left": [
+        {
+          "id": "a",
+          "t": "OLT",
+          "s": "",
+          "why": "A OLT fica na central e fala com as ONUs na casa dos clientes pela fibra (GPON)."
+        },
+        {
+          "id": "b",
+          "t": "BNG",
+          "s": "BRAS, concentrador",
+          "why": "O BNG termina as sessões PPPoE, autentica, aplica o plano e entrega o IP do cliente."
+        },
+        {
+          "id": "c",
+          "t": "CGNAT",
+          "s": "",
+          "why": "O CGNAT coloca vários clientes atrás de um IP público, cada um numa faixa de portas."
+        },
+        {
+          "id": "d",
+          "t": "AS",
+          "s": "",
+          "why": "AS é o Sistema Autônomo: a rede do provedor com número próprio, que fala BGP com as outras."
+        },
+        {
+          "id": "e",
+          "t": "Trânsito",
+          "s": "",
+          "why": "Trânsito é o link pago com uma operadora maior, que entrega rota para a internet inteira."
+        },
+        {
+          "id": "f",
+          "t": "Peering",
+          "s": "IX.br",
+          "why": "Peering é a troca direta de tráfego com outra rede, sem pagar trânsito."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Liga a fibra dos clientes",
+          "s": "Fica na central",
+          "why": "Quem fala com a fibra dos clientes é a OLT."
+        },
+        {
+          "id": "b",
+          "t": "Termina o PPPoE do cliente",
+          "s": "",
+          "why": "A sessão PPPoE termina no BNG."
+        },
+        {
+          "id": "c",
+          "t": "Divide um IP público entre clientes",
+          "s": "",
+          "why": "Dividir IPv4 público entre clientes é o CGNAT."
+        },
+        {
+          "id": "d",
+          "t": "Rede com número próprio na internet",
+          "s": "",
+          "why": "Rede com número próprio que fala BGP é um AS."
+        },
+        {
+          "id": "e",
+          "t": "Link pago para a internet inteira",
+          "s": "",
+          "why": "Link pago com rota para tudo é trânsito."
+        },
+        {
+          "id": "f",
+          "t": "Troca direta, sem pagar trânsito",
+          "s": "",
+          "why": "Troca direta entre redes é peering."
+        }
+      ]
+    },
+    {
+      "title": "Quatro fabricantes, um comando",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "rack",
+      "cap": "Abrindo os consoles do rack...",
+      "goal": "Leve cada comando para o fabricante que usa esse jeito de escrever.",
+      "intro": "No mesmo provedor tem <b>Cisco</b>, <b>Huawei</b>, <b>Juniper</b> e <b>MikroTik</b>. Os comandos fazem as mesmas coisas, mas cada <b>CLI</b> escreve de um jeito. Separe por fabricante.",
+      "z": "Você decorou o Cisco e eu te joguei num Huawei. Vai digitar show até cansar.",
+      "me": "Cisco e Juniper usam show, Huawei usa display, MikroTik começa com barra.",
+      "lesson": [
+        "Os quatro fazem o mesmo trabalho: ver rotas, interfaces e configuração. Muda a <b>CLI</b>, o jeito de escrever.",
+        "<b>Cisco IOS</b> usa show: show ip route, show ip interface brief, show running-config.",
+        "<b>Huawei VRP</b> usa display: display ip routing-table, display ip interface brief, display current-configuration.",
+        "<b>Juniper Junos</b> também usa show, mas mais curto: show route, show interfaces terse, show configuration.",
+        "<b>MikroTik RouterOS</b> organiza por caminho com barra: /ip route print, /interface print, /export."
+      ],
+      "check": {
+        "q": "Qual fabricante usa display no lugar de show?",
+        "v": [
+          "display ip routing-table é comando de qual fabricante?",
+          "Em qual equipamento você digita display para ver as coisas?"
+        ],
+        "a": 0,
+        "o": [
+          "Huawei",
+          {
+            "t": "Juniper",
+            "why": "O Junos usa show, como o Cisco, só que com outras palavras: show route."
+          },
+          {
+            "t": "MikroTik",
+            "why": "O MikroTik usa caminhos com barra e print: /ip route print."
+          }
+        ],
+        "why": "O VRP da Huawei usa display para tudo que mostra informação."
+      },
+      "tip": "display = Huawei. Barra no começo e print = MikroTik. show ip ... e running-config = Cisco. show route, terse e show configuration = Juniper.",
+      "learn": "Ver rotas: show ip route (Cisco), display ip routing-table (Huawei), show route (Junos), /ip route print (MikroTik). Interfaces: show ip interface brief, display ip interface brief, show interfaces terse, /interface print. Configuração: show running-config, display current-configuration, show configuration, /export.",
+      "buckets": [
+        {
+          "label": "CISCO IOS",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "show ip route",
+              "why": "Cisco: show ip route mostra a tabela de rotas IPv4."
+            },
+            {
+              "t": "show ip interface brief",
+              "why": "Cisco: resumo das interfaces com IP e estado."
+            },
+            {
+              "t": "show running-config",
+              "why": "Cisco: a configuração que está rodando agora."
+            }
+          ]
+        },
+        {
+          "label": "HUAWEI VRP",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "display ip routing-table",
+              "why": "Huawei: display em vez de show. Mostra a tabela de rotas."
+            },
+            {
+              "t": "display ip interface brief",
+              "why": "Huawei: resumo das interfaces, com display."
+            },
+            {
+              "t": "display current-configuration",
+              "why": "Huawei: a configuração atual. É o equivalente ao running-config."
+            }
+          ]
+        },
+        {
+          "label": "JUNIPER JUNOS",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "show route",
+              "why": "Junos: show route, sem o ip no meio, mostra as rotas."
+            },
+            {
+              "t": "show interfaces terse",
+              "why": "Junos: terse é o resumo curto das interfaces."
+            },
+            {
+              "t": "show configuration",
+              "why": "Junos: mostra a configuração ativa."
+            }
+          ]
+        },
+        {
+          "label": "MIKROTIK ROUTEROS",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "/ip route print",
+              "why": "MikroTik: caminho com barra (/ip route) e print para listar."
+            },
+            {
+              "t": "/interface print",
+              "why": "MikroTik: lista as interfaces."
+            },
+            {
+              "t": "/export",
+              "why": "MikroTik: mostra a configuração em forma de comandos."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "IPv6 de provedor sem susto",
+      "tag": "IPV6",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo o plano IPv6 do provedor...",
+      "heads": [
+        "BLOCO",
+        "PARA QUEM"
+      ],
+      "goal": "Ligue cada tamanho de bloco IPv6 a quem costuma usar.",
+      "z": "/32, /48, /56, /64... para você é tudo número. Vou entregar um /64 para um cliente com cinco redes.",
+      "me": "Do maior para o menor: provedor, empresa, casa, rede local, um endereço.",
+      "lesson": [
+        "No IPv6, quanto <b>menor</b> o número depois da barra, <b>maior</b> o bloco. Um /32 é gigante; um /128 é um endereço só.",
+        "O provedor recebe do registro (no Brasil, o NIC.br) um bloco <b>/32</b> e divide entre os clientes.",
+        "Cliente empresa costuma receber <b>/48</b>; cliente residencial, <b>/56</b>. Cada um divide em várias /64.",
+        "Toda rede local é <b>/64</b>: é o tamanho que o SLAAC precisa.",
+        "O bloco chega no roteador do cliente pelo <b>DHCPv6-PD</b>, e dentro de casa os aparelhos se configuram pelo <b>RA</b>."
+      ],
+      "check": {
+        "q": "Entre /48 e /56, qual bloco é maior?",
+        "v": [
+          "Qual tem mais endereços: um /48 ou um /56?",
+          "Um /48 é maior ou menor que um /56?"
+        ],
+        "a": 0,
+        "o": [
+          "/48",
+          {
+            "t": "/56",
+            "why": "Quanto maior o número, mais bits são de rede e menos sobram para dentro: o /56 é 256 vezes menor que o /48."
+          },
+          {
+            "t": "São do mesmo tamanho",
+            "why": "Cada bit a menos de prefixo dobra o bloco. São 8 bits de diferença: 256 vezes."
+          }
+        ],
+        "why": "O /48 deixa 80 bits para o cliente; o /56 deixa 72. Cabem 256 blocos /56 dentro de um /48."
+      },
+      "tip": "/32 = provedor. /48 = empresa. /56 = casa. /64 = uma rede local. /128 = um endereço só. fe80::/10 = link-local, que não sai do enlace.",
+      "learn": "O provedor recebe um /32 e entrega /48 para empresas e /56 para residências pelo DHCPv6-PD. Cada rede local usa uma /64, um /128 é um endereço só (como a loopback de um roteador) e o fe80::/10 é o link-local que os roteadores usam entre si.",
+      "left": [
+        {
+          "id": "a",
+          "t": "/32",
+          "s": "",
+          "why": "/32 é o bloco que o provedor recebe do registro (NIC.br, LACNIC) para distribuir."
+        },
+        {
+          "id": "b",
+          "t": "/48",
+          "s": "",
+          "why": "/48 é o bloco típico de um cliente empresa: 65.536 redes /64."
+        },
+        {
+          "id": "c",
+          "t": "/56",
+          "s": "",
+          "why": "/56 é o bloco típico de um cliente residencial: 256 redes /64."
+        },
+        {
+          "id": "d",
+          "t": "/64",
+          "s": "",
+          "why": "/64 é o tamanho de uma rede local, o que o SLAAC precisa."
+        },
+        {
+          "id": "e",
+          "t": "/128",
+          "s": "",
+          "why": "/128 é um endereço só, como a loopback de um roteador."
+        },
+        {
+          "id": "f",
+          "t": "fe80::/10",
+          "s": "",
+          "why": "fe80::/10 é o link-local: existe em toda interface e não sai do enlace."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "O provedor, vindo do registro",
+          "s": "NIC.br / LACNIC",
+          "why": "O bloco grande que o provedor recebe é o /32."
+        },
+        {
+          "id": "b",
+          "t": "Cliente empresa",
+          "s": "",
+          "why": "Empresa costuma receber /48."
+        },
+        {
+          "id": "c",
+          "t": "Cliente residencial",
+          "s": "",
+          "why": "Residência costuma receber /56."
+        },
+        {
+          "id": "d",
+          "t": "Uma rede local (VLAN)",
+          "s": "",
+          "why": "Toda LAN IPv6 é /64."
+        },
+        {
+          "id": "e",
+          "t": "Um endereço só",
+          "s": "Loopback do roteador",
+          "why": "Um endereço único é /128."
+        },
+        {
+          "id": "f",
+          "t": "Conversa entre vizinhos do enlace",
+          "s": "Não é roteado",
+          "why": "O que não sai do enlace é o link-local fe80::/10."
+        }
+      ]
+    }
+  ]
+}

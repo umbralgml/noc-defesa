@@ -8,24 +8,25 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 68 fases organizadas em trilhas de treinamento. A **Trilha inicial** (46 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** e **Linux** (já no ar), **Servidores** e **Segurança** (em breve).
+São 73 fases organizadas em trilhas de treinamento. A **Trilha inicial** (48 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** e **Linux** (já no ar), **Servidores** e **Segurança** (em breve).
 
 | Parte | Nível | Tema | Fases |
 |-------|-------|------|-------|
 | Prólogo | iniciante | Primeiros passos | equipamentos e o que fazem, camadas da rede, IP x porta x MAC, binário, ping, DHCP, primeiro terminal Linux (com tutorial), DNS e /etc/hosts |
 | Formação N1 | básico | Pronto para o primeiro chamado | máscara e CIDR, TCP x UDP, cabo certo, ARP spoofing, NAT e um chamado "sem internet" do começo ao fim |
-| 1 | básico | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, achar a falha na topologia com ping e traceroute, portas de serviço |
+| 1 | básico | Camada física e endereçamento | cabos e transceivers, faixas privadas e CGNAT, sub-redes, achar a falha na topologia com ping e traceroute, portas de serviço, escrita do IPv6 |
 | 2 | básico | Firewall e DDoS | política de firewall, ordem de regras, ACL contra reflexão NTP, SYN flood no Wireshark, mitigação de DDoS e a botnet ao vivo |
 | 3 | intermediário | Linux no NOC | comandos de rede no Linux, serviço exposto (ss, ufw), resolvedor DNS aberto (tcpdump, dig), SSH sob ataque (journalctl, last), boas práticas |
 | 4 | intermediário | Switching e BGP | VLAN hopping, uplink redundante e STP, filtro de cliente BGP, sequestro de prefixo e RPKI |
 | 5 | intermediário | Resposta a incidente | fases do NIST SP 800-61, caça em logs, VLSM, rastro do C2 numa captura e o chefe final |
-| 6 | avançado | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
+| 6 | avançado | IPv6, Wi-Fi e serviços | tipos de endereço IPv6, SLAAC, RA e NDP no terminal, plano /48 → /64, Wi-Fi seguro, DHCP, DNS e NTP |
 | 7 | avançado | Troubleshooting no terminal | investigar switch e roteador com comandos IOS (porta em shutdown, rota padrão apagada) e o contra-ataque final na borda |
 
 Trilha **Redes**:
 
 | Ato | Nível | Tema | Fases |
 |-----|-------|------|-------|
+| Introdução | básico (nivelamento) | Nivelamento de provedor | vocabulário de provedor (OLT, BNG, CGNAT, AS, trânsito, peering), o mesmo comando em Cisco, Huawei, Juniper e MikroTik, e tamanhos de bloco IPv6 |
 | 1 | intermediário | Plantão no provedor | IPv6 de provedor (RA, DHCPv6-PD, ICMPv6, PMTUD), PD no PPPoE do MikroTik, BGP em Active no Huawei, BGP oscilando no Junos, loop na agregação, STP com root errado, MPLS e LSP que não sobe, CGNAT sem portas no Cisco, ofício judicial com logs de CGNAT e o chefe na borda |
 
 Trilha **Linux**:

@@ -117,6 +117,150 @@
       ]
     },
     {
+      "title": "IPv6 que se configura sozinho",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "desk",
+      "novo": true,
+      "host": "noc",
+      "prompt": "voce@noc:~$",
+      "cap": "Abrindo o terminal da estação do NOC...",
+      "goal": "Descubra de onde veio o IPv6 da estação do NOC, quem é o gateway e como o IPv6 acha os vizinhos.",
+      "intro": "Ninguém configurou IPv6 na estação do NOC, mas ela já tem endereço. Antes de o Z3R0 usar isso, entenda <b>de onde ele veio</b>.",
+      "z": "Sua máquina tem IPv6 e você nunca configurou. Quem será que deu esse endereço para ela?",
+      "me": "Foi o roteador, pelo RA. Vou provar com o ip -6.",
+      "lesson": [
+        "No IPv6 o roteador anuncia a rede com o <b>RA</b> (router advertisement): o prefixo /64 e que ele é o gateway.",
+        "Com o RA, a máquina monta o próprio endereço sozinha: é o <b>SLAAC</b>. Junta o prefixo anunciado com um final que ela cria.",
+        "Toda interface também tem um <b>link-local</b> (fe80::), que só vale no enlace. O gateway aparece pelo link-local do roteador.",
+        "Quem faz o papel do ARP é o <b>NDP</b>, por meio de mensagens <b>ICMPv6</b>. Por isso não se bloqueia todo ICMPv6.",
+        "No Linux, o <b>ip -6</b> mostra a parte IPv6: ip -6 addr, ip -6 route e ip -6 neigh (os vizinhos)."
+      ],
+      "tip": "proto ra na rota quer dizer que veio do anúncio do roteador (SLAAC). O gateway é o default via fe80::1. Vizinhos IPv6 aparecem no ip -6 neigh, feito pelo NDP.",
+      "learn": "A estação ganhou IPv6 por SLAAC: o roteador anunciou 2001:db8:cafe:10::/64 no RA e ela montou o próprio endereço. O gateway é o link-local fe80::1 do roteador, e quem descobre o MAC dele é o NDP, que roda em ICMPv6.",
+      "cmds": [
+        {
+          "c": "ip -6 addr show dev eth0",
+          "alias": [
+            "ip -6 a",
+            "ip -6 addr",
+            "ip -6 address"
+          ],
+          "out": "2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 state UP qlen 1000\n    inet6 2001:db8:cafe:10:5054:ff:fe12:3456/64 scope global dynamic mngtmpaddr noprefixroute\n       valid_lft 2591922sec preferred_lft 604722sec\n    inet6 fe80::5054:ff:fe12:3456/64 scope link\n       valid_lft forever preferred_lft forever",
+          "why": "Dois endereços: o global 2001:db8:cafe:10:...:3456 (dynamic, com prazo de validade) e o link-local fe80::... Aqui o final foi montado a partir do MAC 52:54:00:12:34:56 (EUI-64). Muitos sistemas hoje usam um final aleatório por privacidade."
+        },
+        {
+          "c": "ip -6 route",
+          "alias": [
+            "ip -6 r",
+            "ip -6 route show"
+          ],
+          "out": "2001:db8:cafe:10::/64 dev eth0 proto ra metric 100 expires 2591922sec pref medium\nfe80::/64 dev eth0 proto kernel metric 256 pref medium\ndefault via fe80::1 dev eth0 proto ra metric 100 expires 1722sec pref medium",
+          "why": "proto ra: a rede e o gateway vieram do anúncio do roteador. O gateway é fe80::1, um link-local, o que é normal no IPv6."
+        },
+        {
+          "c": "ip -6 neigh",
+          "alias": [
+            "ip -6 neighbor",
+            "ip -6 neigh show"
+          ],
+          "out": "fe80::1 dev eth0 lladdr 3c:22:fb:00:00:01 router REACHABLE",
+          "why": "A tabela de vizinhos, que no IPv4 seria a tabela ARP. O fe80::1 tem o MAC 3c:22:fb:00:00:01 e está marcado como router."
+        },
+        {
+          "c": "ping -6 -c 2 2001:db8:cafe:20::10",
+          "alias": [
+            "ping -6 2001:db8:cafe:20::10",
+            "ping 2001:db8:cafe:20::10"
+          ],
+          "out": "PING 2001:db8:cafe:20::10(2001:db8:cafe:20::10) 56 data bytes\n64 bytes from 2001:db8:cafe:20::10: icmp_seq=1 ttl=63 time=1.12 ms\n64 bytes from 2001:db8:cafe:20::10: icmp_seq=2 ttl=63 time=0.98 ms\n\n--- 2001:db8:cafe:20::10 ping statistics ---\n2 packets transmitted, 2 received, 0% packet loss, time 1002ms\nrtt min/avg/max/mdev = 0.980/1.050/1.120/0.070 ms",
+          "why": "O servidor da VLAN 20 responde por IPv6. O TTL 63 (hop limit, no IPv6) mostra que passou por um roteador."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Qual é o endereço IPv6 global da estação?",
+          "v": [
+            "Pelo ip -6 addr, qual endereço vale na rede toda?",
+            "Qual dos endereços da eth0 é o global?"
+          ],
+          "a": 0,
+          "o": [
+            "2001:db8:cafe:10:5054:ff:fe12:3456",
+            {
+              "t": "fe80::5054:ff:fe12:3456",
+              "why": "Esse é o link-local (scope link): só vale no enlace."
+            },
+            {
+              "t": "fe80::1",
+              "why": "fe80::1 é o link-local do roteador, o gateway."
+            }
+          ],
+          "why": "É o que tem scope global. O fe80:: tem scope link e não atravessa roteador."
+        },
+        {
+          "q": "Ninguém configurou IPv6. De onde veio esse endereço?",
+          "v": [
+            "Como a estação ganhou o IPv6 sem configuração?",
+            "Quem deu o endereço IPv6 para a estação?"
+          ],
+          "a": 0,
+          "o": [
+            "Do SLAAC: o roteador anunciou o prefixo no RA e a estação montou o endereço",
+            {
+              "t": "Do DHCP do IPv4",
+              "why": "O DHCP do IPv4 entrega só endereço IPv4."
+            },
+            {
+              "t": "Alguém digitou o endereço na mão",
+              "why": "Endereço fixo não teria prazo de validade (dynamic) nem proto ra na rota."
+            }
+          ],
+          "why": "proto ra e o endereço dynamic com prazo mostram que veio do anúncio do roteador. É o SLAAC."
+        },
+        {
+          "q": "Qual é o gateway IPv6 da estação?",
+          "v": [
+            "Pelo ip -6 route, por onde a estação sai para outras redes?",
+            "Quem é o default via no IPv6?"
+          ],
+          "a": 0,
+          "o": [
+            "fe80::1, o link-local do roteador",
+            {
+              "t": "2001:db8:cafe:10::/64",
+              "why": "Essa é a rede local, não o gateway."
+            },
+            {
+              "t": "Não tem gateway, o IPv6 não precisa",
+              "why": "Para sair da rede local sempre precisa de gateway. Aqui é o default via fe80::1."
+            }
+          ],
+          "why": "default via fe80::1: no IPv6 o gateway costuma ser o link-local do roteador, que não muda mesmo se o prefixo global mudar."
+        },
+        {
+          "q": "No IPv6 não existe ARP. Quem descobre o MAC do roteador?",
+          "v": [
+            "Qual protocolo faz o papel do ARP no IPv6?",
+            "Como o IPv6 descobre o MAC de um vizinho?"
+          ],
+          "a": 0,
+          "o": [
+            "O NDP, com mensagens ICMPv6",
+            {
+              "t": "O ARP, igual ao IPv4",
+              "why": "O IPv6 não usa ARP. A tabela que você viu é do ip -6 neigh, preenchida pelo NDP."
+            },
+            {
+              "t": "O DNS",
+              "why": "O DNS traduz nome em IP, não IP em MAC."
+            }
+          ],
+          "why": "O NDP (neighbor discovery) roda em ICMPv6 e também carrega o RA. Por isso bloquear todo ICMPv6 quebra o IPv6."
+        }
+      ]
+    },
+    {
       "title": "Plano IPv6",
       "tag": "SUB-REDES IPV6",
       "type": "drop",

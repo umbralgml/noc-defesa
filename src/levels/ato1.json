@@ -711,6 +711,94 @@
           "why": "TCP 3389 é a porta do RDP."
         }
       ]
+    },
+    {
+      "title": "IPv6 sem medo",
+      "tag": "IPV6",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "novo": true,
+      "cap": "Abrindo a planilha de endereços IPv6...",
+      "goal": "Separe os endereços IPv6 escritos do jeito certo dos que estão errados.",
+      "intro": "O provedor já entrega <b>IPv6</b> e um colega digitou os endereços na planilha. Separe os que estão <b>certos</b> dos que nenhum equipamento aceitaria.",
+      "z": "Endereço com letra, dois-pontos para todo lado... aposto que você nem sabe se está certo.",
+      "me": "8 grupos, hexadecimal e o :: só uma vez. Dá para conferir no olho.",
+      "lesson": [
+        "O <b>IPv6</b> existe porque os endereços IPv4 acabaram. Ele tem 128 bits: endereço para tudo, sem precisar dividir um IP entre vários clientes.",
+        "Ele é escrito em <b>8 grupos</b> de até 4 dígitos, separados por dois-pontos: 2001:0db8:0000:0000:0000:0000:0000:0001.",
+        "Os dígitos são <b>hexadecimal</b>: de 0 a 9 e de a até f. Letra depois do f não existe no IPv6.",
+        "Para encurtar: zeros à esquerda de cada grupo podem sumir (0db8 vira db8) e uma sequência de grupos zerados vira <b>::</b>.",
+        "O <b>::</b> só pode aparecer uma vez. Com dois, não dá para saber quantos zeros cada um esconde."
+      ],
+      "check": {
+        "q": "Qual é a forma curta de 2001:0db8:0000:0000:0000:0000:0000:0001?",
+        "v": [
+          "Encurte 2001:0db8:0000:0000:0000:0000:0000:0001.",
+          "Como fica 2001:0db8:0000:0000:0000:0000:0000:0001 do jeito curto?"
+        ],
+        "a": 0,
+        "o": [
+          "2001:db8::1",
+          {
+            "t": "2001:db8:1",
+            "why": "Assim ficariam só 3 grupos. Sem o ::, não dá para saber que existem zeros no meio."
+          },
+          {
+            "t": "21:db8::1",
+            "why": "Só os zeros à esquerda de cada grupo podem sumir. O 2001 não tem zero à esquerda."
+          }
+        ],
+        "why": "0db8 perde o zero à esquerda, e os cinco grupos 0000 do meio viram um único ::."
+      },
+      "tip": "Confira três coisas: no máximo 8 grupos, só dígitos de 0 a 9 e letras de a até f, e o :: no máximo uma vez. Cada grupo tem até 4 dígitos.",
+      "learn": "IPv6 são 8 grupos de até 4 dígitos hexadecimais. Zeros à esquerda somem e uma sequência de grupos zerados vira ::, mas só uma vez. Letra depois do f, grupo com 5 dígitos ou mais de 8 grupos deixam o endereço inválido.",
+      "buckets": [
+        {
+          "label": "ESCRITA CERTA",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "2001:db8::1",
+              "why": "Certo: 2001:0db8:0000:0000:0000:0000:0000:0001 encurtado, com um único ::."
+            },
+            {
+              "t": "fe80::1",
+              "why": "Certo: o :: esconde os 6 grupos zerados do meio. Este é um link-local, comum como endereço de roteador."
+            },
+            {
+              "t": "2001:db8:0:10::5",
+              "why": "Certo: os grupos zerados podem ficar como 0, e o :: aparece uma vez só."
+            },
+            {
+              "t": "::1",
+              "why": "Certo: são 7 grupos zerados e o último 1. É o loopback do IPv6, como o 127.0.0.1."
+            }
+          ]
+        },
+        {
+          "label": "ESCRITA ERRADA",
+          "c": "#ff4d6d",
+          "a": [
+            {
+              "t": "2001:db8::10::1",
+              "why": "Errado: dois ::. Não dá para saber quantos grupos zerados cada um esconde."
+            },
+            {
+              "t": "2001:db8:gh::1",
+              "why": "Errado: g e h não existem em hexadecimal, que vai só até o f."
+            },
+            {
+              "t": "2001:db8:12345::1",
+              "why": "Errado: um grupo tem no máximo 4 dígitos (16 bits)."
+            },
+            {
+              "t": "2001:db8:0:0:0:0:0:0:1",
+              "why": "Errado: são 9 grupos. O IPv6 tem exatamente 8."
+            }
+          ]
+        }
+      ]
     }
   ]
 }

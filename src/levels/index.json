@@ -9,6 +9,7 @@
     "ato4.json",
     "ato5.json",
     "ato6.json",
+    "provedor-nivel.json",
     "provedor.json",
     "linux-intro.json",
     "linux-plantao.json"
@@ -35,8 +36,9 @@
       "id": "redes",
       "name": "Redes",
       "icon": "🌐",
-      "desc": "Plantão de provedor em vários fabricantes (Huawei, Juniper, MikroTik e Cisco): BGP, STP, MPLS, CGNAT e IPv6. Nível intermediário: recomendada depois da trilha inicial.",
+      "desc": "Plantão de provedor em vários fabricantes (Huawei, Juniper, MikroTik e Cisco): BGP, STP, MPLS, CGNAT e IPv6. Comece pelo nivelamento; se já trabalha em provedor, pule direto para o Ato 1.",
       "acts": [
+        "provedor-nivel.json",
         "provedor.json"
       ]
     },
