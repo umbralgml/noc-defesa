@@ -18,7 +18,7 @@ export async function loadLevels() {
     TRAILS.push({ id: t.id, name: t.name, icon: t.icon || '', desc: t.desc || '', soon: t.soon || '', acts: [] });
     data[ti].forEach(a => {
       const ai = ACTS.length;
-      ACTS.push([a.tag, a.name, a.diff || '', a.story || null, ti]);
+      ACTS.push([a.tag, a.name, a.diff || '', a.story || null, ti, !!a.nivel]);
       TRAILS[ti].acts.push(ai);
       a.levels.forEach(L => LEVELS.push({ ...L, act: ai, trail: ti }));
     });

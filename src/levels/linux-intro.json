@@ -1,0 +1,854 @@
+{
+  "tag": "INTRODUÇÃO",
+  "name": "Primeiros passos no Linux",
+  "diff": "iniciante",
+  "nivel": true,
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Nunca mexeu em Linux? Sem problema. Antes do plantão de servidores, a gente aprende o básico: onde você está, onde ficam as coisas e como ler o que o servidor diz."
+    },
+    {
+      "who": "z",
+      "t": "Tela preta, letra verde e nenhum botão. Aposto que você trava no primeiro comando."
+    },
+    {
+      "who": "me",
+      "t": "Cada comando tem um cartão com o ? do lado. Vou ler, testar e entender."
+    }
+  ],
+  "levels": [
+    {
+      "title": "O que é Linux",
+      "tag": "VOCABULÁRIO",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo o caderno do novato...",
+      "heads": [
+        "PALAVRA",
+        "O QUE É"
+      ],
+      "goal": "Ligue cada palavra do mundo Linux ao que ela significa.",
+      "z": "Kernel, shell, distro... você vai se perder nas palavras antes de digitar qualquer coisa.",
+      "me": "Pensa num carro: tem motor, modelo e volante. O Linux é igual.",
+      "lesson": [
+        "O <b>Linux</b> é um sistema operacional, como o Windows. Ele roda na maioria dos servidores da internet, em muitos roteadores e até no Android.",
+        "Pense num carro: o <b>kernel</b> é o motor (fala com o hardware), a <b>distribuição</b> é o modelo (Ubuntu, Debian, Red Hat) e o <b>terminal</b> é o volante.",
+        "No terminal, quem lê o que você digita é o <b>shell</b>, normalmente o bash.",
+        "O <b>root</b> é o administrador: pode tudo. Por isso, no dia a dia, você usa o seu usuário e pede poder de administrador só quando precisa.",
+        "Viu uma palavra sublinhada? Toque nela para abrir o cartão do glossário. A Sala de estudo, no mapa, guarda todos os cartões."
+      ],
+      "check": {
+        "q": "No exemplo do carro, o que o kernel seria?",
+        "v": [
+          "Comparando o Linux com um carro, qual papel é o do kernel?",
+          "Se o Linux fosse um carro, o kernel seria qual peça?"
+        ],
+        "a": 0,
+        "o": [
+          "O motor, que faz a máquina funcionar",
+          {
+            "t": "O volante, por onde você comanda",
+            "why": "O volante é o terminal: é por ele que você dá os comandos."
+          },
+          {
+            "t": "O modelo do carro",
+            "why": "O modelo é a distribuição: Ubuntu, Debian, Red Hat."
+          }
+        ],
+        "why": "O kernel é o núcleo: conversa com disco, rede e memória, como o motor move o carro."
+      },
+      "tip": "Kernel = motor, distribuição = modelo, terminal = volante, shell = quem entende o que você digita, root = administrador.",
+      "learn": "O Linux é o sistema operacional dos servidores. O kernel é o núcleo, a distribuição é o pacote completo (Ubuntu, Debian), o terminal é a tela de texto, o shell interpreta os comandos e o root é o administrador.",
+      "left": [
+        {
+          "id": "a",
+          "t": "Linux",
+          "s": "",
+          "why": "Linux é o sistema operacional: o que faz o computador funcionar, como o Windows. Domina os servidores."
+        },
+        {
+          "id": "b",
+          "t": "Kernel",
+          "s": "",
+          "why": "O kernel é o núcleo do Linux: divide memória, disco e rede entre os programas."
+        },
+        {
+          "id": "c",
+          "t": "Distribuição",
+          "s": "Ubuntu, Debian...",
+          "why": "Distribuição é o Linux pronto para instalar, com programas e ferramentas. Ubuntu e Debian são as mais comuns em servidor."
+        },
+        {
+          "id": "d",
+          "t": "Terminal",
+          "s": "",
+          "why": "O terminal é a tela de texto onde você digita comandos e lê as respostas."
+        },
+        {
+          "id": "e",
+          "t": "Shell",
+          "s": "bash",
+          "why": "O shell é o programa que entende o que você digitou e executa. O bash é o mais usado."
+        },
+        {
+          "id": "f",
+          "t": "root",
+          "s": "",
+          "why": "root é o usuário administrador. Pode tudo, inclusive estragar o sistema, por isso é usado com cuidado."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Sistema operacional",
+          "s": "Roda na maioria dos servidores",
+          "why": "Sistema operacional dos servidores é o Linux."
+        },
+        {
+          "id": "b",
+          "t": "Núcleo que fala com o hardware",
+          "s": "O motor do carro",
+          "why": "Quem fala com o hardware é o kernel."
+        },
+        {
+          "id": "c",
+          "t": "Linux empacotado",
+          "s": "O modelo do carro",
+          "why": "Linux pronto com programas e instalador é uma distribuição."
+        },
+        {
+          "id": "d",
+          "t": "Tela de texto",
+          "s": "O volante",
+          "why": "A tela onde você digita é o terminal."
+        },
+        {
+          "id": "e",
+          "t": "Quem entende o que você digita",
+          "s": "",
+          "why": "Quem interpreta os comandos é o shell."
+        },
+        {
+          "id": "f",
+          "t": "Administrador",
+          "s": "Pode tudo",
+          "why": "O administrador do Linux é o root."
+        }
+      ]
+    },
+    {
+      "title": "Onde estou?",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "srv01",
+      "prompt": "ana@srv01:~$",
+      "cap": "Primeiro acesso por SSH no srv01...",
+      "goal": "Descubra com qual usuário você entrou, em qual máquina e em qual pasta está.",
+      "intro": "Seu primeiro acesso a um servidor. Antes de mexer em qualquer coisa, descubra <b>quem</b> você é, <b>onde</b> está e o que tem por perto. Toque no <b>?</b> ao lado de um comando para abrir o cartão dele.",
+      "z": "Entrou num servidor e nem sabe em qual. Que perigo seria apagar a coisa errada...",
+      "me": "whoami, hostname e pwd. Primeiro eu me localizo.",
+      "lesson": [
+        "O <b>prompt</b> ana@srv01:~$ já conta muito: usuário <b>ana</b>, máquina <b>srv01</b>, pasta <b>~</b> e o $ de usuário comum. Root aparece com #.",
+        "O <b>~</b> é um atalho para a sua <b>home</b>, a pasta pessoal: /home/ana.",
+        "<b>whoami</b> diz quem você é, <b>hostname</b> diz em qual máquina está e <b>pwd</b> diz em qual pasta.",
+        "<b>ls</b> lista o que tem na pasta. <b>ls -l</b> mostra detalhes, e o d no começo da linha indica que é uma pasta.",
+        "<b>cd</b> entra numa pasta: cd /var/log vai para os logs e cd sozinho volta para a home."
+      ],
+      "check": {
+        "q": "No prompt ana@srv01:~$, qual é o nome da máquina?",
+        "v": [
+          "Em ana@srv01:~$, qual parte é o nome do servidor?",
+          "Olhando o prompt ana@srv01:~$, em qual máquina você está?"
+        ],
+        "a": 0,
+        "o": [
+          "srv01",
+          {
+            "t": "ana",
+            "why": "ana é o usuário: vem antes do @."
+          },
+          {
+            "t": "~",
+            "why": "O ~ é a pasta atual, a home do usuário."
+          }
+        ],
+        "why": "O formato é usuário@máquina:pasta. Depois do @ vem a máquina: srv01."
+      },
+      "tip": "whoami = usuário, hostname = máquina, pwd = pasta atual, ls = o que tem aqui. No ls -l, linha que começa com d é pasta.",
+      "learn": "Antes de mexer num servidor, se localize: whoami (quem sou), hostname (onde estou), pwd (em qual pasta) e ls (o que tem aqui). O prompt resume tudo isso, e cd muda de pasta.",
+      "cmds": [
+        {
+          "c": "whoami",
+          "out": "ana",
+          "why": "Você entrou como ana, um usuário comum. Não é o root."
+        },
+        {
+          "c": "hostname",
+          "out": "srv01",
+          "why": "A máquina se chama srv01. Confira sempre antes de mexer: é fácil ter vários servidores abertos."
+        },
+        {
+          "c": "pwd",
+          "out": "/home/ana",
+          "why": "Você está em /home/ana, a sua pasta pessoal. É o que o ~ do prompt quer dizer."
+        },
+        {
+          "c": "ls",
+          "out": "anotacoes.txt  backup  scripts",
+          "why": "Na sua home tem um arquivo (anotacoes.txt) e duas pastas (backup e scripts). O ls simples não diz quem é pasta: para isso, use ls -l."
+        },
+        {
+          "c": "ls -l",
+          "alias": [
+            "ls -la",
+            "ls -lh"
+          ],
+          "out": "total 12\n-rw-r--r-- 1 ana ana  214 Nov  2 07:10 anotacoes.txt\ndrwxr-xr-x 2 ana ana 4096 Oct 28 18:02 backup\ndrwxr-xr-x 2 ana ana 4096 Oct 30 09:41 scripts",
+          "why": "Agora com detalhes: linha que começa com d é pasta (backup e scripts), com - é arquivo. Depois vêm as permissões, o dono (ana), o tamanho e a data."
+        },
+        {
+          "c": "ls /var/log",
+          "out": "alternatives.log  apt  auth.log  btmp  dmesg  dpkg.log  journal  kern.log  lastlog  nginx  syslog  wtmp",
+          "why": "Dá para listar outra pasta sem entrar nela, passando o caminho. Em /var/log ficam os logs do sistema."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Com qual usuário você entrou?",
+          "v": [
+            "Qual usuário está logado neste terminal?",
+            "Pelo whoami, quem é você neste servidor?"
+          ],
+          "a": 0,
+          "o": [
+            "ana, um usuário comum",
+            {
+              "t": "root, o administrador",
+              "why": "O whoami mostrou ana. E o prompt termina em $, de usuário comum; root mostraria #."
+            },
+            {
+              "t": "srv01",
+              "why": "srv01 é o nome da máquina, não do usuário."
+            }
+          ],
+          "why": "whoami respondeu ana, e o $ no fim do prompt confirma: usuário comum."
+        },
+        {
+          "q": "Em qual pasta você está?",
+          "v": [
+            "Qual é a pasta atual?",
+            "O pwd mostrou qual pasta?"
+          ],
+          "a": 0,
+          "o": [
+            "/home/ana, a pasta pessoal da ana",
+            {
+              "t": "/var/log",
+              "why": "Você só listou /var/log com ls. Não entrou nela."
+            },
+            {
+              "t": "/root",
+              "why": "/root é a home do administrador. A da ana é /home/ana."
+            }
+          ],
+          "why": "pwd mostra a pasta atual: /home/ana. O ~ do prompt é o atalho para ela."
+        },
+        {
+          "q": "No ls -l, como saber que backup é uma pasta?",
+          "v": [
+            "Pelo ls -l, o que mostra que scripts é uma pasta?",
+            "Que detalhe do ls -l diferencia pasta de arquivo?"
+          ],
+          "a": 0,
+          "o": [
+            "A linha começa com d",
+            {
+              "t": "O nome não tem ponto",
+              "why": "Pasta pode ter ponto no nome e arquivo pode não ter. Quem diz é o primeiro caractere."
+            },
+            {
+              "t": "O tamanho é 4096",
+              "why": "4096 é o tamanho comum de uma pasta, mas arquivos também podem ter esse tamanho."
+            }
+          ],
+          "why": "O primeiro caractere da linha é o tipo: d para diretório (pasta), - para arquivo comum."
+        },
+        {
+          "q": "Qual comando leva você até a pasta dos logs?",
+          "v": [
+            "Como entrar na pasta /var/log?",
+            "Para trabalhar dentro de /var/log, qual comando usar?"
+          ],
+          "a": 0,
+          "o": [
+            "cd /var/log",
+            {
+              "t": "ls /var/log",
+              "why": "ls só lista o que tem lá. Você continua na pasta onde estava."
+            },
+            {
+              "t": "pwd /var/log",
+              "why": "pwd só mostra a pasta atual. Não muda de pasta."
+            }
+          ],
+          "why": "cd (change directory) muda de pasta. Depois dele, o prompt mostraria ana@srv01:/var/log$.",
+          "run": "cd /var/log\npwd",
+          "out": "/var/log"
+        }
+      ]
+    },
+    {
+      "title": "Cada coisa na sua pasta",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Abrindo o mapa de pastas do Linux...",
+      "goal": "Arraste cada arquivo para a pasta onde ele fica no Linux.",
+      "intro": "No Linux, cada tipo de arquivo tem lugar certo. Saber onde procurar economiza metade do troubleshooting. Leve cada item para a sua <b>pasta</b>.",
+      "z": "Escondi seus arquivos em pastas aleatórias. Vai procurar config dentro de log?",
+      "me": "Configuração em /etc, log em /var/log. Não tem mistério.",
+      "lesson": [
+        "Tudo começa na <b>raiz</b>, escrita só como /. As outras pastas ficam dentro dela.",
+        "<b>/etc</b> guarda as configurações: do SSH, do site, dos nomes da rede.",
+        "<b>/var/log</b> guarda os <b>logs</b>, o diário de cada serviço. É onde você procura quando algo quebra.",
+        "<b>/home</b> tem uma pasta para cada usuário, com os arquivos pessoais dele.",
+        "<b>/usr/bin</b> guarda os programas que você roda pelo terminal, como ls e ping."
+      ],
+      "check": {
+        "q": "O site parou e você quer ver o que o nginx registrou. Onde procurar primeiro?",
+        "v": [
+          "Para ler o que um serviço registrou, qual pasta abrir?",
+          "Um serviço deu erro. Em qual pasta ficam os registros dele?"
+        ],
+        "a": 0,
+        "o": [
+          "/var/log",
+          {
+            "t": "/etc",
+            "why": "Em /etc fica a configuração do nginx, não o que ele registrou."
+          },
+          {
+            "t": "/home",
+            "why": "/home tem os arquivos pessoais dos usuários."
+          }
+        ],
+        "why": "Os logs ficam em /var/log. O do nginx fica em /var/log/nginx."
+      },
+      "tip": "Configuração em /etc, logs em /var/log, arquivos de cada pessoa em /home, programas em /usr/bin.",
+      "learn": "O Linux organiza tudo a partir da raiz (/): configurações em /etc, logs em /var/log, arquivos dos usuários em /home e programas em /usr/bin. Quando algo quebra, o caminho é ler o log em /var/log e conferir a configuração em /etc.",
+      "buckets": [
+        {
+          "label": "/etc",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "sshd_config (config do SSH)",
+              "why": "A configuração do servidor SSH fica em /etc/ssh/sshd_config."
+            },
+            {
+              "t": "hosts (nomes locais)",
+              "why": "O /etc/hosts lista nomes e IPs que a máquina resolve sozinha, sem DNS."
+            },
+            {
+              "t": "nginx.conf (config do site)",
+              "why": "A configuração do nginx fica em /etc/nginx/nginx.conf."
+            }
+          ]
+        },
+        {
+          "label": "/var/log",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "syslog (diário do sistema)",
+              "why": "O /var/log/syslog registra mensagens gerais do sistema no Ubuntu e no Debian."
+            },
+            {
+              "t": "auth.log (logins)",
+              "why": "O /var/log/auth.log registra logins e uso do sudo. É onde se vê tentativa de invasão no SSH."
+            },
+            {
+              "t": "error.log do nginx",
+              "why": "Os erros do nginx ficam em /var/log/nginx/error.log."
+            }
+          ]
+        },
+        {
+          "label": "/home",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "relatorio.pdf da Ana",
+              "why": "Arquivos pessoais da Ana ficam na home dela: /home/ana."
+            },
+            {
+              "t": ".bashrc (preferências do terminal da Ana)",
+              "why": "O .bashrc fica na home de cada usuário e guarda as preferências do shell dele. O ponto no começo deixa o arquivo oculto."
+            },
+            {
+              "t": "scripts que a Ana escreveu",
+              "why": "O que o usuário cria fica na pasta dele em /home."
+            }
+          ]
+        },
+        {
+          "label": "/usr/bin",
+          "c": "#ff7ad9",
+          "a": [
+            {
+              "t": "ls",
+              "why": "O programa ls fica em /usr/bin/ls. Quando você digita ls, o shell procura lá."
+            },
+            {
+              "t": "ping",
+              "why": "O ping é um programa como outro qualquer: /usr/bin/ping."
+            },
+            {
+              "t": "nano (editor de texto)",
+              "why": "O editor nano fica em /usr/bin/nano."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Lendo o log",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "web01",
+      "prompt": "ana@web01:~$",
+      "cap": "Conectando por SSH no web01...",
+      "goal": "Leia os logs do nginx e descubra por que o login da loja dá erro.",
+      "intro": "Um cliente avisou que o <b>login</b> da loja virtual mostra uma página de erro. O site roda com <b>nginx</b> no <b>web01</b>. Os logs ficam em /var/log/nginx. Use o <b>?</b> dos comandos se precisar.",
+      "z": "Seu site está dando erro e você nem sabe ler um log. Vai reiniciar tudo e torcer?",
+      "me": "Reiniciar sem ler o log é chute. Primeiro eu leio.",
+      "lesson": [
+        "<b>cat</b> mostra o arquivo inteiro. Bom para arquivo curto; log de servidor costuma ter milhares de linhas.",
+        "<b>tail</b> mostra o fim do arquivo, onde ficam as linhas mais novas. <b>tail -f</b> continua mostrando o que chega, ao vivo.",
+        "<b>head</b> mostra o começo do arquivo.",
+        "<b>grep</b> mostra só as linhas que têm uma palavra. <b>grep -i</b> ignora maiúsculas e minúsculas.",
+        "O nginx separa o <b>access.log</b> (cada visita) do <b>error.log</b> (cada problema)."
+      ],
+      "check": {
+        "q": "Num log enorme, qual comando mostra as linhas mais recentes?",
+        "v": [
+          "As linhas mais novas de um log ficam no fim. Qual comando mostra o fim?",
+          "Para ver o que acabou de acontecer num log, qual comando usar?"
+        ],
+        "a": 0,
+        "o": [
+          "tail",
+          {
+            "t": "head",
+            "why": "head mostra o começo do arquivo, que são as linhas mais antigas."
+          },
+          {
+            "t": "cat",
+            "why": "cat despeja o arquivo inteiro. Num log grande, as linhas novas passam correndo."
+          }
+        ],
+        "why": "Logs crescem para baixo: o mais novo está no fim, e o tail mostra o fim."
+      },
+      "tip": "ls /var/log/nginx mostra os arquivos, tail no error.log mostra o erro mais recente e grep filtra só as linhas que interessam.",
+      "learn": "O nginx respondia 502 porque não conseguia falar com a aplicação na porta 3000 (connection refused). Para chegar nisso bastou listar a pasta de logs, olhar o fim do error.log com tail e filtrar com grep. Ler o log antes de agir é o hábito número um do plantão.",
+      "cmds": [
+        {
+          "c": "ls /var/log/nginx",
+          "alias": [
+            "ls -l /var/log/nginx"
+          ],
+          "out": "access.log  error.log",
+          "why": "O nginx tem dois logs: access.log (cada visita) e error.log (cada problema)."
+        },
+        {
+          "c": "cat /etc/hostname",
+          "out": "web01",
+          "why": "O cat mostrou o arquivo inteiro, que aqui tem uma linha só: o nome da máquina. Com arquivo curto, cat é perfeito."
+        },
+        {
+          "c": "tail -n 3 /var/log/nginx/access.log",
+          "alias": [
+            "tail /var/log/nginx/access.log",
+            "sudo tail -n 3 /var/log/nginx/access.log"
+          ],
+          "out": "177.10.0.40 - - [02/Nov/2026:07:12:31 -0300] \"GET /produtos HTTP/1.1\" 200 5120 \"-\" \"Mozilla/5.0\"\n177.10.0.40 - - [02/Nov/2026:07:12:38 -0300] \"GET /login HTTP/1.1\" 200 2048 \"-\" \"Mozilla/5.0\"\n177.10.0.40 - - [02/Nov/2026:07:12:44 -0300] \"POST /login HTTP/1.1\" 502 166 \"-\" \"Mozilla/5.0\"",
+          "why": "As três últimas visitas. O número depois do pedido é o código de resposta: 200 deu certo, 502 deu erro. O erro aparece justamente no POST /login, quando o cliente envia a senha."
+        },
+        {
+          "c": "tail -n 2 /var/log/nginx/error.log",
+          "alias": [
+            "tail /var/log/nginx/error.log",
+            "sudo tail -n 2 /var/log/nginx/error.log"
+          ],
+          "out": "2026/11/02 07:12:44 [error] 812#812: *39 connect() failed (111: Connection refused) while connecting to upstream, client: 177.10.0.40, server: loja.exemplo.com.br, request: \"POST /login HTTP/1.1\", upstream: \"http://127.0.0.1:3000/login\", host: \"loja.exemplo.com.br\"",
+          "why": "O erro, no mesmo horário: o nginx tentou repassar o login para a aplicação em 127.0.0.1:3000 (o upstream) e a conexão foi recusada. Ninguém está atendendo nessa porta."
+        },
+        {
+          "c": "grep -i error /var/log/nginx/error.log",
+          "alias": [
+            "grep error /var/log/nginx/error.log",
+            "sudo grep -i error /var/log/nginx/error.log"
+          ],
+          "out": "2026/11/02 06:58:02 [error] 812#812: *21 connect() failed (111: Connection refused) while connecting to upstream, client: 189.44.2.17, server: loja.exemplo.com.br, request: \"POST /login HTTP/1.1\", upstream: \"http://127.0.0.1:3000/login\", host: \"loja.exemplo.com.br\"\n2026/11/02 07:12:44 [error] 812#812: *39 connect() failed (111: Connection refused) while connecting to upstream, client: 177.10.0.40, server: loja.exemplo.com.br, request: \"POST /login HTTP/1.1\", upstream: \"http://127.0.0.1:3000/login\", host: \"loja.exemplo.com.br\"",
+          "why": "O grep trouxe só as linhas com error. O mesmo erro já tinha acontecido às 06:58 com outro cliente: não é problema de uma pessoa só."
+        }
+      ],
+      "steps": [
+        {
+          "q": "No access.log, qual linha mostra o problema?",
+          "v": [
+            "Qual visita do access.log deu errado?",
+            "No access.log, onde aparece o erro do cliente?"
+          ],
+          "a": 0,
+          "o": [
+            "O POST /login, que voltou com código 502",
+            {
+              "t": "O GET /produtos, com código 200",
+              "why": "200 quer dizer que deu certo: a página de produtos abriu normal."
+            },
+            {
+              "t": "O GET /login, com código 200",
+              "why": "A página de login abriu (200). O erro veio depois, ao enviar a senha."
+            }
+          ],
+          "why": "O código 502 (Bad Gateway) diz que o nginx recebeu o pedido mas não conseguiu resposta de quem fica atrás dele."
+        },
+        {
+          "q": "O que o error.log explica?",
+          "v": [
+            "Pelo error.log, por que o login falha?",
+            "Qual a causa que o error.log mostra?"
+          ],
+          "a": 0,
+          "o": [
+            "O nginx não consegue falar com a aplicação na porta 3000: a conexão é recusada",
+            {
+              "t": "A senha do cliente está errada",
+              "why": "Senha errada daria resposta da aplicação. Aqui a aplicação nem atendeu."
+            },
+            {
+              "t": "O disco está cheio",
+              "why": "Disco cheio daria outra mensagem, como No space left on device."
+            }
+          ],
+          "why": "Connection refused em 127.0.0.1:3000 quer dizer que nada escuta nessa porta: a aplicação da loja parou. O nginx está bem, quem caiu foi o que está atrás dele."
+        },
+        {
+          "q": "Para ver só as linhas com a palavra error num arquivo grande, qual comando usar?",
+          "v": [
+            "Qual comando filtra só as linhas que têm error?",
+            "Como mostrar apenas as linhas com error de um log?"
+          ],
+          "a": 0,
+          "o": [
+            "grep -i error arquivo",
+            {
+              "t": "head arquivo",
+              "why": "head mostra o começo, com ou sem error."
+            },
+            {
+              "t": "cat arquivo",
+              "why": "cat mostra tudo. Você teria que achar no olho."
+            }
+          ],
+          "why": "grep filtra por texto. Com -i, pega Error, ERROR e error."
+        },
+        {
+          "q": "Você vai pedir para o cliente tentar de novo. Como ver o log ao vivo enquanto ele testa?",
+          "v": [
+            "Como acompanhar o error.log em tempo real?",
+            "Qual comando mostra as linhas novas do log assim que chegam?"
+          ],
+          "a": 0,
+          "o": [
+            "tail -f /var/log/nginx/error.log",
+            {
+              "t": "cat /var/log/nginx/error.log",
+              "why": "cat mostra o arquivo uma vez e termina."
+            },
+            {
+              "t": "ls /var/log/nginx",
+              "why": "ls só lista os arquivos."
+            }
+          ],
+          "why": "O -f (follow) mantém o tail aberto mostrando cada linha nova. Ctrl+C sai.",
+          "run": "tail -f /var/log/nginx/error.log",
+          "out": "(aguardando novas linhas... Ctrl+C para sair)"
+        }
+      ]
+    },
+    {
+      "title": "Lendo permissões",
+      "tag": "PERMISSÕES",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Conferindo quem pode o quê...",
+      "heads": [
+        "NO LS -L",
+        "QUEM PODE O QUÊ"
+      ],
+      "goal": "Ligue cada permissão, do jeito que o ls -l mostra, ao que ela permite.",
+      "z": "rw-r--r--? Parece senha de Wi-Fi. Você não sabe quem pode mexer nos seus arquivos.",
+      "me": "Primeiro o tipo, depois três blocos: dono, grupo e outros.",
+      "lesson": [
+        "No <b>ls -l</b>, a primeira coluna tem 10 caracteres. O 1º é o tipo: <b>-</b> arquivo, <b>d</b> pasta.",
+        "Os outros 9 são três blocos de três: <b>dono</b>, <b>grupo</b> e <b>outros</b>.",
+        "Em cada bloco: <b>r</b> = ler, <b>w</b> = escrever, <b>x</b> = executar. Um traço quer dizer que não pode.",
+        "Em pasta, o <b>x</b> é o direito de entrar nela.",
+        "<b>sudo</b> faz um comando rodar como administrador, mesmo sem a permissão: por isso pede senha e fica registrado."
+      ],
+      "check": {
+        "q": "Em -rw-r--r--, o que os outros usuários podem fazer?",
+        "v": [
+          "No -rw-r--r--, qual é a permissão dos outros?",
+          "Lendo -rw-r--r--, o que sobra para quem não é dono nem do grupo?"
+        ],
+        "a": 0,
+        "o": [
+          "Só ler",
+          {
+            "t": "Ler e escrever",
+            "why": "Ler e escrever (rw-) é só o dono, no primeiro bloco."
+          },
+          {
+            "t": "Nada",
+            "why": "Nada seria ---. O último bloco é r--: podem ler."
+          }
+        ],
+        "why": "Depois do tipo (-), vêm rw- (dono), r-- (grupo) e r-- (outros). Outros só leem."
+      },
+      "tip": "Leia em blocos: tipo, dono, grupo, outros. r = ler, w = escrever, x = executar, - = não pode.",
+      "learn": "A coluna de permissões do ls -l é tipo + dono + grupo + outros, cada um com r, w e x. Arquivo comum costuma ser -rw-r--r--, segredo -rw-------, pasta drwxr-xr-x e programa -rwxr-xr-x. No plantão você vai ver isso em números (644, 600, 755).",
+      "left": [
+        {
+          "id": "a",
+          "t": "-rw-r--r--",
+          "s": "arquivo do site",
+          "why": "-rw-r--r--: arquivo; dono lê e escreve, grupo e outros só leem."
+        },
+        {
+          "id": "b",
+          "t": "-rw-------",
+          "s": "chave secreta",
+          "why": "-rw-------: arquivo; só o dono lê e escreve. Ninguém mais nem vê o conteúdo."
+        },
+        {
+          "id": "c",
+          "t": "drwxr-xr-x",
+          "s": "pasta",
+          "why": "drwxr-xr-x: pasta (d); dono faz tudo, os outros entram e listam, mas não criam nem apagam."
+        },
+        {
+          "id": "d",
+          "t": "-rwxr-xr-x",
+          "s": "script",
+          "why": "-rwxr-xr-x: arquivo que todos podem executar e ler, mas só o dono altera."
+        },
+        {
+          "id": "e",
+          "t": "drwx------",
+          "s": "pasta particular",
+          "why": "drwx------: pasta em que só o dono entra. Os outros nem conseguem listar."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Todos leem, só o dono altera",
+          "s": "",
+          "why": "Todos lendo e só o dono escrevendo: rw- r-- r--, um arquivo comum."
+        },
+        {
+          "id": "b",
+          "t": "Só o dono lê e escreve",
+          "s": "",
+          "why": "Só o dono e mais ninguém: rw- --- ---."
+        },
+        {
+          "id": "c",
+          "t": "Pasta em que todos entram, só o dono cria",
+          "s": "",
+          "why": "Pasta (d) com rwx para o dono e r-x para os outros: entram e listam."
+        },
+        {
+          "id": "d",
+          "t": "Todos podem executar",
+          "s": "",
+          "why": "Executar para todos é o x nos três blocos: rwx r-x r-x."
+        },
+        {
+          "id": "e",
+          "t": "Pasta em que só o dono entra",
+          "s": "",
+          "why": "Pasta (d) com rwx só no bloco do dono: drwx------."
+        }
+      ]
+    },
+    {
+      "title": "Instalar e ligar um serviço",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "srv01",
+      "prompt": "ana@srv01:~$",
+      "cap": "Conectando por SSH no srv01...",
+      "goal": "Instale o servidor web nginx no srv01 e confira se ele está rodando e se volta sozinho depois de reiniciar.",
+      "intro": "O srv01 vai hospedar uma página interna. Instale o <b>nginx</b>, confira se o <b>serviço</b> está no ar e se ele sobe sozinho quando o servidor reiniciar.",
+      "z": "Instalou e foi embora? Quero ver quando o servidor reiniciar às 3 da manhã.",
+      "me": "Instalo, confiro o status e testo a página. Sem achismo.",
+      "lesson": [
+        "Programas são instalados como <b>pacotes</b>. No Ubuntu e no Debian, quem cuida disso é o <b>apt</b>.",
+        "<b>sudo apt update</b> só atualiza a lista de versões disponíveis. <b>sudo apt install</b> instala. Os dois mexem no sistema, por isso usam <b>sudo</b>.",
+        "Um <b>serviço</b> é um programa que fica rodando em segundo plano. O <b>systemd</b> cuida deles, e o comando para falar com ele é o <b>systemctl</b>.",
+        "No <b>systemctl status</b>: active (running) = rodando agora; enabled = sobe sozinho no boot.",
+        "<b>curl</b> faz um pedido para um site direto do terminal: ótimo para testar se a página responde."
+      ],
+      "check": {
+        "q": "O que o sudo apt update faz?",
+        "v": [
+          "Para que serve o apt update?",
+          "Rodar sudo apt update instala alguma coisa?"
+        ],
+        "a": 0,
+        "o": [
+          "Atualiza a lista de pacotes e versões disponíveis, sem instalar nada",
+          {
+            "t": "Atualiza todos os programas",
+            "why": "Quem atualiza os programas é o apt upgrade. O update só baixa a lista."
+          },
+          {
+            "t": "Instala o nginx",
+            "why": "Quem instala é o apt install nginx."
+          }
+        ],
+        "why": "O update renova o catálogo. Depois dele, o install e o upgrade sabem quais são as versões mais novas."
+      },
+      "tip": "sudo apt update, sudo apt install nginx, systemctl status nginx (procure active e enabled) e curl -I http://localhost para testar a página.",
+      "learn": "Com o apt você instala pacotes (sudo apt update, depois sudo apt install). O systemctl status mostra se o serviço está rodando (active) e se sobe no boot (enabled), e o curl testa a página direto do servidor.",
+      "cmds": [
+        {
+          "c": "sudo apt update",
+          "alias": [
+            "apt update"
+          ],
+          "out": "Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease\nGet:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]\nGet:3 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]\nFetched 252 kB in 1s (310 kB/s)\nReading package lists... Done\nBuilding dependency tree... Done\nReading state information... Done\n12 packages can be upgraded. Run 'apt list --upgradable' to see them.",
+          "why": "O apt baixou a lista nova de pacotes dos servidores do Ubuntu. Não instalou nada: só avisa que 12 pacotes têm atualização."
+        },
+        {
+          "c": "sudo apt install -y nginx",
+          "alias": [
+            "sudo apt install nginx",
+            "apt install nginx"
+          ],
+          "out": "Reading package lists... Done\nBuilding dependency tree... Done\nReading state information... Done\nThe following NEW packages will be installed:\n  nginx nginx-common\n0 upgraded, 2 newly installed, 0 to remove and 12 not upgraded.\nNeed to get 552 kB of archives.\nGet:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 nginx-common all 1.24.0-2ubuntu7.1 [31.2 kB]\nGet:2 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 nginx amd64 1.24.0-2ubuntu7.1 [521 kB]\nSetting up nginx-common (1.24.0-2ubuntu7.1) ...\nSetting up nginx (1.24.0-2ubuntu7.1) ...\nProcessing triggers for man-db (2.12.0-4build2) ...",
+          "why": "Instalou o nginx e o nginx-common, que vem junto. O -y responde sim sozinho à pergunta de confirmação."
+        },
+        {
+          "c": "systemctl status nginx",
+          "alias": [
+            "sudo systemctl status nginx",
+            "systemctl status nginx --no-pager"
+          ],
+          "out": "● nginx.service - A high performance web server and a reverse proxy server\n     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)\n     Active: active (running) since Mon 2026-11-02 07:20:31 -03; 12s ago\n       Docs: man:nginx(8)\n   Main PID: 2410 (nginx)\n      Tasks: 3 (limit: 4558)\n     Memory: 2.4M (peak: 2.7M)\n        CPU: 21ms\n     CGroup: /system.slice/nginx.service\n             ├─2410 \"nginx: master process /usr/sbin/nginx -g daemon on; master_process on;\"\n             ├─2411 \"nginx: worker process\"\n             └─2412 \"nginx: worker process\"",
+          "why": "Duas palavras importam: active (running), rodando agora, e enabled, na linha Loaded, que quer dizer que ele sobe sozinho no boot. No Ubuntu, o pacote já deixa o serviço habilitado."
+        },
+        {
+          "c": "curl -I http://localhost",
+          "alias": [
+            "curl http://localhost",
+            "curl -I localhost"
+          ],
+          "out": "HTTP/1.1 200 OK\nServer: nginx/1.24.0 (Ubuntu)\nDate: Mon, 02 Nov 2026 10:20:44 GMT\nContent-Type: text/html\nContent-Length: 615\nLast-Modified: Mon, 02 Nov 2026 10:20:30 GMT\nConnection: keep-alive\nETag: \"6ae863ee-267\"\nAccept-Ranges: bytes",
+          "why": "O nginx respondeu 200 OK com a página padrão. O -I pede só o cabeçalho da resposta, sem o HTML."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Por que o apt install precisou de sudo?",
+          "v": [
+            "Qual o motivo do sudo antes do apt install?",
+            "Por que instalar pacote pede sudo?"
+          ],
+          "a": 0,
+          "o": [
+            "Instalar programa mexe no sistema inteiro, e isso exige permissão de administrador",
+            {
+              "t": "Porque o nginx é pago",
+              "why": "O nginx é gratuito. O sudo é sobre permissão, não sobre preço."
+            },
+            {
+              "t": "Porque sem sudo a internet não funciona",
+              "why": "A rede funciona sem sudo. O que exige administrador é gravar em pastas do sistema."
+            }
+          ],
+          "why": "O apt grava em pastas do sistema, como /usr e /etc, que só o root pode alterar. O sudo dá esse poder só para aquele comando e registra quem usou."
+        },
+        {
+          "q": "O status mostra active (running). O que isso quer dizer?",
+          "v": [
+            "Pelo systemctl status, o nginx está funcionando?",
+            "O que significa active (running) no status?"
+          ],
+          "a": 0,
+          "o": [
+            "O nginx está rodando agora",
+            {
+              "t": "Está instalado, mas parado",
+              "why": "Parado apareceria como inactive (dead)."
+            },
+            {
+              "t": "Vai ligar no próximo boot",
+              "why": "Quem fala do boot é o enabled. O active é sobre agora."
+            }
+          ],
+          "why": "active (running) é o estado de agora: o processo está no ar. É bom confirmar com um teste real, como o curl."
+        },
+        {
+          "q": "Se o servidor reiniciar, o nginx volta sozinho?",
+          "v": [
+            "Depois de um reboot, o nginx sobe sem ninguém mexer?",
+            "O nginx volta sozinho se o srv01 reiniciar?"
+          ],
+          "a": 0,
+          "o": [
+            "Sim: o status mostra enabled, então ele sobe no boot",
+            {
+              "t": "Não: precisa rodar systemctl start toda vez",
+              "why": "Isso seria se estivesse disabled. Aqui está enabled."
+            },
+            {
+              "t": "Só se alguém logar no servidor",
+              "why": "Serviço sobe no boot sem ninguém logado. É para isso que serve o enabled."
+            }
+          ],
+          "why": "enabled quer dizer que o systemd liga o serviço em todo boot. Se estivesse disabled, o comando para mudar seria sudo systemctl enable nginx."
+        },
+        {
+          "q": "Qual teste prova que a página está respondendo de verdade?",
+          "v": [
+            "Como confirmar que o site responde?",
+            "Que comando testa a página do nginx direto do servidor?"
+          ],
+          "a": 0,
+          "o": [
+            "curl -I http://localhost, que voltou 200 OK",
+            {
+              "t": "ls /var/log/nginx",
+              "why": "Os logs existirem não prova que a página responde."
+            },
+            {
+              "t": "sudo apt update",
+              "why": "Isso só atualiza a lista de pacotes."
+            }
+          ],
+          "why": "O curl faz um pedido igual ao do navegador. 200 OK é a resposta de sucesso do HTTP."
+        }
+      ]
+    }
+  ]
+}

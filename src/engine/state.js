@@ -2,7 +2,7 @@
 // LEVELS e ACTS começam vazios e são preenchidos por loadLevels() (levels.js).
 
 export const LEVELS = [];   // fases na ordem do mapa; cada uma recebe .act (índice do ato)
-export const ACTS = [];     // [tag, nome, dificuldade, história, trilha] de cada ato, ex.: ['ATO 1', 'Camada física e endereçamento', 'básico', [...], 0]
+export const ACTS = [];     // [tag, nome, dificuldade, história, trilha, nivelamento] de cada ato, ex.: ['ATO 1', 'Camada física e endereçamento', 'básico', [...], 0, false]
 export const TRAILS = [];   // trilhas do mapa: { id, name, icon, desc, acts: [índices em ACTS] }; cada fase recebe .trail
 // Iniciante e básico ganham ajuda extra (dica automática); os eventos do Z3R0 crescem com o nível.
 export const DIFFS = ['iniciante', 'básico', 'intermediário', 'avançado'];
@@ -30,10 +30,12 @@ export const K = i => LEVELS[i].title;
 export const num = i => LEVELS.slice(0, i + 1).filter(L => L.trail === LEVELS[i].trail).length;
 // Primeira fase de cada trilha: as trilhas começam liberadas (a inicial é a recomendada).
 const firstOfTrail = i => i === 0 || LEVELS[i - 1].trail !== LEVELS[i].trail;
+// Primeira fase do ato logo depois de um nivelamento ("nivel": true): quem já domina o básico pula direto para ela.
+const afterNivel = i => i > 0 && LEVELS[i - 1].act !== LEVELS[i].act && LEVELS[i - 1].trail === LEVELS[i].trail && !!(ACTS[LEVELS[i - 1].act] || [])[5];
 
-// Liberada: a primeira de cada trilha, as que já têm estrela (mesmo se entrou fase nova antes delas), a seguinte de uma concluída
+// Liberada: a primeira de cada trilha, a primeira depois de um nivelamento, as que já têm estrela (mesmo se entrou fase nova antes delas), a seguinte de uma concluída
 // e as fases novas ("novo": true) que ficam antes de alguma fase que o jogador já fez.
-export const unlocked = i => firstOfTrail(i) || (S.prog[K(i)] || 0) > 0 || (S.prog[K(i - 1)] || 0) > 0
+export const unlocked = i => firstOfTrail(i) || afterNivel(i) || (S.prog[K(i)] || 0) > 0 || (S.prog[K(i - 1)] || 0) > 0
   || (!!LEVELS[i].novo && LEVELS.some((L, k) => k > i && L.trail === LEVELS[i].trail && S.prog[L.title]));   // fase nova não trava quem já passou dali
 
 // Resumo do progresso salvo: estrelas, pontos e fases concluídas.

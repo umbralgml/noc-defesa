@@ -5,6 +5,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { matches, path, reach, lid, compile } from '../src/engine/netlib.js';
+import { cmdGloss } from '../src/engine/glossary.js';
 
 const DIR = fileURLToPath(new URL('../src/levels/', import.meta.url));
 const LOCS = ['rack', 'desk', 'firewall', 'war', 'server'];
@@ -158,6 +159,9 @@ for (const f of read('index.json').acts) {
   if (!a.tag || !a.name) errors.push(`${f}: ato sem "tag" ou "name"`);
   if (a.diff !== undefined && !['iniciante', 'básico', 'intermediário', 'avançado'].includes(a.diff)) errors.push(`${f}: "diff" deve ser iniciante, básico, intermediário ou avançado`);
   if (!a.diff) warns.push(`${f}: ato sem "diff" (dificuldade)`);
+  if (a.nivel !== undefined && typeof a.nivel !== 'boolean') errors.push(`${f}: "nivel" precisa ser true ou false`);
+  // Nivelamento é para quem nunca viu o assunto: todo comando do terminal precisa ter cartão "?" no glossário.
+  if (a.nivel) a.levels.forEach(L => (L.cmds || []).forEach(c => { if (!cmdGloss(c.c)) warns.push(`${f} "${L.title}": comando "${c.c}" sem cartão no glossário (glossary.js, item com 'cmd')`); }));
   (a.story || []).forEach((s, i) => { if (!['z', 'me', 'chefe'].includes(s.who) || !s.t) errors.push(`${f}: story[${i}] precisa de "who" (z, me ou chefe) e "t"`); });
   a.levels.forEach((L, i) => {
     total++;

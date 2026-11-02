@@ -81,7 +81,7 @@ export function openStudy(tab = 0) {
   } else {
     const seen = new Set(JSON.parse(localStorage.getItem('noc_gloss') || '[]'));
     box.innerHTML = `<input class="glsearch" id="glQ" placeholder="buscar termo..." aria-label="Buscar no glossário" autocomplete="off">
-      <dl class="gllist">${GLOSS.map(g => `<div data-k="${esc((g[0] + ' ' + g[1].join(' ')).toLowerCase())}"><dt>${seen.has(g[0]) ? '👁 ' : ''}${esc(g[0])}</dt><dd>${esc(g[2])}</dd></div>`).join('')}</dl>
+      <dl class="gllist">${[...GLOSS].sort((x, y) => x[0].replace(/^\W+/, '').localeCompare(y[0].replace(/^\W+/, ''), 'pt')).map(g => `<div data-k="${esc((g[0] + ' ' + g[1].join(' ') + (g[3] === 'cmd' ? ' comando' : '')).toLowerCase())}"><dt>${seen.has(g[0]) ? '👁 ' : ''}${g[3] === 'cmd' ? '⌨ ' : ''}${esc(g[0])}</dt><dd>${esc(g[2])}</dd></div>`).join('')}</dl>
       <div class="fnote">👁 = termos que você já consultou durante as aulas. Toque nos termos sublinhados das aulas para ver a definição na hora.</div>`;
     $('glQ').oninput = () => { const q = $('glQ').value.toLowerCase().trim(); box.querySelectorAll('.gllist > div').forEach(d => { d.hidden = q && !d.dataset.k.includes(q); }); };
   }

@@ -26,18 +26,20 @@ export function linkGloss(root) {
     b.classList.add('gl'); b.tabIndex = 0; b.setAttribute('role', 'button'); b.title = 'Ver no glossário';
   });
 }
-function glossPop(b) {
-  const g = findGloss(b.textContent); if (!g) return;
+function glossPop(b) { const g = findGloss(b.textContent); if (g) glossCard(g); }
+// Abre o cartão do glossário embaixo da tela e marca o termo como visto (sala de estudo).
+export function glossCard(g, kind = '📘 GLOSSÁRIO') {
   let p = $('glpop');
   if (!p) { p = document.createElement('div'); p.id = 'glpop'; p.className = 'glpop'; p.setAttribute('role', 'dialog'); document.body.append(p); }
-  p.innerHTML = '<span class="glk">📘 GLOSSÁRIO</span><b></b><span class="gld"></span><button class="lnk" type="button">fechar</button>';
+  p.innerHTML = '<span class="glk"></span><b></b><span class="gld"></span><button class="lnk" type="button">fechar</button>';
+  p.querySelector('.glk').textContent = kind;
   p.querySelector('b').textContent = g[0]; p.querySelector('.gld').textContent = g[2];
   p.querySelector('button').onclick = () => p.classList.remove('on');
   p.classList.remove('on'); void p.offsetWidth; p.classList.add('on');
   const seen = new Set(JSON.parse(localStorage.getItem('noc_gloss') || '[]')); seen.add(g[0]);
   try { localStorage.setItem('noc_gloss', JSON.stringify([...seen])); } catch (e) {}
 }
-document.addEventListener('click', e => { const b = e.target.closest('.gl'); if (b) { e.stopPropagation(); glossPop(b); } else if (!e.target.closest('#glpop')) $('glpop')?.classList.remove('on'); }, true);
+document.addEventListener('click', e => { const b = e.target.closest('.gl'); if (b) { e.stopPropagation(); glossPop(b); } else if (!e.target.closest('#glpop, .cmdi')) $('glpop')?.classList.remove('on'); }, true);
 document.addEventListener('keydown', e => { const b = e.target.closest && e.target.closest('.gl'); if (b && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); glossPop(b); } });
 export function closeModal() { $('modal').classList.remove('on'); }
 

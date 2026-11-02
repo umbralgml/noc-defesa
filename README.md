@@ -8,7 +8,7 @@ Funciona no celular e no desktop, sem cadastro. Dá para **instalar como app** (
 
 ## O que você aprende
 
-São 62 fases organizadas em trilhas de treinamento. A **Trilha inicial** (46 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** e **Linux** (já no ar), **Servidores** e **Segurança** (em breve).
+São 68 fases organizadas em trilhas de treinamento. A **Trilha inicial** (46 fases) vai do zero ao avançado: um Prólogo para quem nunca viu rede, a Formação N1 e 7 atos de dificuldade crescente. As trilhas de aprofundamento são **Redes** e **Linux** (já no ar), **Servidores** e **Segurança** (em breve).
 
 | Parte | Nível | Tema | Fases |
 |-------|-------|------|-------|
@@ -32,12 +32,14 @@ Trilha **Linux**:
 
 | Ato | Nível | Tema | Fases |
 |-----|-------|------|-------|
+| Introdução | iniciante (nivelamento) | Primeiros passos no Linux | o que é Linux, onde estou (whoami, pwd, ls), pastas do sistema, ler logs (cat, tail, grep), permissões em letras e instalar um serviço (apt, systemctl, curl) |
 | 1 | intermediário | Servidor Linux de plantão | permissões em número (chmod e setuid), disco cheio com log em DEBUG (df, du, lsof +L1, truncate, logrotate), nginx que não sobe com a porta 80 ocupada (systemctl, journalctl, ss), OOM killer derrubando o MySQL (free, dmesg, php-fpm) e agenda do cron |
 
 O jogo foi feito para ensinar, não só para testar:
 
 - **Aula em cartões** no briefing de cada fase, com uma pergunta de checagem no fim (sem custo). A aula também fica fixa durante a fase e no botão **?**.
-- **Glossário tocável:** termos sublinhados nas aulas mostram a definição na hora. A **Sala de estudo** no mapa reúne todas as aulas liberadas e o glossário.
+- **Glossário tocável:** termos sublinhados nas aulas mostram a definição na hora, e no terminal o **?** ao lado de cada comando abre um cartão explicando o que ele faz. A **Sala de estudo** no mapa reúne todas as aulas liberadas e o glossário.
+- **Nivelamento em cada trilha:** quem nunca viu o assunto começa pela introdução; quem já trabalha com ele pula direto para o ato seguinte.
 - **Treino sem pressão:** nas fases iniciante e básico, jogue antes sem perder integridade; depois jogue valendo.
 - **Explicação na hora** de cada jogada, certa ou errada: por que aquele IP é público, por que aquela regra vem primeiro, por que aquela opção do quiz não serve.
 - **Revisão no fim da fase** com tudo o que você errou e a explicação de cada item.

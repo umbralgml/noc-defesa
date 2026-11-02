@@ -58,7 +58,7 @@ src/engine/
   game.js             mapa, briefing, play(L)/intro, win/fail, botão de dica, askReset(); ENGINES por type
   daily.js            desafio diário: sorteio com a data como semente, sequência, compartilhar, duelo
   gen.js              geradores de pergunta: GEN (desafio diário, não mexer sem querer mudar o dia) e ACAD (Academia); sem DOM
-  glossary.js         GLOSS: termo, apelidos e definição; findGloss(texto)
+  glossary.js         GLOSS: termo, apelidos, definição e 'cmd' nos comandos; findGloss(texto) e cmdGloss(comando) (cartão ? do terminal)
   report.js           botão "⚑ ERRO?" e painel de reporte de erro de conteúdo (tabela reportes; sem banco, abre e-mail). Outros módulos chamam flow.report(ctx)
   study.js            aula em cartões com a pergunta "check" no briefing; sala de estudo (biblioteca de aulas + glossário)
   academy.js          Academia de exercícios: temas com perguntas geradas, sem perder integridade (quiz com `free`), domínio = 10 seguidas
@@ -68,7 +68,7 @@ src/engine/
   wire.js             tipo "wire" (ligar pares)
   drop.js             tipo "drop" (modes "buckets" e "slots")
   quiz.js             tipo "quiz" (e chefe com "boss")
-  term.js             tipo "term": terminal simulado (comandos com saída fixa, alias, diagnóstico em passos)
+  term.js             tipo "term": terminal simulado (comandos com saída fixa, alias, cartão ? do glossário, diagnóstico em passos)
   steps.js            perguntas de diagnóstico em passos, comuns ao "term" e ao "topo"
   defense.js          tipo "defense": pacotes em ondas, regras de firewall ligadas em tempo real
   topo.js             tipo "topo": diagrama da rede, ping animado, apontar a falha
@@ -141,6 +141,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 - **Banco do ranking:** `tools/ranking.sql` precisa ser idempotente (roda de novo a cada mudança, no Supabase e na VPS). O cliente fala com a API REST (PostgREST/Supabase) em `/rest/v1/`; o `sw.js` nunca guarda esse caminho em cache.
 - **Trilhas:** o mapa mostra uma trilha por vez (abas no topo, `localStorage` `noc_trail`). A Trilha inicial é a visão geral; Redes, Linux, Servidores e Segurança aprofundam. Cada trilha começa liberada, a numeração das fases é por trilha (`num(i)` em `state.js`) e o botão PRÓXIMA não atravessa trilhas. Trilha sem atos entra com `"soon"` e aparece como EM BREVE. A dificuldade só sobe dentro de cada trilha. Ato novo entra no `"acts"` e na trilha dele, no `sw.js` e passa no validador.
 - **Ritmo de lançamento:** conteúdo novo sai em lotes pequenos, de 3 a 5 fases por vez, um lote por PR e por versão do changelog, sempre numa trilha de aprofundamento (Redes, Linux, Servidores, Segurança). Não junte trilhas inteiras num lançamento só: o jogo precisa ter sempre novidade chegando, no site e na Play Store. Um ato pode crescer ao longo de vários lotes (fases novas no fim do `levels`, com `"novo": true`).
+- **Nivelamento em toda trilha:** o público vai de quem nunca viu rede até o pleno. Toda trilha começa com um ato de nivelamento (`"nivel": true`, `diff` iniciante ou básico): analogias, aula curta, `check` e glossário em tudo. Quem já domina pula: a primeira fase do ato seguinte fica liberada (`afterNivel()` em `state.js`). No nivelamento, todo comando do terminal precisa de cartão no glossário (item com `'cmd'` em `glossary.js`; o validador avisa) e todo termo novo da aula entra no glossário, para virar negrito tocável.
 - **Fase nova no meio da campanha:** marque com `"novo": true`. Ela ganha o selo NOVA no mapa e fica liberada para quem já tem estrela em alguma fase depois dela (`unlocked()` em `state.js`), então ninguém trava no meio do caminho.
 - **Dificuldade gradativa:** o jogo é para quem nunca viu rede até quem trabalha num NOC. Cada ato tem `diff` (iniciante → avançado, só sobe). Iniciante/básico: analogias, sem cronômetro, dica automática no 2º erro (`hint()` em `ui.js`). Pressão (tempo, eventos do Z3R0) só a partir de intermediário. A primeira fase tem `"tutorial": true`.
 - **Linux:** muita coisa de rede roda em Linux, então há um ato próprio e o Prólogo já apresenta o terminal (`ip a`, `ping`). Fases `term` com `prompt` Linux. Saídas de comando realistas (copie de um sistema de verdade).

@@ -1,4 +1,4 @@
-// Glossário do NOC: termo, apelidos (como aparecem nas aulas) e definição curta.
+// Glossário do NOC: termo, apelidos (como aparecem nas aulas), definição curta e, nos comandos, 'cmd'.
 // Termos em <b> nas aulas e explicações que batem com um item daqui viram tocáveis.
 export const GLOSS = [
   ['Access point', ['access point', 'ap'], 'Equipamento que leva a rede para o Wi-Fi, ligando os aparelhos sem fio à rede com cabo.'],
@@ -57,8 +57,92 @@ export const GLOSS = [
   ['UDP', ['udp'], 'Transporte sem confirmação: manda e segue. Leve e rápido, bom para voz, DNS e DHCP.'],
   ['VLAN', ['vlan'], 'Rede local virtual: separa grupos de portas num mesmo switch como se fossem redes diferentes.'],
   ['Wildcard', ['wildcard'], 'O inverso da máscara, usado em ACLs Cisco: 255 menos cada octeto. /24 → 0.0.0.255.'],
-  ['Wireshark', ['wireshark'], 'Programa que captura e mostra cada pacote da rede, com filtros para achar o que interessa.']
+  ['Wireshark', ['wireshark'], 'Programa que captura e mostra cada pacote da rede, com filtros para achar o que interessa.'],
+  // Linux
+  ['Linux', ['linux'], 'Sistema operacional livre que roda na maioria dos servidores, em muitos roteadores e até no Android. O centro dele é o kernel.'],
+  ['Kernel', ['kernel', 'núcleo'], 'O núcleo do Linux: conversa com o hardware (disco, rede, memória) e divide a máquina entre os programas.'],
+  ['Distribuição', ['distribuição', 'distribuições', 'distro'], 'O Linux empacotado com programas e instalador: Ubuntu, Debian, Red Hat, Rocky. Muda o gerenciador de pacotes, mas o terminal é parecido.'],
+  ['Shell', ['shell', 'bash'], 'O programa que lê o que você digita no terminal e executa. O mais comum é o bash.'],
+  ['Prompt', ['prompt'], 'O texto antes do cursor, como admin@web01:~$. Mostra usuário, máquina e pasta atual. Termina em $ para usuário comum e em # para root.'],
+  ['root', ['root', 'usuário root', 'superusuário'], 'O administrador do Linux: pode tudo, inclusive apagar o sistema. No dia a dia use seu usuário e o sudo.'],
+  ['Diretório', ['diretório', 'diretórios', 'pasta', 'pastas'], 'O mesmo que pasta: guarda arquivos e outras pastas.'],
+  ['Raiz', ['raiz', 'diretório raiz'], 'A pasta de cima de todas no Linux, escrita só como /. Todo o resto fica dentro dela: /etc, /home, /var.'],
+  ['Caminho', ['caminho', 'caminho absoluto', 'caminho relativo', 'caminho completo'], 'O endereço de um arquivo. Absoluto começa na raiz (/etc/hosts). Relativo parte da pasta onde você está (logs/app.log).'],
+  ['Home', ['home', '/home', '~', 'pasta pessoal'], 'A pasta pessoal de cada usuário, em /home/nome. O ~ é um atalho para ela.'],
+  ['/etc', ['/etc'], 'Pasta das configurações do sistema e dos serviços: /etc/hosts, /etc/ssh/sshd_config, /etc/nginx.'],
+  ['/var/log', ['/var/log'], 'Pasta dos logs do sistema e dos serviços. Primeiro lugar para procurar quando algo quebra.'],
+  ['Log', ['log', 'logs'], 'Registro do que um programa ou o sistema fez, uma linha por evento, com data e hora. É a primeira pista de um problema.'],
+  ['Pacote', ['pacote', 'pacotes'], 'Programa pronto para instalar pelo gerenciador (apt no Debian e Ubuntu, dnf no Red Hat), que já traz junto o que ele precisa.'],
+  ['Serviço', ['serviço', 'serviços', 'daemon'], 'Programa que fica rodando em segundo plano o tempo todo, como o nginx (site) e o sshd (acesso SSH).'],
+  ['systemd', ['systemd'], 'O gerenciador de serviços do Linux atual: sobe os serviços no boot, reinicia quando caem e guarda os logs deles (journal).'],
+  ['Permissões', ['permissão', 'permissões', 'rwx'], 'Quem pode ler (r), escrever (w) e executar (x) um arquivo, separado para o dono, o grupo e os outros.'],
+  ['Grupo', ['grupo', 'grupos'], 'Conjunto de usuários que dividem as mesmas permissões. Quem está no grupo sudo pode virar administrador.'],
+  // IPv6
+  ['IPv6', ['ipv6'], 'A versão nova do IP: 128 bits escritos em 8 grupos hexadecimais, como 2001:db8::1. Tem endereço para tudo, sem precisar de NAT.'],
+  ['Hexadecimal', ['hexadecimal', 'hex'], 'Contagem em base 16: 0 a 9 e depois a até f. Cada dígito vale 4 bits, então um grupo de 4 dígitos do IPv6 tem 16 bits.'],
+  ['Prefixo', ['prefixo', 'prefixos', '/64', '/56', '/48'], 'A parte de rede de um endereço IPv6, contada em bits. Toda rede local é /64; clientes recebem /56 ou /48 para dividir em várias /64.'],
+  ['::', ['::'], 'Atalho do IPv6 para uma sequência de grupos zerados. Só pode aparecer uma vez no endereço: 2001:db8:0:0:0:0:0:1 vira 2001:db8::1.'],
+  ['SLAAC', ['slaac'], 'O aparelho monta o próprio IPv6 juntando o prefixo que o roteador anuncia (RA) com um final que ele mesmo cria. Sem servidor DHCP.'],
+  ['RA', ['ra', 'router advertisement'], 'Anúncio do roteador IPv6: avisa qual é o prefixo da rede e que ele é o gateway. É o que permite o SLAAC.'],
+  ['NDP', ['ndp', 'neighbor discovery'], 'Descoberta de vizinhos do IPv6, feita com ICMPv6. Faz o papel do ARP e ainda carrega os anúncios do roteador.'],
+  ['ICMPv6', ['icmpv6'], 'O ICMP do IPv6. Além do ping, carrega o NDP e o aviso de pacote grande demais. Bloquear todo ICMPv6 quebra o IPv6.'],
+  ['Link-local IPv6', ['fe80::', 'fe80::/10', 'link-local ipv6'], 'Endereço fe80:: que toda interface IPv6 cria sozinha. Só vale dentro do enlace e não passa por roteador.'],
+  ['Endereço global', ['endereço global', 'gua'], 'Endereço IPv6 que vale na internet inteira, como os que começam com 2 ou 3 (faixa 2000::/3).'],
+  ['DHCPv6-PD', ['dhcpv6-pd', 'prefix delegation', 'pd'], 'O provedor entrega um prefixo inteiro (/56 ou /48) ao roteador do cliente, que divide em /64 para cada rede da casa ou da empresa.'],
+  // Provedor
+  ['PPPoE', ['pppoe'], 'Protocolo que autentica o cliente do provedor com usuário e senha e entrega o IP numa sessão em cima da rede ethernet.'],
+  ['BNG', ['bng', 'bras', 'concentrador'], 'Roteador do provedor que termina as sessões PPPoE dos clientes, aplica o plano de velocidade e entrega os endereços.'],
+  ['OLT', ['olt'], 'Equipamento da central de fibra (GPON) que conversa com as ONUs instaladas na casa dos clientes.'],
+  ['Trânsito', ['trânsito', 'trânsito ip'], 'Link pago com uma operadora maior que entrega rotas para a internet inteira.'],
+  ['Peering', ['peering', 'ptt', 'ix'], 'Troca direta de tráfego entre duas redes, sem pagar trânsito, muitas vezes num ponto de troca como o IX.br.'],
+  ['MPLS', ['mpls'], 'Encaminhamento por rótulos dentro do provedor: o primeiro roteador põe um rótulo e os outros só trocam o rótulo. Base das VPNs de operadora.'],
+  ['CLI', ['cli', 'linha de comando'], 'A interface de texto de um equipamento: você digita comandos e ele responde. Cada fabricante tem a sua.'],
+  // Comandos (cartão "?" no terminal)
+  ['pwd', ['pwd'], 'Mostra em qual pasta você está agora (print working directory).', 'cmd'],
+  ['ls', ['ls', 'ls -l', 'ls -la', 'ls -lh'], 'Lista o que tem numa pasta. Com -l mostra detalhes (permissões, dono, tamanho, data); com -a mostra também os arquivos ocultos.', 'cmd'],
+  ['cd', ['cd'], 'Entra numa pasta. cd /var/log vai direto pelo caminho completo, cd .. sobe uma pasta e cd sozinho volta para a sua home.', 'cmd'],
+  ['cat', ['cat'], 'Mostra o conteúdo inteiro de um arquivo na tela. Bom para arquivos curtos.', 'cmd'],
+  ['less', ['less'], 'Abre um arquivo para ler com rolagem, sem alterar nada. Setas rolam, / procura e q sai.', 'cmd'],
+  ['head', ['head'], 'Mostra só o começo de um arquivo (10 linhas, ou quantas pedir com -n).', 'cmd'],
+  ['tail', ['tail', 'tail -f'], 'Mostra o fim de um arquivo, onde ficam as linhas mais novas de um log. Com -f continua mostrando o que chega.', 'cmd'],
+  ['grep', ['grep', 'grep -i'], 'Procura um texto dentro de arquivos ou da saída de outro comando e mostra só as linhas que batem. -i ignora maiúsculas.', 'cmd'],
+  ['sudo', ['sudo'], 'Roda um comando como administrador (root) e registra quem fez. Pede a sua senha.', 'cmd'],
+  ['whoami', ['whoami'], 'Mostra com qual usuário você está logado.', 'cmd'],
+  ['id', ['id'], 'Mostra o seu usuário e os grupos de que você faz parte. Se aparecer o grupo sudo, você pode virar administrador.', 'cmd'],
+  ['hostname', ['hostname'], 'Mostra o nome da máquina em que você está. Bom para não rodar comando no servidor errado.', 'cmd'],
+  ['apt', ['apt', 'apt update', 'apt install', 'apt list'], 'Gerenciador de pacotes do Debian e do Ubuntu. apt update baixa a lista de versões, apt install instala, apt list --upgradable mostra o que tem atualização.', 'cmd'],
+  ['systemctl', ['systemctl', 'systemctl status', 'systemctl start', 'systemctl enable', 'systemctl restart', 'systemctl is-active', 'systemctl disable'], 'Controla os serviços do systemd: status mostra como está, start e stop ligam e param agora, enable e disable decidem se sobe no boot.', 'cmd'],
+  ['journalctl', ['journalctl'], 'Lê os logs guardados pelo systemd. -u nginx filtra um serviço, -n 20 mostra as últimas linhas, -f acompanha ao vivo.', 'cmd'],
+  ['ip', ['ip a', 'ip addr', 'ip route', 'ip r', 'ip -br', 'ip -6', 'ip'], 'Mostra e configura a rede do Linux: ip a lista as interfaces e os endereços, ip route mostra as rotas e o gateway. Com -6, o mesmo para IPv6.', 'cmd'],
+  ['ping', ['ping', 'ping -c', 'ping -6'], 'Manda pacotes ICMP e espera a resposta: diz se o destino responde e em quanto tempo. -c limita a quantidade, -6 usa IPv6.', 'cmd'],
+  ['ss', ['ss', 'ss -tulpn', 'ss -tlnp'], 'Mostra as conexões e quem está escutando em cada porta. -t TCP, -u UDP, -l só quem escuta, -p o processo, -n números em vez de nomes.', 'cmd'],
+  ['df', ['df', 'df -h'], 'Mostra quanto cada disco (sistema de arquivos) tem de espaço usado e livre. -h mostra em G e M.', 'cmd'],
+  ['du', ['du'], 'Soma quanto espaço cada pasta ocupa. Serve para achar quem encheu o disco.', 'cmd'],
+  ['chmod', ['chmod'], 'Muda as permissões de um arquivo: chmod 600 deixa só o dono ler e escrever, chmod +x deixa executar.', 'cmd'],
+  ['chown', ['chown'], 'Muda o dono (e o grupo) de um arquivo: chown www-data:www-data arquivo.', 'cmd'],
+  ['nginx -t', ['nginx -t', 'nginx'], 'Testa a configuração do nginx sem reiniciar nada. Rode antes de aplicar uma mudança.', 'cmd'],
+  ['free', ['free', 'free -h'], 'Mostra a memória RAM e a swap. A coluna available diz quanto ainda dá para usar.', 'cmd'],
+  ['dmesg', ['dmesg'], 'Mostra as mensagens do kernel: hardware, disco, rede e o OOM killer matando processo por falta de memória.', 'cmd'],
+  ['ps', ['ps', 'ps aux'], 'Lista os processos rodando, com usuário, CPU e memória de cada um.', 'cmd'],
+  ['lsof', ['lsof'], 'Lista arquivos abertos e quem abriu. lsof +L1 acha arquivos apagados que ainda ocupam o disco.', 'cmd'],
+  ['dig', ['dig'], 'Consulta o DNS e mostra a resposta completa: dig google.com pergunta o IP, dig @8.8.8.8 escolhe o servidor.', 'cmd'],
+  ['tcpdump', ['tcpdump'], 'Captura pacotes na interface direto no terminal, como um Wireshark de texto. -n não traduz nomes, -i escolhe a interface.', 'cmd'],
+  ['ufw', ['ufw'], 'Firewall simples do Ubuntu: ufw status mostra as regras, ufw allow libera uma porta, ufw enable liga.', 'cmd'],
+  ['traceroute', ['traceroute', 'tracepath', 'mtr'], 'Mostra cada roteador no caminho até o destino e onde o caminho para.', 'cmd'],
+  ['last', ['last', 'lastb'], 'Mostra os últimos logins na máquina (last) e as tentativas que falharam (lastb).', 'cmd'],
+  ['crontab', ['crontab'], 'Edita (-e) ou lista (-l) as tarefas agendadas do seu usuário no cron.', 'cmd'],
+  ['nslookup', ['nslookup'], 'Pergunta ao DNS o IP de um nome. Mais antigo e simples que o dig, existe também no Windows.', 'cmd'],
+  ['getent hosts', ['getent hosts', 'getent'], 'Resolve um nome do jeito que os programas da máquina resolvem: olha primeiro o /etc/hosts e depois o DNS.', 'cmd'],
+  ['curl', ['curl', 'curl -i'], 'Faz um pedido a um site direto do terminal, como o navegador faria. -I mostra só o cabeçalho da resposta (o código, como 200 OK).', 'cmd']
 ];
 const norm = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
-const IDX = new Map(); GLOSS.forEach((g, i) => [g[0], ...g[1]].forEach(a => IDX.set(norm(a), i)));
+// Termos ganham o primeiro que chegar (IP continua sendo o endereço, não o comando ip). Comandos têm índice próprio.
+const IDX = new Map(), CIDX = new Map();
+GLOSS.forEach((g, i) => [g[0], ...g[1]].forEach(a => { const k = norm(a); if (!IDX.has(k)) IDX.set(k, i); if (g[3] === 'cmd') CIDX.set(k, i); }));
 export const findGloss = text => { const i = IDX.get(norm(text)); return i === undefined ? null : GLOSS[i]; };
+// Cartão de um comando do terminal: tenta as duas primeiras palavras ("systemctl status") e depois a primeira ("ls"), ignorando o sudo.
+export const cmdGloss = cmd => {
+  const w = norm(cmd).split(' ').filter(x => x !== 'sudo');
+  const i = (w.length > 1 ? CIDX.get(w[0] + ' ' + w[1]) : undefined) ?? CIDX.get(w[0] || '');
+  return i === undefined ? null : GLOSS[i];
+};

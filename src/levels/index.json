@@ -10,6 +10,7 @@
     "ato5.json",
     "ato6.json",
     "provedor.json",
+    "linux-intro.json",
     "linux-plantao.json"
   ],
   "trilhas": [
@@ -43,8 +44,9 @@
       "id": "linux",
       "name": "Linux",
       "icon": "🐧",
-      "desc": "Servidor Linux no dia a dia do plantão: permissões, disco cheio, serviço que não sobe, memória que acaba e cron. Nível intermediário: recomendada depois da trilha inicial.",
+      "desc": "Do primeiro comando ao plantão de servidor. Nunca usou Linux? Comece pela introdução. Já usa no dia a dia? Pule direto para o Ato 1.",
       "acts": [
+        "linux-intro.json",
         "linux-plantao.json"
       ]
     },
