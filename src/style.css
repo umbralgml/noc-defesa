@@ -720,3 +720,76 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .trail.on{border-color:var(--acc);background:linear-gradient(160deg,rgba(0,224,168,.14),var(--panel));box-shadow:0 0 0 1px var(--acc) inset}
 .trail.soon{opacity:.5;cursor:default}
 .traild{font-size:12.5px;color:var(--muted);line-height:1.45;margin:0 2px 6px}
+
+/* ---------- repaginada (v1.25): menos caixas, menos cor competindo, mais respiro ----------
+   Regra: o verde fica para a ação principal e para o que você já concluiu; o amarelo para o próximo passo;
+   o vermelho é do Z3R0. Orbitron só no logo, nos botões principais e nos rótulos de ato. */
+/* tela inicial */
+#title .content{gap:0;padding:22px 22px 28px;max-width:440px;margin:0 auto;width:100%;box-sizing:border-box}
+.logo{font-size:48px;letter-spacing:8px;margin:2px 0 0}
+.slogan{margin:4px 0 14px;letter-spacing:4px}
+.story{font-size:14.5px;line-height:1.55;color:#b9c7dc;margin:0 auto 22px}
+#title #goMap{width:100%;max-width:340px;padding:16px 26px;font-size:15px}
+.tdaily{width:100%;max-width:340px;margin-top:10px;padding:13px 22px;font:700 14px system-ui,sans-serif!important;letter-spacing:0;color:var(--text)!important;border-color:var(--line)!important}
+.tprog.on{margin:-8px 0 16px}
+.tnew{display:inline-flex;align-items:center;gap:8px;margin:18px auto 0;max-width:100%;background:none;border:none;padding:6px 4px;color:var(--muted);font-size:13px;text-align:left}
+.tnew span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-decoration-color:rgba(138,155,184,.4);text-underline-offset:3px}
+.tnb{flex:0 0 auto;font:700 10.5px system-ui,sans-serif;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.tnew.fresh .tnb{color:#1a1300;background:var(--warn);border-color:var(--warn)}
+.tacts{display:flex;justify-content:center;gap:6px;margin-top:22px;width:100%}
+.tact{flex:1 1 0;max-width:110px;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;border-radius:12px;padding:8px 4px;color:#c9d6ea;font-size:12px;font-weight:600}
+.tact span{font-size:22px;line-height:1}
+.tact:active,.tact:focus-visible{background:var(--panel)}
+.tact[hidden]{display:none}
+.tmore{margin-top:10px;width:100%;max-width:340px}
+.tmore summary{list-style:none;cursor:pointer;font-size:12.5px;color:var(--muted);padding:8px;text-align:center}
+.tmore summary::-webkit-details-marker{display:none}
+.tmore summary::after{content:' ▾'}
+.tmore[open] summary::after{content:' ▴'}
+.tmorel{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:4px 0 6px}
+.credit{margin-top:22px}
+.news{background:transparent}
+
+/* mapa */
+.mapTop{padding:10px 14px}
+.roomv,.roomsvg{height:124px}
+.mapList{padding:2px 16px 34px}
+.trails{gap:6px;margin:12px 0 4px;padding:2px 0 6px}
+.trail{min-width:0;flex-direction:row;align-items:center;gap:8px;border-radius:999px;padding:7px 14px 7px 10px;background:transparent}
+.trail .ti{font-size:16px}
+.trail b{font:600 13px system-ui,sans-serif;letter-spacing:0}
+.trail small{display:none}
+.trail.on{background:rgba(0,224,168,.12);box-shadow:none;border-color:rgba(0,224,168,.6)}
+.traild{font-size:13px;margin:4px 2px 12px}
+.hub{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 6px}
+.hub>div:empty{display:none}
+.hub>#dailyBox{grid-column:1/-1}
+.hub .daily{margin:0;height:100%;box-sizing:border-box}
+.hub #dailyBox .daily{padding:12px 14px}
+.hub>div:not(#dailyBox) .daily{border:1px solid var(--line);background:var(--panel);padding:10px;gap:10px}
+.hub>div:not(#dailyBox) .daily .di{flex:0 0 34px;height:34px;border-radius:10px;font-size:17px;background:var(--panel2)}
+.hub>div:not(#dailyBox) .daily .dt b{font-size:13px;line-height:1.25}
+.hub>div:not(#dailyBox) .daily .dt small{display:block;font:500 11px system-ui,sans-serif;line-height:1.3;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.hub>div:not(#dailyBox) .daily .dg{display:none}
+.acth{margin:26px 0 10px}
+.acth b{font-size:17px}
+.node{padding:4px 0}
+.node .info{border-color:transparent;padding:10px 12px}
+.node .tx b{font-size:14.5px;font-weight:600}
+.node .tx small{font:500 11.5px system-ui,sans-serif;letter-spacing:0;color:var(--muted)}
+.node.done .info{background:transparent;border-color:var(--line)}
+.node.lock .info{background:transparent}
+
+/* tela da fase */
+#game .scene:not(.big){height:66px}
+.lbh{padding:7px 12px;font:600 12px system-ui,sans-serif;letter-spacing:0;color:#c9d6ea}
+.lbh i{font-size:11px}
+.lbb{font-size:13px}
+.coach{font-size:13px;padding:10px 14px}
+.task{background:transparent;border:1px solid var(--line);border-left:3px solid var(--acc);padding:11px 13px;font-size:14px}
+.bank{gap:7px;padding:10px 12px 14px}
+.bankh{font:600 11px system-ui,sans-serif;letter-spacing:.2px;margin-bottom:2px}
+.tlock{background:transparent;border:none;padding:4px 2px;font-size:12.5px;color:var(--muted)}
+.tlog{height:min(26vh,200px)}
+.tlog .tsys{white-space:pre-wrap;width:auto}
+@media (max-width:440px){.logo{font-size:44px}.tact{font-size:11.5px}}

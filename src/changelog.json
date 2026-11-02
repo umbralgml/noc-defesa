@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.25",
+      "date": "2026-11-02",
+      "title": "Faxina no NOC",
+      "items": [
+        "Tela inicial mais limpa: começar o turno e o desafio diário em destaque, o resto em Opções",
+        "Novidades numa linha só, com o selo Novo quando tem versão nova",
+        "Mapa com as trilhas no topo e desafio, academia e sala de estudo num bloco compacto",
+        "Fases com menos caixas e menos texto em volta: mais espaço para jogar"
+      ]
+    },
+    {
       "v": "1.24",
       "date": "2026-11-02",
       "title": "IPv6 sem medo",

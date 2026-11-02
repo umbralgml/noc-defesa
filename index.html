@@ -30,32 +30,26 @@
       <div class="content">
         <h1 class="logo">NOC</h1>
         <div class="slogan">ÚLTIMA LINHA DE DEFESA</div>
-        <p class="story">03:12 da madrugada. O grupo <b style="color:var(--z)">Z3R0</b> invadiu o telão do NOC e lançou um ataque contra o provedor. Você é o analista de plantão. Religue o rack, feche o firewall e cace o invasor antes que a rede caia.</p>
-        <section class="tupd" aria-label="O jogo está em atualização">
-          <div class="tuh"><span class="tub">EM ATUALIZAÇÃO</span><b>📚 O NOC está virando escola</b></div>
-          <p>Estamos atualizando o jogo para você <b>aprender</b>, <b>revisar</b> e <b>praticar</b> redes jogando, do zero até o plantão.</p>
-          <ul class="tur">
-            <li class="ok">10 fases novas para quem está começando (Prólogo e Formação N1)</li>
-            <li class="ok">Academia de exercícios: prática sem fim de binário, máscara, sub-rede, portas e mais</li>
-            <li class="ok">Aula em cartões com pergunta de checagem, glossário tocável e sala de estudo</li>
-            <li class="ok">Treino sem pressão: jogue a fase sem perder integridade antes de valer</li>
-            <li>Mais aulas e fases a caminho: o jogo segue em atualização</li>
-          </ul>
-          <button class="lnk" id="tUpdBtn">ver tudo o que mudou <span id="tUpdLast"></span></button>
-        </section>
+        <p class="story">03:12 da madrugada. O hacker <b style="color:var(--z)">Z3R0</b> invadiu o NOC. Você é o analista de plantão: aprenda redes, Linux e segurança enquanto segura a rede de pé.</p>
         <div class="tprog" id="tProg"></div>
         <button class="btn" id="goMap">INICIAR TURNO</button>
-        <button class="btn ghostb tdaily" id="dailyT">⚡ DESAFIO DIÁRIO</button>
-        <div class="row" style="justify-content:center;margin-top:12px">
-          <button class="btn ghostb tsmall" id="installBtn" hidden>📲 INSTALAR APP</button>
-          <button class="btn ghostb tsmall" id="sndT">SOM: ON</button>
-          <button class="btn ghostb tsmall rankBtn" id="rankT" hidden>🏆 RANKING</button>
-          <button class="btn ghostb tsmall" id="achBtn">🏅 CONQUISTAS</button>
-          <button class="btn ghostb tsmall" id="lookBtn">🎨 ANALISTA</button>
-          <button class="btn ghostb tsmall" id="a11yBtn">♿ ACESSIBILIDADE</button>
-          <button class="btn ghostb tsmall" id="newsBtn">NOVIDADES <span class="ndot" id="newsDot"></span></button>
-          <button class="btn ghostb tsmall" id="resetBtn">ZERAR PROGRESSO</button>
+        <button class="btn ghostb tdaily" id="dailyT">⚡ Desafio diário</button>
+        <button class="tnew" id="tUpdBtn" type="button"><span class="tnb">Novo</span><span id="tUpdLast"></span></button>
+        <div class="tacts">
+          <button class="tact" id="installBtn" hidden><span>📲</span>Instalar</button>
+          <button class="tact rankBtn" id="rankT" hidden><span>🏆</span>Ranking</button>
+          <button class="tact" id="achBtn"><span>🏅</span>Conquistas</button>
+          <button class="tact" id="lookBtn"><span>🎨</span>Analista</button>
         </div>
+        <details class="tmore">
+          <summary>Opções</summary>
+          <div class="tmorel">
+            <button class="btn ghostb tsmall" id="sndT">SOM: ON</button>
+            <button class="btn ghostb tsmall" id="a11yBtn">♿ ACESSIBILIDADE</button>
+            <button class="btn ghostb tsmall" id="newsBtn">NOVIDADES <span class="ndot" id="newsDot"></span></button>
+            <button class="btn ghostb tsmall" id="resetBtn">ZERAR PROGRESSO</button>
+          </div>
+        </details>
         <div class="twho" id="tWho" hidden>Jogando como <b id="tWhoName"></b> · <button class="lnk" id="tWhoEdit">trocar</button></div>
         <div class="trank" id="tRank"></div>
         <div class="credit">criado por <b>Marcos dos Anjos</b> · redes, infra e segurança</div>
