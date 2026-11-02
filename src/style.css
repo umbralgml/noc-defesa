@@ -853,3 +853,15 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tt-zflash{opacity:0;animation:ttZf 7s steps(1,end) infinite}
 @keyframes ttZf{0%,62%{opacity:0}63%{opacity:1}64%{opacity:0}65%{opacity:.6}66%,100%{opacity:0}}
 :root.calm .tt-zflash,:root.calm .tt-mote{opacity:0}
+
+/* ---------- selo da Play Store na tela inicial ---------- */
+.tplay{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:12px;margin:2px auto 18px;padding:10px 20px 10px 14px;border-radius:14px;background:linear-gradient(135deg,#0d1d33,#091426);border:1px solid rgba(0,224,168,.55);box-shadow:0 0 0 4px rgba(0,224,168,.08),0 8px 30px rgba(0,224,168,.18);color:var(--text);text-decoration:none;text-align:left}
+.tplay[hidden]{display:none}
+.tplay .tpi{width:30px;height:30px;flex:0 0 30px;filter:drop-shadow(0 0 8px rgba(0,224,168,.55))}
+.tplay small{display:block;font:700 10px 'JetBrains Mono',monospace;letter-spacing:1.5px;color:var(--acc)}
+.tplay b{display:block;font:700 16px system-ui,sans-serif;margin-top:1px}
+.tplay::after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);transform:skewX(-20deg);animation:tpShine 3.6s ease-in-out infinite}
+@keyframes tpShine{0%,60%{left:-40%}100%{left:130%}}
+.tplay.live{cursor:pointer;background:linear-gradient(135deg,#00e0a8,#00b98a);color:#03130d;border-color:transparent}
+.tplay.live small{color:#03130d}
+.tplay.live .tpi path{fill:#03130d}

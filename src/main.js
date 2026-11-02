@@ -27,6 +27,10 @@ import { applyPrefs, lookModal, a11yModal } from './engine/prefs.js';
 applyPrefs();
 
 $('mA').innerHTML = AV_ME;
+// Selo da Play Store na tela inicial. Quando o app sair, ponha o link aqui e o selo vira botão de baixar.
+const PLAY_URL = '';
+if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) $('tPlay').hidden = true;
+else if (PLAY_URL) { const a = $('tPlay'); a.href = PLAY_URL; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('role'); a.classList.add('live'); $('tPlayK').textContent = 'JÁ DISPONÍVEL'; $('tPlayT').textContent = 'Baixe na Play Store'; a.setAttribute('aria-label', 'Baixar o app na Play Store'); }
 $('tScene').innerHTML = titleSVG() + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
 
 $('sndT').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(MUS.cur || 'menu'); };
