@@ -54,6 +54,9 @@ export function titleSVG() {
     return `<g${red ? ' class="tt-blink"' : ''} style="animation-delay:${i * .3}s"><circle cx="${lx + 6}" cy="${y - 1.6}" r="1.5" fill="${c}"/><text x="${lx + 10}" y="${y}" class="tt-log"${red ? ' fill="#ff8aa5"' : ''}>${t}</text></g>`;
   }).join('');
 
+  // partículas de dados subindo do chão
+  let motes = '';
+  for (let k = 0; k < 14; k++) { const x = 20 + ((k * 53) % 360), d = (k * .73) % 6; motes += `<circle class="tt-mote" style="animation-delay:-${d.toFixed(2)}s;animation-duration:${(5 + (k % 4)).toFixed(1)}s" cx="${x}" cy="${150 - (k % 3) * 8}" r="${k % 3 ? .7 : 1}" fill="${k % 5 ? '#4dd2ff' : '#00e0a8'}"/>`; }
   // chão em perspectiva
   let floor = '';
   for (let k = -9; k <= 9; k++) floor += `<line x1="${200 + k * 8}" y1="110" x2="${200 + k * 60}" y2="${H}" />`;
@@ -71,6 +74,7 @@ export function titleSVG() {
     <clipPath id="ttClipG"><rect x="${gx + 1}" y="${gy + 8}" width="${gw - 2}" height="${gh - 9}"/></clipPath>
   </defs>
   <rect width="${W}" height="${H}" fill="url(#ttBg)"/>
+  <g class="tt-cam">
   <rect width="${W}" height="${H}" fill="url(#ttGlow)"/>
   <rect width="${W}" height="${H}" fill="url(#ttRed)" class="tt-alarm"/>
   <g stroke="rgba(77,210,255,.08)" stroke-width=".5">${floor}</g>
@@ -79,7 +83,9 @@ export function titleSVG() {
   ${panel(gx, gy, gw, gh, 'TRÁFEGO DA BORDA', graph)}
   ${panel(cx, cy, cw, ch, 'TOPOLOGIA', topo + z)}
   ${panel(lx, ly, lw, lh, 'ALERTAS', logs)}
+  <rect class="tt-sweep" x="24" y="8" width="352" height="2" fill="rgba(77,210,255,.35)"/>
   </g>
+  ${motes}
   <path d="M0 ${H} L0 150 Q200 132 400 150 L400 ${H}Z" fill="url(#ttDesk)"/>
   <path d="M0 150 Q200 132 400 150" fill="none" stroke="rgba(77,210,255,.25)" stroke-width=".6"/>
   <g class="tt-me">
@@ -99,5 +105,8 @@ export function titleSVG() {
     <rect x="180" y="110" width="5" height="10" rx="2" fill="#14233a"/><rect x="215" y="110" width="5" height="10" rx="2" fill="#14233a"/>
     <circle cx="217.5" cy="115" r="1.2" class="tt-blink" fill="#00e0a8"/>
   </g>
+  <ellipse cx="200" cy="146" rx="46" ry="5" fill="rgba(0,224,168,.18)" class="tt-key"/>
+  </g>
+  <rect width="${W}" height="${H}" fill="rgba(255,46,99,.22)" class="tt-zflash"/>
 </svg>`;
 }

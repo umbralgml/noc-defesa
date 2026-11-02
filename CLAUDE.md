@@ -35,7 +35,7 @@ Rode depois de qualquer mudança no motor ou em fases. Tipo de fase novo precisa
 ## Arquitetura
 
 ```
-index.html            marcação das 3 telas (#title com aside de novidades, #map, #game), modal, #fx; carrega src/style.css e src/main.js
+index.html            marcação das 3 telas (#title, #map, #game), modal, #fx; carrega src/style.css e src/main.js
 src/style.css         todo o CSS (tokens em :root; seções por tela/componente)
 manifest.webmanifest  PWA (nome, ícones em src/icons/, cores); caminhos relativos para funcionar em /noc-defesa/ e na raiz
 sw.js                 service worker: rede primeiro com cache de reserva (offline); lista CORE com todos os módulos
@@ -65,7 +65,8 @@ src/engine/
   academy.js          Academia de exercícios: temas com perguntas geradas, sem perder integridade (quiz com `free`), domínio = 10 seguidas
   rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura
   pwa.js              registra o sw.js e controla o botão "INSTALAR APP" (pedido nativo ou instruções do iPhone)
-  news.js             linha do tempo de atualizações da tela inicial; selo NOVO até o jogador iniciar o turno
+  news.js             log de mudanças (newsHTML para o painel) e selo Novo da tela inicial até o jogador iniciar o turno
+  board.js            painel da tela inicial: ranking e log de mudanças em abas (openBoard('rank' | 'news'))
   wire.js             tipo "wire" (ligar pares)
   drop.js             tipo "drop" (modes "buckets" e "slots")
   quiz.js             tipo "quiz" (e chefe com "boss")
