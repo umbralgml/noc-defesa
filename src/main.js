@@ -1,7 +1,8 @@
 // Ponto de entrada: monta a tela de título, carrega as fases e liga os botões.
 import { $, fmt } from './engine/util.js';
 import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
-import { AV_ME, HX, sceneSVG, heroTo } from './engine/scene.js';
+import { AV_ME } from './engine/scene.js';
+import { titleSVG } from './engine/titlescene.js';
 import { loadLevels } from './engine/levels.js';
 import { show, modal, closeModal } from './engine/ui.js';
 import { initGame, renderMap, askReset } from './engine/game.js';
@@ -15,7 +16,7 @@ import { initZ3r0 } from './engine/z3r0.js';
 import { initTrain } from './engine/train.js';
 import { initAcademy } from './engine/academy.js';
 import { initStudy } from './engine/study.js';
-import { initReport } from './engine/report.js';
+import { initReport, openContact } from './engine/report.js';
 import { rankOf, RANKS } from './engine/career.js';
 import { achHTML, achCount, ACH } from './engine/ach.js';
 import { initDrop } from './engine/drop.js';
@@ -25,14 +26,14 @@ import { applyPrefs, lookModal, a11yModal } from './engine/prefs.js';
 applyPrefs();
 
 $('mA').innerHTML = AV_ME;
-$('tScene').innerHTML = sceneSVG('war', true) + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
-heroTo($('tScene'), HX.war, true); $('tScene').querySelector('.hero').classList.add('type');
+$('tScene').innerHTML = titleSVG() + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
 
 $('sndT').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(MUS.cur || 'menu'); };
 $('sndM').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music('menu'); };
 setMute(isMuted());
 $('resetBtn').onclick = () => askReset(showProgress);
 $('lookBtn').onclick = () => { au(); lookModal(); };
+$('contactT').onclick = $('contactM').onclick = () => { au(); openContact(); };
 $('a11yBtn').onclick = () => { au(); a11yModal(); };
 
 // Resumo na tela inicial, só para quem já concluiu alguma fase.

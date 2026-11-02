@@ -14,7 +14,11 @@ export async function loadNews() {
   const fresh = seen() !== latest;
   $('newsList').innerHTML = versions.map((v, i) => `<div class="ver${i ? '' : ' latest'}">
     <div class="vh"><span class="vn">v${esc(v.v)}</span><span class="vd">${fmtDate(v.date)}</span>${!i && fresh ? '<span class="vnew">NOVO</span>' : ''}</div>
-    <b class="vt">${esc(v.title)}</b><ul>${v.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('');
+    <b class="vt">${esc(v.title)}</b><ul>${v.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')
+    + (versions.length > 1 ? `<button class="tlmore" id="tlMore" type="button">ver mais (${versions.length - 1} versões anteriores)</button>` : '');
+  // Só a última versão aparece; o resto abre no "ver mais".
+  const more = $('tlMore');
+  if (more) more.onclick = () => { const all = $('newsList').classList.toggle('all'); more.textContent = all ? 'ver menos' : `ver mais (${versions.length - 1} versões anteriores)`; if (all) more.parentNode.append(more); else $('news').scrollIntoView({ block: 'start' }); };
   $('newsDot').classList.toggle('on', fresh);
   $('newsBtn').onclick = $('tUpdBtn').onclick = () => $('news').scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('tUpdLast').textContent = `v${versions[0].v}: ${versions[0].title}`;

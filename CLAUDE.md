@@ -59,7 +59,8 @@ src/engine/
   daily.js            desafio diário: sorteio com a data como semente, sequência, compartilhar, duelo
   gen.js              geradores de pergunta: GEN (desafio diário, não mexer sem querer mudar o dia) e ACAD (Academia); sem DOM
   glossary.js         GLOSS: termo, apelidos, definição e 'cmd' nos comandos; findGloss(texto) e cmdGloss(comando) (cartão ? do terminal)
-  report.js           botão "⚑ ERRO?" e painel de reporte de erro de conteúdo (tabela reportes; sem banco, abre e-mail). Outros módulos chamam flow.report(ctx)
+  report.js           botão "⚑ ERRO?" e painel de reporte de erro de conteúdo; openContact() abre o "Fale com o NOC" (sugestão, dúvida, contato) na mesma tabela reportes, com level 'Contato'. Sem banco, abre e-mail. Outros módulos chamam flow.report(ctx)
+  titlescene.js       cena da tela inicial: telão do NOC (tráfego, topologia, alertas), Z3R0 invadindo e o analista em silhueta; animações nas classes tt-* do style.css
   study.js            aula em cartões com a pergunta "check" no briefing; sala de estudo (biblioteca de aulas + glossário)
   academy.js          Academia de exercícios: temas com perguntas geradas, sem perder integridade (quiz com `free`), domínio = 10 seguidas
   rank.js             ranking opcional via REST do Supabase (sem SDK): perfil, consentimento, envio e leitura

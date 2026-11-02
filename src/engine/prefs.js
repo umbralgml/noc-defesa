@@ -4,6 +4,7 @@ import { $, store, esc } from './util.js';
 import { progress } from './state.js';
 import { modal, closeModal } from './ui.js';
 import { sfx } from './audio.js';
+import { sceneSVG, HX } from './scene.js';
 
 // need: { s: estrelas } | { g: estrelas de ouro } | { a: conquista }
 export const SHIRTS = [
@@ -43,7 +44,8 @@ export function applyPrefs() {
 }
 const set = (k, v) => { store('noc_prefs', { ...prefs(), [k]: v }); applyPrefs(); sfx.sel(); };
 
-const HERO_PREVIEW = () => document.querySelector('#tScene .hero') ? document.querySelector('#tScene svg').outerHTML : '';
+// Prévia do analista: a cena da sala de guerra com o herói parado diante do telão.
+const HERO_PREVIEW = () => sceneSVG('war', true).replace('class="hero" id="hero"', `class="hero type" style="transform:translate(${HX.war}px,106px)"`);
 export function lookModal(after) {
   const p = prefs();
   const sw = (k, list, cur) => list.map((c, i) => `<button class="swc${i === cur ? ' on' : ''}" data-k="${k}" data-v="${i}" style="background:${c}" aria-label="${k === 'hair' ? 'Cabelo' : 'Pele'} ${i + 1}"></button>`).join('');

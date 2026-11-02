@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.26",
+      "date": "2026-11-02",
+      "title": "NOC de cara nova",
+      "items": [
+        "Tela inicial com cena nova: o telão do NOC com tráfego, topologia e alertas ao vivo, e o Z3R0 invadindo",
+        "Novo botão 💬 Sugestões: mande ideias, dúvidas ou um recado direto para o criador do jogo",
+        "O mesmo botão fica no topo do mapa",
+        "Log de mudanças mostra só a última versão; as anteriores ficam no ver mais"
+      ]
+    },
+    {
       "v": "1.25",
       "date": "2026-11-02",
       "title": "Faxina no NOC",

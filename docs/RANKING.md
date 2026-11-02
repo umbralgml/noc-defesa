@@ -63,6 +63,14 @@ select * from metricas_resumo;
 
 O botão **⚑ ERRO?** aparece no painel de explicação de cada jogada, na explicação do quiz e no fim de cada fase. O jogador escolhe o tipo (resposta errada, explicação, digitação ou outro), escreve um comentário e, se quiser, um contato. O reporte vai para a tabela `reportes` com a fase, o item que estava na tela, a explicação mostrada, a versão e a plataforma (web ou android). Sem o ranking configurado, sem a tabela ou sem internet, o jogo abre o e-mail já preenchido.
 
+O botão **💬 Sugestões** (tela inicial e topo do mapa) abre o *Fale com o NOC* e usa a mesma tabela: `level` = `Contato` e `kind` = `sugestao`, `duvida` ou `contato`. O banco precisa da versão do `tools/ranking.sql` com esses tipos (v1.26); até rodar o SQL de novo no Supabase, a mensagem cai no e-mail preenchido.
+
+Só as mensagens do Fale com o NOC:
+
+```sql
+select created_at, kind, comment, contact from reportes_abertos where level = 'Contato';
+```
+
 Para ler: **Table Editor > reportes**, ou no SQL Editor:
 
 ```sql

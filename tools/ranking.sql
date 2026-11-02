@@ -113,7 +113,7 @@ create table if not exists public.reportes (
   level      text        not null check (char_length(level) between 1 and 60),
   item       text        check (item is null or char_length(item) <= 300),
   shown      text        check (shown is null or char_length(shown) <= 1000),
-  kind       text        not null check (kind in ('resposta', 'explicacao', 'texto', 'outro')),
+  kind       text        not null check (kind in ('resposta', 'explicacao', 'texto', 'outro', 'sugestao', 'duvida', 'contato')),
   comment    text        check (comment is null or char_length(comment) <= 1000),
   contact    text        check (contact is null or char_length(contact) <= 100),
   version    text        check (version is null or char_length(version) <= 10),
@@ -121,6 +121,9 @@ create table if not exists public.reportes (
   status     text        not null default 'novo' check (status in ('novo', 'corrigido', 'descartado')),
   created_at timestamptz not null default now()
 );
+-- v1.26: Fale com o NOC usa a mesma tabela (level = 'Contato') com os tipos sugestao, duvida e contato.
+alter table public.reportes drop constraint if exists reportes_kind_check;
+alter table public.reportes add constraint reportes_kind_check check (kind in ('resposta', 'explicacao', 'texto', 'outro', 'sugestao', 'duvida', 'contato'));
 alter table public.reportes enable row level security;
 drop policy if exists "qualquer um insere" on public.reportes;
 create policy "qualquer um insere" on public.reportes for insert to anon with check (status = 'novo');
