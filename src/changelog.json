@@ -1,6 +1,15 @@
 {
   "versions": [
     {
+      "v": "1.28",
+      "date": "2026-11-02",
+      "title": "A caminho da loja",
+      "items": [
+        "Selo novo na tela inicial: o NOC chega em breve como app Android na Play Store",
+        "Quando o app sair, o selo vira o botão para baixar"
+      ]
+    },
+    {
       "v": "1.27",
       "date": "2026-11-02",
       "title": "NOC em alta definição",

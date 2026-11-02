@@ -34,4 +34,4 @@ base64 -w0 noc-upload.jks > noc-upload.b64
 
 12 - Depois dos 14 dias: Painel > Solicitar acesso à produção, responder o questionário sobre o teste (quantos testaram, o que mudou com o feedback) e aguardar a análise (geralmente alguns dias).
 
-13 - Liberado o acesso: Teste e lançamento > Produção > Criar nova versão, enviar o .aab mais recente, escrever as notas da versão (pode copiar os itens do changelog) e enviar para revisão. A primeira revisão pode levar até uma semana.
+13 - Liberado o acesso: Teste e lançamento > Produção > Criar nova versão, enviar o .aab mais recente, escrever as notas da versão (pode copiar os itens do changelog) e enviar para revisão. A primeira revisão pode levar até uma semana. Depois que o app estiver público, ponha o link da página da loja na constante PLAY_URL, no topo de src/main.js: o selo "Em breve na Play Store" da tela inicial vira o botão "Baixe na Play Store" (dentro do próprio app o selo não aparece).
