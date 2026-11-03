@@ -1,6 +1,16 @@
 {
   "versions": [
     {
+      "v": "1.29",
+      "date": "2026-11-03",
+      "title": "Pronto para a loja",
+      "items": [
+        "Novo no perfil: botão para apagar seus dados do ranking quando quiser",
+        "No app Android, compartilhar e salvar o certificado abrem o menu do celular",
+        "Links compartilhados pelo app agora levam direto para o site do jogo"
+      ]
+    },
+    {
       "v": "1.28",
       "date": "2026-11-02",
       "title": "A caminho da loja",

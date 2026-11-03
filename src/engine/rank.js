@@ -92,6 +92,23 @@ export const publicName = () => { const p = profile(); return p && p.consent && 
 const publicLinkedin = () => { const p = profile(); return p && p.consent && p.linkedin ? p.linkedin : null; };
 
 // Pede o perfil na primeira vez e depois segue para "next".
+// Apaga as pontuações deste aparelho no ranking e o perfil local (o progresso das fases fica).
+// 1º toque pede confirmação no próprio botão; sem o SQL novo no banco, avisa e mostra o e-mail.
+async function delData(b) {
+  if (!b.dataset.ok) { b.dataset.ok = 1; b.textContent = 'TOQUE DE NOVO PARA APAGAR'; b.classList.add('danger'); return; }
+  b.disabled = true; b.textContent = 'APAGANDO...';
+  try {
+    await api('rpc/apagar_jogador', { method: 'POST', body: JSON.stringify({ p: playerId() }) });
+    ['noc_profile', 'noc_rank_sent', 'noc_player'].forEach(k => ls(k, null));
+    hooks.profile();
+    b.textContent = 'DADOS APAGADOS ✓';
+    $('fErr').textContent = 'Pronto: suas pontuações saíram do ranking. O progresso das fases continua no aparelho.';
+  } catch (e) {
+    b.disabled = false; delete b.dataset.ok; b.textContent = 'APAGAR MEUS DADOS DO RANKING';
+    $('fErr').innerHTML = 'Não consegui apagar agora. Tente mais tarde ou peça por e-mail: <a href="mailto:marcos.anjosarth@gmail.com?subject=NOC%3A%20apagar%20meus%20dados">marcos.anjosarth@gmail.com</a>.';
+  }
+}
+
 export function ensureProfile(next) { if (profile()) next(); else profileForm(next, true); }
 
 export function profileForm(after, first) {
@@ -103,13 +120,15 @@ export function profileForm(after, first) {
     <label class="fl">Equipe <small>(opcional: turma, faculdade, empresa)</small><input id="fTeam" maxlength="24" placeholder="Ex.: Redes 2026 IFSP"></label>
     <label class="fc"><input type="checkbox" id="fOk"> Pode mostrar meu nome e o LinkedIn no ranking público, junto com a minha pontuação.</label>
     <label class="fc"><input type="checkbox" id="fMet"> Enviar estatísticas anônimas das fases (acertos, erros e tempo, sem nome nem id) para melhorar o jogo.</label>
-    <div class="fnote">A equipe aparece no ranking de equipes, que soma os pontos de campanha de quem joga por ela. Sem marcar a primeira caixa, seus pontos entram como anônimos. Para apagar dados já publicados, abra uma issue em <a href="https://github.com/umbralgml/noc-defesa/issues" target="_blank" rel="noopener">github.com/umbralgml/noc-defesa</a>.</div>
+    <div class="fnote">A equipe aparece no ranking de equipes, que soma os pontos de campanha de quem joga por ela. Sem marcar a primeira caixa, seus pontos entram como anônimos.</div>
+    ${!first && CFG ? '<button class="btn ghostb wideb" id="fDel">APAGAR MEUS DADOS DO RANKING</button>' : ''}
     <div class="ferr" id="fErr"></div>
     <div class="row"><button class="btn ghostb" id="fSkip">${first ? 'PULAR' : 'VOLTAR'}</button><button class="btn" id="fSave">${first ? 'ENTRAR NO PLANTÃO' : 'SALVAR'}</button></div>`);
   $('fAnon').textContent = anonName();
   $('fName').value = p.name || ''; $('fIn').value = p.linkedin || ''; $('fOk').checked = !!p.consent;
   $('fTeam').value = p.team || ''; $('fMet').checked = ls('noc_metricas') !== false;
   const done = v => { ls('noc_metricas', $('fMet').checked); ls('noc_profile', v); ls('noc_rank_sent', null); submitCampaign(); hooks.joined(); hooks.profile(); closeModal(); after && after(); };
+  if ($('fDel')) $('fDel').onclick = e => delData(e.currentTarget);
   $('fSkip').onclick = () => { if (first) done({ name: '', linkedin: '', consent: false, team: '' }); else { closeModal(); after && after(); } };
   $('fSave').onclick = () => {
     const name = cleanName($('fName').value), li = normLinkedin($('fIn').value), ok = $('fOk').checked, team = cleanName($('fTeam').value), err = m => { $('fErr').textContent = m; };
