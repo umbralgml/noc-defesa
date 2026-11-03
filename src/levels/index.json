@@ -12,7 +12,8 @@
     "provedor-nivel.json",
     "provedor.json",
     "linux-intro.json",
-    "linux-plantao.json"
+    "linux-plantao.json",
+    "servidores-nivel.json"
   ],
   "trilhas": [
     {
@@ -56,9 +57,10 @@
       "id": "servidores",
       "name": "Servidores",
       "icon": "🖥️",
-      "desc": "DNS, DHCP, web, virtualização e backup.",
-      "soon": "Em breve",
-      "acts": []
+      "desc": "DNS, DHCP, web, virtualização e backup. Nunca mexeu em servidor? Comece pela introdução. As fases de plantão chegam nos próximos lotes.",
+      "acts": [
+        "servidores-nivel.json"
+      ]
     },
     {
       "id": "seguranca",
