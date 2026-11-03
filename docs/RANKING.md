@@ -93,6 +93,7 @@ O `tools/ranking.sql` deixa o papel público (`anon`) com o mínimo:
 | Ler os reportes ou a visão `reportes_abertos` | não |
 | Ler a visão `ranking_top` (melhor resultado de cada jogador, sem o id) | sim |
 | Ler a tabela crua, alterar ou apagar linhas | não |
+| Apagar as próprias linhas (`rpc/apagar_jogador`, só com o id do aparelho) | sim |
 | Marcar uma linha como escondida | não |
 
 O banco também recusa:
@@ -111,6 +112,6 @@ O painel do Supabase pode mostrar o aviso "Security Definer View" para `ranking_
 
 - **Esconder alguém:** em **Table Editor → ranking**, marque `hidden = true` em qualquer linha do jogador. Ele some do ranking inteiro.
 - **Apagar de vez:** no mesmo lugar, apague as linhas do jogador. Elas compartilham o mesmo valor de `player`.
-- **Pedido de remoção:** o formulário do jogo indica as issues do GitHub como canal. Para achar as linhas, filtre por `name` e confira o `player` antes de apagar.
+- **Pedido de remoção:** o próprio jogador apaga em Perfil → APAGAR MEUS DADOS DO RANKING (função `apagar_jogador` do `tools/ranking.sql`, v1.29). Quem pedir por e-mail: Para achar as linhas, filtre por `name` e confira o `player` antes de apagar.
 
 O texto do consentimento e o link para pedir remoção ficam em `src/engine/rank.js` (`joinForm`).

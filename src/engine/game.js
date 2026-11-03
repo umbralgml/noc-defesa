@@ -1,5 +1,5 @@
 // Fluxo do jogo: mapa, briefing, intro animada da fase, vitória, derrota e dica.
-import { $, fmt, center, buzz, store } from './util.js';
+import { $, fmt, center, buzz, store, siteURL } from './util.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
 import { S, LEVELS, ACTS, TRAILS, DIFFS, diffOf, K, num, unlocked, save, resetProgress, progress } from './state.js';
@@ -243,7 +243,7 @@ function win() {
       ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
       <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`); addReport();
     $('mMap').onclick = () => { closeModal(); goMap(); };
-    if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${location.origin + location.pathname}`, e.currentTarget); };
+    if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${siteURL()}`, e.currentTarget); };
     if (more) $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
     else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
   }, delay);

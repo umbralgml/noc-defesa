@@ -1,6 +1,6 @@
 // Interface compartilhada: telas, modal, toast, partículas, barra de integridade,
 // pontuação, acerto/erro e o painel de explicação (coach).
-import { $, buzz, esc, fmt } from './util.js';
+import { $, buzz, esc, fmt, plug } from './util.js';
 import { AV_ME, AV_Z, heroState, sceneFx } from './scene.js';
 import { sfx } from './audio.js';
 import { unlock } from './ach.js';
@@ -121,6 +121,8 @@ export const stars = () => S.err === 0 ? 3 : S.err <= 2 ? 2 : 1;
 
 // Compartilha pelo menu nativo (celular) ou copia o texto e avisa no botão.
 export async function share(text, btn) {
+  const N = plug('Share'); // no app Android o WebView não tem navigator.share
+  if (N) { try { await N.share({ text }); return; } catch (e) { if (/cancel/i.test(e.message || '')) return; } }
   try { if (navigator.share) { await navigator.share({ text }); return; } } catch (e) { if (e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(text); if (btn) btn.textContent = 'COPIADO ✓ É SÓ COLAR'; }
   catch (e) { prompt('Copie o texto:', text); }

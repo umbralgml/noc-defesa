@@ -1,11 +1,10 @@
 // PWA: registra o service worker (sw.js na raiz) e mostra "INSTALAR APP" sempre que o jogo não está instalado.
 // Com o pedido nativo (Chrome/Edge no Android e no PC), o botão abre ele. Sem o pedido (iPhone, Samsung
 // Internet, Firefox, navegador dentro de app ou Chrome que já recusou uma vez), o botão explica o passo a passo.
-import { $ } from './util.js';
+import { $, NATIVE } from './util.js';
 import { modal, closeModal } from './ui.js';
 
 // Dentro do app Android (Capacitor) não há o que instalar nem service worker: o jogo já vem no APK.
-const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 
 const ua = navigator.userAgent;
 const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;

@@ -1,7 +1,7 @@
 // Desafio diário: 5 perguntas com cronômetro, iguais para todo mundo no mesmo dia
 // (sorteio com a data como semente). Duas vêm dos quizzes das fases e três são geradas
 // na hora (sub-rede, wildcard, endereço de rede, faixas de IP, portas), sempre com o porquê.
-import { $, fmt, store } from './util.js';
+import { $, fmt, store, siteURL } from './util.js';
 import { S, LEVELS } from './state.js';
 import { AV_Z } from './scene.js';
 import { au } from './audio.js';
@@ -81,7 +81,7 @@ function sendToday() {
 
 const hitsOf = rec => rec.log.filter(Boolean).length;
 const grid = rec => rec.log.map(ok => ok ? '🟩' : '🟥').join('');
-const url = () => location.origin + location.pathname;
+const url = siteURL;
 
 // Link de duelo: mesma data (mesmas perguntas) e o placar de quem desafia.
 function duelLink(rec) {

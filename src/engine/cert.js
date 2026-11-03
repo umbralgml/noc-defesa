@@ -1,6 +1,6 @@
 // Certificado de plantão por ato: desenhado num canvas e salvo como PNG (baixar ou compartilhar).
 // O nome digitado fica só no aparelho; nada é enviado.
-import { $, store, esc } from './util.js';
+import { $, store, esc, siteURL, plug } from './util.js';
 import { S, LEVELS, ACTS, K } from './state.js';
 import { modal, closeModal, share } from './ui.js';
 import { profile } from './rank.js';
@@ -70,15 +70,29 @@ export function certModal(ai) {
   };
   let t; $('cName').oninput = () => { clearTimeout(t); t = setTimeout(draw, 300); };
   draw();
-  const file = () => new Promise(r => canvas.toBlob(b => r(new File([b], `certificado-noc-${a[0].toLowerCase().replace(/\s+/g, '-')}.png`, { type: 'image/png' }))));
+  const file = () => new Promise(r => canvas.toBlob(b => r(new File([b], `certificado-noc-${a[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-')}.png`, { type: 'image/png' }))));
   $('cSave').onclick = async () => {
     if (!canvas) return; store('noc_cert_name', $('cName').value.trim());
     const f = await file(), u = URL.createObjectURL(f), l = document.createElement('a');
     l.href = u; l.download = f.name; document.body.append(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(u), 2000);
   };
+  // App Android: o WebView não baixa blob nem compartilha arquivo. Grava no cache e abre o menu do Android (salvar ou enviar).
+  const fs = plug('Filesystem'), sh = plug('Share');
+  if (fs && sh) {
+    $('cSave').remove(); $('cShare').textContent = 'SALVAR OU ENVIAR'; $('cShare').classList.remove('ghostb');
+    $('cShare').onclick = async e => {
+      if (!canvas) return; store('noc_cert_name', $('cName').value.trim());
+      const f = await file(), text = `Concluí o ${a[0]} · ${a[1]} no NOC: Última Linha de Defesa 🛡️ ${siteURL()}`;
+      try {
+        const w = await fs.writeFile({ path: f.name, data: canvas.toDataURL('image/png').split(',')[1], directory: 'CACHE' });
+        await sh.share({ files: [w.uri], text });
+      } catch (er) { if (!/cancel/i.test(er.message || '')) share(text, e.currentTarget); }
+    };
+    return void ($('mOk').onclick = closeModal);
+  }
   $('cShare').onclick = async e => {
     if (!canvas) return;
-    const f = await file(), text = `Concluí o ${a[0]} · ${a[1]} no NOC: Última Linha de Defesa 🛡️ ${location.origin + location.pathname}`;
+    const f = await file(), text = `Concluí o ${a[0]} · ${a[1]} no NOC: Última Linha de Defesa 🛡️ ${siteURL()}`;
     if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text }); } catch (er) {} }
     else share(text, e.currentTarget);
   };

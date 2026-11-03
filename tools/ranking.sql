@@ -54,6 +54,19 @@ where not exists (select 1 from public.ranking h where h.player = b.player and h
 revoke all on public.ranking_top from anon, authenticated;
 grant select on public.ranking_top to anon;
 
+-- Apagar meus dados (v1.29): o jogo chama POST /rest/v1/rpc/apagar_jogador com o id do aparelho.
+-- O id nunca aparece nas visões públicas, então só o próprio aparelho sabe qual apagar.
+create or replace function public.apagar_jogador(p uuid)
+returns integer language plpgsql security definer set search_path = public as $$
+declare n integer;
+begin
+  delete from public.ranking where player = p;
+  get diagnostics n = row_count;
+  return n;
+end $$;
+revoke all on function public.apagar_jogador(uuid) from public, anon, authenticated;
+grant execute on function public.apagar_jogador(uuid) to anon;
+
 -- Ranking de equipes: soma da melhor pontuação de campanha de cada jogador, pela equipe mais recente dele.
 create or replace view public.ranking_equipes as
 with best as (
