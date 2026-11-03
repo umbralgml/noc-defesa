@@ -1,13 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00e0a8"/><stop offset="1" stop-color="#4dd2ff"/></linearGradient>
+    <radialGradient id="bg" cx=".5" cy=".42" r=".75"><stop offset="0" stop-color="#0f1d33"/><stop offset="1" stop-color="#04070d"/></radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0"><stop offset=".3" stop-color="#00e0a8"/><stop offset=".5" stop-color="#4dd2ff"/><stop offset=".7" stop-color="#ff2e63"/></linearGradient>
+    <linearGradient id="lf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d3a3a"/><stop offset="1" stop-color="#071a22"/></linearGradient>
+    <linearGradient id="rf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a0d1e"/><stop offset="1" stop-color="#1a0610"/></linearGradient>
+    <path id="sh" d="M512 128 L792 232 V488 C792 672 676 806 512 888 C348 806 232 672 232 488 V232 Z"/>
+    <clipPath id="cs"><use href="#sh"/></clipPath>
+    <clipPath id="cl"><path d="M0 0 H520 L536 300 L494 430 L534 570 L498 710 L512 1024 H0 Z"/></clipPath>
+    <clipPath id="cr"><path d="M1024 0 H520 L536 300 L494 430 L534 570 L498 710 L512 1024 H1024 Z"/></clipPath>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
   </defs>
-  <rect width="512" height="512" fill="#070d18"/>
-  <!-- escudo -->
-  <path d="M256 86 L392 138 V250 C392 336 334 396 256 428 C178 396 120 336 120 250 V138 Z" fill="#0f1a2c" stroke="url(#g)" stroke-width="20" stroke-linejoin="round"/>
-  <!-- rede: 3 nós ligados -->
-  <path d="M196 300 L256 196 L316 300 Z" fill="none" stroke="#4dd2ff" stroke-width="12" stroke-linejoin="round" opacity=".85"/>
-  <circle cx="256" cy="196" r="26" fill="#00e0a8"/>
-  <circle cx="196" cy="300" r="26" fill="#00e0a8"/>
-  <circle cx="316" cy="300" r="26" fill="#ff2e63"/>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+<g transform="translate(512 512) scale(1.12) translate(-512 -508)">
+  <!-- brilho atrás do escudo -->
+  <use href="#sh" fill="none" stroke="url(#rim)" stroke-width="40" opacity=".35" filter="url(#glow)"/>
+  <g clip-path="url(#cs)">
+    <!-- lado do analista -->
+    <g clip-path="url(#cl)">
+      <rect width="1024" height="1024" fill="url(#lf)"/>
+      <path d="M262 900 C282 740 382 676 512 676 C642 676 742 740 762 900 Z" fill="#00a884"/>
+      <path d="M462 676 L512 744 L562 676 Z" fill="#0b6e57"/>
+      <circle cx="512" cy="478" r="150" fill="#d9a77f"/>
+      <path d="M360 466 C360 362 432 312 512 312 C592 312 664 362 664 462 C628 420 572 400 512 400 C452 400 396 422 360 466 Z" fill="#2b1d14"/>
+      <rect x="402" y="452" width="96" height="66" rx="20" fill="#a0dcff" fill-opacity=".28" stroke="#0b1220" stroke-width="14"/>
+      <path d="M454 586 Q512 618 570 586" stroke="#7a4a33" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <!-- headset -->
+      <path d="M352 474 A160 160 0 0 1 672 474" fill="none" stroke="#1b2a44" stroke-width="30"/>
+      <rect x="322" y="438" width="62" height="118" rx="26" fill="#1b2a44"/>
+      <path d="M352 552 C352 616 400 646 462 650" stroke="#1b2a44" stroke-width="20" fill="none" stroke-linecap="round"/>
+      <circle cx="470" cy="650" r="20" fill="#00e0a8"/>
+      <circle cx="470" cy="650" r="34" fill="#00e0a8" opacity=".3" filter="url(#glow)"/>
+    </g>
+    <!-- lado do Z3R0 -->
+    <g clip-path="url(#cr)">
+      <rect width="1024" height="1024" fill="url(#rf)"/>
+      <path d="M232 920 C232 620 352 330 512 288 C672 330 792 620 792 920 Z" fill="#12050a"/>
+      <path d="M300 920 C306 700 392 520 512 486 C632 520 718 700 724 920 Z" fill="#1f0a12"/>
+      <ellipse cx="512" cy="500" rx="140" ry="166" fill="#e8e8ee"/>
+      <path d="M626 456 L548 486 L626 516 Z" fill="#ff2e63"/>
+      <path d="M626 456 L548 486 L626 516 Z" fill="#ff2e63" opacity=".6" filter="url(#glow)"/>
+      <path d="M500 604 L522 620 L544 604 L566 620 L588 600" stroke="#12050a" stroke-width="11" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <!-- costura do glitch -->
+    <path d="M520 0 L536 300 L494 430 L534 570 L498 710 L512 1024" fill="none" stroke="#e6f1ff" stroke-width="8" opacity=".9"/>
+    <path d="M520 0 L536 300 L494 430 L534 570 L498 710 L512 1024" fill="none" stroke="#4dd2ff" stroke-width="22" opacity=".45" filter="url(#glow)"/>
+    <rect x="540" y="352" width="46" height="12" fill="#ff2e63"/><rect x="452" y="398" width="34" height="10" fill="#00e0a8"/>
+    <rect x="548" y="640" width="30" height="10" fill="#4dd2ff"/><rect x="446" y="512" width="40" height="10" fill="#ff2e63" opacity=".8"/>
+  </g>
+  <use href="#sh" fill="none" stroke="url(#rim)" stroke-width="26" stroke-linejoin="round"/>
+
+</g>
 </svg>
