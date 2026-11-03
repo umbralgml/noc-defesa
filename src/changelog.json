@@ -1,6 +1,17 @@
 {
   "versions": [
     {
+      "v": "1.30",
+      "date": "2026-11-03",
+      "title": "A trilha de Servidores abriu",
+      "items": [
+        "Trilha Servidores liberada, começando por 5 fases de introdução para quem nunca mexeu em servidor",
+        "Cliente e servidor, portas de cada serviço, DNS no terminal com dig, VM x container e backup de verdade",
+        "Mais de 20 cartões novos no glossário: HTTPS, TTL, hypervisor, container, RAID, regra 3-2-1 e mais",
+        "As fases de plantão de servidores chegam nos próximos lotes"
+      ]
+    },
+    {
       "v": "1.29",
       "date": "2026-11-03",
       "title": "Pronto para a loja",

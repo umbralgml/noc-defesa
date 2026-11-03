@@ -1,0 +1,634 @@
+{
+  "tag": "INTRODUÇÃO",
+  "name": "Primeiros passos com servidores",
+  "diff": "iniciante",
+  "nivel": true,
+  "story": [
+    {
+      "who": "chefe",
+      "t": "Site, nome, IP automático, máquina virtual e backup: tudo isso roda em servidor. Antes do plantão de servidores, a gente aprende o que cada um faz, com calma."
+    },
+    {
+      "who": "z",
+      "t": "DNS, DHCP, hypervisor... Aposto que você acha que backup é o RAID."
+    },
+    {
+      "who": "me",
+      "t": "Cada sigla tem um cartão. Vou aprender o que é cada serviço antes de mexer em qualquer um."
+    }
+  ],
+  "levels": [
+    {
+      "title": "O que é um servidor",
+      "tag": "VOCABULÁRIO",
+      "type": "wire",
+      "loc": "desk",
+      "cap": "Abrindo o caderno do novato...",
+      "heads": [
+        "PALAVRA",
+        "O QUE FAZ"
+      ],
+      "goal": "Ligue cada palavra do mundo dos servidores ao que ela faz.",
+      "z": "Servidor, cliente, serviço... para você é tudo computador. Vai se perder antes do primeiro chamado.",
+      "me": "Pensa num restaurante: um pede, o outro prepara e entrega. É só isso.",
+      "lesson": [
+        "Pense num restaurante: o <b>cliente</b> pede, a cozinha prepara e entrega. Na rede é igual: o navegador ou o celular é o cliente, e o <b>servidor</b> é quem atende.",
+        "Servidor é um computador ligado o tempo todo que oferece um <b>serviço</b> para os outros. Uma máquina só pode rodar vários serviços.",
+        "O <b>servidor web</b> entrega páginas, com programas como nginx e Apache. O <b>DNS</b> traduz nomes em IP e o <b>DHCP</b> entrega IP automático para quem chega na rede.",
+        "Um computador forte pode ser dividido em várias <b>máquinas virtuais</b>, cada uma com seu próprio sistema.",
+        "E <b>backup</b> é a cópia guardada em outro lugar, para recuperar os dados quando algo der errado."
+      ],
+      "check": {
+        "q": "No restaurante, quem faz o papel do servidor?",
+        "v": [
+          "Comparando a rede com um restaurante, quem é o servidor?",
+          "Se a rede fosse um restaurante, o servidor seria quem?"
+        ],
+        "a": 0,
+        "o": [
+          "A cozinha, que prepara e entrega o pedido",
+          {
+            "t": "O cliente, que faz o pedido",
+            "why": "Quem pede é o cliente: o navegador, o celular."
+          },
+          {
+            "t": "O cardápio",
+            "why": "O cardápio lembra a lista de serviços oferecidos, mas não é quem atende."
+          }
+        ],
+        "why": "O servidor atende os pedidos, como a cozinha. O cliente é quem pede."
+      },
+      "tip": "Cliente pede, servidor atende. Web entrega página, DNS traduz nome, DHCP entrega IP, VM é um computador dentro de outro e backup é a cópia para recuperar.",
+      "learn": "Na rede, o cliente pede e o servidor atende. Um servidor roda serviços: web (páginas), DNS (nomes viram IP), DHCP (IP automático). Uma máquina física pode virar várias máquinas virtuais, e o backup guarda cópias para recuperar os dados.",
+      "left": [
+        {
+          "id": "a",
+          "t": "Cliente",
+          "s": "navegador, celular",
+          "why": "Cliente é quem pede o serviço: o navegador pedindo uma página, o celular pedindo um IP."
+        },
+        {
+          "id": "b",
+          "t": "Servidor",
+          "s": "",
+          "why": "Servidor é o computador que fica ligado atendendo os pedidos dos clientes."
+        },
+        {
+          "id": "c",
+          "t": "Servidor web",
+          "s": "nginx, Apache",
+          "why": "O servidor web entrega as páginas e arquivos dos sites."
+        },
+        {
+          "id": "d",
+          "t": "DNS",
+          "s": "",
+          "why": "O DNS traduz o nome (loja.com.br) no IP onde o site está."
+        },
+        {
+          "id": "e",
+          "t": "DHCP",
+          "s": "",
+          "why": "O DHCP empresta IP, máscara, gateway e DNS para quem entra na rede."
+        },
+        {
+          "id": "f",
+          "t": "Backup",
+          "s": "",
+          "why": "Backup é a cópia dos dados guardada em outro lugar, para recuperar depois de uma perda."
+        }
+      ],
+      "right": [
+        {
+          "id": "a",
+          "t": "Pede o serviço",
+          "s": "Quem faz o pedido",
+          "why": "Quem pede é o cliente."
+        },
+        {
+          "id": "b",
+          "t": "Atende os pedidos",
+          "s": "A cozinha",
+          "why": "Quem atende é o servidor."
+        },
+        {
+          "id": "c",
+          "t": "Entrega as páginas dos sites",
+          "s": "",
+          "why": "Páginas são entregues pelo servidor web."
+        },
+        {
+          "id": "d",
+          "t": "Traduz nome em IP",
+          "s": "A agenda de contatos",
+          "why": "Traduzir nome em IP é o trabalho do DNS."
+        },
+        {
+          "id": "e",
+          "t": "Entrega IP automático",
+          "s": "",
+          "why": "IP automático vem do DHCP."
+        },
+        {
+          "id": "f",
+          "t": "Cópia para recuperar dados",
+          "s": "",
+          "why": "Cópia para recuperar é o backup."
+        }
+      ]
+    },
+    {
+      "title": "Cada serviço na sua porta",
+      "tag": "CLASSIFICAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "desk",
+      "cap": "Conferindo os serviços do srv01...",
+      "goal": "Arraste cada pista para o serviço a que ela pertence.",
+      "intro": "Um servidor pode rodar vários serviços ao mesmo tempo. Quem separa as conversas é a <b>porta</b>. Leve cada pista para o serviço certo.",
+      "z": "Misturei as portas dos seus serviços. Vai procurar o site na porta do DNS?",
+      "me": "Cada serviço atende numa porta conhecida. 443 é site, 53 é DNS.",
+      "lesson": [
+        "Pense num prédio: o IP é o endereço do prédio e a <b>porta</b> é o número do apartamento. Cada serviço mora num número.",
+        "Site usa <b>HTTP</b> na porta 80 e <b>HTTPS</b> na 443. O S quer dizer seguro: a conversa vai criptografada.",
+        "O <b>DNS</b> atende na porta 53, em UDP e também em TCP.",
+        "O <b>DHCP</b> usa UDP 67 no servidor e 68 no cliente. O IP que ele entrega é um empréstimo com prazo, o <b>lease</b>.",
+        "O <b>SSH</b> atende na porta 22: é o terminal remoto e criptografado, por onde o analista entra no servidor."
+      ],
+      "check": {
+        "q": "Qual porta o HTTPS usa?",
+        "v": [
+          "Um site com cadeado no navegador atende em qual porta?",
+          "Qual é a porta padrão do HTTPS?"
+        ],
+        "a": 0,
+        "o": [
+          "443",
+          {
+            "t": "80",
+            "why": "80 é o HTTP, sem criptografia."
+          },
+          {
+            "t": "53",
+            "why": "53 é a porta do DNS."
+          }
+        ],
+        "why": "HTTPS é o HTTP criptografado, e a porta padrão dele é a 443."
+      },
+      "tip": "Web: 80 (HTTP) e 443 (HTTPS). DNS: 53. DHCP: UDP 67 e 68. SSH: 22.",
+      "learn": "Cada serviço atende numa porta conhecida: web em 80 e 443, DNS em 53, DHCP em UDP 67 e 68 e SSH em 22. Saber a porta ajuda a ler firewall, log e captura de pacotes.",
+      "buckets": [
+        {
+          "label": "WEB",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "Porta 443 (HTTPS)",
+              "why": "HTTPS, o site com cadeado, atende na 443."
+            },
+            {
+              "t": "Porta 80 (HTTP)",
+              "why": "HTTP sem criptografia atende na 80. Hoje ela costuma só redirecionar para a 443."
+            },
+            {
+              "t": "nginx e Apache",
+              "why": "nginx e Apache são programas de servidor web."
+            }
+          ]
+        },
+        {
+          "label": "DNS",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "Porta 53",
+              "why": "O DNS atende na porta 53, em UDP e em TCP."
+            },
+            {
+              "t": "Transforma loja.com.br em IP",
+              "why": "Traduzir nome em IP é o trabalho do DNS."
+            },
+            {
+              "t": "BIND e Unbound",
+              "why": "BIND e Unbound são programas de servidor DNS muito usados em Linux."
+            }
+          ]
+        },
+        {
+          "label": "DHCP",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "UDP 67 e 68",
+              "why": "O servidor DHCP escuta na UDP 67 e responde ao cliente na 68."
+            },
+            {
+              "t": "Dá IP ao notebook que chega na rede",
+              "why": "Entregar IP automático para quem chega é o DHCP."
+            },
+            {
+              "t": "Lease: o IP é emprestado por um tempo",
+              "why": "O DHCP empresta o IP por um prazo, o lease. Perto do fim, o cliente pede para renovar."
+            }
+          ]
+        },
+        {
+          "label": "SSH",
+          "c": "#ff7ad9",
+          "a": [
+            {
+              "t": "Porta 22",
+              "why": "O SSH atende na porta 22."
+            },
+            {
+              "t": "Terminal remoto criptografado",
+              "why": "O SSH abre um terminal em outra máquina, com tudo criptografado."
+            },
+            {
+              "t": "sshd (OpenSSH)",
+              "why": "O sshd é o serviço do OpenSSH que recebe as conexões SSH."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Perguntando ao DNS",
+      "tag": "TERMINAL LINUX",
+      "type": "term",
+      "loc": "server",
+      "host": "srv01",
+      "prompt": "ana@srv01:~$",
+      "cap": "Conectando por SSH no srv01...",
+      "goal": "Descubra por que loja.exemplo.com.br abre e www.loja.exemplo.com.br não abre.",
+      "intro": "Um cliente avisa: <b>loja.exemplo.com.br</b> abre, mas com <b>www</b> na frente o navegador diz que o site não existe. Pergunte ao <b>DNS</b> pelos dois nomes. Toque no <b>?</b> ao lado de um comando para abrir o cartão dele.",
+      "z": "Sumi com o seu www. Duvido que você descubra sem reiniciar o servidor do site.",
+      "me": "Se o navegador diz que o nome não existe, quem responde é o DNS. Eu pergunto direto para ele.",
+      "lesson": [
+        "O DNS funciona como a agenda do celular: você procura o nome e ela devolve o número. Cada linha da agenda é um <b>registro DNS</b>.",
+        "O registro <b>A</b> guarda o IPv4 do nome e o <b>AAAA</b> guarda o IPv6. O <b>MX</b> diz qual servidor recebe os e-mails do domínio.",
+        "Cada resposta vem com um <b>TTL</b>: quantos segundos ela pode ficar guardada em cache antes de perguntar de novo.",
+        "<b>dig</b> pergunta ao DNS e mostra a resposta completa. Com +short, mostra só o resultado. <b>nslookup</b> faz o mesmo de um jeito mais simples.",
+        "No status do dig, NOERROR quer dizer que deu certo. NXDOMAIN quer dizer que esse nome não existe."
+      ],
+      "check": {
+        "q": "Qual registro DNS guarda o IPv4 de um nome?",
+        "v": [
+          "Para saber o IPv4 de um site, qual registro o DNS consulta?",
+          "O endereço IPv4 de um nome fica em qual registro?"
+        ],
+        "a": 0,
+        "o": [
+          "A",
+          {
+            "t": "AAAA",
+            "why": "AAAA guarda o IPv6."
+          },
+          {
+            "t": "MX",
+            "why": "MX diz qual servidor recebe os e-mails do domínio."
+          }
+        ],
+        "why": "O registro A liga um nome a um endereço IPv4. Para IPv6, o registro é o AAAA."
+      },
+      "tip": "dig loja.exemplo.com.br e dig www.loja.exemplo.com.br. Compare o status: NOERROR existe, NXDOMAIN não existe.",
+      "learn": "O site estava no ar: loja.exemplo.com.br tinha registro A (203.0.113.10). O www não abria porque o nome não existe no DNS (NXDOMAIN). A correção é criar o registro do www na zona do domínio, sem mexer no servidor do site. dig e nslookup mostram isso em segundos.",
+      "cmds": [
+        {
+          "c": "dig loja.exemplo.com.br",
+          "alias": [
+            "dig loja.exemplo.com.br A",
+            "dig a loja.exemplo.com.br"
+          ],
+          "out": "; <<>> DiG 9.18.39-0ubuntu0.24.04.2-Ubuntu <<>> loja.exemplo.com.br\n;; global options: +cmd\n;; Got answer:\n;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 41872\n;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version: 0, flags:; udp: 65494\n;; QUESTION SECTION:\n;loja.exemplo.com.br.\t\tIN\tA\n\n;; ANSWER SECTION:\nloja.exemplo.com.br.\t300\tIN\tA\t203.0.113.10\n\n;; Query time: 24 msec\n;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)\n;; WHEN: Tue Nov 03 19:42:12 -03 2026\n;; MSG SIZE  rcvd: 64",
+          "why": "status: NOERROR, deu certo. Na ANSWER SECTION está o registro A: loja.exemplo.com.br aponta para 203.0.113.10, com TTL de 300 segundos. O SERVER 127.0.0.53 é o resolvedor local do Ubuntu, que repassa a pergunta para o DNS configurado."
+        },
+        {
+          "c": "dig www.loja.exemplo.com.br",
+          "alias": [
+            "dig www.loja.exemplo.com.br A"
+          ],
+          "out": "; <<>> DiG 9.18.39-0ubuntu0.24.04.2-Ubuntu <<>> www.loja.exemplo.com.br\n;; global options: +cmd\n;; Got answer:\n;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 5530\n;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version: 0, flags:; udp: 65494\n;; QUESTION SECTION:\n;www.loja.exemplo.com.br.\t\tIN\tA\n\n;; Query time: 31 msec\n;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)\n;; WHEN: Tue Nov 03 19:42:20 -03 2026\n;; MSG SIZE  rcvd: 52",
+          "why": "status: NXDOMAIN e ANSWER: 0. O DNS diz que o nome www.loja.exemplo.com.br não existe. Não é o site que caiu: é o nome que nunca foi criado."
+        },
+        {
+          "c": "dig +short loja.exemplo.com.br",
+          "alias": [
+            "dig loja.exemplo.com.br +short"
+          ],
+          "out": "203.0.113.10",
+          "why": "Com +short, o dig mostra só a resposta: o IP. Ótimo para conferir rápido."
+        },
+        {
+          "c": "dig loja.exemplo.com.br AAAA",
+          "alias": [
+            "dig aaaa loja.exemplo.com.br",
+            "dig +short loja.exemplo.com.br AAAA"
+          ],
+          "out": "; <<>> DiG 9.18.39-0ubuntu0.24.04.2-Ubuntu <<>> loja.exemplo.com.br AAAA\n;; global options: +cmd\n;; Got answer:\n;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 18294\n;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version: 0, flags:; udp: 65494\n;; QUESTION SECTION:\n;loja.exemplo.com.br.\t\tIN\tAAAA\n\n;; ANSWER SECTION:\nloja.exemplo.com.br.\t300\tIN\tAAAA\t2001:db8:10::10\n\n;; Query time: 22 msec\n;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)\n;; WHEN: Tue Nov 03 19:42:27 -03 2026\n;; MSG SIZE  rcvd: 76",
+          "why": "O registro AAAA mostra que o site também tem IPv6: 2001:db8:10::10. Quem tem IPv6 chega por ele."
+        },
+        {
+          "c": "dig exemplo.com.br MX",
+          "alias": [
+            "dig mx exemplo.com.br",
+            "dig +short exemplo.com.br MX"
+          ],
+          "out": "; <<>> DiG 9.18.39-0ubuntu0.24.04.2-Ubuntu <<>> exemplo.com.br MX\n;; global options: +cmd\n;; Got answer:\n;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 60117\n;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1\n\n;; OPT PSEUDOSECTION:\n; EDNS: version: 0, flags:; udp: 65494\n;; QUESTION SECTION:\n;exemplo.com.br.\t\tIN\tMX\n\n;; ANSWER SECTION:\nexemplo.com.br.\t\t3600\tIN\tMX\t10 mail.exemplo.com.br.\n\n;; Query time: 27 msec\n;; SERVER: 127.0.0.53#53(127.0.0.53) (UDP)\n;; WHEN: Tue Nov 03 19:42:33 -03 2026\n;; MSG SIZE  rcvd: 69",
+          "why": "O MX diz para onde vão os e-mails de @exemplo.com.br: mail.exemplo.com.br. O 10 é a prioridade; com vários MX, o menor número é tentado primeiro."
+        },
+        {
+          "c": "nslookup www.loja.exemplo.com.br",
+          "out": "Server:\t\t127.0.0.53\nAddress:\t127.0.0.53#53\n\n** server can't find www.loja.exemplo.com.br: NXDOMAIN",
+          "why": "O nslookup confirma do jeito dele: o servidor não encontrou o nome (NXDOMAIN). O nslookup também existe no Windows, útil para testar no computador do cliente."
+        }
+      ],
+      "steps": [
+        {
+          "q": "Qual é o IPv4 de loja.exemplo.com.br?",
+          "v": [
+            "Pelo dig, para qual IPv4 o nome da loja aponta?",
+            "O registro A da loja mostra qual endereço?"
+          ],
+          "a": 0,
+          "o": [
+            "203.0.113.10",
+            {
+              "t": "127.0.0.53",
+              "why": "127.0.0.53 é o resolvedor local que respondeu a pergunta, não o endereço do site."
+            },
+            {
+              "t": "2001:db8:10::10",
+              "why": "Esse é o IPv6, do registro AAAA."
+            }
+          ],
+          "why": "Na ANSWER SECTION, o registro A liga loja.exemplo.com.br a 203.0.113.10."
+        },
+        {
+          "q": "O que o NXDOMAIN do www quer dizer?",
+          "v": [
+            "Por que o dig do www voltou NXDOMAIN?",
+            "O que significa status NXDOMAIN?"
+          ],
+          "a": 0,
+          "o": [
+            "O nome www.loja.exemplo.com.br não existe no DNS",
+            {
+              "t": "O site está fora do ar",
+              "why": "O site responde pelo outro nome. NXDOMAIN fala do nome, não do servidor."
+            },
+            {
+              "t": "O DNS está desligado",
+              "why": "Se o DNS estivesse desligado, o dig daria timeout. Aqui ele respondeu, e a resposta foi: esse nome não existe."
+            }
+          ],
+          "why": "NXDOMAIN (non-existent domain) é a resposta do DNS para um nome sem nenhum registro."
+        },
+        {
+          "q": "O registro A da loja tem TTL 300. O que isso quer dizer?",
+          "v": [
+            "O que significa o 300 antes do IN A?",
+            "Para que serve o TTL de 300 na resposta?"
+          ],
+          "a": 0,
+          "o": [
+            "A resposta pode ficar guardada em cache por 300 segundos",
+            {
+              "t": "O site aguenta 300 acessos",
+              "why": "O TTL não tem nada a ver com acessos. É tempo de cache."
+            },
+            {
+              "t": "O DNS demorou 300 ms para responder",
+              "why": "O tempo da consulta aparece em Query time, no fim."
+            }
+          ],
+          "why": "TTL é o tempo de vida da resposta em cache, em segundos. Mudou o IP? Quem já perguntou pode levar até o TTL para ver o novo."
+        },
+        {
+          "q": "Como resolver o www?",
+          "v": [
+            "O que fazer para o www.loja.exemplo.com.br abrir?",
+            "Qual a correção para o NXDOMAIN do www?"
+          ],
+          "a": 0,
+          "o": [
+            "Criar o registro do www na zona do domínio, apontando para o site",
+            {
+              "t": "Reiniciar o nginx do site",
+              "why": "O nginx nem recebe o pedido: o navegador para antes, porque o nome não existe."
+            },
+            {
+              "t": "Trocar o IP do servidor",
+              "why": "O IP está certo. Falta só o nome www existir no DNS."
+            }
+          ],
+          "why": "Basta criar o registro na zona do domínio: um CNAME de www para loja.exemplo.com.br, ou um A com o mesmo IP. Depois, o dig do www passa a voltar NOERROR.",
+          "run": "dig +short www.loja.exemplo.com.br",
+          "out": "loja.exemplo.com.br.\n203.0.113.10"
+        }
+      ]
+    },
+    {
+      "title": "Máquina dentro da máquina",
+      "tag": "VIRTUALIZAÇÃO",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "rack",
+      "cap": "Abrindo o inventário do datacenter...",
+      "goal": "Arraste cada item para a camada da virtualização a que ele pertence.",
+      "intro": "No rack tem um servidor físico com o <b>Proxmox</b>. Dentro dele rodam máquinas virtuais e containers. Leve cada item para a sua camada.",
+      "z": "Para você, VM e container são a mesma coisa. Vai reiniciar o host achando que é só um container.",
+      "me": "Prédio, síndico, apartamento e quarto. Cada um no seu andar.",
+      "lesson": [
+        "Pense num prédio. O <b>servidor físico</b> é o prédio: CPU, memória, discos e placas de rede de verdade.",
+        "O <b>hypervisor</b> é o síndico: divide os recursos do prédio entre os moradores. Proxmox VE, VMware ESXi e Hyper-V são hypervisors.",
+        "Uma <b>máquina virtual</b> (VM) é um apartamento completo, com cozinha própria: tem o seu próprio sistema e o seu próprio kernel.",
+        "Um <b>container</b> é um quarto que divide a cozinha: roda isolado, mas usa o kernel do host. Por isso é leve e sobe em segundos. O Docker é o mais conhecido.",
+        "Se o prédio cai, todos os apartamentos caem juntos. Por isso, serviço importante fica em mais de um servidor físico."
+      ],
+      "check": {
+        "q": "Qual a principal diferença entre VM e container?",
+        "v": [
+          "O que a VM tem que o container não tem?",
+          "VM e container: o que muda por dentro?"
+        ],
+        "a": 0,
+        "o": [
+          "A VM tem kernel próprio, o container usa o kernel do host",
+          {
+            "t": "O container é sempre mais seguro",
+            "why": "O container isola menos, justamente porque divide o kernel com o host."
+          },
+          {
+            "t": "A VM não precisa de hypervisor",
+            "why": "A VM só existe porque o hypervisor divide o servidor físico."
+          }
+        ],
+        "why": "A VM é um computador completo, com sistema e kernel próprios. O container divide o kernel com o host: é mais leve, mas isola menos."
+      },
+      "tip": "Físico = o prédio (o hardware de verdade). Hypervisor = o síndico (Proxmox, ESXi). VM = apartamento com kernel próprio. Container = quarto que divide o kernel do host (Docker).",
+      "learn": "A virtualização divide um servidor físico entre várias máquinas. O hypervisor reparte CPU, memória e disco; cada VM tem sistema e kernel próprios; o container divide o kernel do host e por isso é leve. Se o físico cai, tudo que roda nele cai junto.",
+      "buckets": [
+        {
+          "label": "SERVIDOR FÍSICO",
+          "c": "#4dd2ff",
+          "a": [
+            {
+              "t": "Dell PowerEdge no rack",
+              "why": "O PowerEdge é o hardware de verdade, parafusado no rack."
+            },
+            {
+              "t": "Discos e placas de rede de verdade",
+              "why": "Discos e placas que dá para tocar são do servidor físico. As VMs usam versões virtuais deles."
+            },
+            {
+              "t": "Se a fonte queimar, tudo nele para",
+              "why": "Fonte queimada derruba o hardware, e junto com ele todas as VMs e containers que rodam ali."
+            }
+          ]
+        },
+        {
+          "label": "HYPERVISOR",
+          "c": "#ffd166",
+          "a": [
+            {
+              "t": "Proxmox VE",
+              "why": "O Proxmox VE é um hypervisor: roda direto no servidor e cria as VMs e os containers."
+            },
+            {
+              "t": "VMware ESXi",
+              "why": "O ESXi é o hypervisor da VMware, muito usado em empresas."
+            },
+            {
+              "t": "Divide CPU e memória entre as VMs",
+              "why": "Repartir os recursos do físico entre as máquinas virtuais é o trabalho do hypervisor."
+            }
+          ]
+        },
+        {
+          "label": "MÁQUINA VIRTUAL",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "Windows Server rodando dentro do Proxmox",
+              "why": "Rodar outro sistema inteiro, com kernel diferente do host, só dá numa VM."
+            },
+            {
+              "t": "Tem kernel próprio",
+              "why": "Ter kernel próprio é o que separa a VM do container."
+            },
+            {
+              "t": "Pode mudar de host sem desligar",
+              "why": "Com armazenamento compartilhado, o hypervisor move a VM ligada para outro servidor: a migração ao vivo."
+            }
+          ]
+        },
+        {
+          "label": "CONTAINER",
+          "c": "#ff7ad9",
+          "a": [
+            {
+              "t": "nginx rodando no Docker",
+              "why": "O Docker roda aplicações em containers, como um nginx empacotado."
+            },
+            {
+              "t": "Usa o kernel do host",
+              "why": "O container não tem kernel próprio: usa o do host, isolado em compartimentos."
+            },
+            {
+              "t": "Sobe em segundos",
+              "why": "Sem kernel para ligar, o container sobe muito mais rápido que uma VM."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Backup que salva",
+      "tag": "BACKUP",
+      "type": "drop",
+      "mode": "buckets",
+      "loc": "server",
+      "cap": "Revisando a política de backup...",
+      "goal": "Separe o que é backup de verdade do que só parece backup.",
+      "intro": "Um ransomware criptografou os arquivos do servidor de arquivos. Agora é hora de saber o que realmente salva os dados. Separe o <b>backup</b> de verdade do que só parece.",
+      "z": "Criptografei tudo. Seu RAID espelhou direitinho a criptografia nos dois discos.",
+      "me": "RAID protege de disco queimado, não de dado apagado. Backup é outra coisa.",
+      "lesson": [
+        "Backup é uma cópia separada, que não muda quando o original muda. Se apagar ou criptografar o original, a cópia continua lá.",
+        "<b>RAID</b> espelha os discos para o servidor aguentar um disco queimado. Mas apagou num, apagou no outro: RAID não é backup.",
+        "<b>Sincronização</b>, como uma pasta do Drive, repete as mudanças nos dois lados, inclusive a exclusão e a criptografia.",
+        "A <b>regra 3-2-1</b>: 3 cópias dos dados, em 2 tipos de mídia diferentes, com 1 cópia fora do local. Melhor ainda se uma delas não puder ser apagada pela rede.",
+        "Backup que nunca foi restaurado é uma esperança, não um backup. Teste a restauração de tempos em tempos."
+      ],
+      "check": {
+        "q": "Por que o RAID não substitui o backup?",
+        "v": [
+          "O servidor tem RAID 1. Ainda precisa de backup?",
+          "Qual problema o RAID não resolve?"
+        ],
+        "a": 0,
+        "o": [
+          "Porque o que é apagado ou criptografado num disco some no outro também",
+          {
+            "t": "Porque o RAID é mais lento",
+            "why": "Velocidade não é a questão. O RAID só não guarda versões antigas dos dados."
+          },
+          {
+            "t": "Porque RAID só existe em servidor físico",
+            "why": "Existe RAID por software e por hardware. Nenhum deles guarda cópia separada."
+          }
+        ],
+        "why": "O RAID protege contra disco queimado. Contra exclusão, ransomware ou erro humano, só uma cópia separada salva."
+      },
+      "tip": "Backup de verdade é cópia separada e testada, com uma fora do local (regra 3-2-1). RAID, sincronização e cópia no mesmo disco não salvam de exclusão nem de ransomware.",
+      "learn": "Backup é uma cópia separada, que sobrevive quando o original é apagado ou criptografado. RAID e sincronização repetem o estrago. Siga a regra 3-2-1 (3 cópias, 2 mídias, 1 fora do local) e teste a restauração.",
+      "buckets": [
+        {
+          "label": "BACKUP DE VERDADE",
+          "c": "#00e0a8",
+          "a": [
+            {
+              "t": "Cópia diária num storage separado",
+              "why": "Cópia em outro equipamento não muda quando o servidor é atacado. Com várias versões, dá para voltar ao dia anterior."
+            },
+            {
+              "t": "Cópia semanal em outro prédio ou na nuvem",
+              "why": "A cópia fora do local é o 1 da regra 3-2-1: salva até de incêndio ou roubo no prédio."
+            },
+            {
+              "t": "Cópia que não pode ser apagada pela rede",
+              "why": "Cópia imutável ou desconectada resiste ao ransomware, que tenta apagar os backups que alcança."
+            },
+            {
+              "t": "Restauração testada todo mês",
+              "why": "Testar a restauração prova que a cópia funciona antes do dia em que você precisar dela."
+            }
+          ]
+        },
+        {
+          "label": "SÓ PARECE BACKUP",
+          "c": "#ff2e63",
+          "a": [
+            {
+              "t": "RAID 1 espelhando dois discos",
+              "why": "O RAID 1 grava o mesmo dado nos dois discos. Apagou ou criptografou num, o outro repete."
+            },
+            {
+              "t": "Pasta sincronizada com o Drive",
+              "why": "A sincronização repete a exclusão e a criptografia no outro lado."
+            },
+            {
+              "t": "Cópia em outra pasta do mesmo disco",
+              "why": "Se o disco morrer ou o ransomware passar, original e cópia vão juntos."
+            },
+            {
+              "t": "Snapshot guardado no mesmo storage da VM",
+              "why": "Snapshot ajuda a voltar uma mudança, mas fica no mesmo storage: se ele falhar, perde os dois."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
