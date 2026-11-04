@@ -205,6 +205,15 @@ readdirSync(new URL('../src/engine/', import.meta.url)).filter(f => f.endsWith('
 });
 idxActs().forEach(f => { if (!sw.includes(`src/levels/${f}`)) errors.push(`sw.js: src/levels/${f} fora da lista CORE`); });
 
+// Pacotes de idioma (src/i18n/*.js): todos com os mesmos textos de tela e de glossário, e no CORE do sw.js.
+{
+  const packs = await Promise.all(readdirSync(new URL('../src/i18n/', import.meta.url)).filter(f => f.endsWith('.js')).map(async f => [f, (await import(`../src/i18n/${f}`)).default]));
+  const [base, ref] = packs[0] || [];
+  packs.forEach(([f, p]) => {
+    if (!sw.includes(`src/i18n/${f}`)) errors.push(`sw.js: src/i18n/${f} fora da lista CORE`);
+    ['ui', 'gloss'].forEach(k => { const a = Object.keys(ref[k]), b = new Set(Object.keys(p[k])); a.filter(x => !b.has(x)).forEach(x => warns.push(`src/i18n/${f}: falta "${x}" em ${k} (existe em ${base})`)); });
+  });
+}
 warns.forEach(w => console.log('aviso  ' + w));
 errors.forEach(e => console.log('ERRO   ' + e));
 console.log(`\n${total} fases · ${errors.length} erro(s) · ${warns.length} aviso(s)`);

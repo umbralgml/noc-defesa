@@ -114,7 +114,7 @@ try {
         await p.waitForSelector('.opt:not([disabled])');
         await p.evaluate(w => [...document.querySelectorAll('.opt')].find(b => w ? !b._ok : b._ok).click(), mistake && q === 0);
         const label = await p.textContent('#qNext'); await p.click('#qNext');
-        if (label !== 'CONTINUAR') break;
+        if (!['CONTINUAR', 'CONTINUE'].includes(label)) break;   // rótulo traduzido em inglês
       }
     } else if (L.type === 'defense') {
       // liga as regras boas; com erro de propósito, deixa passar o primeiro ataque antes de ligar a que o barraria

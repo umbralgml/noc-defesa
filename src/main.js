@@ -42,16 +42,15 @@ $('resetBtn').onclick = () => askReset(showProgress);
 $('lookBtn').onclick = () => { au(); lookModal(); };
 $('contactT').onclick = $('contactM').onclick = () => { au(); openContact(); };
 $('a11yBtn').onclick = () => { au(); a11yModal(); };
-// Idioma: a troca recarrega a página (fases, glossário e telas são montados no idioma escolhido).
-$('langT').textContent = '🌐 ' + LANGS[LANG];
-$('langT').onclick = () => {
-  au();
-  modal(`<div class="tag">IDIOMA · IDIOMA</div><h2>🌐</h2><div class="langs">${Object.entries(LANGS).map(([k, v]) => `<button class="btn ${k === LANG ? '' : 'ghostb '}wideb" data-l="${k}" data-notr>${v}</button>`).join('')}</div>
-    <div class="fnote">Comandos e saídas de equipamento ficam como no original em todos os idiomas. / Los comandos y las salidas de los equipos quedan como en el original en todos los idiomas.</div>
-    <div class="row"><button class="btn ghostb" id="mOk">OK</button></div>`);
-  document.querySelectorAll('.langs [data-l]').forEach(b => b.onclick = () => b.dataset.l === LANG ? closeModal() : setLang(b.dataset.l));
-  $('mOk').onclick = closeModal;
+// Idioma: bandeiras logo abaixo de Opções. A troca recarrega a página (fases, glossário e telas são montados no idioma escolhido).
+const FLAGS = {
+  pt: '<rect width="30" height="20" fill="#009c3b"/><path d="M15 2.6 27.4 10 15 17.4 2.6 10z" fill="#ffdf00"/><circle cx="15" cy="10" r="4.4" fill="#002776"/><path d="M10.8 9.2q4.2-1.3 8.4 1.2" stroke="#fff" stroke-width=".9" fill="none"/>',
+  en: '<rect width="30" height="20" fill="#b22234"/>' + [1, 3, 5, 7, 9, 11].map(k => `<rect y="${k * 20 / 13}" width="30" height="${20 / 13}" fill="#fff"/>`).join('') + '<rect width="13" height="10.8" fill="#3c3b6e"/>',
+  es: '<rect width="30" height="20" fill="#aa151b"/><rect y="5" width="30" height="10" fill="#f1bf00"/>'
 };
+const SHORT = { pt: 'Português', en: 'English', es: 'Español' };
+$('tLang').innerHTML = Object.keys(LANGS).map(k => `<button type="button" class="tlb${k === LANG ? ' on' : ''}" data-l="${k}" aria-pressed="${k === LANG}" aria-label="${LANGS[k]}"><svg viewBox="0 0 30 20" aria-hidden="true">${FLAGS[k]}</svg>${SHORT[k]}</button>`).join('');
+$('tLang').querySelectorAll('.tlb').forEach(b => b.onclick = () => { if (b.dataset.l !== LANG) setLang(b.dataset.l); });
 
 // Resumo na tela inicial, só para quem já concluiu alguma fase.
 function showProgress() {

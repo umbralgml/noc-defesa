@@ -743,7 +743,10 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tact:active,.tact:focus-visible{background:var(--panel)}
 .tact[hidden]{display:none}
 .tmore{margin-top:10px;width:100%;max-width:340px}
-.tmore summary{list-style:none;cursor:pointer;font-size:12.5px;color:var(--muted);padding:8px;text-align:center}
+.tmore summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:max-content;margin:0 auto;padding:10px 22px;border-radius:999px;border:1px solid rgba(120,190,255,.28);background:var(--panel);color:var(--text);font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.tmore summary:hover,.tmore summary:focus-visible{border-color:var(--acc)}
+.tmore[open] summary{border-color:rgba(0,224,168,.55)}
+.tmi{font-size:15px;line-height:1;color:var(--acc)}
 .tmore summary::-webkit-details-marker{display:none}
 .tmore summary::after{content:' ▾'}
 .tmore[open] summary::after{content:' ▴'}
@@ -869,7 +872,12 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 /* No computador a coluna da tela inicial rola: nenhum item pode encolher (o selo era espremido e cortado) */
 #title .content>*{flex-shrink:0}
 
-/* idioma: aviso de fase sem tradução e escolha do idioma */
+/* idioma: aviso de fase sem tradução */
 .trnote{margin:8px 0 4px;padding:8px 12px;border-radius:10px;border:1px dashed rgba(255,209,102,.5);color:var(--warn);font-size:13px}
-.langs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
-.langs .wideb{margin-top:0}
+
+/* idioma: bandeiras na tela inicial, logo abaixo de Opções */
+.tlang{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tlb{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;border:1px solid rgba(120,190,255,.2);background:transparent;color:var(--muted);font:600 12px system-ui,sans-serif;cursor:pointer}
+.tlb svg{width:21px;height:14px;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.tlb.on{border-color:var(--acc);color:var(--text);background:rgba(0,224,168,.1)}
+.tlb:hover,.tlb:focus-visible{border-color:var(--acc)}
