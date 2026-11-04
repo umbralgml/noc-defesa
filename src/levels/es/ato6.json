@@ -1,0 +1,148 @@
+{
+ "tag": "ACTO 7",
+ "name": "Troubleshooting en la terminal",
+ "story": [
+  { "t": "Z3R0 tocó directamente la configuración de los equipos. Investiga en la terminal antes de tocar nada." },
+  { "t": "Una línea aquí, un shutdown allá. Encuéntralo si puedes." },
+  { "t": "show, log y solo después configure terminal." }
+ ],
+ "levels": [
+  {
+   "title": "Enlace caído",
+   "tag": "TERMINAL",
+   "cap": "Conectando el cable de consola al switch core...",
+   "goal": "Investiga el switch core, descubre por qué cayó el piso 2 y corrígelo.",
+   "intro": "El <b>piso 2</b> (VLAN 20) está sin red. Estás en la consola del <b>SW-CORE</b>. Investiga antes de tocar.",
+   "z": "Entré a tu switch core y apagué un puerto. Adivina cuál. Todo el piso 2 está sin red.",
+   "me": "No voy a adivinar. Voy a mirar.",
+   "lesson": [
+    "El <b>troubleshooting</b> es método: confirma el síntoma, junta evidencia, diagnostica y recién entonces corrige.",
+    "<b>show ip interface brief</b>: Status es la capa 1 (física) y Protocol la capa 2. <b>administratively down</b> = puerto apagado por comando.",
+    "<b>show interfaces status</b>: <b>connected</b> ok, <b>notconnect</b> sin cable o el otro lado apagado, <b>disabled</b> apagado, <b>err-disabled</b> apagado por protección.",
+    "<b>show logging</b> cuenta qué cambió, cuándo y quién lo cambió. <b>show running-config</b> muestra la configuración en uso.",
+    "En IOS, <b>no</b> deshace un comando. Y <b>copy running-config startup-config</b> guarda la configuración para que sobreviva a un reboot."
+   ],
+   "tip": "\"administratively down\" es shutdown. Corrígelo con \"no shutdown\" en la interfaz y cierra el acceso VTY del intruso.",
+   "learn": "Una interfaz \"administratively down\" fue apagada por comando, y \"no shutdown\" la vuelve a encender. El log mostró quién lo hizo (z3r0 por el vty0), así que la corrección completa incluye ACL en el acceso VTY, cambio de credenciales y guardar la configuración.",
+   "cmds": [
+    { "why": "Resume cada interfaz: IP, Status (capa 1) y Protocol (capa 2). \"administratively down\" quiere decir que alguien hizo shutdown." },
+    { "why": "Muestra el estado de cada puerto del switch. \"disabled\" es un puerto apagado por configuración; \"notconnect\" sería cable; \"err-disabled\" sería una protección, como el port-security." },
+    { "why": "El log dice qué cambió, cuándo y quién lo cambió. Siempre mira el log antes de tocar." },
+    { "why": "Muestra la configuración de la interfaz. La línea \"shutdown\" apaga el puerto." },
+    { "why": "Confirma el síntoma: ninguna máquina del piso 2 (VLAN 20) responde. Cada \".\" es un paquete sin respuesta." }
+   ],
+   "steps": [
+    {
+     "q": "¿Por qué el piso 2 está sin red?",
+     "v": ["¿Qué dejó al piso 2 sin red?", "Por lo que viste en la terminal, ¿cuál es la causa de la caída del piso 2?"],
+     "o": ["La Gi1/0/2 fue apagada con shutdown", { "t": "Se rompió el cable de la Gi1/0/2", "why": "Un cable roto aparece como \"down/down\" o \"notconnect\", no como \"administratively down\"." }, { "t": "Se borró la VLAN 20", "why": "La VLAN existe: la SVI Vlan20 aparece en la lista. El problema es que el puerto que lleva la VLAN está apagado." }, { "t": "Dúplex incompatible en el puerto", "why": "Un dúplex mal configurado causa errores y lentitud, pero el puerto sigue up." }],
+     "why": "Status \"administratively down\" y la línea \"shutdown\" en la configuración: alguien apagó el puerto a propósito. El log muestra que fue z3r0, por el vty0."
+    },
+    {
+     "q": "Dentro de \"interface Gi1/0/2\", ¿qué comando vuelve a encender el puerto?",
+     "v": ["Ya en \"interface Gi1/0/2\", ¿qué comando activa el puerto?", "¿Qué comando, dentro de la interface Gi1/0/2, vuelve a poner el puerto en servicio?"],
+     "o": ["no shutdown", { "t": "shutdown", "why": "shutdown es justamente lo que apaga el puerto." }, { "t": "reload", "why": "Reiniciar el switch tumba a todo el mundo, y el puerto vuelve apagado: el shutdown está en la configuración." }, { "t": "clear counters", "why": "Pone en cero los contadores de la interfaz. No cambia el estado del puerto." }],
+     "why": "En IOS, \"no\" deshace un comando: \"no shutdown\" enciende el puerto de nuevo."
+    },
+    {
+     "q": "Red en pie. ¿Qué impide que Z3R0 lo repita?",
+     "v": ["La red volvió. ¿Cómo evitar que Z3R0 lo haga de nuevo?", "Puerto encendido otra vez. ¿Qué hacer para que Z3R0 no entre al switch de nuevo?"],
+     "o": ["Restringir el acceso VTY con ACL, cambiar las credenciales y guardar", { "t": "Borrar el log para que no vea lo que hiciste", "why": "Sin log pierdes la evidencia y no ves el próximo ataque." }, { "t": "Mover el puerto a la VLAN 1", "why": "La VLAN no tiene relación con quién accede a la gestión del switch." }, { "t": "Nada: fue solo un puerto", "why": "Tenía acceso de configuración al switch core. Eso es un incidente." }],
+     "why": "El log muestra el login de z3r0 por el vty0 desde 45.67.89.10. Una ACL en el \"line vty\" (access-class) solo deja entrar a la red de gestión, una contraseña nueva le corta el acceso, y guardar garantiza que la corrección sobreviva a un reboot."
+    }
+   ]
+  },
+  {
+   "title": "Ruta perdida",
+   "tag": "TERMINAL",
+   "cap": "Abriendo la consola del router de borde...",
+   "goal": "Investiga el router de borde, descubre por qué se cayó internet y restáuralo.",
+   "intro": "Nadie accede a internet, pero la red interna funciona. Consola del <b>RT-BORDA</b>: el enlace con el proveedor es la <b>Gi0/0</b> (200.1.1.2/30), y el proveedor es el <b>200.1.1.1</b>.",
+   "z": "Borré una línea de la configuración de tu router de borde. Una sola. Toda la empresa está sin internet.",
+   "me": "Una línea. Veamos cuál.",
+   "lesson": [
+    "Método: un <b>ping</b> al siguiente salto (el gateway del proveedor) separa un problema de enlace de un problema de enrutamiento.",
+    "<b>show ip route</b>: C = conectada, S = estática, B = BGP. <b>Gateway of last resort</b> es la ruta por defecto (0.0.0.0/0).",
+    "Sin ruta por defecto, el router descarta todo lo que no está en la tabla: internet desaparece, pero la red local sigue.",
+    "<b>traceroute</b> muestra hasta dónde llega el paquete. Morir en el salto 1 = el problema está en el propio router.",
+    "<b>show running-config | include</b> filtra la configuración. En un router, la salida a internet es <b>ip route 0.0.0.0 0.0.0.0 siguiente-salto</b>."
+   ],
+   "tip": "El gateway del proveedor responde e internet no: es la ruta. \"Gateway of last resort is not set\" = falta la ruta por defecto. Vuelve con ip route 0.0.0.0 0.0.0.0 200.1.1.1.",
+   "learn": "Enlace arriba + ping al gateway OK + internet caída = problema de enrutamiento. La ruta por defecto (ip route 0.0.0.0 0.0.0.0 200.1.1.1) había sido borrada; las redes conectadas (C) siguen funcionando sin ella.",
+   "cmds": [
+    { "why": "La tabla de rutas. \"Gateway of last resort is not set\" = no existe ruta por defecto: el router no sabe a dónde mandar lo que no está en la tabla." },
+    { "why": "El gateway del proveedor responde: el enlace físico y la red /30 con el proveedor están arriba." },
+    { "why": "Internet no responde. Como el enlace con el proveedor está arriba, el problema es de enrutamiento." },
+    { "why": "Ni el primer salto responde: el paquete no sale del router." },
+    { "why": "Con el log de comandos activado (archive log config), cada línea escrita queda registrada. Aquí aparece el comando exacto que usó el intruso." },
+    { "why": "Filtra la configuración por las rutas estáticas. Vacío: la ruta por defecto fue borrada." }
+   ],
+   "steps": [
+    {
+     "q": "¿Por qué se cayó internet para todo el mundo?",
+     "v": ["¿Cuál es el motivo de que internet se caiga para todos?", "Por lo que viste en la terminal, ¿por qué nadie sale a internet?"],
+     "o": ["El router ya no tiene ruta por defecto", { "t": "Se cayó el enlace con el proveedor", "why": "El ping a 200.1.1.1 responde: el enlace está arriba." }, { "t": "El DNS se detuvo", "why": "El ping va directo a la IP 8.8.8.8 y aun así falla. No es DNS." }, { "t": "El proveedor bloqueó el 8.8.8.8", "why": "El traceroute muere ya en el primer salto: el paquete ni sale de tu router." }],
+     "why": "Sin ruta por defecto (\"Gateway of last resort is not set\"), todo lo que no es red conocida se descarta. El log muestra el \"no ip route 0.0.0.0 0.0.0.0 200.1.1.1\" de z3r0."
+    },
+    {
+     "q": "¿Qué comando restaura la salida a internet?",
+     "v": ["¿Qué comando devuelve la salida a internet?", "¿Cómo recrear la ruta por defecto hacia el proveedor?"],
+     "o": ["ip route 0.0.0.0 0.0.0.0 200.1.1.1", { "t": "ip route 200.1.1.1 255.255.255.255 0.0.0.0", "why": "Está invertido: el destino es 0.0.0.0/0 (cualquier red) y el siguiente salto es el proveedor." }, { "t": "ip default-gateway 200.1.1.1", "why": "ip default-gateway solo vale con el enrutamiento apagado, como en un switch L2. En un router, usa ruta por defecto." }, { "t": "ip route 8.8.8.8 255.255.255.255 200.1.1.1", "why": "Eso solo lleva al 8.8.8.8. El resto de internet seguiría caído." }],
+     "why": "Ruta por defecto: destino 0.0.0.0 con máscara 0.0.0.0 (cualquier red) y siguiente salto 200.1.1.1, el proveedor."
+    },
+    {
+     "q": "¿Por qué el ping a 200.1.1.1 funcionaba aun sin ruta por defecto?",
+     "v": ["Sin ruta por defecto, ¿por qué el ping a 200.1.1.1 seguía respondiendo?", "¿Cómo respondía 200.1.1.1 al ping aun sin ruta por defecto configurada?"],
+     "o": ["Está en una red directamente conectada (la /30 con el proveedor)", { "t": "Porque el ping no usa la tabla de rutas", "why": "Todo paquete IP consulta la tabla de rutas, incluido el ping." }, { "t": "Porque el proveedor tiene una ruta hasta ti", "why": "La ruta de vuelta del proveedor no ayuda a tu router a encontrar el camino de ida." }, { "t": "Fue la caché de ARP", "why": "ARP resuelve MAC en la red local. Quien decide el camino es la ruta \"C\" (connected)." }],
+     "why": "Las redes directamente conectadas entran solas a la tabla (código C). 200.1.1.1 está en la /30 de la Gi0/0, así que no depende de la ruta por defecto."
+    }
+   ]
+  },
+  {
+   "title": "Contraataque final",
+   "tag": "DEFENSA EN VIVO",
+   "cap": "Z3R0 en la pantalla grande: contraataque en todos los frentes...",
+   "goal": "Activa las 4 reglas correctas y aguanta las dos oleadas sin tumbar BGP, ICMP ni clientes.",
+   "z": "Última carta. Todo lo que tengo, de una vez, sin etiqueta. Quiero verte leer paquetes con el susto.",
+   "me": "Los leo. Origen, protocolo, puerto. Una regla a la vez.",
+   "intro": "Ataque final en el borde <b>177.10.0.0/22</b>. Los paquetes llegan <b>sin color</b>: solo aparece después de que el firewall decide.",
+   "lesson": [
+    "Sin colores ahora: lee <b>origen</b>, <b>protocolo</b> y <b>puerto</b> de cada paquete y decide por las reglas. El formato es \"origen PROTO puerto-de-origen→puerto-de-destino\".",
+    "<b>Anti-spoofing</b> (BCP 38/84): desde internet no puede llegar un origen privado (10/8, 172.16/12, 192.168/16). Si llegó, está falsificado.",
+    "<b>Reflexión</b>: la respuesta llega con el puerto del servicio abusado como <b>origen</b> (memcached 11211, NTP 123). Cuidado: la respuesta DNS que pidió TU resolver también viene del 53.",
+    "No se bloquea lo que mantiene el borde en pie: <b>BGP</b> (TCP/179) con la operadora y el <b>ICMP</b> necesario (ping de monitoreo, PMTUD)."
+   ],
+   "tip": "Cuatro reglas: origen 10.0.0.0/8, UDP con origen 11211, TCP/3389 y origen 45.67.89.0/24. ICMP, TCP/179 y TCP/443 tienen tráfico legítimo.",
+   "learn": "Borde bien filtrado: anti-spoofing (BCP 38/84), ACL contra reflexión por el puerto de origen, puertos de administración fuera de internet (RDP solo por VPN) y bloqueo de los rangos del atacante. Sin romper lo que mantiene la red en pie: la sesión BGP con la operadora y el ICMP esencial.",
+   "server": "BORDE 177.10.0.0/22",
+   "rules": [
+    { "t": "Bloquear origen 10.0.0.0/8 desde internet", "why": "Anti-spoofing: nadie en internet usa 10.x (RFC 1918). Un paquete de internet con ese origen está falsificado." },
+    { "t": "Bloquear UDP con origen 11211 (memcached)", "why": "Para la reflexión memcached. No consultas memcached desde afuera, así que ninguna respuesta legítima llega con ese origen." },
+    { "t": "Bloquear TCP/3389 (RDP)", "why": "RDP expuesto a internet es puerta de entrada del ransomware. Acceso remoto solo por VPN." },
+    { "t": "Bloquear origen 45.67.89.0/24 (red del C2)", "why": "El rango del C2 de Z3R0, ya identificado en los IoC. Bloquea el origen, sea cual sea el puerto." },
+    { "t": "Bloquear todo ICMP", "why": "Trampa: bloquear todo ICMP rompe ping, traceroute y el Path MTU Discovery (mensaje \"fragmentation needed\"). Filtra ICMP con criterio." },
+    { "t": "Bloquear TCP/179 (BGP)", "why": "Trampa: 179 es la sesión BGP con la operadora. Bloquearla tumba tus rutas y saca la red del aire." },
+    { "t": "Bloquear TCP/443 (HTTPS)", "why": "Trampa: 443 es el puerto de los clientes. Bloquearlo es hacerle el DDoS a Z3R0." }
+   ],
+   "waves": [
+    { "msg": "Primera oleada: spoofing, reflexión y la red del C2.", "packets": [
+     { "why": "Origen 10.x llegando desde internet: IP falsificada. Aunque sea por el 443, es ataque." },
+     { "why": "Cliente de la tienda por HTTPS." },
+     { "why": "Respuesta memcached que nadie pidió: reflexión con amplificación enorme (así fue el ataque de 1,3 Tbps a GitHub en 2018). Origen 11211." },
+     { "why": "Keepalive de la sesión BGP con la operadora (200.1.1.1). Sin ella, tus rutas desaparecen." },
+     { "why": "Rango del C2 (45.67.89.0/24). Solo la regla de origen lo atrapa sin tumbar clientes." },
+     { "why": "Respuesta DNS que tu resolver le pidió a 8.8.8.8. Tráfico legítimo, aunque venga del 53." }
+    ] },
+    { "msg": "Z3R0 aceleró: RDP, más reflexión y más spoofing.", "packets": [
+     { "why": "Fuerza bruta en RDP desde internet." },
+     { "why": "Ping del servicio de monitoreo externo. Bloquear todo ICMP le esconde la red y rompe el PMTUD." },
+     { "why": "Origen 10.x desde internet: falsificado. Y encima con cara de reflexión memcached." },
+     { "why": "El C2 de Z3R0 intentando SSH." },
+     { "why": "Respuesta memcached que nadie pidió: reflexión con amplificación enorme (así fue el ataque de 1,3 Tbps a GitHub en 2018). Origen 11211." },
+     { "why": "Cliente de la tienda (HTTPS)." },
+     { "why": "Más fuerza bruta en RDP." }
+    ] }
+   ]
+  }
+ ]
+}

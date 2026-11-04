@@ -178,11 +178,12 @@ for (const f of read('index.json').acts) {
 const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 // Traduções (src/levels/<lang>/): só textos, na mesma estrutura do original. Comandos, saídas, configurações,
 // endereços e ids nunca mudam; a fase mesclada passa pelas mesmas checagens do original.
+// Em "explain" as chaves são nomes de lacuna ([c], [ip]...), então o texto delas se traduz mesmo com nome protegido.
 const PROT = new Set(['c', 'out', 'alias', 'run', 'prompt', 'host', 'type', 'loc', 'mode', 'id', 'who', 'src', 'dst', 'proto', 'flags', 'info', 'qname', 'method', 'f', 'kind', 'fault', 'from', 'accept', 'ico', 'm', 'diff', 'dailyFrom', 'ip']);
 function same(o, x, at, err) {
   if (x === undefined || x === null) return;
   if (Array.isArray(o)) { if (!Array.isArray(x)) return err(`${at}: era lista no original`); if (x.length > o.length) err(`${at}: ${x.length} itens, o original tem ${o.length}`); x.forEach((v, i) => same(o[i], v, `${at}[${i}]`, err)); return; }
-  if (o && typeof o === 'object') { if (typeof x !== 'object' || Array.isArray(x)) return err(`${at}: era objeto no original`); for (const k in x) { if (!(k in o)) err(`${at}.${k}: campo que não existe no original`); else if (PROT.has(k) && JSON.stringify(o[k]) !== JSON.stringify(x[k])) err(`${at}.${k}: não se traduz (comando, saída, endereço ou id). Deixe igual ao original ou tire da tradução`); else same(o[k], x[k], `${at}.${k}`, err); } return; }
+  if (o && typeof o === 'object') { if (typeof x !== 'object' || Array.isArray(x)) return err(`${at}: era objeto no original`); for (const k in x) { if (!(k in o)) err(`${at}.${k}: campo que não existe no original`); else if (PROT.has(k) && !/\.explain$/.test(at) && JSON.stringify(o[k]) !== JSON.stringify(x[k])) err(`${at}.${k}: não se traduz (comando, saída, endereço ou id). Deixe igual ao original ou tire da tradução`); else same(o[k], x[k], `${at}.${k}`, err); } return; }
   if (typeof o !== typeof x) err(`${at}: tipo diferente do original`);
   else if (typeof o !== 'string' && o !== x) err(`${at}: número ou sim/não muda o jogo, não se traduz`);
 }

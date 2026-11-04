@@ -1,0 +1,577 @@
+{
+ "tag": "ACT 2",
+ "name": "Firewall and DDoS",
+ "story": [
+  {
+   "t": "Now the attack is traffic. We need a well-written firewall and DDoS mitigation."
+  },
+  {
+   "t": "I'll fill your links until nothing else fits. And I'll hide my packets among yours."
+  },
+  {
+   "t": "Policy first, rules second. And DDoS gets solved before the edge."
+  }
+ ],
+ "levels": [
+  {
+   "title": "Traffic triage",
+   "tag": "TRIAGE",
+   "cap": "Connecting to the firewall console...",
+   "goal": "Apply the policy: decide what passes and what gets blocked.",
+   "intro": "Policy for web server <b>10.0.0.10</b>: accept only <b>HTTPS</b> from the internet. <b>SSH</b> only from management <b>10.99.0.0/24</b>. Everything else: block.",
+   "z": "I'm sending packets from everywhere. Which one is mine? Guess.",
+   "me": "I don't need to guess. The policy decides.",
+   "lesson": [
+    "A firewall rule looks at <b>source</b>, <b>destination</b>, <b>protocol</b> and <b>destination port</b>. The packet only passes if everything matches the policy.",
+    "Read each line like this: <b>who → to whom, protocol/port</b>. For example, 203.0.113.7 → 10.0.0.10 TCP/443 is someone on the internet opening HTTPS on the server.",
+    "A <b>/24</b> fixes the first three octets: everything starting with <b>10.99.0.</b> is inside 10.99.0.0/24. But 10.98.0.x is outside.",
+    "A good policy is an <b>allow list</b>: whatever isn't written is denied. When in doubt, block."
+   ],
+   "check": {
+    "q": "In an allow-list policy, what happens to what isn't written?",
+    "v": [
+     "On a firewall with an allow list, what happens to traffic that isn't in the rules?",
+     "Allow-list policy: what wasn't explicitly allowed is..."
+    ],
+    "o": [
+     "It's blocked",
+     {
+      "t": "It's allowed",
+      "why": "Allowing what nobody thought about is the opposite of an allow list."
+     },
+     {
+      "t": "It goes to manual review",
+      "why": "The firewall decides on the spot: what isn't allowed is denied."
+     }
+    ],
+    "why": "Allow list: only what was explicitly allowed passes."
+   },
+   "tip": "Check destination, port and, for SSH, whether the source is inside 10.99.0.0/24 (10.99.0.0 to 10.99.0.255).",
+   "learn": "A good firewall is policy written before rules. Watch out for look-alike neighbors: 10.98.0.15 isn't in 10.99.0.0/24, and HTTPS to 10.0.0.11 isn't the authorized server. Port 80 stays closed too if the policy says HTTPS only.",
+   "buckets": [
+    {
+     "label": "ALLOW",
+     "a": [
+      {
+       "why": "HTTPS from the internet to the web server: exactly what the policy allows."
+      },
+      {
+       "why": "SSH from 10.99.0.15, which is inside management 10.99.0.0/24."
+      },
+      {
+       "why": "Any source can reach HTTPS on 10.0.0.10."
+      }
+     ]
+    },
+    {
+     "label": "BLOCK",
+     "a": [
+      {
+       "why": "SSH from the internet. Only management 10.99.0.0/24 may use SSH."
+      },
+      {
+       "why": "10.98 isn't 10.99: this source is outside the management network."
+      },
+      {
+       "why": "Port 80 is unencrypted HTTP. The policy allows only HTTPS (443)."
+      },
+      {
+       "why": "The destination is 10.0.0.11, not the authorized server 10.0.0.10."
+      },
+      {
+       "why": "The source is from management, but RDP (3389) isn't in the policy. SSH only."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "First match",
+   "tag": "ORDERING",
+   "cap": "Auditing the rule order...",
+   "goal": "Put the rules in the right order. The firewall stops at the first one that matches.",
+   "intro": "The firewall reads <b>top to bottom</b> and stops at the first match. Goals: block the attacker <b>45.67.89.10</b> on everything, public HTTPS to <b>10.0.0.10</b>, SSH only from management <b>10.99.0.0/24</b> and deny the rest.",
+   "z": "My rules are on your firewall, I just shuffled the order. Have fun.",
+   "me": "Rule order is everything. Specific deny first.",
+   "lesson": [
+    "An ACL is read <b>top to bottom</b>. At the first rule that matches, the firewall decides and <b>stops reading</b>.",
+    "That's why the <b>most specific</b> rule comes before the more generic one. Blocking a host has to come before any permit that would also include it.",
+    "At the end sits <b>deny ip any any</b>: everything not allowed before falls into it.",
+    "Vocabulary: <b>any</b> = any address, <b>host X</b> = only that IP, <b>eq 443</b> = destination port equal to 443."
+   ],
+   "check": {
+    "q": "The firewall reads rules top to bottom. What happens at the first one that matches?",
+    "v": [
+     "Firewall rules are read top to bottom. When one matches the packet, what happens?",
+     "The packet matched the third rule on the list. What does the firewall do?"
+    ],
+    "o": [
+     "It applies that rule and stops reading",
+     {
+      "t": "It reads them all and applies the most specific",
+      "why": "No: the first match wins. That's why the specific one has to come first."
+     },
+     {
+      "t": "It applies the last rule on the list",
+      "why": "The last one only applies if none before it matched."
+     }
+    ],
+    "why": "First match: decided, stopped. Rule order changes the result."
+   },
+   "tip": "If the 443 permit comes before the attacker block, the attacker gets in on 443. deny any any always closes the list. Two of those rules aren't part of the policy.",
+   "learn": "Most specific rule first, implicit or explicit deny at the end. \"permit ip any any\" cancels everything below it, and SSH allowed to any breaks the management-only requirement.",
+   "explain": {
+    "r1": "The attacker block comes first. Below the 443 permit, the attacker would get in over HTTPS.",
+    "r2": "Public HTTPS and management SSH don't overlap, so the order between the two doesn't matter.",
+    "r3": "Public HTTPS and management SSH don't overlap, so the order between the two doesn't matter.",
+    "r4": "deny any any closes the list: whatever didn't match anything above is denied."
+   },
+   "chips": [
+    {
+     "why": "Blocks everything from the attacker. It has to be the first rule."
+    },
+    {
+     "why": "Allows HTTPS from any source to the web server. Comes after the attacker block."
+    },
+    {
+     "why": "Allows SSH only from the management network (10.99.0.0/24, which in a Cisco ACL becomes 10.99.0.0 0.0.0.255). Comes after the attacker block."
+    },
+    {
+     "why": "Denies everything else. It's always the last rule."
+    },
+    {
+     "why": "permit ip any any allows everything and cancels the rules below it. It's not part of the policy."
+    },
+    {
+     "why": "Allows SSH from any source, but the policy requires it to come only from management."
+    }
+   ]
+  },
+  {
+   "title": "Build the ACL",
+   "tag": "CLI",
+   "cap": "Plugging the console cable into the edge router...",
+   "goal": "Complete the ACL that blocks the NTP reflection and apply it on the right interface.",
+   "intro": "<b>NTP reflection</b> attack coming in over transit against block <b>177.10.0.0/22</b>. Block UDP with <b>source port 123</b>, allow the rest and apply it inbound on the uplink.",
+   "z": "Thousands of NTP servers answering you at the same time. Monlist is beautiful.",
+   "me": "Source port 123, right wildcard and the ACL inbound. Let's go.",
+   "lesson": [
+    "<b>Reflection</b>: the attacker sends small queries to open servers, forging YOUR IP as the source. The servers answer you, with much bigger responses.",
+    "In NTP, the <b>monlist</b> command returns up to 600 addresses per query. Responses leave the server's <b>port 123</b>, so they reach you with <b>source port 123</b>.",
+    "Cisco extended ACL: <b>access-list N action protocol source [port] destination [port]</b>. An <b>eq</b> right after the source filters the source port.",
+    "Cisco uses a <b>wildcard</b>, the inverse of the mask: 255 minus each octet. 255.255.252.0 becomes <b>0.0.3.255</b>.",
+    "Every ACL ends with an <b>implicit deny</b>. Without a <b>permit</b> at the end, you block everything else.",
+    "<b>in</b> filters what enters the interface and <b>out</b> what leaves it. The attack comes from the internet, so it enters on the uplink."
+   ],
+   "check": {
+    "q": "In NTP reflection, how does the attack reach you?",
+    "v": [
+     "In an NTP reflection attack, how does the traffic reach the victim?",
+     "In NTP reflection, what is the protocol and source port of the traffic flooding the victim?"
+    ],
+    "o": [
+     "UDP with source port 123",
+     {
+      "t": "UDP with destination port 123",
+      "why": "The destination port is random: it's the one the attacker forged. 123 is the source, from the NTP server."
+     },
+     {
+      "t": "TCP on port 443",
+      "why": "NTP uses UDP, not TCP."
+     }
+    ],
+    "why": "Responses leave port 123 on the NTP servers: they reach you with source 123."
+   },
+   "tip": "Cisco ACLs use a wildcard, not a mask: /22 = 0.0.3.255. Port 123 is the SOURCE port, so the \"eq\" goes right after \"any\". Traffic coming from the internet enters on the uplink.",
+   "learn": "A wildcard is the inverse of the mask: 255.255.252.0 becomes 0.0.3.255. In reflection, the victim gets responses coming from the abused service's port, so the filter is on the source port. Ideally you also ask the upstream to filter before your link. In real life, this filter also breaks clock sync with outside NTP servers: use internal NTP or filter only the large responses typical of monlist.",
+   "explain": {
+    "a": "deny: the first line drops the attack traffic.",
+    "b": "NTP runs over UDP.",
+    "d": "/22 = 255.255.252.0. Inverted, the wildcard is 0.0.3.255.",
+    "e": "Without this permit, the implicit deny at the end of the ACL would block the whole internet.",
+    "c": "eq 123 right after the source any filters SOURCE port 123, where the reflected responses come from.",
+    "f": "The attack comes from the internet, so the filter goes inbound (in) on the uplink."
+   },
+   "chips": [
+    {
+     "why": "Drops the packet that matches the line."
+    },
+    {
+     "why": "Allows the packet that matches the line."
+    },
+    {
+     "why": "NTP, DNS and SNMP run over UDP."
+    },
+    {
+     "why": "NTP doesn't use TCP. Reflection attacks are UDP, which accepts a forged source with no handshake."
+    },
+    {
+     "why": "123 is the NTP port."
+    },
+    {
+     "why": "53 is DNS. Here the abused service is NTP."
+    },
+    {
+     "why": "Wildcard for a /22."
+    },
+    {
+     "why": "That's the mask. A Cisco ACL asks for the wildcard, which is the inverse."
+    },
+    {
+     "why": "Wildcard for a /23: it would cover only half of the /22 block."
+    },
+    {
+     "why": "Filters traffic entering the interface."
+    },
+    {
+     "why": "out filters what leaves through the uplink, and the attack is coming in."
+    }
+   ]
+  },
+  {
+   "title": "On-call Wireshark",
+   "tag": "CAPTURE",
+   "cap": "Opening the capture in Wireshark...",
+   "goal": "Classify each packet in the capture as NORMAL or SUSPICIOUS.",
+   "z": "I sent a few SYNs to your store. A few thousand. Per second.",
+   "me": "Capture by hand. Whoever doesn't finish the handshake will show up.",
+   "intro": "The online store (<b>177.10.0.5</b>, HTTPS) is slow. I captured 12 packets. Use the filters to separate attack from customer and classify everything. You can mark <b>all visible</b> at once, but a broad filter catches innocents too.",
+   "lesson": [
+    "<b>Wireshark</b> captures packets and shows each one: source, destination, protocol and a summary (Info). Tap a packet to see the details.",
+    "A <b>display filter</b> hides what doesn't matter: <b>tcp.flags.syn == 1</b>, <b>ip.src == 1.2.3.4</b>, <b>udp.port == 53</b>. Combine with <b>&&</b> (and), <b>||</b> (or) and <b>!</b> (not).",
+    "Every TCP connection starts with the <b>handshake</b>: the client sends <b>SYN</b>, the server answers <b>SYN-ACK</b> and the client confirms with <b>ACK</b>.",
+    "<b>SYN flood</b>: the attacker sends thousands of SYNs, almost always with a forged source, and never confirms. The server keeps each half-open connection until the queue fills up."
+   ],
+   "check": {
+    "q": "What is the order of the TCP handshake?",
+    "v": [
+     "In what sequence does TCP's three-way handshake happen?",
+     "To open a TCP connection, what is the order of the messages?"
+    ],
+    "o": [
+     "SYN, SYN-ACK, ACK",
+     {
+      "t": "ACK, SYN, SYN-ACK",
+      "why": "The client starts with SYN, never with ACK."
+     },
+     {
+      "t": "SYN, ACK, FIN",
+      "why": "FIN closes the connection. Opening ends with the client's ACK."
+     }
+    ],
+    "why": "The client asks (SYN), the server accepts (SYN-ACK) and the client confirms (ACK)."
+   },
+   "tip": "Filter pure SYN (syn == 1 && ack == 0). One of them is from client 189.40.12.7, who completes the handshake and sends TLS. The others only send SYN.",
+   "learn": "The SYN flood signature is lots of SYN without the final ACK, from varied (forged) sources. Mitigation: SYN cookies on the server (it only keeps state after the ACK), SYN rate limiting on the firewall and scrubbing at the provider when the volume is large.",
+   "filters": [
+    {
+     "why": "Only pure SYN, the first step of the handshake. In a SYN flood they dominate the capture. Careful: a legitimate client also starts with SYN."
+    },
+    {
+     "why": "Everything to and from one IP. Useful to follow a whole connection: SYN, SYN-ACK, ACK and data."
+    },
+    {
+     "why": "Pure SYN, minus the client that completed the handshake. Only the attack is left."
+    },
+    {
+     "why": "Already open connections (TLS) and name queries (DNS). Whoever reached TLS completed the handshake."
+    }
+   ],
+   "packets": [
+    {
+     "why": "First step of a client's handshake. It continues: SYN-ACK, ACK and TLS right after. It's a real customer."
+    },
+    {
+     "why": "The server answering the client: second step of the handshake."
+    },
+    {
+     "why": "The client confirms and the connection opens. A SYN flooder never sends this ACK."
+    },
+    {
+     "why": "SYN from a source that never completes the handshake. Many different IPs, all SYN only, in the same second: SYN flood with forged sources."
+    },
+    {
+     "why": "SYN from a source that never completes the handshake. Many different IPs, all SYN only, in the same second: SYN flood with forged sources."
+    },
+    {
+     "why": "SYN from a source that never completes the handshake. Many different IPs, all SYN only, in the same second: SYN flood with forged sources."
+    },
+    {
+     "why": "A complete connection already negotiating HTTPS: legitimate traffic."
+    },
+    {
+     "why": "SYN from a source that never completes the handshake. Many different IPs, all SYN only, in the same second: SYN flood with forged sources."
+    },
+    {
+     "why": "SYN from a source that never completes the handshake. Many different IPs, all SYN only, in the same second: SYN flood with forged sources."
+    },
+    {
+     "why": "SYN from a source that never completes the handshake. Many different IPs, all SYN only, in the same second: SYN flood with forged sources."
+    },
+    {
+     "why": "DNS query from the server itself, looking up the time server. Nothing to do with the attack."
+    },
+    {
+     "why": "A client with an established connection exchanging encrypted data."
+    }
+   ]
+  },
+  {
+   "title": "DDoS mitigation",
+   "tag": "QUIZ",
+   "cap": "Running to the traffic dashboard...",
+   "goal": "Answer the mitigation questions to hold off the volumetric attack.",
+   "z": "Now it's for real. I'll fill your links until nothing else fits.",
+   "me": "Volumetric isn't solved at my edge. It's solved before it.",
+   "lesson": [
+    "<b>Volumetric DDoS</b> fills the link. If 80 Gbps arrive on a 10G link, nothing on your router helps: the pipe is already full before it.",
+    "<b>Protocol DDoS</b>, like the SYN flood, exhausts server resources (the connection table). That one is handled on the host itself or on the firewall.",
+    "<b>RTBH</b> (Remote Triggered Black Hole): you announce the attacked IP over BGP with a blackhole community, and the upstream drops the traffic before it reaches you.",
+    "<b>Amplification</b> uses open servers (DNS, NTP) to multiply the traffic. The response arrives with the abused service's port as the source.",
+    "<b>Spoofing</b> is forging the source IP. Filtering it at the edge (<b>BCP 38</b>, with uRPF) keeps your network from being used in attacks."
+   ],
+   "check": {
+    "q": "80 Gbps hit a 10 Gbps link. Where does the traffic need to be dropped?",
+    "v": [
+     "80 Gbps of attack against a 10 Gbps link. At what point must the traffic be dropped?",
+     "The attack is 8 times bigger than your link. Where does it need to be stopped?"
+    ],
+    "o": [
+     "Before your link, at the provider (RTBH or scrubbing)",
+     {
+      "t": "On your edge firewall",
+      "why": "By the time it reaches your edge, the link is already full."
+     },
+     {
+      "t": "On the attacked server",
+      "why": "The server doesn't even receive anything: the pipe filled up before."
+     }
+    ],
+    "why": "Volumetric is solved before the bottleneck: the upstream drops or cleans the traffic."
+   },
+   "tip": "Think about where the traffic is dropped. If it already reached your uplink, the link is already full.",
+   "learn": "Layers of DDoS defense: SYN cookies on the host, uRPF against spoofing (BCP 38), ACLs for reflection, RTBH or scrubbing upstream for volumetric.",
+   "qs": [
+    {
+     "q": "The server gets millions of SYNs without completing the handshake and the connection table is full. Most direct mitigation on the host?",
+     "v": [
+      "Millions of SYNs without a complete handshake filled the server's connection table. What do you do on the host itself?",
+      "SYN flood: the server can't take any more half-open connections. What's the most direct mitigation on it?"
+     ],
+     "o": [
+      "Enable SYN cookies",
+      {
+       "t": "Increase the interface MTU",
+       "why": "MTU is the maximum packet size. It has nothing to do with pending connections."
+      },
+      {
+       "t": "Switch TCP to UDP",
+       "why": "The service is TCP. Changing protocol breaks the application and doesn't solve the attack."
+      },
+      {
+       "t": "Put the server behind NAT",
+       "why": "NAT only translates addresses. The SYNs keep arriving and filling the table."
+      }
+     ],
+     "why": "SYN cookies avoid keeping state until the final ACK arrives, so the table doesn't fill up."
+    },
+    {
+     "q": "80 Gbps of junk hit a single customer IP on a 10G uplink. What saves the rest of the network?",
+     "v": [
+      "A 10G uplink gets 80 Gbps of junk aimed at a single customer IP. What protects the rest of the network?",
+      "80 Gbps attack against one customer on a 10G uplink. Which action saves the other customers?"
+     ],
+     "o": [
+      "RTBH: announce the /32 with a blackhole community to the upstream",
+      {
+       "t": "Create an ACL on the edge router",
+       "why": "The ACL drops on your router, but the traffic already crossed and filled the 10G uplink."
+      },
+      {
+       "t": "Restart the edge router",
+       "why": "Restarting takes everything down for minutes, and the attack continues when it comes back."
+      },
+      {
+       "t": "Increase the interface buffer",
+       "why": "A bigger buffer only adds delay. 80 Gbps don't fit in 10G, buffer or not."
+      }
+     ],
+     "why": "If the traffic reached your uplink, the link is already saturated. Only the upstream dropping it earlier solves it. RTBH sacrifices the target IP to save the rest."
+    },
+    {
+     "q": "Which BGP community standardized by RFC 7999 signals blackhole?",
+     "v": [
+      "RFC 7999 standardized which BGP community for blackhole?",
+      "Which well-known BGP community asks the upstream for blackhole (RFC 7999)?"
+     ],
+     "o": [
+      "65535:666",
+      {
+       "t": "65535:65281",
+       "why": "65535:65281 is NO_EXPORT (RFC 1997): don't pass the route outside the AS."
+      },
+      {
+       "t": "0:0",
+       "why": "0:0 isn't a standardized blackhole community."
+      },
+      {
+       "t": "64512:100",
+       "why": "64512 is a private ASN. Communities like that are local: each network defines what they mean."
+      }
+     ],
+     "why": "BLACKHOLE is 65535:666. 65535:65281 is no-export."
+    },
+    {
+     "q": "In DNS amplification, what is the SOURCE port of the traffic reaching the victim?",
+     "v": [
+      "In DNS amplification, which source port does the traffic hitting the victim come from?",
+      "DNS amplification: what is the SOURCE port of the responses reaching the victim?"
+     ],
+     "o": [
+      "UDP 53",
+      {
+       "t": "TCP 53",
+       "why": "Amplification uses UDP, which has no handshake and accepts a forged source IP."
+      },
+      {
+       "t": "UDP 123",
+       "why": "123 is NTP. Here the abused service is DNS."
+      },
+      {
+       "t": "Random above 1024",
+       "why": "That's the DESTINATION port on the victim, the one the attacker put in the forged query."
+      }
+     ],
+     "why": "Responses come from the open resolvers, so the source is 53/UDP. If it were NTP, it would be 123."
+    },
+    {
+     "q": "Which feature drops packets with a forged source IP, with no return route through the inbound interface?",
+     "v": [
+      "Which feature drops packets with a spoofed source by checking for a return route through the inbound interface?",
+      "Which router feature stops a forged source IP by checking the return route through the interface the packet came in on?"
+     ],
+     "o": [
+      "uRPF",
+      {
+       "t": "Spanning Tree",
+       "why": "STP prevents loops at layer 2. It doesn't look at the source IP."
+      },
+      {
+       "t": "LACP",
+       "why": "LACP bundles several physical links into one. It doesn't filter traffic."
+      },
+      {
+       "t": "VRRP",
+       "why": "VRRP provides gateway redundancy between routers."
+      }
+     ],
+     "why": "uRPF strict checks whether the route to the source IP goes out the same interface. It's the basis of BCP 38 against spoofing."
+    }
+   ]
+  },
+  {
+   "title": "Live botnet",
+   "tag": "LIVE DEFENSE",
+   "cap": "Z3R0 on the big screen: the botnet is coming...",
+   "goal": "Turn on the right rules and hold off both botnet waves without taking customers down.",
+   "z": "Enough theory. My whole botnet against your firewall. Live.",
+   "me": "Right rule, at the right time. Bring it.",
+   "intro": "Store <b>177.10.0.5</b> under attack. Tap the rules to turn them on and off at any time. Packets are evaluated at the <b>orange line</b>.",
+   "lesson": [
+    "Now it's real time: packets cross the track and the firewall decides when they cross the orange line.",
+    "Turn on only the rules that stop the attack. A rule that's too broad takes customers down: that's a <b>false positive</b>, and it costs integrity too.",
+    "<b>NTP reflection</b>: the response arrives with <b>source port 123</b>. <b>Telnet</b> (TCP/23) is botnets' favorite port. A known attack source gets blocked by IP.",
+    "Never block your own service's port (the store's 443) or your own network."
+   ],
+   "check": {
+    "q": "What is a false positive on the firewall?",
+    "v": [
+     "On the firewall, what is a false positive?",
+     "When the firewall hits someone it shouldn't, we have a false positive. What is it?"
+    ],
+    "o": [
+     "Blocking a legitimate customer",
+     {
+      "t": "Letting an attack through",
+      "why": "That's a false negative: the attack got away."
+     },
+     {
+      "t": "Blocking an attack",
+      "why": "That's a hit: a true positive."
+     }
+    ],
+    "why": "A false positive is the rule catching who it shouldn't. A rule that's too broad takes customers down."
+   },
+   "tip": "Three rules solve it: UDP with source 123, source 45.67.89.10 and TCP/23. Blocking 443 or 177.10.0.0/16 takes customers down.",
+   "learn": "Layered defense at the edge: an ACL against reflection (UDP source 123), blocking ports that shouldn't be exposed (Telnet) and blocking the identified C2 source. Each rule has to be specific: blocking the service port or your own network is doing the DDoS for the attacker.",
+   "server": "STORE 177.10.0.5",
+   "rules": [
+    {
+     "t": "Block UDP with source 123 (NTP)",
+     "why": "Stops the NTP reflection. The store server syncs its clock from internal NTP, so nothing legitimate arrives from outside with source 123."
+    },
+    {
+     "t": "Block source 45.67.89.10",
+     "why": "Z3R0's C2 IP. It's not a customer: block the source, whatever the port."
+    },
+    {
+     "t": "Block TCP/23 (Telnet)",
+     "why": "Telnet sends the password in plain text and is botnets' favorite port. Management is done over SSH, from inside the network."
+    },
+    {
+     "t": "Block TCP/443 (HTTPS)",
+     "why": "Trap: 443 is the store's port. Blocking it takes customers down, which is exactly what Z3R0 wants."
+    },
+    {
+     "t": "Block source 177.10.0.0/16",
+     "why": "Trap: 177.10 is YOUR network. The internal ERP querying the store would be blocked."
+    }
+   ],
+   "waves": [
+    {
+     "msg": "First wave: NTP reflection, Telnet and the C2 scanning.",
+     "packets": [
+      {
+       "why": "An NTP response nobody asked for: reflection. Source 123 from outside, to a random port on your server."
+      },
+      {
+       "why": "Customer buying at the store (HTTPS). Has to pass."
+      },
+      {
+       "why": "Z3R0's C2 trying SSH on the store. Block it by source."
+      },
+      {
+       "why": "The internal ERP (177.10.3.20) querying the store. It's your network."
+      },
+      {
+       "why": "Bot trying Telnet with a default password, like the Mirai botnet does with cameras and routers."
+      },
+      {
+       "why": "An NTP response nobody asked for: reflection. Source 123 from outside, to a random port on your server."
+      }
+     ]
+    },
+    {
+     "msg": "The botnet sped up! Notice: the C2 now comes in on 443.",
+     "packets": [
+      {
+       "why": "Even on 443, it's Z3R0's C2. Only the source rule catches it without taking customers down."
+      },
+      {
+       "why": "Another customer at the store."
+      },
+      {
+       "why": "Bot trying Telnet with a default password, like the Mirai botnet does with cameras and routers."
+      },
+      {
+       "why": "An NTP response nobody asked for: reflection. Source 123 from outside, to a random port on your server."
+      },
+      {
+       "why": "Customer at the store (HTTPS)."
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

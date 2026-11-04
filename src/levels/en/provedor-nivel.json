@@ -1,0 +1,137 @@
+{
+ "tag": "INTRODUCTION",
+ "name": "ISP leveling",
+ "story": [
+  { "t": "ISP on-call has its own vocabulary and four different vendors in the same rack. Before taking incidents, level up the basics." },
+  { "t": "BNG, CGNAT, display, show, /ip... you'll be lost before I even start." },
+  { "t": "A command changes name on each vendor, but the idea is the same. I'll build my own dictionary." }
+ ],
+ "levels": [
+  {
+   "title": "ISP vocabulary",
+   "tag": "VOCABULARY",
+   "cap": "Opening the ISP diagram...",
+   "heads": ["ACRONYM", "WHAT IT DOES AT THE ISP"],
+   "goal": "Connect each everyday ISP word to what it does.",
+   "z": "Your boss said transit, peering and BNG in the same sentence. You just nodded.",
+   "me": "From the customer to the internet: OLT, BNG, CGNAT, and at the edge transit and peering.",
+   "lesson": [
+    "Follow the customer's path: the fiber reaches the <b>OLT</b>, the <b>PPPoE</b> session ends at the <b>BNG</b> and, if IPv4 is short, <b>CGNAT</b> shares one public IP among many customers.",
+    "At the edge, the ISP is an <b>AS</b>: a network with its own number that exchanges routes over <b>BGP</b>.",
+    "<b>Transit</b> is the paid link with a bigger carrier, which delivers the whole internet.",
+    "<b>Peering</b> is direct exchange with other networks, without paying for transit, often at an exchange point like IX.br.",
+    "Tap the underlined words to open the glossary card."
+   ],
+   "check": {
+    "q": "On which device does the customer's PPPoE session end?",
+    "v": ["Who receives the customers' PPPoE authentication?", "The subscriber's PPPoE session goes as far as which device?"],
+    "o": ["On the BNG", { "t": "On the OLT", "why": "The OLT handles the fiber to the customer's home. The PPPoE session passes through it and ends at the BNG." }, { "t": "On the edge router", "why": "The edge speaks BGP with transit and peering. Customers end at the BNG." }],
+    "why": "The BNG (or BRAS, or concentrator) authenticates the customer, applies the speed plan and hands out the IP."
+   },
+   "tip": "OLT = customer fiber. BNG = ends PPPoE. CGNAT = shares the public IP. AS = the network with a number. Transit = paid, whole internet. Peering = direct exchange.",
+   "learn": "The subscriber's path goes through the OLT (fiber), the BNG (PPPoE, plan and IP) and CGNAT (shared public IP). At the edge, the ISP's AS exchanges routes over BGP with transit, which is paid, and with peering, which is direct.",
+   "left": [
+    { "why": "The OLT sits in the central office and talks to the ONUs at customers' homes over fiber (GPON)." },
+    { "why": "The BNG ends PPPoE sessions, authenticates, applies the plan and hands out the customer's IP." },
+    { "why": "CGNAT puts several customers behind one public IP, each on a range of ports." },
+    { "why": "AS is the Autonomous System: the ISP's network with its own number, speaking BGP with the others." },
+    { "t": "Transit", "why": "Transit is the paid link with a bigger carrier, which delivers routes to the whole internet." },
+    { "why": "Peering is direct traffic exchange with another network, without paying for transit." }
+   ],
+   "right": [
+    { "t": "Connects the customers' fiber", "s": "Sits in the central office", "why": "What talks to the customers' fiber is the OLT." },
+    { "t": "Ends the customer's PPPoE", "why": "The PPPoE session ends at the BNG." },
+    { "t": "Shares one public IP among customers", "why": "Sharing public IPv4 among customers is CGNAT." },
+    { "t": "Network with its own number on the internet", "why": "A network with its own number speaking BGP is an AS." },
+    { "t": "Paid link to the whole internet", "why": "A paid link with routes to everything is transit." },
+    { "t": "Direct exchange, no transit fee", "why": "Direct exchange between networks is peering." }
+   ]
+  },
+  {
+   "title": "Four vendors, one command",
+   "tag": "CLASSIFICATION",
+   "cap": "Opening the rack consoles...",
+   "goal": "Take each command to the vendor that writes it that way.",
+   "intro": "The same ISP runs <b>Cisco</b>, <b>Huawei</b>, <b>Juniper</b> and <b>MikroTik</b>. The commands do the same things, but each <b>CLI</b> writes them its own way. Sort them by vendor.",
+   "z": "You memorized Cisco and I threw you onto a Huawei. You'll type show until you're tired.",
+   "me": "Cisco and Juniper use show, Huawei uses display, MikroTik starts with a slash.",
+   "lesson": [
+    "All four do the same job: view routes, interfaces and configuration. What changes is the <b>CLI</b>, the way of writing.",
+    "<b>Cisco IOS</b> uses show: show ip route, show ip interface brief, show running-config.",
+    "<b>Huawei VRP</b> uses display: display ip routing-table, display ip interface brief, display current-configuration.",
+    "<b>Juniper Junos</b> also uses show, but shorter: show route, show interfaces terse, show configuration.",
+    "<b>MikroTik RouterOS</b> organizes by slash paths: /ip route print, /interface print, /export."
+   ],
+   "check": {
+    "q": "Which vendor uses display instead of show?",
+    "v": ["display ip routing-table is a command from which vendor?", "On which device do you type display to see things?"],
+    "o": ["Huawei", { "t": "Juniper", "why": "Junos uses show, like Cisco, just with other words: show route." }, { "t": "MikroTik", "why": "MikroTik uses slash paths and print: /ip route print." }],
+    "why": "Huawei's VRP uses display for everything that shows information."
+   },
+   "tip": "display = Huawei. Leading slash and print = MikroTik. show ip ... and running-config = Cisco. show route, terse and show configuration = Juniper.",
+   "learn": "View routes: show ip route (Cisco), display ip routing-table (Huawei), show route (Junos), /ip route print (MikroTik). Interfaces: show ip interface brief, display ip interface brief, show interfaces terse, /interface print. Configuration: show running-config, display current-configuration, show configuration, /export.",
+   "buckets": [
+    { "a": [
+     { "why": "Cisco: show ip route shows the IPv4 routing table." },
+     { "why": "Cisco: summary of interfaces with IP and state." },
+     { "why": "Cisco: the configuration running right now." }
+    ] },
+    { "a": [
+     { "why": "Huawei: display instead of show. Shows the routing table." },
+     { "why": "Huawei: interface summary, with display." },
+     { "why": "Huawei: the current configuration. It's the equivalent of running-config." }
+    ] },
+    { "a": [
+     { "why": "Junos: show route, without the ip in the middle, shows the routes." },
+     { "why": "Junos: terse is the short interface summary." },
+     { "why": "Junos: shows the active configuration." }
+    ] },
+    { "a": [
+     { "why": "MikroTik: slash path (/ip route) and print to list." },
+     { "why": "MikroTik: lists the interfaces." },
+     { "why": "MikroTik: shows the configuration as commands." }
+    ] }
+   ]
+  },
+  {
+   "title": "ISP IPv6 without fear",
+   "tag": "IPV6",
+   "cap": "Opening the ISP's IPv6 plan...",
+   "heads": ["BLOCK", "FOR WHOM"],
+   "goal": "Connect each IPv6 block size to who usually uses it.",
+   "z": "/32, /48, /56, /64... to you it's all numbers. I'll hand a /64 to a customer with five networks.",
+   "me": "Largest to smallest: ISP, company, home, local network, one address.",
+   "lesson": [
+    "In IPv6, the <b>smaller</b> the number after the slash, the <b>bigger</b> the block. A /32 is huge; a /128 is a single address.",
+    "The ISP gets a <b>/32</b> block from the registry (in Brazil, NIC.br) and splits it among customers.",
+    "A business customer usually gets a <b>/48</b>; a residential customer, a <b>/56</b>. Each splits it into many /64s.",
+    "Every local network is a <b>/64</b>: it's the size SLAAC needs.",
+    "The block reaches the customer's router via <b>DHCPv6-PD</b>, and inside the home devices configure themselves via <b>RA</b>."
+   ],
+   "check": {
+    "q": "Between /48 and /56, which block is bigger?",
+    "v": ["Which has more addresses: a /48 or a /56?", "Is a /48 bigger or smaller than a /56?"],
+    "o": ["/48", { "t": "/56", "why": "The bigger the number, the more bits are network and the fewer remain inside: a /56 is 256 times smaller than a /48." }, { "t": "They're the same size", "why": "Each prefix bit less doubles the block. That's 8 bits of difference: 256 times." }],
+    "why": "A /48 leaves 80 bits for the customer; a /56 leaves 72. 256 /56 blocks fit inside a /48."
+   },
+   "tip": "/32 = ISP. /48 = company. /56 = home. /64 = one local network. /128 = a single address. fe80::/10 = link-local, which doesn't leave the link.",
+   "learn": "The ISP gets a /32 and hands /48s to businesses and /56s to homes via DHCPv6-PD. Each local network uses a /64, a /128 is a single address (like a router's loopback) and fe80::/10 is the link-local routers use between themselves.",
+   "left": [
+    { "why": "/32 is the block the ISP gets from the registry (NIC.br, LACNIC) to distribute." },
+    { "why": "/48 is the typical block for a business customer: 65,536 /64 networks." },
+    { "why": "/56 is the typical block for a residential customer: 256 /64 networks." },
+    { "why": "/64 is the size of a local network, what SLAAC needs." },
+    { "why": "/128 is a single address, like a router's loopback." },
+    { "why": "fe80::/10 is the link-local: it exists on every interface and doesn't leave the link." }
+   ],
+   "right": [
+    { "t": "The ISP, from the registry", "why": "The big block the ISP gets is the /32." },
+    { "t": "Business customer", "why": "A business usually gets a /48." },
+    { "t": "Residential customer", "why": "A home usually gets a /56." },
+    { "t": "One local network (VLAN)", "why": "Every IPv6 LAN is /64." },
+    { "t": "A single address", "s": "Router loopback", "why": "A single address is a /128." },
+    { "t": "Talk between neighbors on the link", "s": "Not routed", "why": "What doesn't leave the link is the link-local fe80::/10." }
+   ]
+  }
+ ]
+}

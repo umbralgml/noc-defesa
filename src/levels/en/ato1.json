@@ -1,0 +1,559 @@
+{
+ "tag": "ACT 1",
+ "name": "Physical layer and addressing",
+ "story": [
+  {
+   "t": "First real incident: Z3R0 got into the datacenter, ripped out cables and scrambled the addressing."
+  },
+  {
+   "t": "If the base goes down, nothing on top works. Physical layer and addresses: let's see if you learned."
+  },
+  {
+   "t": "Right cable, right IP. Start from the floor."
+  }
+ ],
+ "levels": [
+  {
+   "title": "Rack knocked down",
+   "tag": "CABLING",
+   "cap": "Running to the datacenter rack...",
+   "heads": [
+    "YOUR EQUIPMENT",
+    "WHERE TO PLUG"
+   ],
+   "goal": "Every cable has a type. Connect each device on the left to the compatible port on the right.",
+   "z": "I got into the datacenter and ripped every cable out of your rack. Let's see you plug it all back at 3 a.m.",
+   "me": "Every port has its transceiver. Just read what's written on it.",
+   "lesson": [
+    "A <b>transceiver</b> is the module (SFP, SFP+, SFP28) that turns electrical signal into light. The name tells the reach: <b>SR</b> = short range, <b>LR</b> = long range (up to 10 km).",
+    "<b>Single-mode fiber</b> (OS2, yellow jacket): thin 9 µm core, light follows a single path and goes far, for kilometers. It pairs with <b>LR</b>.",
+    "<b>Multimode fiber</b> (OM3/OM4, aqua jacket): 50 µm core, light follows many paths and spreads, so it only reaches hundreds of meters. It pairs with <b>SR</b>.",
+    "<b>DAC</b>: copper twinax cable with the modules already fixed on the ends. Cheap and no optics, but only good for a few meters, inside the same rack.",
+    "<b>RJ45 + Cat6</b>: twisted-pair copper, up to 100 m. A <b>GPON</b> network uses the <b>SC/APC</b> connector (green), with an angle-polished tip."
+   ],
+   "check": {
+    "q": "A 10GBASE-LR transceiver goes with which cable?",
+    "v": [
+     "Which cable type do you use with a 10GBASE-LR transceiver?",
+     "Which physical medium was the 10GBASE-LR module made for?"
+    ],
+    "o": [
+     "Single-mode fiber",
+     {
+      "t": "Multimode fiber",
+      "why": "Multimode pairs with SR, for short range."
+     },
+     {
+      "t": "DAC cable",
+      "why": "DAC is copper twinax with the modules already fixed, for a few meters."
+     }
+    ],
+    "why": "LR is long range (up to 10 km): it needs single-mode fiber."
+   },
+   "tip": "LR = long range on single-mode fiber (yellow). SR = short range on multimode (aqua). SFP28 in the same rack = DAC. RJ45 = copper. The OLT PON port goes to the optical splitter.",
+   "learn": "OS2 single-mode (yellow) serves LR/ER, kilometers. OM4 multimode (aqua) serves SR, up to about 400 m at 10G. DAC is copper twinax with a built-in transceiver, ideal up to ~5 m. GPON uses SC/APC (green) because the angled polish reduces reflection.",
+   "left": [
+    {
+     "s": "SFP+ 10GBASE-LR · POP 8 km away",
+     "why": "LR (long reach) uses a 1310 nm laser on single-mode fiber and reaches 10 km. For 8 km to the POP, only OS2 works."
+    },
+    {
+     "s": "SFP28 25G · same rack, 1 m",
+     "why": "Two devices in the same rack, 1 m apart: a DAC solves it without paying for optical transceivers."
+    },
+    {
+     "s": "SFP+ 10GBASE-SR · 150 m",
+     "why": "SR (short reach) uses an 850 nm laser on multimode. OM4 carries 10G up to about 400 m, so 150 m is comfortable."
+    },
+    {
+     "t": "NOC workstation",
+     "s": "RJ45 1000BASE-T NIC",
+     "why": "1000BASE-T is Gigabit over copper: Cat6 cable with RJ45, up to 100 m."
+    },
+    {
+     "s": "Class C+ PON module",
+     "why": "The OLT PON port goes out on single-mode fiber with an SC/APC connector to the splitter, which divides the signal for up to 16 customers."
+    }
+   ],
+   "right": [
+    {
+     "t": "Remote POP",
+     "s": "Patch panel with OS2 single-mode fiber",
+     "why": "The remote POP is 8 km away and its fiber panel is single-mode: only an LR transceiver gets there."
+    },
+    {
+     "s": "SFP28 cage in the same rack",
+     "why": "A 25G SFP28 port in the same rack: it needs a 25G DAC, not fiber or RJ45."
+    },
+    {
+     "s": "SFP+ SR · OM4 fiber",
+     "why": "An SFP+ SR port with OM4 fiber: it needs an SR transceiver, short range, a few hundred meters at most."
+    },
+    {
+     "s": "Cat6 patch panel",
+     "why": "A Cat6 patch panel is copper: it only takes a cable with RJ45."
+    },
+    {
+     "s": "Green SC/APC adapter",
+     "why": "An optical splitter with green SC/APC is the end of a GPON network: only the OLT plugs in here."
+    }
+   ]
+  },
+  {
+   "title": "Who is who",
+   "tag": "CLASSIFICATION",
+   "cap": "Opening the logs in the terminal...",
+   "goal": "Drag each IP to the right category: private, CGNAT or public.",
+   "intro": "The logs are full of IPs. Separate what is <b>internal</b>, what is <b>CGNAT</b> and what comes from the <b>internet</b>.",
+   "z": "I filled your logs with IPs. Bet you can't even tell what's internal and what's from the internet.",
+   "me": "RFC 1918 and RFC 6598 I know by heart.",
+   "lesson": [
+    "<b>RFC 1918</b> reserves three private ranges, which are not routed on the internet: <b>10.0.0.0/8</b>, <b>172.16.0.0/12</b> and <b>192.168.0.0/16</b>.",
+    "How to read the prefix: <b>/8</b> fixes the 1st octet, <b>/16</b> fixes the first two. But <b>/12</b> and <b>/10</b> fix only part of the 2nd octet, so you have to check where the range ends.",
+    "The <b>/12</b> of 172 goes from <b>172.16</b> to <b>172.31</b>. 172.15 and 172.32 are already public.",
+    "<b>RFC 6598</b> reserves <b>100.64.0.0/10</b> for <b>CGNAT</b>: the provider gives this IP to the customer and NATs it to a shared public IP. It goes from <b>100.64</b> to <b>100.127</b>.",
+    "Any address outside the reserved ranges is <b>public</b>: routed on the internet and with a registered owner."
+   ],
+   "check": {
+    "q": "The address 172.20.5.1 is:",
+    "v": [
+     "How do you classify the address 172.20.5.1?",
+     "Is the IP 172.20.5.1 public or private?"
+    ],
+    "o": [
+     "Private",
+     {
+      "t": "Public",
+      "why": "172.16.0.0/12 goes from 172.16 to 172.31: 172.20 is inside."
+     },
+     {
+      "t": "CGNAT",
+      "why": "CGNAT is 100.64.0.0/10."
+     }
+    ],
+    "why": "172.20 falls inside 172.16.0.0/12, one of the RFC 1918 private ranges."
+   },
+   "tip": "Private: 10.0.0.0/8, 172.16.0.0/12 (172.16 to 172.31), 192.168.0.0/16. CGNAT: 100.64.0.0/10 (100.64 to 100.127). Everything else here is public.",
+   "learn": "Classic traps: 172.32.x.x is already public because the /12 only goes to 172.31. 100.128.x.x is public because the CGNAT /10 ends at 100.127. 192.169.x.x is public too.",
+   "buckets": [
+    {
+     "label": "PRIVATE · RFC 1918",
+     "a": [
+      {
+       "why": "Starts with 10: it's in 10.0.0.0/8, private."
+      },
+      {
+       "why": "172.16 is the start of 172.16.0.0/12, private."
+      },
+      {
+       "why": "Every 192.168.x.x is private (192.168.0.0/16)."
+      },
+      {
+       "why": "172.31 is the last stretch of the /12 (172.16 to 172.31): still private."
+      }
+     ]
+    },
+    {
+     "label": "CGNAT · RFC 6598",
+     "a": [
+      {
+       "why": "100.64 is the start of 100.64.0.0/10, the CGNAT range."
+      },
+      {
+       "why": "100.100 is between 100.64 and 100.127: CGNAT."
+      },
+      {
+       "why": "100.127 is the last stretch of the /10: still CGNAT."
+      }
+     ]
+    },
+    {
+     "label": "PUBLIC",
+     "a": [
+      {
+       "why": "Google's public DNS, routed on the internet."
+      },
+      {
+       "why": "172.32 is past the end of the /12, which ends at 172.31: it's public."
+      },
+      {
+       "why": "100.128 is past the end of the CGNAT /10, which ends at 100.127: it's public."
+      },
+      {
+       "why": "177.x doesn't fall in any reserved range: it's public."
+      },
+      {
+       "why": "Only 192.168 is private. 192.169 is already public."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Divide and conquer",
+   "tag": "SUBNETS",
+   "cap": "Planning the network segmentation...",
+   "goal": "Split 192.168.10.0/24 into 4 equal subnets by dragging the right values.",
+   "intro": "Isolate the segments: split <b>192.168.10.0/24</b> into <b>4 equal subnets</b>.",
+   "z": "I put everything in one single /24. One broadcast and I reach everybody.",
+   "me": "Then I'll segment it. 4 subnets, 2 borrowed bits.",
+   "lesson": [
+    "A <b>/24</b> has 256 addresses: 8 bits left for hosts. To split it, you <b>borrow bits</b> from the host part for the network part.",
+    "Each borrowed bit doubles the number of subnets: 1 bit = 2, <b>2 bits = 4</b>, 3 bits = 8. So 4 subnets = /24 + 2 = <b>/26</b>.",
+    "Block size = <b>256 − last octet of the mask</b>. A /26 is 255.255.255.<b>192</b>, so blocks have <b>64</b> addresses: .0, .64, .128, .192.",
+    "In each block, the <b>first</b> address is the network and the <b>last</b> is the broadcast. Usable hosts = size − 2."
+   ],
+   "check": {
+    "q": "To split a /24 into 4 equal subnets, what is the new mask?",
+    "v": [
+     "Splitting a /24 into 4 subnets of the same size, which mask will each one have?",
+     "A /24 must become 4 equal subnets. What is the new prefix?"
+    ],
+    "o": [
+     "/26",
+     {
+      "t": "/25",
+      "why": "/25 splits the /24 into only 2 subnets."
+     },
+     {
+      "t": "/28",
+      "why": "/28 gives 16 subnets, more than asked."
+     }
+    ],
+    "why": "4 subnets = 2 borrowed bits: /24 + 2 = /26, blocks of 64."
+   },
+   "tip": "4 subnets = 2 more bits: the /24 becomes /26. Each /26 has 64 addresses (62 usable). Blocks step by 64.",
+   "learn": "/26 = 255.255.255.192, blocks of 64 addresses. Network is the first, broadcast is the last: .0-.63, .64-.127, .128-.191, .192-.255. Usable = 2^6 - 2 = 62.",
+   "html": "<div class=\"kv\">Mask<span class=\"grow\"></span>[m]</div>\n<div class=\"kv\">Usable hosts per subnet<span class=\"grow\"></span>[h]</div>\n<div class=\"grid3\"><div class=\"h\">SUB</div><div class=\"h\">NETWORK 192.168.10.x</div><div class=\"h\">BROADCAST</div>\n<div class=\"h\">A</div>[a1][a2]<div class=\"h\">B</div>[b1][b2]<div class=\"h\">C</div>[c1][c2]<div class=\"h\">D</div>[d1][d2]</div>",
+   "explain": {
+    "h": "A /26 leaves 6 host bits: 2^6 = 64 addresses, minus network and broadcast = 62.",
+    "a1": "The first subnet starts at the beginning of the block: .0.",
+    "a2": "The broadcast is the last address before the next network: 64 − 1 = .63.",
+    "b1": "Blocks step by 64: 0 + 64 = .64.",
+    "b2": "The next network starts at .128, so this one's broadcast is .127.",
+    "c1": "64 + 64 = .128.",
+    "c2": "The next network starts at .192, so the broadcast is .191.",
+    "d1": "128 + 64 = .192, the last subnet.",
+    "d2": "The last address of the /24 is always the broadcast of the last subnet: .255.",
+    "m": "4 subnets need 2 borrowed bits: /26, which is 255.255.255.192."
+   },
+   "chips": [
+    {
+     "why": "/26 mask: blocks of 64 addresses."
+    },
+    {
+     "why": "That's the /27: blocks of 32, which would give 8 subnets. Here it's 4."
+    },
+    {
+     "why": "That's the /25: blocks of 128, which would give only 2 subnets."
+    },
+    {
+     "why": "2^6 − 2 = 62 usable hosts in a /26."
+    },
+    {
+     "why": "64 is the total number of addresses in the /26. Take out the network and the broadcast."
+    },
+    {
+     "why": "30 usable hosts is the size of a /27, not a /26."
+    },
+    {
+     "why": ".0 is the network address of subnet A."
+    },
+    {
+     "why": ".63 is the broadcast of subnet A (.0 to .63)."
+    },
+    {
+     "why": ".64 is the network address of subnet B."
+    },
+    {
+     "why": ".127 is the broadcast of subnet B (.64 to .127)."
+    },
+    {
+     "why": ".128 is the network address of subnet C."
+    },
+    {
+     "why": ".191 is the broadcast of subnet C (.128 to .191)."
+    },
+    {
+     "why": ".192 is the network address of subnet D."
+    },
+    {
+     "why": ".255 is the broadcast of subnet D (.192 to .255)."
+    },
+    {
+     "why": ".32 is a /27 boundary, which steps by 32. Here blocks are 64."
+    },
+    {
+     "why": ".96 is a multiple of 32 but not of 64: a /27 boundary, not a /26 one."
+    },
+    {
+     "why": ".224 is a /27 boundary. In a /26 the blocks start at .0, .64, .128 and .192."
+    }
+   ]
+  },
+  {
+   "title": "Where did the network break?",
+   "tag": "TOPOLOGY",
+   "cap": "Opening the network map...",
+   "goal": "Use pings to find where the path broke and point to the fault on the map.",
+   "z": "I pulled a cable somewhere in your datacenter. Good luck finding which one.",
+   "me": "I don't need luck. I need ping.",
+   "intro": "Finance can't open the network share or the ERP, but the internet works. Send pings from the <b>finance PC</b> and find out <b>where</b> the path breaks.",
+   "lesson": [
+    "To find a fault, test <b>in parts</b>, from nearest to farthest. The problem is between the <b>last point that answers</b> and the <b>first one that doesn't</b>.",
+    "If <b>several</b> destinations go down together, look for what they have <b>in common</b> on the path.",
+    "<b>Traceroute</b> lists the routers (hops) to the destination. Switches work at layer 2 and don't show up in it.",
+    "Start with the <b>physical layer</b>: a dark LED, a loose cable and a disabled port explain a lot of outages."
+   ],
+   "check": {
+    "q": "The ping to the router comes back, but not to the server. Where do you look?",
+    "v": [
+     "The router answers the ping, the server doesn't. Which stretch do you check for the fault?",
+     "The ping gets to the router, but not to the server. Where do you investigate?"
+    ],
+    "o": [
+     "Between the router and the server",
+     {
+      "t": "On the PC the ping came from",
+      "why": "The router answered: the PC and the path to it are fine."
+     },
+     {
+      "t": "On the internet",
+      "why": "The server is internal. The internet isn't even on that path."
+     }
+    ],
+    "why": "The fault is between the last point that answers and the first one that doesn't."
+   },
+   "tip": "Ping the internet (answers?) and a server (fails?). What do the servers have in common that the internet doesn't? The SW-DC and the cable linking the router to it.",
+   "learn": "Isolating the fault by comparing tests is the basis of troubleshooting. Internet ok and servers down = a problem on the stretch only the servers use: the uplink between the router and the SW-DC. Physical layer first: the cable was loose.",
+   "nodes": [
+    {
+     "t": "FINANCE PC"
+    },
+    {
+     "why": "Access switch: connects the PCs on the floor. It's layer 2, forwards by MAC address and doesn't show up in traceroute."
+    },
+    {
+     "t": "ROUTER",
+     "why": "Router and the PC's gateway. Connects the user network to the server network and to the internet exit."
+    },
+    {
+     "why": "Edge firewall: everything going to the internet passes through it."
+    },
+    {
+     "why": "8.8.8.8 is Google's public DNS. A good target to test whether the internet exit works."
+    },
+    {
+     "why": "Datacenter switch: connects the servers. If it, or the cable to it, goes down, all servers vanish together."
+    },
+    {
+     "t": "FILES",
+     "why": "File server, where the finance network share lives."
+    },
+    {
+     "why": "ERP server, the company's management system."
+    }
+   ],
+   "faultName": "On the uplink between the router and the SW-DC",
+   "faultWhy": "The router and the internet answer, but the SW-DC and both servers don't. What they have in common is the uplink from the router to the SW-DC: the fault is there.",
+   "steps": [
+    {
+     "q": "Router and internet answer; SW-DC and servers don't. What does that indicate?",
+     "v": [
+      "Router and internet answer, but SW-DC and servers don't. Where is the fault?",
+      "The ping stops at the SW-DC: everything after it is down, everything before answers. What does that show?"
+     ],
+     "o": [
+      "The fault is between the router and the SW-DC",
+      {
+       "t": "The internet is down",
+       "why": "The ping to 8.8.8.8 came back: the internet exit works."
+      },
+      {
+       "t": "The finance PC is broken",
+       "why": "If it were the PC, nothing would answer, not even the router, which is its gateway."
+      }
+     ],
+     "why": "The problem is between the last point that answers (router) and the first one that doesn't (SW-DC)."
+    },
+    {
+     "q": "On the rack, the uplink port LED is off. What's the first step?",
+     "v": [
+      "The uplink LED on the rack is off. What do you do first?",
+      "Uplink port with no light on the rack. What's the first action?"
+     ],
+     "o": [
+      "Check the cable and reconnect it: physical layer first",
+      {
+       "t": "Restart the file server",
+       "why": "The server isn't to blame: the path to it is cut. Restarting only causes more downtime."
+      },
+      {
+       "t": "Change the finance PC's IP",
+       "why": "An IP address doesn't light an LED. A dark LED is a physical problem (layer 1)."
+      }
+     ],
+     "why": "LED off = no electrical or optical signal. Loose cable, bad crimp or disabled port. Fix the physical layer before touching configuration."
+    }
+   ]
+  },
+  {
+   "title": "Ports and services",
+   "tag": "CONNECTION",
+   "cap": "Reviewing exposed services...",
+   "heads": [
+    "SERVICE",
+    "DEFAULT PORT"
+   ],
+   "goal": "Connect each service to its default port.",
+   "z": "I changed all the port rules. You won't know what to allow.",
+   "me": "Default ports are an analyst's tattoo.",
+   "lesson": [
+    "The <b>IP</b> takes the packet to the machine. The <b>port</b> delivers the packet to the right program inside it.",
+    "<b>TCP</b> opens a connection (handshake) and guarantees delivery. <b>UDP</b> sends without a connection: it's lighter and works well for short queries like DNS and SNMP.",
+    "Ports <b>0 to 1023</b> are the well-known ones, reserved by IANA for standard services.",
+    "On the firewall, knowing the port is knowing what you're exposing. An open port with no need is a way in."
+   ],
+   "check": {
+    "q": "What is the default port for HTTPS?",
+    "v": [
+     "Which port does HTTPS use by default?",
+     "Which protocol and default port does HTTPS use?"
+    ],
+    "o": [
+     "TCP 443",
+     {
+      "t": "TCP 80",
+      "why": "80 is unencrypted HTTP."
+     },
+     {
+      "t": "TCP 22",
+      "why": "22 is SSH."
+     }
+    ],
+    "why": "HTTPS is HTTP over TLS, on TCP port 443."
+   },
+   "tip": "SSH 22, DNS 53, BGP 179, SNMP 161, HTTPS 443, RDP 3389.",
+   "learn": "BGP runs over TCP 179. SNMP uses UDP 161 (traps on 162). DNS uses UDP 53 and falls back to TCP 53 for large responses and zone transfers. RDP exposed on 3389 is one of ransomware's favorite targets.",
+   "left": [
+    {
+     "s": "Secure remote access",
+     "why": "SSH uses TCP 22. It replaced Telnet (23), which sends even the password in plain text."
+    },
+    {
+     "s": "Name resolution",
+     "why": "DNS answers on UDP 53. Large responses and zone transfers use TCP 53."
+    },
+    {
+     "s": "Routing between ASes",
+     "why": "BGP opens a TCP session on port 179 between neighboring routers."
+    },
+    {
+     "s": "Monitoring",
+     "why": "SNMP polls devices on UDP 161. Alerts (traps) arrive on UDP 162."
+    },
+    {
+     "s": "Encrypted web",
+     "why": "HTTPS is HTTP over TLS on TCP 443. Unencrypted HTTP uses 80."
+    },
+    {
+     "s": "Remote desktop",
+     "why": "RDP uses TCP 3389. Exposed on the internet, it's a target for brute force and ransomware."
+    }
+   ],
+   "right": [
+    {
+     "why": "TCP 22 is the SSH port."
+    },
+    {
+     "why": "53 is the DNS port."
+    },
+    {
+     "why": "TCP 179 is the BGP port."
+    },
+    {
+     "why": "UDP 161 is the SNMP port."
+    },
+    {
+     "why": "TCP 443 is the HTTPS port."
+    },
+    {
+     "why": "TCP 3389 is the RDP port."
+    }
+   ]
+  },
+  {
+   "title": "IPv6 without fear",
+   "tag": "IPV6",
+   "cap": "Opening the IPv6 address sheet...",
+   "goal": "Separate the correctly written IPv6 addresses from the wrong ones.",
+   "intro": "The provider already delivers <b>IPv6</b> and a colleague typed the addresses into the sheet. Separate the <b>correct</b> ones from those no device would accept.",
+   "z": "Addresses with letters, colons everywhere... bet you can't even tell if they're right.",
+   "me": "8 groups, hexadecimal and :: only once. You can check it by eye.",
+   "lesson": [
+    "<b>IPv6</b> exists because IPv4 addresses ran out. It has 128 bits: addresses for everything, with no need to split one IP among many customers.",
+    "It's written in <b>8 groups</b> of up to 4 digits, separated by colons: 2001:0db8:0000:0000:0000:0000:0000:0001.",
+    "The digits are <b>hexadecimal</b>: 0 to 9 and a to f. A letter after f doesn't exist in IPv6.",
+    "To shorten: leading zeros in each group can go (0db8 becomes db8) and a run of all-zero groups becomes <b>::</b>.",
+    "The <b>::</b> can only appear once. With two, there's no way to know how many zeros each one hides."
+   ],
+   "check": {
+    "q": "What is the short form of 2001:0db8:0000:0000:0000:0000:0000:0001?",
+    "v": [
+     "Shorten 2001:0db8:0000:0000:0000:0000:0000:0001.",
+     "How does 2001:0db8:0000:0000:0000:0000:0000:0001 look in short form?"
+    ],
+    "o": [
+     "2001:db8::1",
+     {
+      "t": "2001:db8:1",
+      "why": "That leaves only 3 groups. Without ::, there's no way to know there are zeros in the middle."
+     },
+     {
+      "t": "21:db8::1",
+      "why": "Only the leading zeros of each group can go. 2001 has no leading zero."
+     }
+    ],
+    "why": "0db8 loses the leading zero, and the five 0000 groups in the middle become a single ::."
+   },
+   "tip": "Check three things: at most 8 groups, only digits 0 to 9 and letters a to f, and :: at most once. Each group has up to 4 digits.",
+   "learn": "IPv6 is 8 groups of up to 4 hexadecimal digits. Leading zeros go away and a run of all-zero groups becomes ::, but only once. A letter after f, a 5-digit group or more than 8 groups make the address invalid.",
+   "buckets": [
+    {
+     "label": "CORRECTLY WRITTEN",
+     "a": [
+      {
+       "why": "Correct: 2001:0db8:0000:0000:0000:0000:0000:0001 shortened, with a single ::."
+      },
+      {
+       "why": "Correct: the :: hides the 6 all-zero groups in the middle. This is a link-local, common as a router address."
+      },
+      {
+       "why": "Correct: all-zero groups can stay as 0, and :: appears only once."
+      },
+      {
+       "why": "Correct: 7 all-zero groups and a final 1. It's the IPv6 loopback, like 127.0.0.1."
+      }
+     ]
+    },
+    {
+     "label": "WRONGLY WRITTEN",
+     "a": [
+      {
+       "why": "Wrong: two ::. There's no way to know how many all-zero groups each one hides."
+      },
+      {
+       "why": "Wrong: g and h don't exist in hexadecimal, which only goes up to f."
+      },
+      {
+       "why": "Wrong: a group has at most 4 digits (16 bits)."
+      },
+      {
+       "why": "Wrong: that's 9 groups. IPv6 has exactly 8."
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

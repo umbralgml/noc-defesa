@@ -93,7 +93,7 @@ export function setMute(m) {
   if (MASTER) MASTER.gain.setTargetAtTime(m ? 0 : .9, AC.currentTime, .05);
   if (!m && AC && MUS.cur && !MUS.timer) { const c = MUS.cur; MUS.cur = null; music(c); }
   if (m) stopMusic();
-  document.querySelectorAll('#sndT,#sndG').forEach(b => b.textContent = 'SOM: ' + (m ? 'OFF' : 'ON'));
+  document.querySelectorAll('#sndT,#sndG,#sndP').forEach(b => b.textContent = 'SOM: ' + (m ? 'OFF' : 'ON'));
   document.querySelectorAll('#sndM').forEach(b => b.style.opacity = m ? .4 : 1);
 }
 export const isMuted = () => muted;

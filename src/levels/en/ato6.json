@@ -1,0 +1,148 @@
+{
+ "tag": "ACT 7",
+ "name": "Troubleshooting in the terminal",
+ "story": [
+  { "t": "Z3R0 went straight into the device configs. Investigate in the terminal before touching anything." },
+  { "t": "A line here, a shutdown there. Find it if you can." },
+  { "t": "show, log, and only then configure terminal." }
+ ],
+ "levels": [
+  {
+   "title": "Link down",
+   "tag": "TERMINAL",
+   "cap": "Plugging the console cable into the core switch...",
+   "goal": "Investigate the core switch, find out why floor 2 went down and fix it.",
+   "intro": "<b>Floor 2</b> (VLAN 20) has no network. You're on the <b>SW-CORE</b> console. Investigate before touching anything.",
+   "z": "I got into your core switch and shut a port. Guess which one. All of floor 2 is offline.",
+   "me": "I won't guess. I'll look.",
+   "lesson": [
+    "<b>Troubleshooting</b> is method: confirm the symptom, gather evidence, diagnose and only then fix.",
+    "<b>show ip interface brief</b>: Status is layer 1 (physical) and Protocol is layer 2. <b>administratively down</b> = port shut by command.",
+    "<b>show interfaces status</b>: <b>connected</b> ok, <b>notconnect</b> no cable or the other side off, <b>disabled</b> shut down, <b>err-disabled</b> shut by a protection.",
+    "<b>show logging</b> tells what changed, when and who changed it. <b>show running-config</b> shows the configuration in use.",
+    "In IOS, <b>no</b> undoes a command. And <b>copy running-config startup-config</b> saves the configuration so it survives a reboot."
+   ],
+   "tip": "\"administratively down\" is shutdown. Fix it with \"no shutdown\" on the interface and close the intruder's VTY access.",
+   "learn": "An \"administratively down\" interface was shut by command, and \"no shutdown\" brings it back. The log showed who did it (z3r0 via vty0), so the full fix includes an ACL on VTY access, new credentials and saving the configuration.",
+   "cmds": [
+    { "why": "Summarizes each interface: IP, Status (layer 1) and Protocol (layer 2). \"administratively down\" means someone ran shutdown." },
+    { "why": "Shows the state of each switch port. \"disabled\" is a port shut by configuration; \"notconnect\" would be the cable; \"err-disabled\" would be a protection, like port-security." },
+    { "why": "The log says what changed, when and who changed it. Always check the log before touching anything." },
+    { "why": "Shows the interface configuration. The \"shutdown\" line turns the port off." },
+    { "why": "Confirms the symptom: no machine on floor 2 (VLAN 20) answers. Each \".\" is an unanswered packet." }
+   ],
+   "steps": [
+    {
+     "q": "Why is floor 2 offline?",
+     "v": ["What left floor 2 without network?", "From what you saw in the terminal, what caused floor 2 to go down?"],
+     "o": ["Gi1/0/2 was turned off with shutdown", { "t": "The Gi1/0/2 cable broke", "why": "A broken cable shows as \"down/down\" or \"notconnect\", not \"administratively down\"." }, { "t": "VLAN 20 was deleted", "why": "The VLAN exists: SVI Vlan20 shows up in the list. The problem is that the port carrying the VLAN is shut." }, { "t": "Duplex mismatch on the port", "why": "A wrong duplex causes errors and slowness, but the port stays up." }],
+     "why": "Status \"administratively down\" and the \"shutdown\" line in the config: someone turned the port off on purpose. The log shows it was z3r0, via vty0."
+    },
+    {
+     "q": "Inside \"interface Gi1/0/2\", which command turns the port back on?",
+     "v": ["Already in \"interface Gi1/0/2\", which command enables the port?", "Which command, inside interface Gi1/0/2, puts the port back in service?"],
+     "o": ["no shutdown", { "t": "shutdown", "why": "shutdown is exactly what turns the port off." }, { "t": "reload", "why": "Restarting the switch takes everyone down, and the port comes back off: the shutdown is in the config." }, { "t": "clear counters", "why": "Resets the interface counters. It doesn't change the port state." }],
+     "why": "In IOS, \"no\" undoes a command: \"no shutdown\" turns the port on again."
+    },
+    {
+     "q": "Network back up. What stops Z3R0 from doing it again?",
+     "v": ["The network is back. How do you stop Z3R0 from doing this again?", "Port back on. What do you do so Z3R0 can't get into the switch again?"],
+     "o": ["Restrict VTY access with an ACL, change the credentials and save", { "t": "Delete the log so he can't see what you did", "why": "Without the log you lose the evidence and can't see the next attack." }, { "t": "Move the port to VLAN 1", "why": "The VLAN has nothing to do with who reaches the switch's management." }, { "t": "Nothing: it was just one port", "why": "He had config access to the core switch. That's an incident." }],
+     "why": "The log shows z3r0 logging in via vty0 from 45.67.89.10. An ACL on \"line vty\" (access-class) only lets the management network in, a new password cuts his access, and saving makes sure the fix survives a reboot."
+    }
+   ]
+  },
+  {
+   "title": "Missing route",
+   "tag": "TERMINAL",
+   "cap": "Opening the edge router console...",
+   "goal": "Investigate the edge router, find out why the internet went down and restore it.",
+   "intro": "Nobody can reach the internet, but the internal network works. <b>RT-BORDA</b> console: the provider link is <b>Gi0/0</b> (200.1.1.2/30), and the provider is <b>200.1.1.1</b>.",
+   "z": "I deleted one line from your edge router's config. Just one. The whole company is without internet.",
+   "me": "One line. Let's see which.",
+   "lesson": [
+    "Method: a <b>ping</b> to the next hop (the provider's gateway) separates a link problem from a routing problem.",
+    "<b>show ip route</b>: C = connected, S = static, B = BGP. <b>Gateway of last resort</b> is the default route (0.0.0.0/0).",
+    "Without a default route, the router drops everything not in the table: the internet vanishes, but the local network keeps working.",
+    "<b>traceroute</b> shows how far the packet gets. Dying at hop 1 = the problem is on the router itself.",
+    "<b>show running-config | include</b> filters the configuration. On a router, the way out to the internet is <b>ip route 0.0.0.0 0.0.0.0 next-hop</b>."
+   ],
+   "tip": "The provider gateway answers and the internet doesn't: it's routing. \"Gateway of last resort is not set\" = the default route is missing. Bring it back with ip route 0.0.0.0 0.0.0.0 200.1.1.1.",
+   "learn": "Link up + gateway ping OK + internet down = routing problem. The default route (ip route 0.0.0.0 0.0.0.0 200.1.1.1) had been deleted; connected networks (C) keep working without it.",
+   "cmds": [
+    { "why": "The routing table. \"Gateway of last resort is not set\" = there's no default route: the router doesn't know where to send what isn't in the table." },
+    { "why": "The provider gateway answers: the physical link and the /30 with the provider are up." },
+    { "why": "The internet doesn't answer. Since the provider link is up, the problem is routing." },
+    { "why": "Not even the first hop answers: the packet doesn't leave the router." },
+    { "why": "With command logging on (archive log config), every typed line is recorded. Here you see the exact command the intruder used." },
+    { "why": "Filters the configuration for static routes. Empty: the default route was deleted." }
+   ],
+   "steps": [
+    {
+     "q": "Why did the internet go down for everyone?",
+     "v": ["What's the reason the internet went down for everybody?", "From what you saw in the terminal, why can't anyone get to the internet?"],
+     "o": ["The router no longer has a default route", { "t": "The provider link went down", "why": "The ping to 200.1.1.1 answers: the link is up." }, { "t": "DNS stopped", "why": "The ping goes straight to the IP 8.8.8.8 and still fails. It's not DNS." }, { "t": "The provider blocked 8.8.8.8", "why": "The traceroute dies at the first hop: the packet doesn't even leave your router." }],
+     "why": "Without a default route (\"Gateway of last resort is not set\"), anything that isn't a known network is dropped. The log shows z3r0's \"no ip route 0.0.0.0 0.0.0.0 200.1.1.1\"."
+    },
+    {
+     "q": "Which command restores the way out to the internet?",
+     "v": ["Which command brings back internet access?", "How do you recreate the default route to the provider?"],
+     "o": ["ip route 0.0.0.0 0.0.0.0 200.1.1.1", { "t": "ip route 200.1.1.1 255.255.255.255 0.0.0.0", "why": "It's backwards: the destination is 0.0.0.0/0 (any network) and the next hop is the provider." }, { "t": "ip default-gateway 200.1.1.1", "why": "ip default-gateway only applies with routing turned off, like on an L2 switch. On a router, use a default route." }, { "t": "ip route 8.8.8.8 255.255.255.255 200.1.1.1", "why": "That only reaches 8.8.8.8. The rest of the internet would stay down." }],
+     "why": "Default route: destination 0.0.0.0 with mask 0.0.0.0 (any network) and next hop 200.1.1.1, the provider."
+    },
+    {
+     "q": "Why did the ping to 200.1.1.1 work even without a default route?",
+     "v": ["Without a default route, why did the ping to 200.1.1.1 still answer?", "How did 200.1.1.1 answer the ping even with no default route configured?"],
+     "o": ["It's on a directly connected network (the /30 with the provider)", { "t": "Because ping doesn't use the routing table", "why": "Every IP packet checks the routing table, ping included." }, { "t": "Because the provider has a route to you", "why": "The provider's return route doesn't help your router find the outbound path." }, { "t": "It was the ARP cache", "why": "ARP resolves MACs on the local network. The path is decided by the \"C\" (connected) route." }],
+     "why": "Directly connected networks enter the table on their own (code C). 200.1.1.1 is on Gi0/0's /30, so it doesn't depend on the default route."
+    }
+   ]
+  },
+  {
+   "title": "Final counterattack",
+   "tag": "LIVE DEFENSE",
+   "cap": "Z3R0 on the big screen: counterattack on every front...",
+   "goal": "Turn on the 4 right rules and hold both waves without breaking BGP, ICMP or customers.",
+   "z": "Last card. Everything I've got, all at once, no labels. Let's see you read packets in a panic.",
+   "me": "I'll read them. Source, protocol, port. One rule at a time.",
+   "intro": "Final attack on the <b>177.10.0.0/22</b> edge. Packets arrive <b>without color</b>: it only shows up after the firewall decides.",
+   "lesson": [
+    "No colors now: read each packet's <b>source</b>, <b>protocol</b> and <b>port</b> and decide by the rules. The format is \"source PROTO source-port→destination-port\".",
+    "<b>Anti-spoofing</b> (BCP 38/84): no private source (10/8, 172.16/12, 192.168/16) can arrive from the internet. If it did, it's forged.",
+    "<b>Reflection</b>: the response arrives with the abused service's port as the <b>source</b> (memcached 11211, NTP 123). Careful: the DNS answer YOUR resolver asked for also comes from 53.",
+    "Don't block what keeps the edge up: <b>BGP</b> (TCP/179) with the carrier and the necessary <b>ICMP</b> (monitoring ping, PMTUD)."
+   ],
+   "tip": "Four rules: source 10.0.0.0/8, UDP with source 11211, TCP/3389 and source 45.67.89.0/24. ICMP, TCP/179 and TCP/443 carry legitimate traffic.",
+   "learn": "A well-filtered edge: anti-spoofing (BCP 38/84), an ACL against reflection by source port, admin ports off the internet (RDP only over VPN) and blocking the attacker's ranges. Without breaking what keeps the network up: the BGP session with the carrier and essential ICMP.",
+   "server": "EDGE 177.10.0.0/22",
+   "rules": [
+    { "t": "Block source 10.0.0.0/8 from the internet", "why": "Anti-spoofing: nobody on the internet uses 10.x (RFC 1918). An internet packet with that source is forged." },
+    { "t": "Block UDP with source 11211 (memcached)", "why": "Stops the memcached reflection. You don't query memcached from outside, so no legitimate response arrives with that source." },
+    { "t": "Block TCP/3389 (RDP)", "why": "RDP exposed to the internet is a ransomware entry point. Remote access only over VPN." },
+    { "t": "Block source 45.67.89.0/24 (C2 network)", "why": "Z3R0's C2 range, already identified in the IoCs. Block the source, whatever the port." },
+    { "t": "Block all ICMP", "why": "Trap: blocking all ICMP breaks ping, traceroute and Path MTU Discovery (the \"fragmentation needed\" message). Filter ICMP carefully." },
+    { "t": "Block TCP/179 (BGP)", "why": "Trap: 179 is the BGP session with the carrier. Blocking it drops your routes and takes the network offline." },
+    { "t": "Block TCP/443 (HTTPS)", "why": "Trap: 443 is the customers' port. Blocking it is doing the DDoS for Z3R0." }
+   ],
+   "waves": [
+    { "msg": "First wave: spoofing, reflection and the C2 network.", "packets": [
+     { "why": "A 10.x source arriving from the internet: forged IP. Even on 443, it's an attack." },
+     { "why": "Store customer over HTTPS." },
+     { "why": "A memcached response nobody asked for: reflection with huge amplification (that's how the 1.3 Tbps attack on GitHub happened in 2018). Source 11211." },
+     { "why": "Keepalive of the BGP session with the carrier (200.1.1.1). Without it, your routes disappear." },
+     { "why": "C2 range (45.67.89.0/24). Only the source rule catches it without taking customers down." },
+     { "why": "A DNS answer your resolver asked 8.8.8.8 for. Legitimate traffic, even coming from 53." }
+    ] },
+    { "msg": "Z3R0 sped up: RDP, more reflection and more spoofing.", "packets": [
+     { "why": "RDP brute force from the internet." },
+     { "why": "Ping from the external monitoring service. Blocking all ICMP hides the network from it and breaks PMTUD." },
+     { "why": "A 10.x source from the internet: forged. And it even looks like memcached reflection." },
+     { "why": "Z3R0's C2 trying SSH." },
+     { "why": "A memcached response nobody asked for: reflection with huge amplification (that's how the 1.3 Tbps attack on GitHub happened in 2018). Source 11211." },
+     { "why": "Store customer (HTTPS)." },
+     { "why": "More RDP brute force." }
+    ] }
+   ]
+  }
+ ]
+}

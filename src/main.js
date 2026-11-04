@@ -6,7 +6,7 @@ import { AV_ME } from './engine/scene.js';
 import { titleSVG } from './engine/titlescene.js';
 import { loadLevels } from './engine/levels.js';
 import { show, modal, closeModal } from './engine/ui.js';
-import { initGame, renderMap, askReset } from './engine/game.js';
+import { initGame, renderMap } from './engine/game.js';
 import { progress } from './engine/state.js';
 import { loadNews, markNewsSeen } from './engine/news.js';
 import { initDaily, startDaily, dailyBoard, readChallenge } from './engine/daily.js';
@@ -23,7 +23,8 @@ import { rankOf, RANKS } from './engine/career.js';
 import { achHTML, achCount, ACH } from './engine/ach.js';
 import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
-import { applyPrefs, lookModal, a11yModal } from './engine/prefs.js';
+import { applyPrefs } from './engine/prefs.js';
+import { openPerfil } from './engine/perfil.js';
 
 applyPrefs();
 initI18n();
@@ -35,13 +36,12 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
 else if (PLAY_URL) { const a = $('tPlay'); a.href = PLAY_URL; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('role'); a.classList.add('live'); $('tPlayK').textContent = 'JÁ DISPONÍVEL'; $('tPlayT').textContent = 'Baixe na Play Store'; a.setAttribute('aria-label', 'Baixar o app na Play Store'); }
 $('tScene').innerHTML = titleSVG() + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
 
-$('sndT').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(MUS.cur || 'menu'); };
 $('sndM').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music('menu'); };
 setMute(isMuted());
-$('resetBtn').onclick = () => askReset(showProgress);
-$('lookBtn').onclick = () => { au(); lookModal(); };
+// Perfil: personagem, dados do ranking e ajustes (som, acessibilidade, zerar progresso) num painel só.
+const home = () => { showProgress(); showWho(); showRank(); };
+$('lookBtn').onclick = () => { au(); openPerfil('char', home); };
 $('contactT').onclick = $('contactM').onclick = () => { au(); openContact(); };
-$('a11yBtn').onclick = () => { au(); a11yModal(); };
 // Idioma: bandeiras logo abaixo de Opções. A troca recarrega a página (fases, glossário e telas são montados no idioma escolhido).
 const FLAGS = {
   pt: '<rect width="30" height="20" fill="#009c3b"/><path d="M15 2.6 27.4 10 15 17.4 2.6 10z" fill="#ffdf00"/><circle cx="15" cy="10" r="4.4" fill="#002776"/><path d="M10.8 9.2q4.2-1.3 8.4 1.2" stroke="#fff" stroke-width=".9" fill="none"/>',
@@ -84,7 +84,7 @@ function showWho() {
 }
 hooks.profile = () => { showWho(); };
 showWho();
-$('tWhoEdit').onclick = () => profileForm();
+$('tWhoEdit').onclick = () => { au(); openPerfil('data', home); };
 // Mapa → tela inicial, com resumo e ranking atualizados.
 $('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); show('title'); };
 document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openBoard('rank'); });

@@ -1,0 +1,631 @@
+{
+ "tag": "ACTO 1",
+ "name": "Servidor Linux de guardia",
+ "story": [
+  {
+   "t": "Hoy hay guardia de servidores. Nadie invadió nada todavía, pero un servidor Linux también se cae solo: disco lleno, servicio que no sube, memoria que se acaba."
+  },
+  {
+   "t": "Ni necesito atacar. Espero a que el disco se llene y el kernel mate tu base de datos por mí."
+  },
+  {
+   "t": "df, systemctl, journalctl, free. El servidor habla, yo solo necesito saber preguntar."
+  }
+ ],
+ "levels": [
+  {
+   "title": "Permisos en número",
+   "tag": "PERMISOS",
+   "cap": "Abriendo la auditoría de permisos...",
+   "heads": [
+    "CHMOD",
+    "QUIÉN PUEDE QUÉ"
+   ],
+   "goal": "Conecta cada permiso en número con lo que permite.",
+   "z": "chmod 777 en todo y listo. Rápido, práctico y genial para mí.",
+   "me": "Cada dígito es dueño, grupo y otros. Solo se permite lo que hace falta.",
+   "lesson": [
+    "Cada archivo tiene permisos para el <b>dueño</b>, el <b>grupo</b> y los <b>otros</b>, en ese orden.",
+    "En número: <b>r = 4</b> (leer), <b>w = 2</b> (escribir), <b>x = 1</b> (ejecutar). Suma: 6 = rw, 5 = rx, 7 = rwx, 4 = solo r, 0 = nada.",
+    "En un directorio, <b>x</b> es el derecho a entrar en él. Por eso un directorio suele ser 755 o 700.",
+    "Un cuarto dígito adelante enciende bits especiales: <b>4</b> es el <b>setuid</b>, el programa corre con el permiso del dueño del archivo."
+   ],
+   "tip": "Lee dígito por dígito: dueño, grupo, otros. 6 = rw, 5 = rx, 4 = r, 0 = nada. El 4 adelante en 4755 es el setuid.",
+   "learn": "644 para un archivo común, 600 para un secreto, 755 para directorios y scripts, 700 para una carpeta privada como ~/.ssh, 640 para una config que lee el grupo del servicio y 4755 para programas setuid como passwd.",
+   "left": [
+    {
+     "why": "644: el dueño lee y escribe, grupo y otros solo leen. Es el estándar de un archivo común, como el index.html del sitio."
+    },
+    {
+     "why": "600: solo el dueño lee y escribe. Es lo correcto para un secreto, como la clave privada ~/.ssh/id_ed25519."
+    },
+    {
+     "why": "755: el dueño hace todo, grupo y otros leen y entran o ejecutan. Estándar de directorio y de script público."
+    },
+    {
+     "why": "700: solo el dueño entra, lee y escribe. SSH espera que ~/.ssh esté así."
+    },
+    {
+     "why": "640: el dueño lee y escribe, el grupo solo lee, los otros nada. Bueno para una config con contraseña que lee el grupo del servicio."
+    },
+    {
+     "why": "4755: el 4 adelante es el setuid. El programa corre con el permiso del dueño, como /usr/bin/passwd, que es de root."
+    }
+   ],
+   "right": [
+    {
+     "t": "Todos leen, solo el dueño modifica",
+     "s": "Archivo del sitio",
+     "why": "Todos leen y solo el dueño escribe: 6 para el dueño, 4 para grupo y otros, 644."
+    },
+    {
+     "t": "Solo el dueño lee y escribe",
+     "s": "Clave privada SSH",
+     "why": "Solo el dueño con lectura y escritura: 6 para el dueño, 0 para el resto, 600."
+    },
+    {
+     "t": "Todos entran, solo el dueño modifica",
+     "s": "Directorio /var/www",
+     "why": "Entrar en el directorio exige x: 7 para el dueño y 5 (r + x) para grupo y otros, 755."
+    },
+    {
+     "t": "Solo el dueño entra",
+     "s": "Carpeta ~/.ssh",
+     "why": "Solo el dueño con todo y nadie más: 7 y dos ceros, 700."
+    },
+    {
+     "t": "El grupo lee, los otros nada",
+     "s": "Config con contraseña",
+     "why": "Dueño rw (6), grupo solo r (4), otros nada (0): 640."
+    },
+    {
+     "t": "Corre como el dueño del archivo",
+     "why": "Correr con el permiso del dueño es el setuid, el 4 del cuarto dígito: 4755."
+    }
+   ]
+  },
+  {
+   "title": "Disco lleno de madrugada",
+   "tag": "TERMINAL LINUX",
+   "cap": "Conectando por SSH al app01...",
+   "goal": "Descubre qué llenó el disco del app01 y libera espacio sin tumbar la aplicación.",
+   "intro": "El sistema de pedidos dejó de grabar y el log muestra <b>No space left on device</b>. Investiga el <b>app01</b>.",
+   "z": "Ni tuve que invadir. Un log olvidado hizo el trabajo por mí.",
+   "me": "df para ver qué se llenó, du para encontrar al culpable.",
+   "lesson": [
+    "<b>df -h</b> muestra el uso de cada sistema de archivos. <b>du</b> muestra cuánto ocupa cada carpeta.",
+    "Borrar con <b>rm</b> un archivo que un proceso todavía tiene abierto no libera espacio: el disco solo se libera cuando el proceso cierra el archivo. <b>lsof +L1</b> muestra esos archivos borrados y todavía abiertos.",
+    "<b>truncate -s 0</b> vacía el archivo sin borrarlo, y el espacio vuelve al instante aunque el proceso siga escribiendo en él.",
+    "<b>logrotate</b> rota y comprime logs. Con <b>copytruncate</b>, copia y vacía el archivo, para programas que no reabren el log solos."
+   ],
+   "tip": "/var/log/app tiene un debug.log de 31G porque el log quedó en DEBUG. Vacíalo con truncate (rm no libera mientras Java tenga el archivo abierto) y crea una regla de logrotate.",
+   "learn": "El log en DEBUG llenó el disco con un archivo de 31G. truncate liberó el espacio sin detener la aplicación, y logrotate con maxsize, compress y copytruncate impide que vuelva a pasar. Y rm sobre un archivo abierto no libera nada: lsof +L1 muestra el archivo fantasma.",
+   "cmds": [
+    {
+     "why": "El / (raíz, /dev/sda2) está en 100% sin espacio libre. Used muestra 38G de 40G porque ext4 reserva cerca del 5% para root."
+    },
+    {
+     "why": "du suma el tamaño de cada carpeta. De los 35G de /var, 32G están en /var/log: son logs."
+    },
+    {
+     "why": "Un solo archivo, debug.log, tiene 31G. Todavía se está escribiendo (hora actual)."
+    },
+    {
+     "why": "Alguien encendió el modo DEBUG para una prueba y se olvidó. DEBUG graba cada detalle y genera gigabytes por día."
+    },
+    {
+     "why": "El proceso java (PID 1432) tiene el archivo abierto para escritura (5w). Eso cambia la forma correcta de liberar el espacio."
+    }
+   ],
+   "steps": [
+    {
+     "q": "¿Qué llenó el disco?",
+     "v": [
+      "¿Quién es el culpable del disco al 100%?",
+      "Por lo que investigaste, ¿qué ocupó el espacio?"
+     ],
+     "o": [
+      "El debug.log de la aplicación, con 31G, por el log en DEBUG",
+      {
+       "t": "Los paquetes en /var/cache",
+       "why": "/var/cache tiene 1.4G: pesa poco al lado de los 32G de /var/log."
+      },
+      {
+       "t": "El /boot/efi",
+       "why": "/boot/efi es otra partición, con 1% de uso. No afecta al /."
+      },
+      {
+       "t": "La base de datos en /var/lib",
+       "why": "/var/lib tiene 1.2G. Lo que creció fue el log."
+      }
+     ],
+     "why": "df mostró / al 100%, du apuntó a /var/log y ls encontró el debug.log de 31G, generado por el log_level en DEBUG."
+    },
+    {
+     "q": "¿Cómo liberar espacio ahora sin detener la aplicación?",
+     "v": [
+      "¿Cuál es la forma segura de recuperar el espacio ya, con el sistema corriendo?",
+      "¿Cómo vaciar ese log sin tumbar el servicio de pedidos?"
+     ],
+     "o": [
+      "Vaciar el archivo con truncate -s 0",
+      {
+       "t": "Borrar el debug.log con rm",
+       "why": "java tiene el archivo abierto: con rm el nombre desaparece, pero el espacio solo vuelve cuando el proceso cierre el archivo. df seguiría en 100%."
+      },
+      {
+       "t": "Reiniciar el servidor",
+       "why": "Libera el espacio, pero tumba el sistema de pedidos y no resuelve la causa: el log vuelve a crecer."
+      },
+      {
+       "t": "Borrar /var/log/journal",
+       "why": "El journal no es el culpable y es donde están los logs del sistema que ayudan a investigar."
+      }
+     ],
+     "why": "truncate pone en cero el tamaño del archivo que el proceso sigue usando. El espacio vuelve al instante y la aplicación sigue grabando en el mismo archivo."
+    },
+    {
+     "q": "Un colega ya había ejecutado rm sobre un log grande y df no cambió. ¿Cómo encontrar ese archivo?",
+     "v": [
+      "Alguien borró un log con rm y el espacio no volvió. ¿Qué comando muestra el archivo?",
+      "El espacio no volvió después de un rm. ¿Cómo encontrar el archivo borrado que todavía ocupa el disco?"
+     ],
+     "o": [
+      "sudo lsof +L1, que lista los archivos borrados todavía abiertos por algún proceso",
+      {
+       "t": "sudo du -sh /",
+       "why": "du solo suma archivos que todavía tienen nombre. El archivo borrado no aparece, por eso df y du no coinciden."
+      },
+      {
+       "t": "ls -la /var/log",
+       "why": "El nombre ya se quitó del directorio: ls ya no muestra el archivo."
+      },
+      {
+       "t": "sudo fsck /",
+       "why": "fsck verifica la estructura del sistema de archivos. No es para esto, y ejecutarlo con el disco montado es riesgoso."
+      }
+     ],
+     "why": "lsof +L1 muestra archivos con cero enlaces (sin nombre) todavía abiertos, marcados como (deleted). Reiniciar el proceso dueño o truncar vía /proc/PID/fd libera el espacio."
+    },
+    {
+     "q": "¿Y para que no se llene de nuevo?",
+     "v": [
+      "¿Cómo evitar que el disco se vuelva a llenar?",
+      "¿Cuál es la corrección definitiva?"
+     ],
+     "o": [
+      "Volver el log a INFO y crear una regla de logrotate con tamaño máximo, compresión y copytruncate",
+      {
+       "t": "Programar un rm del log cada madrugada",
+       "why": "rm sobre un archivo abierto no libera espacio, y pierdes todo el historial de una vez."
+      },
+      {
+       "t": "Ampliar el disco a 80G",
+       "why": "Solo lo posterga: con el log en DEBUG, 80G también se llenan."
+      },
+      {
+       "t": "Apagar los logs de la aplicación",
+       "why": "Sin log, el próximo problema queda sin pistas para investigar."
+      }
+     ],
+     "why": "La causa es el nivel DEBUG. logrotate limita el tamaño, guarda pocas copias comprimidas y, con copytruncate, funciona con programas que no reabren el archivo de log."
+    }
+   ]
+  },
+  {
+   "title": "Nginx no sube",
+   "tag": "TERMINAL LINUX",
+   "cap": "Conectando por SSH al web02...",
+   "goal": "Descubre por qué nginx no sube en el web02 y pon el sitio en el aire.",
+   "intro": "Después del mantenimiento de ayer, el <b>web02</b> reinició y el sitio no volvió. <b>nginx</b> no sube.",
+   "z": "Alguien instaló un paquete ayer. Un solo paquete. ¿Adivina qué vino con él?",
+   "me": "systemctl status y journalctl. El motivo está en el log.",
+   "lesson": [
+    "<b>systemctl status</b> muestra si el servicio está activo y el resultado del último intento. <b>journalctl -u</b> muestra el log del servicio.",
+    "Dos cosas no pueden escuchar en el mismo puerto y dirección. El error <b>Address already in use</b> quiere decir que otro proceso tomó el puerto.",
+    "<b>systemctl stop</b> detiene el servicio ahora. <b>systemctl disable</b> impide que suba en el arranque. <b>disable --now</b> hace las dos cosas.",
+    "<b>apt</b> instala también las dependencias y los paquetes recomendados, marcados como automatic. El historial queda en <b>/var/log/apt/history.log</b>."
+   ],
+   "tip": "El journal dice que el puerto 80 ya está en uso. ss muestra a apache2 en él, instalado junto con libapache2-mod-php. Deshabilita apache2 y sube nginx.",
+   "learn": "apache2 vino junto con libapache2-mod-php, subió en el arranque y tomó el puerto 80 antes que nginx. Con disable --now en apache2, nginx sube. Para PHP con nginx, el camino es php-fpm.",
+   "cmds": [
+    {
+     "why": "La prueba de configuración (ExecStartPre, nginx -t) pasó, pero el ExecStart falló. La configuración está bien: el problema es al momento de subir."
+    },
+    {
+     "why": "bind() falló con Address already in use: otro proceso ya escucha en el puerto 80."
+    },
+    {
+     "why": "Quien está en el puerto 80 es apache2, otro servidor web."
+    },
+    {
+     "why": "La configuración de nginx es válida. Tocarla no resolvería nada."
+    },
+    {
+     "why": "Ayer instalaron libapache2-mod-php8.3, que es el PHP para Apache. apache2 vino con él, marcado como automatic."
+    }
+   ],
+   "steps": [
+    {
+     "q": "¿Por qué nginx no sube?",
+     "v": [
+      "¿Qué impide que nginx inicie?",
+      "¿Cuál es la causa de la falla de nginx?"
+     ],
+     "o": [
+      "El puerto 80 ya está ocupado por otro proceso",
+      {
+       "t": "Error de sintaxis en la configuración",
+       "why": "nginx -t y el ExecStartPre pasaron: la configuración es válida."
+      },
+      {
+       "t": "El firewall bloquea el puerto 80",
+       "why": "El firewall filtra conexiones entrantes. No impide que un servicio escuche en el puerto."
+      },
+      {
+       "t": "nginx no está habilitado en el arranque",
+       "why": "El status muestra enabled: intentó subir y falló."
+      }
+     ],
+     "why": "El log muestra bind() failed (98: Address already in use). Solo un proceso puede escuchar en el mismo puerto y dirección."
+    },
+    {
+     "q": "¿Quién tomó el puerto 80 y cómo llegó ahí?",
+     "v": [
+      "¿Quién ocupa el puerto 80 y de dónde vino?",
+      "¿Qué proceso está en el 80 y por qué está instalado?"
+     ],
+     "o": [
+      "apache2, que vino ayer junto con la instalación de libapache2-mod-php8.3",
+      {
+       "t": "Un malware de Z3R0",
+       "why": "El proceso es apache2, y el historial de apt muestra que lo instaló un usuario del equipo."
+      },
+      {
+       "t": "Otro nginx corriendo en paralelo",
+       "why": "ss muestra apache2 en el puerto 80, no nginx."
+      },
+      {
+       "t": "php8.3-mysql",
+       "why": "php8.3-mysql es solo la extensión de base de datos de PHP. No escucha en ningún puerto."
+      }
+     ],
+     "why": "ss muestra apache2 en el 80, y history.log muestra apache2 marcado como automatic en la instalación de libapache2-mod-php8.3. En el arranque, subió antes que nginx."
+    },
+    {
+     "q": "¿Cómo poner el sitio en el aire de la forma correcta?",
+     "v": [
+      "¿Cuál es la corrección para que nginx vuelva?",
+      "¿Qué hacer para que el sitio vuelva con nginx?"
+     ],
+     "o": [
+      "Deshabilitar apache2 con disable --now y subir nginx (PHP en nginx va por php-fpm)",
+      {
+       "t": "Mover nginx al puerto 8080",
+       "why": "El sitio saldría del puerto estándar y los visitantes no llegarían. Lo correcto es sacar a quien no debería estar en el 80."
+      },
+      {
+       "t": "kill -9 a los procesos de apache2",
+       "why": "apache2 sigue habilitado: vuelve en el próximo arranque y el problema se repite."
+      },
+      {
+       "t": "Reinstalar nginx",
+       "why": "nginx está bien (nginx -t pasó). El puerto es lo que está ocupado."
+      }
+     ],
+     "why": "disable --now detiene apache2 ahora e impide que suba en el arranque. Con el puerto libre, nginx sube. El PHP para nginx es php8.3-fpm, no el módulo de Apache."
+    },
+    {
+     "q": "¿Por qué no alcanzaba con systemctl stop apache2?",
+     "v": [
+      "¿Cuál es el problema de solo detener apache2 con stop?",
+      "¿Por qué usar disable y no solo stop?"
+     ],
+     "o": [
+      "stop solo vale hasta el próximo arranque: apache2 sigue habilitado y sube de nuevo",
+      {
+       "t": "stop no detiene el proceso de verdad",
+       "why": "stop detiene el servicio, sí. El problema es que vuelve en el arranque."
+      },
+      {
+       "t": "stop borra la configuración de apache2",
+       "why": "stop no borra nada, solo detiene el servicio."
+      },
+      {
+       "t": "Alcanzaba, no hay diferencia",
+       "why": "La hay: fue justamente el arranque el que trajo de vuelta a apache2 al puerto 80."
+      }
+     ],
+     "why": "enable y disable controlan el arranque. start y stop controlan el ahora. disable --now hace las dos cosas: detiene ahora y no sube más en el arranque."
+    }
+   ]
+  },
+  {
+   "title": "¿Quién mató la base?",
+   "tag": "TERMINAL LINUX",
+   "cap": "Conectando por SSH al loja01...",
+   "goal": "Descubre quién tumbó el MySQL del loja01 y evita que vuelva a pasar.",
+   "intro": "En el pico de la promoción, la tienda virtual empezó a dar <b>error de conexión con la base de datos</b>. El sitio y el MySQL corren en el mismo servidor, el <b>loja01</b>.",
+   "z": "No toqué tu base. Fue tu propio kernel el que apretó el gatillo.",
+   "me": "Si fue el kernel, quedó registrado en el dmesg.",
+   "lesson": [
+    "Cuando se acaba la memoria, el kernel activa el <b>OOM killer</b> (out of memory) y mata un proceso para salvar el sistema.",
+    "Elige por el <b>oom_score</b>, que pesa sobre todo cuánta memoria usa cada proceso por sí solo. Quien muere suele ser el proceso más grande, no el culpable.",
+    "En <b>free -h</b>, la columna que importa es <b>available</b>: memoria libre más la caché que el kernel puede liberar.",
+    "<b>php-fpm</b> corre un proceso por cada petición simultánea. <b>pm.max_children</b> limita cuántos pueden existir al mismo tiempo."
+   ],
+   "tip": "El dmesg muestra al OOM killer matando a mysqld. Quienes llenaron la memoria fueron decenas de procesos php-fpm de ~175 MB cada uno, permitidos por pm.max_children = 100. Reduce el límite para que quepa en la RAM.",
+   "learn": "El pm.max_children alto dejó que php-fpm abriera 40 procesos de ~175 MB en el pico, la memoria se acabó y el OOM killer mató al mayor proceso individual, mysqld. Limitar php-fpm a lo que cabe en la RAM protege la base.",
+   "cmds": [
+    {
+     "why": "Quedan solo 96Mi en available, y no hay swap. El servidor está sin memoria."
+    },
+    {
+     "why": "El kernel lo registró: Out of memory, mató el proceso 1187, mysqld, que usaba cerca de 2,5 GB (anon-rss)."
+    },
+    {
+     "why": "systemd confirma Result: oom-kill e intenta reiniciar MySQL. Sin memoria, vuelve a caer."
+    },
+    {
+     "why": "El tope de la lista es solo php-fpm, cada uno con cerca de 175 MB (RSS) y 2,2% de la memoria. Solo, ninguno asusta. Juntos, depende de cuántos sean."
+    },
+    {
+     "why": "41 procesos: el master y 40 workers. 40 × 175 MB da unos 7 GB, casi toda la RAM de 7,7 GB."
+    },
+    {
+     "why": "pm.max_children = 100 permite hasta 100 workers. Con 175 MB cada uno, serían 17 GB en un servidor de 7,7 GB."
+    }
+   ],
+   "steps": [
+    {
+     "q": "¿Quién mató a mysqld?",
+     "v": [
+      "¿Qué tumbó MySQL?",
+      "¿Quién terminó el proceso de la base?"
+     ],
+     "o": [
+      "El OOM killer del kernel, porque se acabó la memoria",
+      {
+       "t": "Z3R0, con kill -9",
+       "why": "El dmesg registra Out of memory: Killed process. Fue el kernel, sin atacante."
+      },
+      {
+       "t": "Un bug de MySQL",
+       "why": "No fue un cuelgue de MySQL: systemd muestra Result: oom-kill, muerte por falta de memoria."
+      },
+      {
+       "t": "systemd, para reiniciar el servicio",
+       "why": "systemd solo intenta subirlo de nuevo después de que el kernel mató el proceso."
+      }
+     ],
+     "why": "Sin memoria disponible y sin swap, el kernel activa el OOM killer y mata un proceso para que el sistema no se cuelgue entero."
+    },
+    {
+     "q": "free muestra 118Mi en free. ¿Qué columna dice de verdad cuánto queda para usar?",
+     "v": [
+      "¿Qué columna de free muestra la memoria que realmente todavía se puede usar?",
+      "Para saber si falta memoria, ¿qué columna de free mirar?"
+     ],
+     "o": [
+      "available, que suma lo libre y la caché que el kernel puede liberar",
+      {
+       "t": "free",
+       "why": "free ignora la caché, que el kernel devuelve cuando la necesita. En un servidor sano, free suele ser bajo igual."
+      },
+      {
+       "t": "used",
+       "why": "used muestra lo ocupado. Para saber el margen, mira available."
+      },
+      {
+       "t": "shared",
+       "why": "shared es la memoria compartida (tmpfs y similares), no el margen del sistema."
+      }
+     ],
+     "why": "Linux usa la memoria sobrante como caché de disco. available estima cuánto se puede asignar sin swap. Aquí son solo 96Mi: falta memoria de verdad."
+    },
+    {
+     "q": "Si quien llenó la memoria fue php-fpm, ¿por qué el kernel mató a mysqld?",
+     "v": [
+      "¿Por qué el OOM killer eligió a MySQL y no a php-fpm?",
+      "php-fpm llenó la memoria. ¿Por qué la víctima fue la base?"
+     ],
+     "o": [
+      "El OOM killer elige por el oom_score, que pesa la memoria de cada proceso: mysqld era el mayor por sí solo",
+      {
+       "t": "Porque MySQL es el proceso más viejo",
+       "why": "La edad del proceso no decide. El criterio es el oom_score, basado sobre todo en memoria."
+      },
+      {
+       "t": "Porque php-fpm corre como www-data",
+       "why": "El usuario no protege al proceso. Pesa la memoria de cada uno."
+      },
+      {
+       "t": "El kernel siempre mata primero a la base de datos",
+       "why": "El kernel no sabe qué es una base de datos. Mira el oom_score de cada proceso."
+      }
+     ],
+     "why": "Cada php-fpm tiene unos 175 MB, y mysqld solo tenía 2,5 GB. La memoria sumada de php-fpm causó el problema, pero la víctima fue el mayor proceso individual."
+    },
+    {
+     "q": "¿Cuál es la corrección para que la base deje de caer?",
+     "v": [
+      "¿Cómo evitar un nuevo OOM en el próximo pico?",
+      "¿Qué ajustar para que la base no muera de nuevo?"
+     ],
+     "o": [
+      "Limitar php-fpm a lo que cabe en la RAM (pm.max_children = 20) y recargar el servicio",
+      {
+       "t": "Subir pm.max_children para atender a más gente",
+       "why": "Más workers es más memoria: el OOM llegaría todavía más rápido."
+      },
+      {
+       "t": "Reiniciar MySQL cada hora",
+       "why": "La base sigue muriendo en el pico, solo vuelve antes."
+      },
+      {
+       "t": "Matar los procesos php-fpm cada vez que la memoria suba",
+       "why": "Tumba peticiones de clientes y no resuelve la configuración."
+      }
+     ],
+     "why": "Con unos 3,5 GB reservados para PHP y ~175 MB por worker, caben cerca de 20. Las peticiones de más esperan en la cola en vez de tumbar la base."
+    }
+   ]
+  },
+  {
+   "title": "Agenda del cron",
+   "tag": "QUIZ",
+   "cap": "Revisando las tareas programadas...",
+   "goal": "Lee las agendas del cron y descubre por qué el backup no corre.",
+   "z": "Cambié una coma de tu crontab. Tu backup ahora corre... algún día.",
+   "me": "Cinco campos: minuto, hora, día, mes y día de la semana.",
+   "lesson": [
+    "Una línea de cron tiene 5 campos de tiempo: <b>minuto hora día-del-mes mes día-de-la-semana</b>, y después el comando.",
+    "<b>*</b> = cualquier valor. <b>*/15</b> = cada 15. En el día de la semana, <b>0</b> y <b>7</b> son domingo.",
+    "En el <b>crontab -e</b> de un usuario, el comando va justo después de los 5 campos. En <b>/etc/cron.d/</b>, va antes una columna con el <b>usuario</b> que lo va a ejecutar.",
+    "cron corre con un entorno mínimo (PATH corto, sin tu .bashrc). Usa la <b>ruta completa</b> en los comandos."
+   ],
+   "tip": "Lee campo por campo: minuto, hora, día del mes, mes, día de la semana. En /etc/cron.d está la columna del usuario. Un script que funciona a mano y falla en cron casi siempre es el PATH.",
+   "learn": "Los 5 campos de cron son minuto, hora, día del mes, mes y día de la semana. En /etc/cron.d va el usuario antes del comando, cron corre con entorno mínimo y el log de ejecución queda en el journal del servicio cron o en el syslog.",
+   "qs": [
+    {
+     "q": "¿Cuándo corre: 0 3 * * * /usr/local/bin/backup.sh?",
+     "v": [
+      "La línea 0 3 * * * /usr/local/bin/backup.sh, ¿cuándo corre?",
+      "¿A qué hora ejecuta 0 3 * * * /usr/local/bin/backup.sh?"
+     ],
+     "o": [
+      "Todos los días a las 03:00",
+      {
+       "t": "Cada 3 minutos",
+       "why": "Cada 3 minutos sería */3 * * * *. Aquí el 0 es el minuto y el 3 es la hora."
+      },
+      {
+       "t": "A las 00:03 todos los días",
+       "why": "00:03 sería 3 0 * * *. El primer campo es el minuto."
+      },
+      {
+       "t": "Todos los días 3 del mes",
+       "why": "El día del mes es el tercer campo, que aquí está con *."
+      }
+     ],
+     "why": "Minuto 0, hora 3, cualquier día, cualquier mes, cualquier día de la semana: todos los días a las 03:00."
+    },
+    {
+     "q": "¿Qué hace */15 * * * *?",
+     "v": [
+      "¿Con qué frecuencia corre */15 * * * *?",
+      "Una tarea en */15 * * * *, ¿cuándo se ejecuta?"
+     ],
+     "o": [
+      "Corre cada 15 minutos (00, 15, 30 y 45 de cada hora)",
+      {
+       "t": "Corre a las 15 h todos los días",
+       "why": "Las 15 h sería 0 15 * * *. El */15 está en el campo del minuto."
+      },
+      {
+       "t": "Corre el día 15 de cada mes",
+       "why": "El día 15 iría en el tercer campo: 0 0 15 * *."
+      },
+      {
+       "t": "Corre 15 veces por día",
+       "why": "*/15 en el minuto da 4 veces por hora, 96 por día."
+      }
+     ],
+     "why": "*/15 en el campo del minuto quiere decir cada 15 minutos: 0, 15, 30 y 45."
+    },
+    {
+     "q": "¿Cuándo corre 30 2 * * 0?",
+     "v": [
+      "La agenda 30 2 * * 0, ¿cuándo se ejecuta?",
+      "¿Qué día y a qué hora corre 30 2 * * 0?"
+     ],
+     "o": [
+      "Todos los domingos a las 02:30",
+      {
+       "t": "Todos los días a las 02:30",
+       "why": "Sería 30 2 * * *. El último campo, 0, lo limita al domingo."
+      },
+      {
+       "t": "Todos los lunes a las 02:30",
+       "why": "El lunes es 1. En el día de la semana, 0 y 7 son domingo."
+      },
+      {
+       "t": "A las 02:30 del día 30",
+       "why": "El día del mes es el tercer campo, aquí *. El 30 es el minuto."
+      }
+     ],
+     "why": "Minuto 30, hora 2, día de la semana 0: domingo a las 02:30. El domingo se puede escribir 0 o 7."
+    },
+    {
+     "q": "¿Qué línea en /etc/cron.d/backup corre el backup como root el día 1 de cada mes a las 04:00?",
+     "v": [
+      "En /etc/cron.d/backup, ¿qué línea ejecuta como root todos los días 1, a las 04:00?",
+      "¿Qué entrada de /etc/cron.d programa el backup para el día 1 del mes, 04:00, como root?"
+     ],
+     "o": [
+      "0 4 1 * * root /usr/local/bin/backup.sh",
+      {
+       "t": "0 4 1 * * /usr/local/bin/backup.sh",
+       "why": "En /etc/cron.d falta la columna del usuario. Sin ella, cron entiende la ruta del script como nombre de usuario."
+      },
+      {
+       "t": "4 0 1 * * root /usr/local/bin/backup.sh",
+       "why": "Minuto 4, hora 0: corre a las 00:04, no a las 04:00."
+      },
+      {
+       "t": "0 4 * 1 * root /usr/local/bin/backup.sh",
+       "why": "El 1 en el cuarto campo es el mes: correría todos los días de enero a las 04:00."
+      }
+     ],
+     "why": "Minuto 0, hora 4, día del mes 1, cualquier mes, cualquier día de la semana, usuario root y el comando con ruta completa."
+    },
+    {
+     "q": "backup.sh funciona cuando lo ejecutas a mano, pero falla en cron. ¿Cuál es la causa más común?",
+     "v": [
+      "El script corre en la terminal y se rompe en cron. ¿Qué suele ser?",
+      "¿Por qué un script que funciona a mano falla cuando lo ejecuta cron?"
+     ],
+     "o": [
+      "cron corre con un entorno mínimo: PATH corto y sin las variables de tu shell",
+      {
+       "t": "cron no ejecuta scripts .sh",
+       "why": "cron ejecuta cualquier comando o script con permiso de ejecución."
+      },
+      {
+       "t": "cron solo corre con el usuario conectado",
+       "why": "cron corre sin nadie conectado. Para eso existe."
+      },
+      {
+       "t": "cron ignora la hora del servidor",
+       "why": "cron usa el huso horario del sistema. Una hora equivocada no hace fallar al script."
+      }
+     ],
+     "why": "En la terminal tienes tu PATH y tu .bashrc. En cron, el PATH es corto (algo como /usr/bin:/bin). Usa rutas completas o define PATH al principio de la crontab."
+    },
+    {
+     "q": "¿Dónde confirmar si cron ejecutó el backup?",
+     "v": [
+      "¿Cómo verificar si la tarea de cron corrió?",
+      "¿Qué comando muestra las ejecuciones de cron en Ubuntu?"
+     ],
+     "o": [
+      "journalctl -u cron (o grep CRON /var/log/syslog)",
+      {
+       "t": "crontab -l",
+       "why": "crontab -l solo lista lo programado, no lo que corrió."
+      },
+      {
+       "t": "systemctl status backup.sh",
+       "why": "backup.sh no es un servicio de systemd. Quien lo ejecuta es cron."
+      },
+      {
+       "t": "cat /etc/crontab",
+       "why": "Muestra la agenda del sistema, no el registro de ejecuciones."
+      }
+     ],
+     "why": "En Ubuntu y Debian, cron registra cada ejecución en el journal del servicio cron y en el syslog, con la línea CMD del comando."
+    }
+   ]
+  }
+ ]
+}

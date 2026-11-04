@@ -84,6 +84,7 @@ src/engine/
   train.js            treino dos seus erros: quiz com os itens do banco; 2 acertos seguidos tiram o item
   career.js           XP e cargos (Estagiário → Arquiteto de Redes)
   ach.js              conquistas (lista ACH), faixa no topo (#achv), vitrine; stat() para contadores
+  perfil.js           painel Perfil (botão da tela inicial e "trocar"): abas Personagem (prefs), Dados (rank) e Ajustes (som, acessibilidade, zerar progresso)
   prefs.js            visual do analista (camisa/cabelo/pele/acessório em variáveis CSS do HERO) e acessibilidade (classes hc, big, calm no <html>)
   cert.js             certificado PNG por ato concluído (canvas), baixar ou compartilhar
   room.js             sala do NOC no topo do mapa: herói anda (toque/setas), câmera acompanha, estação abre os incidentes do `loc`

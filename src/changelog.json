@@ -1,6 +1,35 @@
 {
   "versions": [
     {
+      "v": "1.34",
+      "date": "2026-11-04",
+      "title": "Seu crachá de analista",
+      "items": [
+        "Botão Perfil na tela inicial: personagem, nome, LinkedIn e apagar dados num lugar só",
+        "Som, acessibilidade e zerar progresso também moram no Perfil, na aba Ajustes",
+        "Todas as fases agora em espanhol e em inglês: atos, Linux, provedor e servidores",
+        "Comandos e saídas continuam iguais em qualquer idioma, como no equipamento"
+      ],
+      "es": {
+        "title": "Tu credencial de analista",
+        "items": [
+          "Botón Perfil en la pantalla de inicio: personaje, nombre, LinkedIn y borrar datos en un solo lugar",
+          "Sonido, accesibilidad y reiniciar el progreso también viven en el Perfil, en la pestaña Ajustes",
+          "Todas las fases ahora en español y en inglés: actos, Linux, proveedor y servidores",
+          "Los comandos y las salidas siguen iguales en cualquier idioma, como en el equipo"
+        ]
+      },
+      "en": {
+        "title": "Your analyst badge",
+        "items": [
+          "Profile button on the home screen: character, name, LinkedIn and delete data in one place",
+          "Sound, accessibility and reset progress also live in the Profile, under the Settings tab",
+          "Every level now in Spanish and English: acts, Linux, ISP and servers",
+          "Commands and outputs stay the same in any language, just like on the device"
+        ]
+      }
+    },
+    {
       "v": "1.33",
       "date": "2026-11-04",
       "title": "Hello, analyst!",
