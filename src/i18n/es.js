@@ -864,3 +864,4 @@ export const ES = {
     'curl': ['curl', [], 'Hace un pedido a un sitio directo desde la terminal, como lo haría el navegador. -I muestra solo el encabezado de la respuesta (el código, como 200 OK).']
   }
 };
+export default ES;

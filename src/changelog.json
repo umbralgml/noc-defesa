@@ -1,6 +1,35 @@
 {
   "versions": [
     {
+      "v": "1.33",
+      "date": "2026-11-04",
+      "title": "Hello, analyst!",
+      "items": [
+        "Novo idioma: inglês, junto com o português e o espanhol",
+        "Bandeiras na tela inicial, logo abaixo de Opções: um toque troca o idioma",
+        "Botão de Opções mais fácil de achar",
+        "Prólogo e Formação N1 em inglês; as outras fases chegam traduzidas aos poucos"
+      ],
+      "es": {
+        "title": "Hello, analyst!",
+        "items": [
+          "Nuevo idioma: inglés, junto con el portugués y el español",
+          "Banderas en la pantalla de inicio, justo debajo de Opciones: un toque cambia el idioma",
+          "Botón de Opciones más fácil de encontrar",
+          "Prólogo y Formación N1 en inglés; las demás fases llegan traducidas de a poco"
+        ]
+      },
+      "en": {
+        "title": "Hello, analyst!",
+        "items": [
+          "New language: English, alongside Portuguese and Spanish",
+          "Flags on the home screen, right below Options: one tap switches the language",
+          "An easier-to-find Options button",
+          "Prologue and Tier 1 Training in English; the other levels will be translated over time"
+        ]
+      }
+    },
+    {
       "v": "1.32",
       "date": "2026-11-04",
       "title": "¡Hola, analista!",
@@ -17,6 +46,15 @@
           "Pantallas, glosario, Academia y desafío diario en español; el Prólogo y la Formación N1 ya están traducidos",
           "Las demás fases llegan traducidas de a poco y, mientras tanto, aparecen en portugués con un aviso",
           "Los comandos y las salidas de los equipos quedan iguales en todos los idiomas, como en el equipo de verdad"
+        ]
+      },
+      "en": {
+        "title": "¡Hola, analista!",
+        "items": [
+          "New language: Spanish. Pick it in Options, or the game opens in Spanish by itself on a Spanish device",
+          "Screens, glossary, Academy and daily challenge in Spanish; Prologue and Tier 1 Training already translated",
+          "The other levels will be translated over time and, until then, show in Portuguese with a notice",
+          "Commands and device outputs stay the same in every language, just like on real gear"
         ]
       }
     },

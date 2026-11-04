@@ -4,17 +4,19 @@
 // - glossário: gloss no mesmo arquivo, pela chave do termo em português.
 // Comandos, saídas e configurações nunca são traduzidos (o validador confere).
 // O que não tem tradução aparece em português. Trocar o idioma recarrega a página.
-import { store } from './util.js';
-import { ES } from '../i18n/es.js';
+import { store, setLocale } from './util.js';
 
-export const LANGS = { pt: 'Português', es: 'Español' };
-const PACKS = { es: ES };
+// Idiomas do seletor da tela inicial (bandeiras em main.js). Aparelho em outro idioma abre em inglês.
+export const LANGS = { pt: 'Português (Brasil)', en: 'English', es: 'Español' };
 const pick = () => {
   const s = store('noc_lang'); if (LANGS[s]) return s;
-  return /^es\b/i.test(navigator.language || '') ? 'es' : 'pt';
+  const n = (typeof navigator !== 'undefined' && navigator.language) || 'pt';
+  return /^pt\b/i.test(n) ? 'pt' : /^es\b/i.test(n) ? 'es' : 'en';   // outros idiomas: inglês
 };
 export const LANG = pick();
-export const PACK = PACKS[LANG] || null;
+setLocale({ pt: 'pt-BR', es: 'es', en: 'en-US' }[LANG]);
+// Só o pacote do idioma escolhido é carregado.
+export const PACK = LANG === 'pt' ? null : (await import(`../i18n/${LANG}.js`)).default;
 export const setLang = l => { store('noc_lang', l); location.reload(); };
 
 // Chave do dicionário: espaços normalizados e números trocados por {n} (voltam na mesma ordem).

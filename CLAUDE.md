@@ -43,12 +43,12 @@ deploy/install.sh     instalador para Ubuntu/Debian (nginx ou Apache existente, 
 deploy/vps/           API própria do ranking: instalar-api.sh (PostgreSQL + PostgREST + nginx /rest/v1/ + backup), roles.sql, configs
 src/main.js           entrada: cena do título, botões do título, init dos motores, loadLevels(), loadNews()
 src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mais recente primeiro
-src/i18n/es.js        pacote do espanhol: ui (texto de tela, chave = original em português), gloss (glossário) e trails
+src/i18n/es.js, en.js pacotes do espanhol e do inglês: ui (texto de tela, chave = original em português), gloss (glossário) e trails; só o do idioma escolhido é carregado
 src/config.json       { "ranking": { "url", "key" } }: Supabase (url + key publishable) ou API própria na VPS (só url, key vazia); url vazia = ranking desligado
 src/levels/
   index.json          { "acts": [...], "trilhas": [{ "id", "name", "icon", "desc", "soon"?, "acts": [...] }] }: "acts" é a soma das trilhas, na mesma ordem
   prologo.json, formacao.json, atoN.json, linux.json   { "tag", "name", "diff", "story", "levels": [ ... ] }
-  es/<ato>.json       tradução: só os textos, na mesma estrutura do original (fase ausente = aparece em português)
+  es/, en/<ato>.json  tradução: só os textos, na mesma estrutura do original (fase ausente = aparece em português)
 src/engine/
   util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON), merge (tradução de fase), siteURL; sem dependências
   i18n.js             idioma (LANG, noc_lang ou idioma do aparelho), t() para texto de tela e translateDOM() (MutationObserver aplica o dicionário)
@@ -122,7 +122,7 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 
 ## Convenções
 
-- **Idiomas:** o português é o original e a chave de tudo; o espanhol é uma camada por cima. Telas: o texto continua em português no código e `ES.ui` (em `src/i18n/es.js`) traduz no DOM (números viram `{n}` na chave). Texto que não passa pelo DOM (compartilhar, legenda digitada) usa `t()` de `i18n.js`. Fases: `src/levels/es/<ato>.json` com só os textos; `levels.js` mescla e guarda `L.key` (título em português, chave do progresso) e `L.orig` (o desafio diário sorteia pelo original). Glossário: `ES.gloss` pelo termo em português. **Comandos, saídas, configurações, endereços e ids nunca são traduzidos**: o validador acusa se mudarem. Fase sem tradução aparece em português com aviso no briefing. Ao criar texto de tela novo, acrescente a tradução em `ES.ui`; ao criar fase nova, a tradução pode vir num lote seguinte. Teste em espanhol com `node tools/testes/campanha.mjs --lang es` (e `--coleta arq.json` lista os textos de tela sem tradução).
+- **Idiomas:** o português é o original e a chave de tudo; espanhol e inglês são camadas por cima. O jogador escolhe pelas bandeiras logo abaixo de Opções (`#tLang`, em `main.js`); sem escolha, vale o idioma do aparelho (outro idioma abre em inglês). Os pacotes `ES` e `EN` precisam ter as mesmas chaves (o validador avisa). Telas: o texto continua em português no código e `ui` de cada pacote traduz no DOM (números viram `{n}` na chave). Texto que não passa pelo DOM (compartilhar, legenda digitada) usa `t()` de `i18n.js`. Fases: `src/levels/<lang>/<ato>.json` com só os textos; `levels.js` mescla e guarda `L.key` (título em português, chave do progresso) e `L.orig` (o desafio diário sorteia pelo original). Glossário: `gloss` pelo termo em português. Perguntas geradas: `g(pt, es, en)` em `gen.js`. **Comandos, saídas, configurações, endereços e ids nunca são traduzidos**: o validador acusa se mudarem. Fase sem tradução aparece em português com aviso no briefing. Ao criar texto de tela novo, acrescente a tradução em `ES.ui` e `EN.ui`; ao criar fase nova, a tradução pode vir num lote seguinte. Teste com `node tools/testes/campanha.mjs --lang es` (ou `en`) (e `--coleta arq.json` lista os textos de tela sem tradução).
 - **Idioma do código:** tudo que o jogador vê nasce em pt-BR. Comentários de código também em pt-BR, curtos. Nomes de variáveis e funções seguem o estilo existente (curto, em inglês: `L`, `S`, `sel`, `renderDrop`).
 - **Estilo do JS:** compacto, igual ao código existente. `const $ = id => ...`, funções pequenas, template strings para HTML, `;` no fim, aspas simples, 2 espaços. Sem classes, sem bibliotecas.
 - **Texto do jogador:** conteúdo vindo do JSON em campos de texto (`t`, `s`, `why`, `q`, opções) vai por `textContent`. Só os campos documentados como HTML (`goal`, `intro`, `z`, `me`, `lesson`, `tip`, `learn`, `html`, `label`) vão por `innerHTML`.
