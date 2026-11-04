@@ -1,0 +1,179 @@
+{
+ "tag": "ACTO 4",
+ "name": "Switching y BGP",
+ "story": [
+  { "t": "¿Creíste que me iba a quedar en Linux? Voy a saltar de VLAN y secuestrar tus prefijos." },
+  { "t": "Switching y BGP: los errores aquí tumban a mucha gente de una vez. Cuidado." },
+  { "t": "Trunk blindado y prefix-list estricta." }
+ ],
+ "levels": [
+  {
+   "title": "VLAN hopping",
+   "tag": "SWITCHING",
+   "cap": "Yendo al switch de acceso...",
+   "goal": "Configura el puerto de la cámara como access y el uplink como trunk blindado contra VLAN hopping.",
+   "intro": "Cámara en la <b>VLAN 30</b> en la Gi1/0/10. Uplink hacia el core solo con las VLANs <b>10, 20 y 30</b>. Native VLAN en una VLAN sin uso y nada de negociación automática.",
+   "z": "Tu switch negocia trunk con cualquiera. Voy a saltar directo a la VLAN de gestión.",
+   "me": "Access es access, trunk es trunk. Y DTP apagado.",
+   "lesson": [
+    "La <b>VLAN</b> divide un switch físico en varias redes lógicas. Una cámara en la VLAN 30 no ve a quien está en la VLAN 10 sin pasar por un router.",
+    "Un puerto <b>access</b> pertenece a una sola VLAN: es donde se conectan hosts (PC, cámara, impresora). Un puerto <b>trunk</b> lleva varias VLANs marcadas con tag <b>802.1Q</b>: es la conexión entre switches.",
+    "El <b>DTP</b> negocia trunk solo. Si el puerto acepta negociar, un atacante finge ser switch, forma un trunk y gana acceso a todas las VLANs. <b>switchport nonegotiate</b> lo apaga.",
+    "La <b>native VLAN</b> viaja sin tag en el trunk. Ponerla en una VLAN sin usuarios (ej.: 999) evita el ataque de <b>double tagging</b>.",
+    "<b>allowed vlan</b> limita el trunk a las VLANs que de verdad necesitan pasar por él."
+   ],
+   "tip": "El puerto de host es access. El uplink es trunk con lista explícita de VLANs. Native VLAN fuera de uso (ej.: 999) y nonegotiate apagan el DTP.",
+   "learn": "El VLAN hopping ocurre por switch spoofing (DTP formando trunk con el atacante) o double tagging (usando la native VLAN). Defensa: puertos de host en access fijo, switchport nonegotiate, trunk con allowed vlan explícito y native VLAN que no lleve usuarios.",
+   "explain": {
+    "a": "La cámara es un host: puerto access, fijo en una VLAN.",
+    "b": "La cámara queda en la VLAN 30, como pide la misión.",
+    "d": "Solo pasan las VLANs 10, 20 y 30. Las demás quedan fuera del trunk.",
+    "e": "Native VLAN en una VLAN sin uso (999) evita el double tagging."
+   },
+   "chips": [
+    { "why": "Modo de puerto de host: una sola VLAN." },
+    { "why": "Modo de puerto entre switches: varias VLANs con tag." },
+    { "why": "Intenta formar trunk vía DTP con quien esté del otro lado. Es justamente lo que permite el switch spoofing." },
+    { "why": "30 es la VLAN de la cámara." },
+    { "why": "La VLAN 1 es la de fábrica. Usarla como native o para hosts es el error clásico." },
+    { "why": "Lista explícita de las VLANs que pueden pasar por el trunk." },
+    { "why": "Permitir todas lleva al core hasta VLANs que no deberían salir de este switch." },
+    { "why": "VLAN sin usuarios: buena elección para native VLAN." },
+    { "why": "Apaga el DTP en el puerto." },
+    { "why": "Port-security limita las MACs aceptadas en el puerto. Es útil, pero no apaga el DTP." }
+   ]
+  },
+  {
+   "title": "Uplink cortado",
+   "tag": "TOPOLOGÍA",
+   "cap": "Abriendo el mapa del campus...",
+   "goal": "Encuentra el corte, entiende por qué falló la redundancia y reconecta el camino de respaldo.",
+   "z": "Corté el camino del 3.er piso. ¿Y ese cable de respaldo tuyo? Jajaja.",
+   "me": "Si hay respaldo, hay salida. Primero encuentro el corte.",
+   "intro": "Todo el 3.er piso desapareció del monitoreo. Prueba desde el <b>MONITOR</b> del datacenter. Sin traceroute ahora: solo responde o no responde. El enlace <b>punteado</b> es el de respaldo.",
+   "lesson": [
+    "Sin traceroute, solo sabes si cada destino <b>responde o no</b>. Compara los resultados para cercar la falla.",
+    "<b>Redundancia</b>: el switch de acceso tiene dos uplinks, uno a cada switch de core. Si un cable cae, el otro asume.",
+    "El <b>STP</b> (Spanning Tree) deja el enlace de respaldo <b>bloqueado</b> para no formar bucle y lo libera cuando el principal cae. Con <b>RSTP</b>, en pocos segundos.",
+    "Un puerto en <b>shutdown</b> fue apagado por el administrador. No asume nada solo."
+   ],
+   "tip": "Haz ping al SW-CORE-1, a internet y al SW-ANDAR3. Lo que responde está del lado del datacenter. El piso 3 está detrás del cable Gi0/1.",
+   "learn": "La redundancia solo protege si está activa: el uplink de respaldo estaba en shutdown, así que el corte de la Gi0/1 aisló el piso. Con los dos uplinks encendidos, el STP (RSTP) bloquea uno y lo libera en segundos cuando el otro cae. Monitorea los dos enlaces para saber cuándo te quedaste sin respaldo.",
+   "nodes": [
+    { "t": "PC PISO3", "why": "Uno de los PCs del 3.er piso. Depende del SW-ANDAR3 para hablar con cualquier cosa." },
+    { "why": "Switch de acceso del 3.er piso. Tiene dos uplinks: Gi0/1 al SW-CORE-1 y Gi0/2 (respaldo) al SW-CORE-2." },
+    { "why": "Switch de core principal. Concentra los pisos, los servidores y la salida." },
+    { "why": "Switch de core de respaldo, conectado al core principal. Es el que recibiría el piso 3 si la Gi0/2 estuviera activa." },
+    { "t": "BORDE", "why": "Router de borde: la salida a internet." },
+    { "why": "Prueba de salida a internet." },
+    { "why": "Servidor del datacenter, colgado del core principal." },
+    {}
+   ],
+   "links": [
+    {},
+    {},
+    { "t": "Gi0/2 respaldo", "why": "Este es el enlace de respaldo, apagado (punteado). No cayó ahora: ya estaba fuera de servicio. Es parte del problema, pero no es el corte." }
+   ],
+   "faultName": "En el uplink Gi0/1 entre el SW-ANDAR3 y el SW-CORE-1",
+   "faultWhy": "El monitor alcanza los dos cores, el borde, internet y el servidor, pero nada del piso 3. El corte está en el uplink Gi0/1 entre el SW-ANDAR3 y el SW-CORE-1. El log de consola del switch del piso lo confirma: Gi0/1 down. Como el respaldo estaba en shutdown, nadie asumió.",
+   "steps": [
+    {
+     "q": "¿Por qué el enlace de respaldo (Gi0/2) no salvó al piso 3?",
+     "v": ["Si había enlace de respaldo (Gi0/2), ¿por qué cayó el piso 3?", "El piso 3 tenía un segundo uplink. ¿Por qué no asumió?"],
+     "o": ["El puerto de respaldo estaba en shutdown: una redundancia apagada no protege", { "t": "El STP bloquea el enlace de respaldo para siempre", "why": "El STP bloquea el respaldo solo mientras el principal está arriba. Cuando el principal cae, libera el respaldo." }, { "t": "El enlace de respaldo solo funciona con BGP", "why": "Entre switches de la misma red, quien cuida la redundancia es el STP (o la agregación de enlaces). BGP es entre redes (AS)." }],
+     "why": "La redundancia tiene que estar activa y probada. Con STP, el respaldo queda bloqueado y asume solo cuando el principal cae. En shutdown, no asume nunca."
+    },
+    {
+     "q": "Por el cable de consola del SW-ANDAR3, ¿cómo reactivar el puerto de respaldo Gi0/2?",
+     "v": ["En la consola del SW-ANDAR3, ¿qué comandos reactivan la Gi0/2?", "Conectado por la consola del SW-ANDAR3, ¿cómo reactivar el puerto de respaldo Gi0/2?"],
+     "o": ["interface gi0/2 y después no shutdown", { "t": "interface gi0/2 y después spanning-tree portfast", "why": "PortFast es para puertos de usuario (acelera la subida). En un puerto entre switches arriesga un bucle, y el puerto seguiría apagado." }, { "t": "interface gi0/2 y después shutdown", "why": "shutdown apaga el puerto. Es lo contrario de lo que quieres." }],
+     "why": "no shutdown enciende el puerto. El STP negocia y el piso 3 vuelve por el SW-CORE-2."
+    },
+    {
+     "q": "Para que el próximo corte no tumbe el piso, lo correcto es:",
+     "v": ["Para que un próximo corte no tumbe el piso, ¿cuál es la mejor práctica?", "¿Cómo dejar el piso 3 protegido de verdad contra la caída de un uplink?"],
+     "o": ["Dejar los dos uplinks encendidos con STP (o agregación LACP) y monitorear los dos", { "t": "Apagar el STP para que los dos uplinks reenvíen juntos", "why": "Sin STP, dos caminos entre switches forman un bucle: una tormenta de broadcast tumba la red en segundos." }, { "t": "Usar un solo uplink, de fibra más cara", "why": "Un solo cable es un punto único de falla, sin importar el precio." }],
+     "why": "Dos caminos activos y vigilados. El STP evita el bucle; la agregación (LACP) usa los dos al mismo tiempo cuando conectan al mismo par de switches."
+    }
+   ]
+  },
+  {
+   "title": "Filtro de cliente BGP",
+   "tag": "BGP",
+   "cap": "Abriendo la sesión BGP del cliente AS64500...",
+   "goal": "Decide qué aceptar del cliente BGP AS64500, dueño del bloque 45.160.0.0/22.",
+   "intro": "El cliente <b>AS64500</b> tiene el bloque <b>45.160.0.0/22</b> con ROA hasta <b>/24</b>. Acepta solo lo que es suyo. El resto es leak o secuestro.",
+   "z": "Voy a anunciar por tu cliente lo que quiera. Total, tú aceptas todo.",
+   "me": "Un cliente BGP solo anuncia lo que es suyo. Prefix-list estricta.",
+   "lesson": [
+    "<b>BGP</b> es el protocolo que usan las redes de internet (cada una con su número de <b>AS</b>) para intercambiar rutas. Cada AS anuncia los bloques que posee.",
+    "BGP confía en lo que anuncia el vecino. Si aceptas todo del cliente, un error o ataque suyo se vuelve problema de todo internet.",
+    "Una <b>prefix-list</b> dice exactamente qué aceptar. <b>45.160.0.0/22 le 24</b> = el /22 y cualquier pedazo suyo hasta /24.",
+    "El /22 va de <b>45.160.0.0</b> a <b>45.160.3.255</b>. La mayor parte de internet descarta prefijos más específicos que <b>/24</b>, y el <b>ROA</b> (RPKI) registra quién puede anunciar el bloque y hasta qué tamaño.",
+    "Nunca aceptes de un cliente: ruta <b>default</b>, rangos privados o reservados (<b>bogons</b>), <b>tus</b> bloques o bloques de terceros."
+   ],
+   "tip": "45.160.0.0/22 cubre de 45.160.0.0 a 45.160.3.255. Acepta solo prefijos dentro de eso entre /22 y /24. Default route, bogons, tus propios prefijos y bloques de terceros se rechazan.",
+   "learn": "Filtro de cliente = prefix-list 45.160.0.0/22 le 24. Rechaza default, RFC 1918, CGNAT, tus propios bloques y cualquier cosa más específica que /24, que internet descarta. Suma max-prefix y validación RPKI para cerrar el cerco. Es lo que pide MANRS.",
+   "buckets": [
+    { "label": "ACEPTAR", "a": [
+     { "why": "El bloque entero del cliente, exactamente como está registrado." },
+     { "why": "La mitad del /22 (45.160.0 y 45.160.1): dentro del bloque y no pasa de /24." },
+     { "why": "Un /24 dentro del /22 (45.160.0 a 45.160.3), permitido por el ROA." },
+     { "why": "El último /24 del bloque, todavía dentro de 45.160.0.0/22." }
+    ] },
+    { "label": "RECHAZAR", "a": [
+     { "why": "Ruta default. Un cliente nunca debe anunciar default al proveedor." },
+     { "why": "Rango privado de la RFC 1918 (bogon). No circula en internet." },
+     { "why": "Rango de CGNAT (RFC 6598). También es bogon." },
+     { "t": "177.10.0.0/22 (tu bloque)", "why": "Es TU bloque. Aceptarlo del cliente desviaría tu propio tráfico hacia él." },
+     { "why": "Bloque de Google. El cliente no es dueño: sería secuestro de prefijo." },
+     { "why": "El /22 termina en 45.160.3.255. 45.160.4 ya está fuera del bloque del cliente." },
+     { "why": "/25 es más específico que el /24 permitido por el ROA: sería RPKI invalid." }
+    ] }
+   ]
+  },
+  {
+   "title": "Secuestro de prefijo",
+   "tag": "QUIZ",
+   "cap": "Alerta de ruta en el panel de BGP...",
+   "goal": "Z3R0 está anunciando tus prefijos en internet. Descubre cómo lo hace y cómo defenderte.",
+   "z": "Anuncié un /24 de tu /22 afuera. Todo tu tráfico ahora pasa por mí.",
+   "me": "Longest match. Voy a cerrar esa brecha.",
+   "lesson": [
+    "En la tabla de rutas siempre gana el <b>prefijo más específico</b> (longest prefix match). Un /24 le gana a un /22, sea cual sea el AS-path.",
+    "<b>Hijack</b> (secuestro): alguien anuncia un prefijo que no es suyo. Si el anuncio es más específico que el tuyo, el tráfico va hacia él.",
+    "<b>RPKI</b>: el dueño del bloque publica un <b>ROA</b> diciendo qué AS puede anunciar y el tamaño máximo (<b>maxLength</b>). Quien hace <b>ROV</b> descarta los anuncios inválidos.",
+    "El ROV verifica solo el <b>origen</b> y el <b>tamaño</b>. No verifica el camino: quien falsifica tu AS como origen pasa. Para eso existe <b>ASPA</b>.",
+    "<b>Route leak</b>: un cliente reenvía rutas que recibió de otros. <b>maximum-prefix</b> tumba la sesión si anuncia más de lo acordado."
+   ],
+   "tip": "El router siempre prefiere el prefijo más específico. RPKI valida origen y tamaño máximo, pero no el camino.",
+   "learn": "El hijack por un prefijo más específico gana por longest prefix match. Un ROA con maxLength igual al anuncio real hace que el /24 falso sea RPKI invalid, y quien hace ROV lo descarta. El origen falsificado pasa el RPKI; ahí entran ASPA y los filtros de tránsito. Max-prefix protege contra el route leak de un cliente.",
+   "qs": [
+    {
+     "q": "Anuncias 177.10.0.0/22. Z3R0 anuncia 177.10.1.0/24 desde otro AS. ¿A dónde va el tráfico destinado a 177.10.1.5?",
+     "v": ["Anuncias 177.10.0.0/22 y Z3R0 anuncia 177.10.1.0/24 desde otro AS. ¿A dónde va el tráfico hacia 177.10.1.5?", "Tu /22 contra el /24 de Z3R0 dentro de él. ¿Quién recibe el tráfico hacia 177.10.1.5?"],
+     "o": ["A Z3R0, porque el /24 es más específico", { "t": "A ti, porque anunciaste primero", "why": "El orden de anuncio no importa entre prefijos distintos. Gana el más específico." }, { "t": "A quien tenga el AS-path más corto", "why": "El AS-path solo desempata rutas al MISMO prefijo. /24 y /22 son rutas distintas." }, { "t": "Se divide mitad y mitad", "why": "No hay división: para cada destino, la tabla elige el prefijo más específico." }],
+     "why": "El longest prefix match va antes de cualquier atributo de BGP. El /24 le gana al /22."
+    },
+    {
+     "q": "Z3R0 puede falsificar tu AS como origen. ¿Qué ROA hace que un /24 dentro de tu /22 se marque como inválido igual?",
+     "v": ["Aun con Z3R0 falsificando tu AS de origen, ¿qué ROA vuelve inválido un /24 dentro de tu /22?", "¿Qué ROA hace que cualquier /24 sacado de tu /22 se marque inválido, incluso con tu AS falsificado en el origen?"],
+     "o": ["ROA 177.10.0.0/22 con maxLength /22", { "t": "ROA 177.10.0.0/22 con maxLength /24", "why": "maxLength /24 autoriza anuncios hasta /24. Un /24 con tu origen falsificado sería válido." }, { "t": "Sin ningún ROA", "why": "Sin ROA el estado es \"not found\", y casi nadie descarta rutas not found." }, { "t": "ROA con maxLength /32", "why": "Autoriza cualquier pedazo del bloque, hasta /32. Es lo contrario de lo que quieres." }],
+     "why": "Con maxLength /22, cualquier anuncio más específico que /22 es invalid, incluso con el origen correcto."
+    },
+    {
+     "q": "Si Z3R0 anuncia el /22 falsificando TU AS como origen, ¿lo detecta el RPKI ROV?",
+     "v": ["Z3R0 anuncia tu /22 con TU AS falsificado como origen. ¿Lo atrapa el RPKI ROV?", "Ruta con prefijo y AS de origen iguales a los tuyos, pero que viene por Z3R0. ¿La marca inválida el ROV?"],
+     "o": ["No. El ROV solo valida origen y tamaño, no el camino", { "t": "Sí, siempre", "why": "El ROV compara solo el AS de origen y el tamaño con el ROA. Si el origen falsificado coincide, la ruta es válida." }, { "t": "Sí, si tiene community", "why": "La community es solo una etiqueta en la ruta. No entra en la validación RPKI." }, { "t": "Solo si es IPv6", "why": "RPKI funciona igual para IPv4 e IPv6." }],
+     "why": "El origen falsificado pasa el ROV. Para eso existen ASPA, BGPsec y los filtros en los tránsitos."
+    },
+    {
+     "q": "Tu cliente BGP te filtró la tabla completa (900 mil rutas). ¿Qué habría tumbado la sesión antes del desastre?",
+     "v": ["Un cliente BGP te mandó la tabla completa (900 mil rutas) por error. ¿Qué configuración habría tumbado la sesión antes?", "Filtración de la tabla entera por un cliente BGP. ¿Qué protección en la sesión habría evitado el desastre?"],
+     "o": ["maximum-prefix en la sesión del cliente", { "t": "Aumentar la memoria del router", "why": "Ayuda al router a sobrevivir, pero el tráfico seguiría desviándose por las rutas filtradas." }, { "t": "Community no-export", "why": "no-export limita hasta dónde se propagan las rutas. No impide recibirlas." }, { "t": "Local-preference alta", "why": "Una local-preference alta haría que PREFIERAS las rutas filtradas. Solo empeoraría." }],
+     "why": "Max-prefix tumba la sesión cuando el cliente pasa el límite acordado. Protección básica contra route leak."
+    }
+   ]
+  }
+ ]
+}
