@@ -1,0 +1,689 @@
+{
+ "tag": "INTRODUCTION",
+ "name": "First steps in Linux",
+ "story": [
+  {
+   "t": "Never used Linux? No problem. Before the server on-call, we learn the basics: where you are, where things live and how to read what the server says."
+  },
+  {
+   "t": "Black screen, green letters and no buttons. Bet you freeze on the first command."
+  },
+  {
+   "t": "Every command has a card with the ? next to it. I'll read, try and understand."
+  }
+ ],
+ "levels": [
+  {
+   "title": "What Linux is",
+   "tag": "VOCABULARY",
+   "cap": "Opening the rookie's notebook...",
+   "heads": [
+    "WORD",
+    "WHAT IT IS"
+   ],
+   "goal": "Connect each word from the Linux world to what it means.",
+   "z": "Kernel, shell, distro... you'll get lost in the words before typing anything.",
+   "me": "Think of a car: it has an engine, a model and a steering wheel. Linux is the same.",
+   "lesson": [
+    "<b>Linux</b> is an operating system, like Windows. It runs on most internet servers, on many routers and even on Android.",
+    "Think of a car: the <b>kernel</b> is the engine (it talks to the hardware), the <b>distribution</b> is the model (Ubuntu, Debian, Red Hat) and the <b>terminal</b> is the steering wheel.",
+    "In the terminal, whoever reads what you type is the <b>shell</b>, usually bash.",
+    "<b>root</b> is the administrator: it can do anything. That's why, day to day, you use your own user and ask for admin power only when you need it.",
+    "See an underlined word? Tap it to open the glossary card. The Study room, on the map, keeps all the cards."
+   ],
+   "check": {
+    "q": "In the car example, what would the kernel be?",
+    "v": [
+     "Comparing Linux to a car, what role does the kernel play?",
+     "If Linux were a car, which part would the kernel be?"
+    ],
+    "o": [
+     "The engine, which makes the machine run",
+     {
+      "t": "The steering wheel, where you give commands",
+      "why": "The steering wheel is the terminal: that's where you give the commands."
+     },
+     {
+      "t": "The car model",
+      "why": "The model is the distribution: Ubuntu, Debian, Red Hat."
+     }
+    ],
+    "why": "The kernel is the core: it talks to the disk, network and memory, like the engine moves the car."
+   },
+   "tip": "Kernel = engine, distribution = model, terminal = steering wheel, shell = what understands what you type, root = administrator.",
+   "learn": "Linux is the servers' operating system. The kernel is the core, the distribution is the complete package (Ubuntu, Debian), the terminal is the text screen, the shell interprets the commands and root is the administrator.",
+   "left": [
+    {
+     "why": "Linux is the operating system: what makes the computer work, like Windows. It dominates servers."
+    },
+    {
+     "why": "The kernel is Linux's core: it shares memory, disk and network among programs."
+    },
+    {
+     "t": "Distribution",
+     "why": "A distribution is Linux ready to install, with programs and tools. Ubuntu and Debian are the most common on servers."
+    },
+    {
+     "why": "The terminal is the text screen where you type commands and read the answers."
+    },
+    {
+     "why": "The shell is the program that understands what you typed and runs it. bash is the most used."
+    },
+    {
+     "why": "root is the administrator user. It can do anything, including breaking the system, so it's used carefully."
+    }
+   ],
+   "right": [
+    {
+     "t": "Operating system",
+     "s": "Runs on most servers",
+     "why": "The servers' operating system is Linux."
+    },
+    {
+     "t": "Core that talks to the hardware",
+     "s": "The car's engine",
+     "why": "What talks to the hardware is the kernel."
+    },
+    {
+     "t": "Packaged Linux",
+     "s": "The car model",
+     "why": "Linux ready with programs and an installer is a distribution."
+    },
+    {
+     "t": "Text screen",
+     "s": "The steering wheel",
+     "why": "The screen where you type is the terminal."
+    },
+    {
+     "t": "What understands what you type",
+     "why": "What interprets the commands is the shell."
+    },
+    {
+     "t": "Administrator",
+     "s": "Can do anything",
+     "why": "Linux's administrator is root."
+    }
+   ]
+  },
+  {
+   "title": "Where am I?",
+   "tag": "LINUX TERMINAL",
+   "cap": "First SSH login to srv01...",
+   "goal": "Find out which user you logged in as, on which machine and in which folder you are.",
+   "intro": "Your first login to a server. Before touching anything, find out <b>who</b> you are, <b>where</b> you are and what's nearby. Tap the <b>?</b> next to a command to open its card.",
+   "z": "You got into a server and don't even know which. How dangerous it would be to delete the wrong thing...",
+   "me": "whoami, hostname and pwd. First I find my bearings.",
+   "lesson": [
+    "The <b>prompt</b> ana@srv01:~$ already tells a lot: user <b>ana</b>, machine <b>srv01</b>, folder <b>~</b> and the $ of a regular user. root shows #.",
+    "<b>~</b> is a shortcut to your <b>home</b>, the personal folder: /home/ana.",
+    "<b>whoami</b> says who you are, <b>hostname</b> says which machine you're on and <b>pwd</b> says which folder.",
+    "<b>ls</b> lists what's in the folder. <b>ls -l</b> shows details, and a d at the start of the line means it's a folder.",
+    "<b>cd</b> enters a folder: cd /var/log goes to the logs and cd alone goes back home."
+   ],
+   "check": {
+    "q": "In the prompt ana@srv01:~$, what's the machine's name?",
+    "v": [
+     "In ana@srv01:~$, which part is the server's name?",
+     "Looking at the prompt ana@srv01:~$, which machine are you on?"
+    ],
+    "o": [
+     "srv01",
+     {
+      "t": "ana",
+      "why": "ana is the user: it comes before the @."
+     },
+     {
+      "t": "~",
+      "why": "~ is the current folder, the user's home."
+     }
+    ],
+    "why": "The format is user@machine:folder. After the @ comes the machine: srv01."
+   },
+   "tip": "whoami = user, hostname = machine, pwd = current folder, ls = what's here. In ls -l, a line starting with d is a folder.",
+   "learn": "Before touching a server, find your bearings: whoami (who I am), hostname (where I am), pwd (which folder) and ls (what's here). The prompt sums all that up, and cd changes folders.",
+   "cmds": [
+    {
+     "why": "You logged in as ana, a regular user. Not root."
+    },
+    {
+     "why": "The machine is called srv01. Always check before touching: it's easy to have several servers open."
+    },
+    {
+     "why": "You're in /home/ana, your personal folder. That's what the ~ in the prompt means."
+    },
+    {
+     "why": "Your home has one file (anotacoes.txt) and two folders (backup and scripts). Plain ls doesn't say which is a folder: for that, use ls -l."
+    },
+    {
+     "why": "Now with details: a line starting with d is a folder (backup and scripts), with - it's a file. Then come the permissions, the owner (ana), the size and the date."
+    },
+    {
+     "why": "You can list another folder without entering it, by passing the path. /var/log holds the system logs."
+    }
+   ],
+   "steps": [
+    {
+     "q": "Which user did you log in as?",
+     "v": [
+      "Which user is logged into this terminal?",
+      "From whoami, who are you on this server?"
+     ],
+     "o": [
+      "ana, a regular user",
+      {
+       "t": "root, the administrator",
+       "why": "whoami showed ana. And the prompt ends in $, a regular user; root would show #."
+      },
+      {
+       "t": "srv01",
+       "why": "srv01 is the machine's name, not the user's."
+      }
+     ],
+     "why": "whoami answered ana, and the $ at the end of the prompt confirms it: regular user."
+    },
+    {
+     "q": "Which folder are you in?",
+     "v": [
+      "What's the current folder?",
+      "Which folder did pwd show?"
+     ],
+     "o": [
+      "/home/ana, ana's personal folder",
+      {
+       "t": "/var/log",
+       "why": "You only listed /var/log with ls. You didn't enter it."
+      },
+      {
+       "t": "/root",
+       "why": "/root is the administrator's home. ana's is /home/ana."
+      }
+     ],
+     "why": "pwd shows the current folder: /home/ana. The ~ in the prompt is the shortcut to it."
+    },
+    {
+     "q": "In ls -l, how do you know backup is a folder?",
+     "v": [
+      "From ls -l, what shows that scripts is a folder?",
+      "Which detail in ls -l tells a folder from a file?"
+     ],
+     "o": [
+      "The line starts with d",
+      {
+       "t": "The name has no dot",
+       "why": "A folder can have a dot in its name and a file may not. The first character tells."
+      },
+      {
+       "t": "The size is 4096",
+       "why": "4096 is a common folder size, but files can also be that size."
+      }
+     ],
+     "why": "The first character of the line is the type: d for directory (folder), - for a regular file."
+    },
+    {
+     "q": "Which command takes you to the logs folder?",
+     "v": [
+      "How do you enter the /var/log folder?",
+      "To work inside /var/log, which command do you use?"
+     ],
+     "o": [
+      "cd /var/log",
+      {
+       "t": "ls /var/log",
+       "why": "ls only lists what's there. You stay in the folder you were in."
+      },
+      {
+       "t": "pwd /var/log",
+       "why": "pwd only shows the current folder. It doesn't change folders."
+      }
+     ],
+     "why": "cd (change directory) changes folders. After it, the prompt would show ana@srv01:/var/log$."
+    }
+   ]
+  },
+  {
+   "title": "Everything in its folder",
+   "tag": "CLASSIFICATION",
+   "cap": "Opening the Linux folder map...",
+   "goal": "Drag each file to the folder where it lives in Linux.",
+   "intro": "In Linux, each kind of file has its proper place. Knowing where to look saves half the troubleshooting. Take each item to its <b>folder</b>.",
+   "z": "I hid your files in random folders. Going to look for config inside the logs?",
+   "me": "Configuration in /etc, logs in /var/log. No mystery.",
+   "lesson": [
+    "Everything starts at the <b>root</b>, written just as /. The other folders live inside it.",
+    "<b>/etc</b> holds the configurations: for SSH, for the site, for network names.",
+    "<b>/var/log</b> holds the <b>logs</b>, each service's diary. It's where you look when something breaks.",
+    "<b>/home</b> has a folder for each user, with their personal files.",
+    "<b>/usr/bin</b> holds the programs you run from the terminal, like ls and ping."
+   ],
+   "check": {
+    "q": "The site stopped and you want to see what nginx recorded. Where do you look first?",
+    "v": [
+     "To read what a service recorded, which folder do you open?",
+     "A service threw an error. Which folder holds its records?"
+    ],
+    "o": [
+     "/var/log",
+     {
+      "t": "/etc",
+      "why": "/etc holds nginx's configuration, not what it recorded."
+     },
+     {
+      "t": "/home",
+      "why": "/home has the users' personal files."
+     }
+    ],
+    "why": "Logs live in /var/log. nginx's is in /var/log/nginx."
+   },
+   "tip": "Configuration in /etc, logs in /var/log, each person's files in /home, programs in /usr/bin.",
+   "learn": "Linux organizes everything from the root (/): configurations in /etc, logs in /var/log, users' files in /home and programs in /usr/bin. When something breaks, the path is reading the log in /var/log and checking the configuration in /etc.",
+   "buckets": [
+    {
+     "a": [
+      {
+       "t": "sshd_config (SSH config)",
+       "why": "The SSH server's configuration is in /etc/ssh/sshd_config."
+      },
+      {
+       "t": "hosts (local names)",
+       "why": "/etc/hosts lists names and IPs the machine resolves on its own, without DNS."
+      },
+      {
+       "t": "nginx.conf (site config)",
+       "why": "nginx's configuration is in /etc/nginx/nginx.conf."
+      }
+     ]
+    },
+    {
+     "a": [
+      {
+       "t": "syslog (system diary)",
+       "why": "/var/log/syslog records general system messages on Ubuntu and Debian."
+      },
+      {
+       "t": "auth.log (logins)",
+       "why": "/var/log/auth.log records logins and sudo use. It's where you see SSH break-in attempts."
+      },
+      {
+       "t": "nginx error.log",
+       "why": "nginx's errors are in /var/log/nginx/error.log."
+      }
+     ]
+    },
+    {
+     "a": [
+      {
+       "t": "Ana's relatorio.pdf",
+       "why": "Ana's personal files live in her home: /home/ana."
+      },
+      {
+       "t": ".bashrc (Ana's terminal preferences)",
+       "why": ".bashrc lives in each user's home and holds their shell preferences. The leading dot makes the file hidden."
+      },
+      {
+       "t": "scripts Ana wrote",
+       "why": "What the user creates lives in their folder in /home."
+      }
+     ]
+    },
+    {
+     "a": [
+      {
+       "why": "The ls program lives at /usr/bin/ls. When you type ls, the shell looks there."
+      },
+      {
+       "why": "ping is a program like any other: /usr/bin/ping."
+      },
+      {
+       "t": "nano (text editor)",
+       "why": "The nano editor lives at /usr/bin/nano."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Reading the log",
+   "tag": "LINUX TERMINAL",
+   "cap": "Connecting over SSH to web01...",
+   "goal": "Read the nginx logs and find out why the store's login throws an error.",
+   "intro": "A customer reported that the online store's <b>login</b> shows an error page. The site runs on <b>nginx</b> on <b>web01</b>. The logs live in /var/log/nginx. Use the commands' <b>?</b> if you need it.",
+   "z": "Your site is throwing errors and you can't even read a log. Going to restart everything and hope?",
+   "me": "Restarting without reading the log is guessing. First I read.",
+   "lesson": [
+    "<b>cat</b> shows the whole file. Good for short files; a server log usually has thousands of lines.",
+    "<b>tail</b> shows the end of the file, where the newest lines are. <b>tail -f</b> keeps showing what arrives, live.",
+    "<b>head</b> shows the start of the file.",
+    "<b>grep</b> shows only the lines containing a word. <b>grep -i</b> ignores upper and lower case.",
+    "nginx keeps the <b>access.log</b> (every visit) separate from the <b>error.log</b> (every problem)."
+   ],
+   "check": {
+    "q": "In a huge log, which command shows the most recent lines?",
+    "v": [
+     "A log's newest lines are at the end. Which command shows the end?",
+     "To see what just happened in a log, which command do you use?"
+    ],
+    "o": [
+     "tail",
+     {
+      "t": "head",
+      "why": "head shows the start of the file, which are the oldest lines."
+     },
+     {
+      "t": "cat",
+      "why": "cat dumps the whole file. In a big log, the new lines fly by."
+     }
+    ],
+    "why": "Logs grow downward: the newest is at the end, and tail shows the end."
+   },
+   "tip": "ls /var/log/nginx shows the files, tail on error.log shows the latest error and grep filters only the lines that matter.",
+   "learn": "nginx answered 502 because it couldn't talk to the application on port 3000 (connection refused). Getting there only took listing the logs folder, looking at the end of error.log with tail and filtering with grep. Reading the log before acting is the number one on-call habit.",
+   "cmds": [
+    {
+     "why": "nginx has two logs: access.log (every visit) and error.log (every problem)."
+    },
+    {
+     "why": "cat showed the whole file, which here has a single line: the machine's name. For a short file, cat is perfect."
+    },
+    {
+     "why": "The last three visits. The number after the request is the response code: 200 worked, 502 failed. The error shows up exactly on POST /login, when the customer sends the password."
+    },
+    {
+     "why": "The error, at the same time: nginx tried to pass the login to the application at 127.0.0.1:3000 (the upstream) and the connection was refused. Nobody is answering on that port."
+    },
+    {
+     "why": "grep brought only the lines with error. The same error had already happened at 06:58 with another customer: it's not a one-person problem."
+    }
+   ],
+   "steps": [
+    {
+     "q": "In access.log, which line shows the problem?",
+     "v": [
+      "Which access.log visit went wrong?",
+      "In access.log, where does the customer's error show up?"
+     ],
+     "o": [
+      "The POST /login, which came back with code 502",
+      {
+       "t": "The GET /produtos, with code 200",
+       "why": "200 means it worked: the products page opened normally."
+      },
+      {
+       "t": "The GET /login, with code 200",
+       "why": "The login page opened (200). The error came after, when sending the password."
+      }
+     ],
+     "why": "Code 502 (Bad Gateway) says nginx got the request but couldn't get an answer from what sits behind it."
+    },
+    {
+     "q": "What does error.log explain?",
+     "v": [
+      "From error.log, why does the login fail?",
+      "What cause does error.log show?"
+     ],
+     "o": [
+      "nginx can't talk to the application on port 3000: the connection is refused",
+      {
+       "t": "The customer's password is wrong",
+       "why": "A wrong password would get an answer from the application. Here the application didn't even answer."
+      },
+      {
+       "t": "The disk is full",
+       "why": "A full disk would give another message, like No space left on device."
+      }
+     ],
+     "why": "Connection refused on 127.0.0.1:3000 means nothing listens on that port: the store's application stopped. nginx is fine; what went down is what's behind it."
+    },
+    {
+     "q": "To see only the lines with the word error in a big file, which command do you use?",
+     "v": [
+      "Which command filters only the lines that have error?",
+      "How do you show only a log's lines with error?"
+     ],
+     "o": [
+      "grep -i error file",
+      {
+       "t": "head file",
+       "why": "head shows the start, error or not."
+      },
+      {
+       "t": "cat file",
+       "why": "cat shows everything. You'd have to find it by eye."
+      }
+     ],
+     "why": "grep filters by text. With -i, it catches Error, ERROR and error."
+    },
+    {
+     "q": "You'll ask the customer to try again. How do you watch the log live while they test?",
+     "v": [
+      "How do you follow error.log in real time?",
+      "Which command shows the log's new lines as soon as they arrive?"
+     ],
+     "o": [
+      "tail -f /var/log/nginx/error.log",
+      {
+       "t": "cat /var/log/nginx/error.log",
+       "why": "cat shows the file once and exits."
+      },
+      {
+       "t": "ls /var/log/nginx",
+       "why": "ls only lists the files."
+      }
+     ],
+     "why": "-f (follow) keeps tail open showing each new line. Ctrl+C exits."
+    }
+   ]
+  },
+  {
+   "title": "Reading permissions",
+   "tag": "PERMISSIONS",
+   "cap": "Checking who can do what...",
+   "heads": [
+    "IN LS -L",
+    "WHO CAN DO WHAT"
+   ],
+   "goal": "Connect each permission, as ls -l shows it, to what it allows.",
+   "z": "rw-r--r--? Looks like a Wi-Fi password. You don't know who can touch your files.",
+   "me": "First the type, then three blocks: owner, group and others.",
+   "lesson": [
+    "In <b>ls -l</b>, the first column has 10 characters. The 1st is the type: <b>-</b> file, <b>d</b> folder.",
+    "The other 9 are three blocks of three: <b>owner</b>, <b>group</b> and <b>others</b>.",
+    "In each block: <b>r</b> = read, <b>w</b> = write, <b>x</b> = execute. A dash means not allowed.",
+    "On a folder, <b>x</b> is the right to enter it.",
+    "<b>sudo</b> runs a command as administrator, even without the permission: that's why it asks for a password and gets logged."
+   ],
+   "check": {
+    "q": "In -rw-r--r--, what can other users do?",
+    "v": [
+     "In -rw-r--r--, what's the others' permission?",
+     "Reading -rw-r--r--, what's left for someone who isn't the owner or in the group?"
+    ],
+    "o": [
+     "Only read",
+     {
+      "t": "Read and write",
+      "why": "Read and write (rw-) is only the owner, in the first block."
+     },
+     {
+      "t": "Nothing",
+      "why": "Nothing would be ---. The last block is r--: they can read."
+     }
+    ],
+    "why": "After the type (-) come rw- (owner), r-- (group) and r-- (others). Others only read."
+   },
+   "tip": "Read in blocks: type, owner, group, others. r = read, w = write, x = execute, - = not allowed.",
+   "learn": "The ls -l permissions column is type + owner + group + others, each with r, w and x. A regular file is usually -rw-r--r--, a secret -rw-------, a folder drwxr-xr-x and a program -rwxr-xr-x. On call you'll see these as numbers (644, 600, 755).",
+   "left": [
+    {
+     "s": "site file",
+     "why": "-rw-r--r--: file; the owner reads and writes, group and others only read."
+    },
+    {
+     "s": "secret key",
+     "why": "-rw-------: file; only the owner reads and writes. Nobody else even sees the content."
+    },
+    {
+     "s": "folder",
+     "why": "drwxr-xr-x: folder (d); the owner does everything, others enter and list, but don't create or delete."
+    },
+    {
+     "why": "-rwxr-xr-x: a file everyone can run and read, but only the owner changes."
+    },
+    {
+     "s": "private folder",
+     "why": "drwx------: a folder only the owner can enter. Others can't even list it."
+    }
+   ],
+   "right": [
+    {
+     "t": "Everyone reads, only the owner changes",
+     "why": "Everyone reading and only the owner writing: rw- r-- r--, a regular file."
+    },
+    {
+     "t": "Only the owner reads and writes",
+     "why": "Only the owner and nobody else: rw- --- ---."
+    },
+    {
+     "t": "Folder everyone enters, only the owner creates in",
+     "why": "Folder (d) with rwx for the owner and r-x for others: they enter and list."
+    },
+    {
+     "t": "Everyone can execute",
+     "why": "Execute for everyone is x in all three blocks: rwx r-x r-x."
+    },
+    {
+     "t": "Folder only the owner enters",
+     "why": "Folder (d) with rwx only in the owner block: drwx------."
+    }
+   ]
+  },
+  {
+   "title": "Install and start a service",
+   "tag": "LINUX TERMINAL",
+   "cap": "Connecting over SSH to srv01...",
+   "goal": "Install the nginx web server on srv01 and check that it's running and comes back on its own after a reboot.",
+   "intro": "srv01 is going to host an internal page. Install <b>nginx</b>, check that the <b>service</b> is up and that it starts on its own when the server reboots.",
+   "z": "Installed it and walked away? Let's see when the server reboots at 3 a.m.",
+   "me": "I install, check the status and test the page. No guessing.",
+   "lesson": [
+    "Programs are installed as <b>packages</b>. On Ubuntu and Debian, <b>apt</b> takes care of that.",
+    "<b>sudo apt update</b> only refreshes the list of available versions. <b>sudo apt install</b> installs. Both change the system, so they use <b>sudo</b>.",
+    "A <b>service</b> is a program that keeps running in the background. <b>systemd</b> takes care of them, and the command to talk to it is <b>systemctl</b>.",
+    "In <b>systemctl status</b>: active (running) = running now; enabled = starts on its own at boot.",
+    "<b>curl</b> makes a request to a site straight from the terminal: great for testing whether the page answers."
+   ],
+   "check": {
+    "q": "What does sudo apt update do?",
+    "v": [
+     "What is apt update for?",
+     "Does running sudo apt update install anything?"
+    ],
+    "o": [
+     "Refreshes the list of available packages and versions, without installing anything",
+     {
+      "t": "Updates all programs",
+      "why": "What updates programs is apt upgrade. update only downloads the list."
+     },
+     {
+      "t": "Installs nginx",
+      "why": "What installs is apt install nginx."
+     }
+    ],
+    "why": "update refreshes the catalog. After it, install and upgrade know which versions are the newest."
+   },
+   "tip": "sudo apt update, sudo apt install nginx, systemctl status nginx (look for active and enabled) and curl -I http://localhost to test the page.",
+   "learn": "With apt you install packages (sudo apt update, then sudo apt install). systemctl status shows whether the service is running (active) and starts at boot (enabled), and curl tests the page straight from the server.",
+   "cmds": [
+    {
+     "why": "apt downloaded the new package list from Ubuntu's servers. It installed nothing: it just says 12 packages have updates."
+    },
+    {
+     "why": "It installed nginx and nginx-common, which comes with it. -y answers yes to the confirmation question on its own."
+    },
+    {
+     "why": "Two words matter: active (running), running now, and enabled, on the Loaded line, which means it starts on its own at boot. On Ubuntu, the package already leaves the service enabled."
+    },
+    {
+     "why": "nginx answered 200 OK with the default page. -I asks only for the response header, without the HTML."
+    }
+   ],
+   "steps": [
+    {
+     "q": "Why did apt install need sudo?",
+     "v": [
+      "What's the reason for sudo before apt install?",
+      "Why does installing a package ask for sudo?"
+     ],
+     "o": [
+      "Installing a program changes the whole system, and that requires administrator permission",
+      {
+       "t": "Because nginx is paid",
+       "why": "nginx is free. sudo is about permission, not price."
+      },
+      {
+       "t": "Because without sudo the internet doesn't work",
+       "why": "The network works without sudo. What requires an administrator is writing to system folders."
+      }
+     ],
+     "why": "apt writes to system folders, like /usr and /etc, which only root can change. sudo grants that power for that one command and records who used it."
+    },
+    {
+     "q": "The status shows active (running). What does that mean?",
+     "v": [
+      "From systemctl status, is nginx working?",
+      "What does active (running) mean in the status?"
+     ],
+     "o": [
+      "nginx is running now",
+      {
+       "t": "It's installed, but stopped",
+       "why": "Stopped would show as inactive (dead)."
+      },
+      {
+       "t": "It'll start on the next boot",
+       "why": "Boot is what enabled talks about. active is about now."
+      }
+     ],
+     "why": "active (running) is the current state: the process is up. It's good to confirm with a real test, like curl."
+    },
+    {
+     "q": "If the server reboots, does nginx come back on its own?",
+     "v": [
+      "After a reboot, does nginx start without anyone touching it?",
+      "Does nginx come back on its own if srv01 reboots?"
+     ],
+     "o": [
+      "Yes: the status shows enabled, so it starts at boot",
+      {
+       "t": "No: you have to run systemctl start every time",
+       "why": "That would be if it were disabled. Here it's enabled."
+      },
+      {
+       "t": "Only if someone logs into the server",
+       "why": "A service starts at boot with nobody logged in. That's what enabled is for."
+      }
+     ],
+     "why": "enabled means systemd starts the service on every boot. If it were disabled, the command to change it would be sudo systemctl enable nginx."
+    },
+    {
+     "q": "Which test proves the page is really answering?",
+     "v": [
+      "How do you confirm the site answers?",
+      "Which command tests the nginx page straight from the server?"
+     ],
+     "o": [
+      "curl -I http://localhost, which came back 200 OK",
+      {
+       "t": "ls /var/log/nginx",
+       "why": "The logs existing doesn't prove the page answers."
+      },
+      {
+       "t": "sudo apt update",
+       "why": "That only refreshes the package list."
+      }
+     ],
+     "why": "curl makes a request just like the browser's. 200 OK is HTTP's success response."
+    }
+   ]
+  }
+ ]
+}
