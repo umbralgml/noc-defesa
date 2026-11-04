@@ -868,3 +868,8 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tplay.live .tpi path{fill:#03130d}
 /* No computador a coluna da tela inicial rola: nenhum item pode encolher (o selo era espremido e cortado) */
 #title .content>*{flex-shrink:0}
+
+/* idioma: aviso de fase sem tradução e escolha do idioma */
+.trnote{margin:8px 0 4px;padding:8px 12px;border-radius:10px;border:1px dashed rgba(255,209,102,.5);color:var(--warn);font-size:13px}
+.langs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.langs .wideb{margin-top:0}

@@ -422,6 +422,14 @@ Filtros aceitos (subconjunto do Wireshark, em `src/engine/netlib.js`): protocolo
 
 ---
 
+## Tradução (espanhol)
+
+A fase original fica em `src/levels/<ato>.json`, em português. A tradução vai em `src/levels/es/<ato>.json`, **com a mesma estrutura e só os textos**: `title`, `tag`, `cap`, `goal`, `intro`, `z`, `me`, `lesson`, `check`, `tip`, `learn`, `t`, `s`, `why`, `q`, `v`, `o`, `label`, `heads`, `html`, `explain` e o `t` das fichas. Listas casam por posição: para pular um item, use `{}` no lugar dele.
+
+O que fica de fora (o jogo usa o original): `c`, `out`, `alias`, `run`, `prompt`, `host`, `type`, `loc`, `mode`, `id`, `a`, `f`, `src`, `dst`, `proto`, `flags`, `info`, `ip` e números. **Comando, saída de equipamento, configuração e endereço nunca se traduzem**, nem dentro das explicações. O validador acusa campo protegido diferente, campo que não existe no original e tipo trocado, e roda as checagens normais na fase mesclada.
+
+Em `drop` com `slots`, se a ficha certa tiver `t` traduzido, o valor em `zones` traduz igual (ou use `v` na ficha, que não muda). O progresso continua pelo título em português, então traduzir o `title` é seguro. Termo novo nas aulas traduzidas entra em `ES.gloss` (`src/i18n/es.js`) com os apelidos em espanhol.
+
 ## Checklist antes do pull request
 
 - [ ] `node tools/validar-fases.mjs` sem erros nem avisos.

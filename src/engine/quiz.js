@@ -1,5 +1,6 @@
 // Motor "quiz": perguntas de múltipla escolha. Com "boss": true vira o chefe final,
 // com cronômetro por pergunta e barra de vida do Z3R0 (precisa acertar 70%).
+import { t as tr } from './i18n.js';
 import { $, shuffle, center, vary, missN, missInc } from './util.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
@@ -58,7 +59,7 @@ function answer(btn) {
     S.hits++; good(at);
     if (L.boss) { sfx.zap(); toast(ZHURT[Math.random() * ZHURT.length | 0], false); const f = $('bossFill'); if (f) f.style.width = bossPct() + '%'; }
   } else {
-    note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
+    note(q.q, `${tr('Resposta:')} ${opt(q.o[q.a]).t}. ${q.why}`);
     missInc(`${L.title}|${base.q}`);
     if (!L.train) bankAdd(`${L.title}|${base.q}`, { lv: L.title, q: base.q, o: base.o, a: base.a, why: base.why, v: base.v });
     if (L.free) { S.err++; S.streak = 0; sfx.bad(); }   // Academia: errar não custa integridade

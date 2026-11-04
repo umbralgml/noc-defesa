@@ -1,5 +1,6 @@
 // Ponto de entrada: monta a tela de título, carrega as fases e liga os botões.
 import { $, fmt } from './engine/util.js';
+import { LANG, LANGS, setLang, initI18n } from './engine/i18n.js';
 import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
 import { AV_ME } from './engine/scene.js';
 import { titleSVG } from './engine/titlescene.js';
@@ -25,6 +26,7 @@ import { initWire } from './engine/wire.js';
 import { applyPrefs, lookModal, a11yModal } from './engine/prefs.js';
 
 applyPrefs();
+initI18n();
 
 $('mA').innerHTML = AV_ME;
 // Selo da Play Store na tela inicial. Quando o app sair, ponha o link aqui e o selo vira botão de baixar.
@@ -40,6 +42,16 @@ $('resetBtn').onclick = () => askReset(showProgress);
 $('lookBtn').onclick = () => { au(); lookModal(); };
 $('contactT').onclick = $('contactM').onclick = () => { au(); openContact(); };
 $('a11yBtn').onclick = () => { au(); a11yModal(); };
+// Idioma: a troca recarrega a página (fases, glossário e telas são montados no idioma escolhido).
+$('langT').textContent = '🌐 ' + LANGS[LANG];
+$('langT').onclick = () => {
+  au();
+  modal(`<div class="tag">IDIOMA · IDIOMA</div><h2>🌐</h2><div class="langs">${Object.entries(LANGS).map(([k, v]) => `<button class="btn ${k === LANG ? '' : 'ghostb '}wideb" data-l="${k}" data-notr>${v}</button>`).join('')}</div>
+    <div class="fnote">Comandos e saídas de equipamento ficam como no original em todos os idiomas. / Los comandos y las salidas de los equipos quedan como en el original en todos los idiomas.</div>
+    <div class="row"><button class="btn ghostb" id="mOk">OK</button></div>`);
+  document.querySelectorAll('.langs [data-l]').forEach(b => b.onclick = () => b.dataset.l === LANG ? closeModal() : setLang(b.dataset.l));
+  $('mOk').onclick = closeModal;
+};
 
 // Resumo na tela inicial, só para quem já concluiu alguma fase.
 function showProgress() {

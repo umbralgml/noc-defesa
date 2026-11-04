@@ -1,5 +1,6 @@
 // Sala do NOC no topo do mapa: o analista anda pela sala (toque no chão ou setas do teclado)
 // e, ao chegar num equipamento, abre os incidentes daquele local. A câmera acompanha o herói.
+import { t as tr } from './i18n.js';
 import { $, store } from './util.js';
 import { sfx, au } from './audio.js';
 import { ROOM_W, STATIONS, LOCNAME, roomSVG } from './scene.js';
@@ -53,7 +54,7 @@ function goStation(t) { au(); walk(t.stand, () => { hero.classList.add('type'); 
 function openStation(t) {
   const list = LEVELS.map((L, i) => ({ L, i })).filter(o => o.L.loc === t.loc);
   const nextI = LEVELS.findIndex((L, i) => unlocked(i) && !S.prog[K(i)]);
-  modal(`<div class="tag">${LOCNAME[t.loc]}</div><h2>${t.name}</h2>
+  modal(`<div class="tag">${tr(LOCNAME[t.loc])}</div><h2>${t.name}</h2>
     <div class="stlist">${list.map(({ L, i }) => {
       const st = S.prog[K(i)] || 0, lock = !unlocked(i);
       return `<button class="stl${lock ? ' lock' : ''}${i === nextI ? ' next' : ''}" data-i="${i}" ${lock ? 'disabled' : ''}>

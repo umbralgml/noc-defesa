@@ -6,6 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { matches, path, reach, lid, compile } from '../src/engine/netlib.js';
 import { cmdGloss } from '../src/engine/glossary.js';
+import { merge } from '../src/engine/util.js';
 
 const DIR = fileURLToPath(new URL('../src/levels/', import.meta.url));
 const LOCS = ['rack', 'desk', 'firewall', 'war', 'server'];
@@ -174,8 +175,31 @@ for (const f of read('index.json').acts) {
   });
 }
 
-// O service worker (sw.js) guarda os módulos para o jogo abrir offline: todo módulo novo precisa estar na lista.
 const sw = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+// Traduções (src/levels/<lang>/): só textos, na mesma estrutura do original. Comandos, saídas, configurações,
+// endereços e ids nunca mudam; a fase mesclada passa pelas mesmas checagens do original.
+const PROT = new Set(['c', 'out', 'alias', 'run', 'prompt', 'host', 'type', 'loc', 'mode', 'id', 'who', 'src', 'dst', 'proto', 'flags', 'info', 'qname', 'method', 'f', 'kind', 'fault', 'from', 'accept', 'ico', 'm', 'diff', 'dailyFrom', 'ip']);
+function same(o, x, at, err) {
+  if (x === undefined || x === null) return;
+  if (Array.isArray(o)) { if (!Array.isArray(x)) return err(`${at}: era lista no original`); if (x.length > o.length) err(`${at}: ${x.length} itens, o original tem ${o.length}`); x.forEach((v, i) => same(o[i], v, `${at}[${i}]`, err)); return; }
+  if (o && typeof o === 'object') { if (typeof x !== 'object' || Array.isArray(x)) return err(`${at}: era objeto no original`); for (const k in x) { if (!(k in o)) err(`${at}.${k}: campo que não existe no original`); else if (PROT.has(k) && JSON.stringify(o[k]) !== JSON.stringify(x[k])) err(`${at}.${k}: não se traduz (comando, saída, endereço ou id). Deixe igual ao original ou tire da tradução`); else same(o[k], x[k], `${at}.${k}`, err); } return; }
+  if (typeof o !== typeof x) err(`${at}: tipo diferente do original`);
+  else if (typeof o !== 'string' && o !== x) err(`${at}: número ou sim/não muda o jogo, não se traduz`);
+}
+const LEVDIR = new URL('../src/levels/', import.meta.url);
+readdirSync(LEVDIR, { withFileTypes: true }).filter(d => d.isDirectory()).forEach(d => {
+  const lang = d.name;
+  readdirSync(new URL(lang + '/', LEVDIR)).filter(f => f.endsWith('.json')).forEach(f => {
+    const at = `${lang}/${f}`, err = m => errors.push(m);
+    if (!idxActs().includes(f)) return errors.push(`${at}: não existe ato "${f}" no index.json`);
+    const o = read(f), x = read(at);
+    same(o, x, at, err);
+    (o.levels || []).forEach((L, i) => { const y = (x.levels || [])[i]; if (y) check(merge(L, y), `${at} #${i + 1} "${y.title || L.title}"`, ['iniciante', 'básico'].indexOf(o.diff) >= 0 ? 1 : 2); });
+    if (!sw.includes(`src/levels/${at}`)) errors.push(`sw.js: src/levels/${at} fora da lista CORE`);
+  });
+});
+
+// O service worker (sw.js) guarda os módulos para o jogo abrir offline: todo módulo novo precisa estar na lista.
 readdirSync(new URL('../src/engine/', import.meta.url)).filter(f => f.endsWith('.js')).forEach(f => {
   if (!sw.includes(`'${f.replace(/\.js$/, '')}'`)) errors.push(`sw.js: módulo src/engine/${f} fora da lista CORE (o jogo não abriria offline)`);
 });

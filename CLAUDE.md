@@ -43,12 +43,15 @@ deploy/install.sh     instalador para Ubuntu/Debian (nginx ou Apache existente, 
 deploy/vps/           API própria do ranking: instalar-api.sh (PostgreSQL + PostgREST + nginx /rest/v1/ + backup), roles.sql, configs
 src/main.js           entrada: cena do título, botões do título, init dos motores, loadLevels(), loadNews()
 src/changelog.json    { "versions": [ { "v", "date", "title", "items" } ] }, mais recente primeiro
+src/i18n/es.js        pacote do espanhol: ui (texto de tela, chave = original em português), gloss (glossário) e trails
 src/config.json       { "ranking": { "url", "key" } }: Supabase (url + key publishable) ou API própria na VPS (só url, key vazia); url vazia = ranking desligado
 src/levels/
   index.json          { "acts": [...], "trilhas": [{ "id", "name", "icon", "desc", "soon"?, "acts": [...] }] }: "acts" é a soma das trilhas, na mesma ordem
   prologo.json, formacao.json, atoN.json, linux.json   { "tag", "name", "diff", "story", "levels": [ ... ] }
+  es/<ato>.json       tradução: só os textos, na mesma estrutura do original (fase ausente = aparece em português)
 src/engine/
-  util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON); sem dependências
+  util.js             $, shuffle, fmt, center, buzz, esc, store (localStorage com JSON), merge (tradução de fase), siteURL; sem dependências
+  i18n.js             idioma (LANG, noc_lang ou idioma do aparelho), t() para texto de tela e translateDOM() (MutationObserver aplica o dicionário)
   state.js            S (estado da partida; S.lv = fase atual), LEVELS, ACTS, save, K, unlocked, resetProgress, progress
   levels.js           loadLevels(): fetch dos JSON por trilha; cada fase recebe .act (índice do ato) e .trail (índice da trilha)
   scene.js            SVG das cenas por `loc`, herói animado, avatares, MEDIA (cabos) e ícones
@@ -96,7 +99,7 @@ docs/CRIAR-FASE.md    formato completo de cada tipo de fase, com exemplos
 
 ### Grafo de dependências (sem ciclos)
 
-`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `steps` ← `term`, `topo`, `defense`, `pcap` (+ `netlib`) ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa`, `prefs` ← `main`; `rank` ← `cert` ← `game`)
+`util` ← `scene`, `audio`, `state` ← `ui` ← `rank` ← `wire`, `drop`, `quiz`, `steps` ← `term`, `topo`, `defense`, `pcap` (+ `netlib`) ← `game` ← `daily`, `room` ← `main` (e `util` ← `news`, `pwa`, `prefs` ← `main`; `rank` ← `cert` ← `game`; `util` ← `i18n` ← `glossary`, `gen`, `levels`, `news` e os motores que usam `t()`; `i18n` importa só `util` e `src/i18n/es.js`)
 
 Os motores de fase **não importam `game.js`**. Para terminar a fase eles chamam `flow.win()` / `flow.fail(msg)`, ganchos de `ui.js` que o `game.js` preenche em `initGame()`. Do mesmo jeito, `flow.map()` (cartão do desafio no mapa) é preenchido pelo `daily.js`, `flow.room()` (placas da sala) pelo `room.js`, `flow.report()` (botão de reportar erro) pelo `report.js` e `hooks.joined` do `rank.js` também. Mantenha assim para não criar import circular.
 
@@ -119,7 +122,8 @@ Crie `src/engine/<tipo>.js` exportando `render<Tipo>(L)` (e `reset<Tipo>()` / `i
 
 ## Convenções
 
-- **Idioma:** tudo que o jogador vê é pt-BR. Comentários de código também em pt-BR, curtos. Nomes de variáveis e funções seguem o estilo existente (curto, em inglês: `L`, `S`, `sel`, `renderDrop`).
+- **Idiomas:** o português é o original e a chave de tudo; o espanhol é uma camada por cima. Telas: o texto continua em português no código e `ES.ui` (em `src/i18n/es.js`) traduz no DOM (números viram `{n}` na chave). Texto que não passa pelo DOM (compartilhar, legenda digitada) usa `t()` de `i18n.js`. Fases: `src/levels/es/<ato>.json` com só os textos; `levels.js` mescla e guarda `L.key` (título em português, chave do progresso) e `L.orig` (o desafio diário sorteia pelo original). Glossário: `ES.gloss` pelo termo em português. **Comandos, saídas, configurações, endereços e ids nunca são traduzidos**: o validador acusa se mudarem. Fase sem tradução aparece em português com aviso no briefing. Ao criar texto de tela novo, acrescente a tradução em `ES.ui`; ao criar fase nova, a tradução pode vir num lote seguinte. Teste em espanhol com `node tools/testes/campanha.mjs --lang es` (e `--coleta arq.json` lista os textos de tela sem tradução).
+- **Idioma do código:** tudo que o jogador vê nasce em pt-BR. Comentários de código também em pt-BR, curtos. Nomes de variáveis e funções seguem o estilo existente (curto, em inglês: `L`, `S`, `sel`, `renderDrop`).
 - **Estilo do JS:** compacto, igual ao código existente. `const $ = id => ...`, funções pequenas, template strings para HTML, `;` no fim, aspas simples, 2 espaços. Sem classes, sem bibliotecas.
 - **Texto do jogador:** conteúdo vindo do JSON em campos de texto (`t`, `s`, `why`, `q`, opções) vai por `textContent`. Só os campos documentados como HTML (`goal`, `intro`, `z`, `me`, `lesson`, `tip`, `learn`, `html`, `label`) vão por `innerHTML`.
 - **Tom do conteúdo:** frases curtas e diretas, voz de analista de plantão. O Z3R0 provoca, o analista responde com o conceito. Explicações dizem o que o item é e por que vai onde vai, nunca só "certo" ou "errado".

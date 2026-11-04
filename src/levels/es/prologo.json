@@ -1,0 +1,531 @@
+{
+ "tag": "PRÓLOGO",
+ "name": "Primeros pasos en la red",
+ "story": [
+  { "t": "¡Bienvenido al NOC! Desde aquí cuidamos la red de un proveedor entero. Hoy es tu primer turno." },
+  { "t": "Primer día... ¿y por qué la pantalla grande parpadea en rojo?" },
+  { "t": "Hola, novato. Soy Z3R0. Voy a pasar la noche tumbando tu red. Intenta seguirme el ritmo." },
+  { "t": "Tranquilo. Empieza por lo básico: quién es quién en la red. Cada fase tiene una clase corta antes, y puedes repasarla durante el juego." }
+ ],
+ "levels": [
+  {
+   "title": "Primer día en el NOC",
+   "tag": "TUTORIAL",
+   "cap": "Llegando al primer turno...",
+   "heads": ["EQUIPO", "QUÉ HACE"],
+   "goal": "Une cada equipo con lo que hace. Empieza tocando el Switch y después su función, a la derecha.",
+   "z": "¿Primer día? Qué tierno. Apuesto a que ni sabes la diferencia entre switch y router.",
+   "me": "Todavía no lo sé todo. Pero aprendo rápido.",
+   "lesson": [
+    "Una <b>red</b> es un conjunto de equipos conversando. Cada uno tiene un papel.",
+    "El <b>switch</b> conecta las computadoras del mismo lugar, la red local (LAN).",
+    "El <b>router</b> conecta redes distintas. Es el que te lleva hasta internet.",
+    "El <b>firewall</b> es el portero: decide qué puede entrar y salir.",
+    "El <b>access point</b> (AP) es la antena del Wi-Fi. El <b>servidor</b> es la máquina que ofrece un servicio, como un sitio web."
+   ],
+   "check": {
+    "q": "¿Qué equipo conecta redes distintas, como la red de la empresa e internet?",
+    "v": [
+     "¿Qué equipo conecta la red de la empresa con internet, uniendo redes distintas?",
+     "Para salir de la red local y llegar a otra red, como internet, ¿por qué equipo pasan los paquetes?"
+    ],
+    "o": [
+     "Router",
+     { "t": "Switch", "why": "El switch conecta los equipos de la misma red local." },
+     { "t": "Access point", "why": "El access point lleva la red al Wi-Fi, pero no conecta redes distintas." }
+    ],
+    "why": "El router reenvía paquetes entre redes distintas según la dirección IP."
+   },
+   "tip": "Switch = misma red. Router = entre redes. Firewall = portero. Access point = Wi-Fi. Servidor = ofrece un servicio.",
+   "learn": "Cada equipo tiene un papel: el switch conecta la red local, el router conecta redes distintas, el firewall filtra, el access point lleva la red al Wi-Fi y el servidor ofrece los servicios. Ese es el mapa mental de cualquier NOC.",
+   "left": [
+    { "t": "Switch", "s": "Caja llena de puertos de red", "why": "El switch conecta los equipos de la misma red local y entrega cada mensaje solo a quien debe recibirlo." },
+    { "t": "Router", "s": "Está entre tu red e internet", "why": "El router elige el camino entre redes distintas. Sin él, tu red no sale a internet." },
+    { "t": "Firewall", "s": "Está en la entrada de la red", "why": "El firewall compara cada conexión con las reglas y bloquea lo que no fue permitido." },
+    { "t": "Access point", "s": "Tiene antenas", "why": "El access point convierte la red cableada en Wi-Fi." },
+    { "t": "Servidor", "s": "Encendido todo el tiempo en el datacenter", "why": "El servidor es la computadora que ofrece un servicio a las demás: sitio web, archivos, correo, DNS." }
+   ],
+   "right": [
+    { "t": "Conecta las computadoras de la misma red local", "s": "", "why": "Conectar las computadoras de la misma red es el papel del switch." },
+    { "t": "Lleva el tráfico de una red a otra", "s": "Y a internet", "why": "Llevar de una red a otra es el papel del router." },
+    { "t": "Decide qué puede entrar y salir", "s": "", "why": "Decidir qué pasa es el papel del firewall." },
+    { "t": "Da acceso por Wi-Fi", "s": "", "why": "El Wi-Fi es el papel del access point." },
+    { "t": "Ofrece un servicio, como un sitio web", "s": "", "why": "Ofrecer un servicio es el papel del servidor." }
+   ]
+  },
+  {
+   "title": "Capas de la red",
+   "tag": "CLASIFICACIÓN",
+   "cap": "Abriendo la pizarra del NOC...",
+   "goal": "Pon cada pieza de la red en la capa donde trabaja.",
+   "intro": "Toda conversación en la red pasa por <b>capas</b>, como una carta: el texto, el sobre, la dirección y el cartero. Separa cada elemento en la capa correcta.",
+   "z": "La red es puro desorden. Nadie entiende esto.",
+   "me": "Nada de desorden. Son capas, y cada una tiene un trabajo.",
+   "lesson": [
+    "El modelo <b>TCP/IP</b> divide la red en 4 capas. Cada una resuelve un problema y entrega el resultado a la de arriba.",
+    "<b>Enlace/física</b>: el medio (cable, Wi-Fi) y la dirección de la tarjeta, la <b>MAC</b>. El <b>switch</b> trabaja aquí.",
+    "<b>Internet</b> (red): la dirección <b>IP</b> y el camino entre redes. El <b>router</b> trabaja aquí.",
+    "<b>Transporte</b>: <b>TCP</b> o <b>UDP</b> y los <b>puertos</b>, que dicen qué programa recibe.",
+    "<b>Aplicación</b>: lo que usas: sitio web (HTTP), nombres (DNS), correo. El modelo <b>OSI</b>, de 7 capas, es la versión detallada del mismo mapa."
+   ],
+   "check": {
+    "q": "¿En qué capa está el puerto (como el 443)?",
+    "v": [
+     "Un número de puerto, como el 443, ¿a qué capa pertenece?",
+     "HTTPS usa el puerto 443. ¿En qué capa se maneja esa información de puerto?"
+    ],
+    "o": [
+     "Transporte",
+     { "t": "Enlace", "why": "En el enlace están el cable, el Wi-Fi y la MAC." },
+     { "t": "Aplicación", "why": "La aplicación es el servicio (HTTP, DNS). El puerto es de la capa de transporte, junto con TCP y UDP." }
+    ],
+    "why": "Puertos, TCP y UDP forman la capa de transporte: entregan la conversación al programa correcto."
+   },
+   "tip": "Cable, Wi-Fi, MAC y switch = enlace. IP, router y ping = internet. TCP, UDP y puertos = transporte. Sitio web, DNS y correo = aplicación.",
+   "learn": "Cada capa tiene un trabajo: enlace lleva la señal hasta la siguiente tarjeta (MAC), internet lleva el paquete entre redes (IP), transporte lo entrega al programa correcto (puerto, TCP/UDP) y aplicación es el servicio que usas. Cuando algo falla, pensar en capas te dice por dónde empezar.",
+   "buckets": [
+    {
+     "label": "ENLACE / FÍSICA",
+     "a": [
+      { "t": "Cable de red Cat6", "why": "El cable es el medio físico: lleva la señal eléctrica de una tarjeta a la otra." },
+      { "t": "Señal de Wi-Fi", "why": "La radio del Wi-Fi es el medio físico inalámbrico, como un cable invisible." },
+      { "t": "Dirección MAC", "why": "La MAC identifica la tarjeta de red en el enlace local. No atraviesa routers." },
+      { "t": "Switch", "why": "El switch reenvía tramas por dirección MAC dentro de la misma red local." }
+     ]
+    },
+    {
+     "label": "INTERNET (RED)",
+     "a": [
+      { "t": "Dirección IP", "why": "La IP identifica la máquina entre redes distintas. Es la capa de internet." },
+      { "t": "Router", "why": "El router lee la IP de destino y elige el camino entre redes." },
+      { "t": "Ping (ICMP)", "why": "El ping usa ICMP, que viaja junto con IP para probar si el destino responde." }
+     ]
+    },
+    {
+     "label": "TRANSPORTE",
+     "a": [
+      { "t": "Puerto 443", "why": "El puerto dice qué programa recibe la conversación. Los puertos son de la capa de transporte." },
+      { "t": "TCP", "why": "TCP confirma la entrega y reenvía lo que se perdió: protocolo de transporte." },
+      { "t": "UDP", "why": "UDP envía sin confirmar, más rápido: también es protocolo de transporte." }
+     ]
+    },
+    {
+     "label": "APLICACIÓN",
+     "a": [
+      { "t": "Sitio web (HTTP)", "why": "HTTP es el idioma de los sitios web: capa de aplicación." },
+      { "t": "DNS", "why": "El DNS traduce nombres en IPs. Es un servicio, así que está en la aplicación." },
+      { "t": "Correo (SMTP)", "why": "SMTP envía correos: otro servicio de la capa de aplicación." }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Dirección, puerto y MAC",
+   "tag": "CLASIFICACIÓN",
+   "cap": "Abriendo la planilla de inventario...",
+   "goal": "Clasifica cada elemento como dirección IP, puerto o dirección MAC.",
+   "intro": "En la planilla del NOC todo está mezclado. Separa lo que es <b>dirección IP</b>, lo que es <b>puerto</b> y lo que es <b>dirección MAC</b>.",
+   "z": "Mezclé IPs, puertos y MACs en tu planilla. Suerte ordenando.",
+   "me": "Dirección, departamento y documento de identidad. Puedo separarlos.",
+   "lesson": [
+    "Piensa en un edificio: la <b>dirección IP</b> es la dirección del edificio, y el <b>puerto</b> es el número del departamento (qué programa va a atender).",
+    "<b>IPv4</b> tiene 4 números de 0 a 255 separados por punto, como <b>192.168.1.10</b>.",
+    "El <b>puerto</b> es un solo número, de 0 a 65535. Algunos son famosos: <b>80</b> (sitio web), <b>443</b> (sitio web seguro), <b>22</b> (SSH).",
+    "La <b>MAC</b> es el \"documento de identidad\" de la tarjeta de red, grabado de fábrica: 6 pares en hexadecimal, como <b>3c:22:fb:11:0a:7e</b>."
+   ],
+   "check": {
+    "q": "¿Cuál de estas es una dirección MAC?",
+    "v": [
+     "Entre las opciones, ¿cuál tiene el formato de una dirección MAC?",
+     "La dirección MAC es la dirección física de la tarjeta de red. ¿Cuál de estas lo es?"
+    ],
+    "o": [
+     "3c:22:fb:11:0a:7e",
+     { "t": "192.168.1.10", "why": "Cuatro números con punto: es una dirección IPv4." },
+     { "t": "443", "why": "Un solo número es un puerto." }
+    ],
+    "why": "La MAC tiene 6 pares en hexadecimal, separados por dos puntos o guion."
+   },
+   "tip": "Cuatro números con punto = IP. Un solo número = puerto. Seis pares con dos puntos o guion = MAC.",
+   "learn": "La dirección IP dice qué máquina, el puerto dice qué programa dentro de ella y la MAC identifica la tarjeta de red en el cable o en el Wi-Fi. Son tres capas distintas de la misma conversación.",
+   "buckets": [
+    {
+     "label": "DIRECCIÓN IP",
+     "a": [
+      { "t": "192.168.1.10", "why": "4 números de 0 a 255 separados por punto: dirección IPv4." },
+      { "t": "8.8.8.8", "why": "Dirección IPv4 del DNS público de Google." },
+      { "t": "10.0.0.1", "why": "Dirección IPv4, común en redes internas." }
+     ]
+    },
+    {
+     "label": "PUERTO",
+     "a": [
+      { "t": "443", "why": "Un solo número, hasta 65535: es un puerto. El 443 es el del sitio web seguro (HTTPS)." },
+      { "t": "22", "why": "Puerto de SSH, el acceso remoto seguro." },
+      { "t": "80", "why": "Puerto del sitio web sin cifrado (HTTP)." },
+      { "t": "3389", "why": "Puerto del escritorio remoto de Windows (RDP)." }
+     ]
+    },
+    {
+     "label": "DIRECCIÓN MAC",
+     "a": [
+      { "t": "3c:22:fb:11:0a:7e", "why": "6 pares en hexadecimal separados por dos puntos: dirección MAC." },
+      { "t": "00-1A-2B-3C-4D-5E", "why": "MAC escrita con guiones, como la muestra Windows." },
+      { "t": "aa:bb:cc:11:22:33", "why": "También es MAC: 6 pares de 00 a ff." }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Binario sin miedo",
+   "tag": "BINARIO",
+   "cap": "Encendiendo la calculadora mental...",
+   "goal": "Convierte los números entre binario y decimal.",
+   "intro": "Por dentro, la IP es solo una fila de <b>0</b> y <b>1</b>. Cada pedazo de 8 bits (un <b>octeto</b>) se convierte en un número de 0 a 255. Usa la tabla de la clase y completa.",
+   "z": "11000000. Apuesto a que ni sabes qué significa.",
+   "me": "128 más 64. Da 192. Siguiente.",
+   "lesson": [
+    "Un <b>bit</b> es 0 o 1. <b>8 bits</b> forman un <b>octeto</b>. IPv4 tiene 4 octetos: <b>32 bits</b>.",
+    "Cada posición del octeto vale un número. De izquierda a derecha: <b>128, 64, 32, 16, 8, 4, 2, 1</b>.",
+    "Para convertir, suma el valor de las posiciones que tienen <b>1</b>. Ejemplo: <b>00000101</b> = 4 + 1 = <b>5</b>.",
+    "Todo encendido, <b>11111111</b>, da 128+64+32+16+8+4+2+1 = <b>255</b>. Por eso ningún número de la IP pasa de 255."
+   ],
+   "check": {
+    "q": "¿Cuánto vale 10000001 en decimal?",
+    "v": [
+     "Al convertir el binario 10000001 a decimal, ¿cuál es el resultado?",
+     "¿Cuánto vale el octeto 10000001 en decimal?"
+    ],
+    "o": [
+     "129",
+     { "t": "2", "why": "Contaste solo cuántos 1 hay. Cada 1 vale su posición: 128 y 1." },
+     { "t": "128", "why": "Faltó sumar el último bit, que vale 1." }
+    ],
+    "why": "El primer bit vale 128 y el último vale 1: 128 + 1 = 129."
+   },
+   "tip": "Posiciones: 128 64 32 16 8 4 2 1. Suma solo donde hay 1. 11000000 = 128+64.",
+   "learn": "El binario es una suma de posiciones: 128, 64, 32, 16, 8, 4, 2 y 1. Un octeto va de 0 (00000000) a 255 (11111111), e IPv4 tiene 4 octetos, 32 bits. Esta cuenta es la que hace que la máscara y las subredes tengan sentido.",
+   "html": "<div class=\"kv\">Bits en un octeto<span class=\"grow\"></span>[b]</div>\n<div class=\"kv\">Bits en una dirección IPv4<span class=\"grow\"></span>[ip]</div>\n<div class=\"kv\">11000000 en decimal<span class=\"grow\"></span>[a]</div>\n<div class=\"kv\">10101000 en decimal<span class=\"grow\"></span>[c]</div>\n<div class=\"kv\">00001010 en decimal<span class=\"grow\"></span>[d]</div>\n<div class=\"kv\">255 en binario<span class=\"grow\"></span>[e]</div>",
+   "explain": {
+    "b": "Un octeto tiene 8 bits. De ahí el nombre: octo = ocho.",
+    "a": "11000000: los dos primeros bits valen 128 y 64. 128 + 64 = 192.",
+    "d": "00001010: solo las posiciones 8 y 2 están encendidas. 8 + 2 = 10.",
+    "e": "255 es todo encendido: 128+64+32+16+8+4+2+1."
+   },
+   "chips": [
+    { "why": "Un octeto tiene 8 bits." },
+    { "why": "IPv4 tiene 32 bits: 4 octetos de 8." },
+    { "why": "128 + 64 = 192." },
+    { "why": "128 + 32 + 8 = 168." },
+    { "why": "8 + 2 = 10." },
+    { "why": "Los 8 bits encendidos: 255." },
+    { "why": "4 es la cantidad de octetos de IPv4, no de bits." },
+    { "why": "Con 8 bits se pueden contar 256 valores, pero van de 0 a 255. El mayor número es 255." },
+    { "why": "10100000 sería 160. En 10101000 el bit del 8 también está encendido: 168." },
+    { "why": "11111110 es 254: falta el último bit, que vale 1." }
+   ]
+  },
+  {
+   "title": "Lo que cuenta el ping",
+   "tag": "QUIZ",
+   "cap": "Abriendo el panel de monitoreo...",
+   "goal": "Responde las preguntas sobre ping, gateway y DNS para entender el panel del NOC.",
+   "z": "Tu panel está lleno de números. Apuesto a que ni sabes leer un ping.",
+   "me": "El ping es la primera herramienta de cualquier analista. A leerlo.",
+   "lesson": [
+    "<b>ping</b> envía un \"¿estás ahí?\" a otro equipo y mide cuánto tarda la respuesta.",
+    "Respuesta en <b>ms</b> (milisegundos) = llegó. <b>Timeout</b> = no volvió nada.",
+    "El <b>gateway</b> es la puerta de salida de tu red, normalmente el router.",
+    "El <b>DNS</b> traduce nombres (google.com) en direcciones IP. Si el ping a la IP funciona pero al nombre no, el problema es el DNS."
+   ],
+   "check": {
+    "q": "El ping al gateway responde, pero al 8.8.8.8 no. ¿Dónde está el problema?",
+    "v": [
+     "El gateway responde al ping, pero el 8.8.8.8 no. ¿En qué parte está la falla?",
+     "La red local está bien (el gateway responde), pero nada en internet responde. ¿Dónde está el problema?"
+    ],
+    "o": [
+     "En la salida a internet",
+     { "t": "En la tarjeta de red de tu PC", "why": "Si fuera la tarjeta, ni el gateway respondería." },
+     { "t": "En el DNS", "why": "8.8.8.8 es una IP: la prueba ni usa DNS." }
+    ],
+    "why": "La red local funciona (el gateway responde); lo que falla es del gateway hacia afuera."
+   },
+   "tip": "Timeout = sin respuesta. ms = tiempo de ida y vuelta. Gateway = salida de la red. La IP responde y el nombre no = DNS.",
+   "learn": "El ping mide si algo responde y en cuánto tiempo. Con él separas los problemas: sin respuesta del gateway es la red local, sin respuesta de internet es la salida, y un nombre que no resuelve es DNS.",
+   "qs": [
+    {
+     "q": "Hiciste ping al servidor y recibiste \"Request timed out\" (tiempo de espera agotado). ¿Qué indica?",
+     "v": [
+      "El ping al servidor solo muestra \"Request timed out\". ¿Qué quiere decir?",
+      "Todas las líneas del ping devolvieron \"tiempo de espera agotado\". ¿Qué pasó con los paquetes?"
+     ],
+     "o": [
+      "No volvió ninguna respuesta: el servidor puede estar apagado, fuera de la red o bloqueando el ping",
+      { "t": "El servidor respondió rápido", "why": "Una respuesta rápida aparece como tiempo en ms, por ejemplo \"time=12 ms\"." },
+      { "t": "Internet está más rápida que lo normal", "why": "Timeout es falta de respuesta, no velocidad." },
+      { "t": "El cable de tu computadora es de fibra", "why": "El tipo de cable no aparece en el ping." }
+     ],
+     "why": "Timeout quiere decir que ninguna respuesta volvió en el tiempo esperado. Puede ser un equipo apagado, un camino roto o un firewall bloqueando el ping."
+    },
+    {
+     "q": "En un resultado de ping aparece \"time=15 ms\". ¿Qué es ese número?",
+     "v": [
+      "El ping muestra \"time=15 ms\". ¿Qué miden esos 15 ms?",
+      "En el resultado del ping, ¿qué significa el valor \"time=15 ms\"?"
+     ],
+     "o": [
+      "El tiempo que tardó el paquete en ir y volver",
+      { "t": "La velocidad de internet en megabits", "why": "La velocidad (ancho de banda) se mide en Mbps, no en ms." },
+      { "t": "Cuántos paquetes se perdieron", "why": "La pérdida aparece en porcentaje, como \"0% packet loss\"." },
+      { "t": "El número del puerto usado", "why": "El ping ni usa puerto: es ICMP." }
+     ],
+     "why": "ms es la latencia: el tiempo de ida y vuelta. Cuanto menor, más rápida la respuesta."
+    },
+    {
+     "q": "¿Qué es el gateway predeterminado de una computadora?",
+     "v": [
+      "En la configuración de red de la PC, ¿qué es el gateway predeterminado?",
+      "Cuando la PC necesita hablar con otra red, ¿a qué equipo envía los paquetes? Ese es el gateway predeterminado, que es:"
+     ],
+     "o": [
+      "El equipo, normalmente el router, por donde salen los paquetes hacia otras redes",
+      { "t": "El servidor que guarda los archivos", "why": "Eso es un servidor de archivos." },
+      { "t": "El cable que conecta la computadora a la pared", "why": "El cable es el medio físico, no una dirección de salida." },
+      { "t": "El sitio que se abre cuando arranca el navegador", "why": "Esa es la página de inicio, no el gateway." }
+     ],
+     "why": "Todo lo que no es de tu red local va al gateway, que lo reenvía hacia afuera."
+    },
+    {
+     "q": "ping 8.8.8.8 responde, pero ping google.com da error. ¿Dónde está el problema más probable?",
+     "v": [
+      "El ping a la IP 8.8.8.8 funciona, pero ping google.com falla. ¿Cuál es la causa más probable?",
+      "Por IP internet responde; por nombre, no. ¿Qué es lo que probablemente tiene problemas?"
+     ],
+     "o": [
+      "En el DNS, que traduce el nombre en IP",
+      { "t": "En el cable de red", "why": "Con el cable malo, ni el ping al 8.8.8.8 respondería." },
+      { "t": "En el sitio de Google", "why": "El ping ni salió: el nombre no llegó a traducirse." },
+      { "t": "En el monitor", "why": "El monitor no tiene relación con la red." }
+     ],
+     "why": "Si la IP responde, la conexión funciona. Lo que falló fue traducir el nombre: DNS."
+    }
+   ]
+  },
+  {
+   "title": "¿Quién me dio esta IP?",
+   "tag": "DHCP",
+   "cap": "Conectando una notebook nueva a la red...",
+   "goal": "Arma la conversación del DHCP, del pedido a la confirmación.",
+   "intro": "Enciendes la notebook y, en segundos, tiene IP, gateway y DNS. Quien hizo eso fue el <b>DHCP</b>. Pon cada paso de la conversación en su lugar.",
+   "z": "Apagué el DHCP de un piso entero. Quiero ver a alguien trabajar con una IP 169.254.",
+   "me": "169.254 es la PC avisando que nadie respondió. Ya sé dónde mirar.",
+   "lesson": [
+    "El <b>DHCP</b> entrega la configuración de red automáticamente: <b>IP</b>, <b>máscara</b>, <b>gateway</b> y <b>DNS</b>.",
+    "La conversación tiene 4 pasos (<b>DORA</b>): <b>Discover</b> (la PC busca por broadcast), <b>Offer</b> (el servidor ofrece una IP), <b>Request</b> (la PC acepta) y <b>Ack</b> (el servidor confirma).",
+    "La IP se presta por un tiempo, el <b>lease</b>. Antes de que venza, la PC pide renovarla.",
+    "Si ningún servidor responde, la PC se asigna una IP <b>169.254.x.x</b> (link-local). Con ella no se llega a internet: es señal de DHCP caído."
+   ],
+   "check": {
+    "q": "La PC quedó con la IP 169.254.10.5. ¿Qué pasó?",
+    "v": [
+     "Una PC aparece con la IP 169.254.10.5. ¿Qué indica?",
+     "¿Qué significa una dirección 169.254.x.x en la PC?"
+    ],
+    "o": [
+     "El DHCP no respondió y la PC se asignó una IP link-local",
+     { "t": "El proveedor dio una IP pública nueva", "why": "169.254 está reservada para link-local y nunca es pública." },
+     { "t": "Cambió el DNS", "why": "El DNS traduce nombres. Quien entrega la IP es el DHCP." }
+    ],
+    "why": "Sin respuesta del DHCP, el equipo se autoconfigura en 169.254.0.0/16."
+   },
+   "tip": "DORA: Discover, Offer, Request, Ack. Sin respuesta del DHCP, la PC queda con 169.254.x.x.",
+   "learn": "El DHCP conversa en 4 pasos (Discover, Offer, Request, Ack) usando UDP 67 en el servidor y 68 en el cliente, y entrega IP, máscara, gateway y DNS por un tiempo (lease). ¿Viste 169.254.x.x? La PC no encontró ningún servidor DHCP.",
+   "html": "<div class=\"kv\">1. La PC sin IP pregunta por broadcast: \"¿hay algún servidor DHCP?\"<span class=\"grow\"></span>[s1]</div>\n<div class=\"kv\">2. El servidor ofrece una IP libre<span class=\"grow\"></span>[s2]</div>\n<div class=\"kv\">3. La PC pide la IP ofrecida<span class=\"grow\"></span>[s3]</div>\n<div class=\"kv\">4. El servidor confirma y presta la IP<span class=\"grow\"></span>[s4]</div>\n<div class=\"kv\">Además de la IP, el DHCP entrega<span class=\"grow\"></span>[gw]</div>\n<div class=\"kv\">IP que la PC se asigna cuando nadie responde<span class=\"grow\"></span>[apipa]</div>",
+   "zones": {
+    "gw": ["máscara, gateway y DNS"]
+   },
+   "explain": {
+    "s1": "Discover: la PC todavía no tiene IP, así que le grita a toda la red (broadcast).",
+    "s2": "Offer: el servidor reserva una IP libre y la ofrece.",
+    "s3": "Request: la PC dice \"quiero esta\". Si hay dos servidores, ambos se enteran de cuál se eligió.",
+    "s4": "Ack: el servidor confirma y la IP queda prestada por el tiempo del lease.",
+    "gw": "Junto con la IP vienen la máscara, el gateway (salida de la red) y el DNS.",
+    "apipa": "Sin respuesta, la PC se asigna una 169.254.x.x (link-local). Solo habla con vecinos en la misma situación."
+   },
+   "chips": [
+    { "why": "Primer paso: la PC busca un servidor DHCP por broadcast." },
+    { "why": "Segundo paso: el servidor ofrece una IP." },
+    { "why": "Tercer paso: la PC pide la IP ofrecida." },
+    { "why": "Cuarto paso: el servidor confirma." },
+    { "t": "máscara, gateway y DNS", "why": "El DHCP entrega la configuración completa, no solo la IP." },
+    { "why": "Link-local: la IP automática de cuando el DHCP no responde." },
+    { "why": "NAK es el rechazo del servidor, por ejemplo cuando la PC pide una IP que no vale en esta red. No forma parte de la conversación normal." },
+    { "why": "127.0.0.1 es el loopback, la propia máquina. Existe siempre, con o sin DHCP." },
+    { "t": "la contraseña del Wi-Fi", "why": "La contraseña del Wi-Fi se escribe en el equipo. El DHCP entra después de que la conexión ya existe." }
+   ]
+  },
+  {
+   "title": "Primera terminal",
+   "tag": "TERMINAL LINUX",
+   "cap": "Abriendo una terminal Linux...",
+   "goal": "Descubre por qué Google no abre en la máquina del compañero y resuélvelo.",
+   "intro": "Un compañero se quejó: \"Google no abre\". Estás en una <b>terminal Linux</b> de su máquina. Los comandos son frases cortas que escribes (o tocas abajo), y la computadora responde.",
+   "z": "Tumbé el DNS de tu compañero. Cree que se cayó internet. Tú también lo vas a creer.",
+   "me": "Voy a probar por partes: red local, internet y nombre.",
+   "lesson": [
+    "La <b>terminal</b> es una conversación por texto con la computadora. Casi todo equipo de red se configura así.",
+    "<b>ip a</b> muestra las direcciones de la máquina. <b>ip route</b> muestra el gateway (la línea que empieza con <b>default</b>).",
+    "<b>ping</b> prueba si otro equipo responde. En Linux, <b>-c 4</b> envía solo 4 intentos.",
+    "<b>cat</b> muestra el contenido de un archivo. En <b>/etc/resolv.conf</b> está el servidor DNS que usa la máquina."
+   ],
+   "check": {
+    "q": "¿Qué comando muestra el gateway en Linux?",
+    "v": [
+     "En Linux, ¿qué comando muestra el gateway predeterminado?",
+     "Para ver por dónde sale Linux hacia otras redes (el gateway), ¿qué comando usar?"
+    ],
+    "o": [
+     "ip route",
+     { "t": "ip a", "why": "ip a muestra las direcciones de las interfaces, no el gateway." },
+     { "t": "cat /etc/resolv.conf", "why": "Ese archivo muestra el servidor DNS." }
+    ],
+    "why": "En ip route, la línea \"default via\" es el gateway."
+   },
+   "tip": "Prueba por capas: ping al gateway, ping a una IP de internet y ping a un nombre. Si solo falla el nombre, es DNS.",
+   "learn": "Diagnóstico por capas: red local (gateway), internet (IP pública) y nombres (DNS). ip a muestra tu IP, ip route muestra el gateway y /etc/resolv.conf muestra el DNS en uso.",
+   "cmds": [
+    { "why": "Muestra las interfaces. La eth0 es la tarjeta de red: IP 192.168.1.50 (línea inet) y MAC 3c:22:fb:11:0a:7e (línea link/ether). La lo es el loopback, la propia máquina." },
+    { "why": "La línea \"default via\" es el gateway: 192.168.1.1. Todo lo que no es de la red 192.168.1.0/24 sale por él." },
+    { "why": "El gateway responde: la red local funciona." },
+    { "why": "Una IP de internet responde: la salida a internet funciona." },
+    { "why": "El ping ni empezó: la máquina no logró traducir el nombre en IP. Falla de resolución de nombres = DNS." },
+    { "why": "El DNS configurado es el 192.168.1.250. Vale la pena probar si existe." },
+    { "why": "El servidor DNS configurado no responde. Por eso los nombres no funcionan." }
+   ],
+   "steps": [
+    {
+     "q": "¿Cuál es la dirección IP de esta máquina?",
+     "v": [
+      "Por la salida de la terminal, ¿cuál es la IP de esta máquina?",
+      "¿Qué dirección IP está configurada en esta computadora?"
+     ],
+     "o": [
+      "192.168.1.50",
+      { "t": "192.168.1.1", "why": "Ese es el gateway, de la línea \"default via\" de ip route." },
+      { "t": "127.0.0.1", "why": "Ese es el loopback, la propia máquina hablando consigo misma." },
+      { "t": "3c:22:fb:11:0a:7e", "why": "Eso es la MAC, no la IP." }
+     ],
+     "why": "La línea inet de la eth0 muestra 192.168.1.50/24."
+    },
+    {
+     "q": "¿Por qué no abre Google, si el ping al 8.8.8.8 funciona?",
+     "v": [
+      "El ping al 8.8.8.8 responde, pero Google no abre. ¿Por qué?",
+      "Internet funciona por IP, pero los sitios no abren por nombre. ¿Qué está fallando?"
+     ],
+     "o": [
+      "El DNS configurado (192.168.1.250) no responde, así que el nombre no se convierte en IP",
+      { "t": "El cable está desconectado", "why": "Con el cable desconectado, ni el gateway respondería." },
+      { "t": "Google está caído", "why": "El ping a google.com ni salió: falló antes, en la traducción del nombre." },
+      { "t": "Falta el gateway", "why": "El gateway existe (192.168.1.1) y responde." }
+     ],
+     "why": "La IP funciona y el nombre no: es DNS. Y el DNS configurado, 192.168.1.250, no responde."
+    },
+    {
+     "q": "¿Cómo resolverlo ahora?",
+     "v": [
+      "¿Cuál es la solución inmediata para que los sitios vuelvan a abrir?",
+      "¿Qué hacer ahora para que los nombres vuelvan a resolver?"
+     ],
+     "o": [
+      "Apuntar la máquina a un DNS que funcione, como el 1.1.1.1",
+      { "t": "Reiniciar el router", "why": "El router funciona: el ping al 8.8.8.8 pasó por él." },
+      { "t": "Cambiar el cable de red", "why": "El cable está bien: la máquina habla con el gateway y con internet." },
+      { "t": "Apagar el firewall", "why": "Nada indica un bloqueo de firewall. El problema es el DNS que no responde." }
+     ],
+     "why": "Con un servidor DNS que responde, los nombres vuelven a funcionar. Después conviene descubrir por qué se cayó el 192.168.1.250."
+    }
+   ]
+  },
+  {
+   "title": "Los nombres se vuelven números",
+   "tag": "TERMINAL LINUX",
+   "cap": "Abriendo la terminal de la PC de finanzas...",
+   "goal": "Descubre por qué solo esta PC no abre el ERP y arréglalo.",
+   "intro": "Todos abren el ERP (<b>erp.empresa.com.br</b>), menos la PC de finanzas. Su internet funciona. Investiga cómo esta PC convierte el nombre en IP.",
+   "z": "Le dejé una notita en un archivo a tu compañero. Su ERP ahora va a otro lugar.",
+   "me": "El nombre se vuelve número en dos lugares: en el DNS y en /etc/hosts. Voy a mirar los dos.",
+   "lesson": [
+    "El <b>DNS</b> traduce nombres en IPs. Antes de preguntarle al DNS, Linux mira el archivo <b>/etc/hosts</b>, una lista local de nombre e IP.",
+    "<b>dig</b> y <b>nslookup</b> le preguntan directo al servidor DNS e <b>ignoran</b> /etc/hosts.",
+    "<b>getent hosts</b> muestra lo que el sistema usa de verdad (hosts y después DNS), igual que el ping y el navegador.",
+    "Si dig da una IP y getent da otra, el culpable está en <b>/etc/hosts</b>."
+   ],
+   "check": {
+    "q": "dig muestra una IP y el ping usa otra. ¿Dónde mirar primero?",
+    "v": [
+     "La IP que muestra dig es distinta de la que usa el ping. ¿Cuál es el primer lugar a revisar?",
+     "El DNS responde una IP, pero la PC usa otra para el mismo nombre. ¿Dónde mirar primero?"
+    ],
+    "o": [
+     "En /etc/hosts",
+     { "t": "En el servidor DNS", "why": "dig ya muestra la respuesta del DNS. La diferencia viene de algo que dig ignora." },
+     { "t": "En el cable de red", "why": "El cable no cambia en qué IP se convierte el nombre." }
+    ],
+    "why": "El sistema consulta /etc/hosts antes que el DNS; dig ignora ese archivo."
+   },
+   "tip": "Compara dig (solo DNS) con getent hosts (lo que usa la PC). Si son distintos, mira /etc/hosts.",
+   "learn": "Linux resuelve nombres primero por /etc/hosts y después por DNS (orden de /etc/nsswitch.conf). Una línea olvidada en hosts pasa por delante del DNS solo en esa máquina. dig y nslookup prueban el DNS; getent hosts muestra lo que el sistema usa de verdad.",
+   "cmds": [
+    { "why": "dig le pregunta directo al servidor DNS: el ERP está en 10.0.0.10." },
+    { "why": "getent muestra lo que el sistema usa de verdad. Encontró 10.0.0.99, distinto del DNS." },
+    { "why": "El ping fue a 10.0.0.99, que ya no existe. La IP correcta, según el DNS, es 10.0.0.10." },
+    { "why": "Lo encontré: una línea vieja apunta el ERP a 10.0.0.99. /etc/hosts va antes que el DNS." },
+    { "why": "Otra forma de preguntarle al DNS. El servidor 10.0.0.53 responde 10.0.0.10, la IP correcta." },
+    { "why": "El DNS configurado es el 10.0.0.53, el mismo de las otras PCs. El DNS no es el problema." }
+   ],
+   "steps": [
+    {
+     "q": "¿Qué IP responde el servidor DNS para erp.empresa.com.br?",
+     "v": [
+      "Según el servidor DNS, ¿cuál es la IP de erp.empresa.com.br?",
+      "¿Qué dirección devuelve el DNS para el nombre erp.empresa.com.br?"
+     ],
+     "o": [
+      "10.0.0.10",
+      { "t": "10.0.0.99", "why": "Esa viene de /etc/hosts. dig le pregunta directo al DNS e ignora el archivo." },
+      { "t": "10.0.0.53", "why": "Esa es la dirección del servidor DNS, no su respuesta." }
+     ],
+     "why": "dig y nslookup muestran la respuesta del DNS: 10.0.0.10."
+    },
+    {
+     "q": "¿Por qué el ping de esta PC va a 10.0.0.99?",
+     "v": [
+      "¿Qué hace que el ping de esta PC vaya a 10.0.0.99?",
+      "El DNS dice 10.0.0.10, pero el ping va a 10.0.0.99. ¿Cuál es el motivo?"
+     ],
+     "o": [
+      "Una línea vieja en /etc/hosts pasa por delante del DNS",
+      { "t": "El servidor DNS tiene la IP equivocada", "why": "dig y nslookup muestran 10.0.0.10, la correcta. El DNS está bien." },
+      { "t": "El cable de red está suelto", "why": "Con el cable suelto, ni el DNS respondería a dig." }
+     ],
+     "why": "El sistema consulta /etc/hosts antes que el DNS. La línea de prueba olvidada desvía el nombre solo en esta PC."
+    },
+    {
+     "q": "¿Cómo resolverlo?",
+     "v": [
+      "¿Cuál es la corrección para que la PC use la IP correcta del ERP?",
+      "¿Qué hacer para que esta PC vuelva a usar el DNS para el ERP?"
+     ],
+     "o": [
+      "Borrar la línea del ERP en /etc/hosts",
+      { "t": "Cambiar el DNS de la PC a 8.8.8.8", "why": "El DNS ya responde bien. Y /etc/hosts seguiría por delante de cualquier DNS." },
+      { "t": "Reiniciar el router", "why": "El problema es un archivo de esta PC. Reiniciar el router tumba a todos sin motivo." }
+     ],
+     "why": "Sin la línea vieja, la PC le pregunta al DNS y recibe la IP correcta."
+    }
+   ]
+  }
+ ]
+}

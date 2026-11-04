@@ -1,5 +1,6 @@
 // Certificado de plantão por ato: desenhado num canvas e salvo como PNG (baixar ou compartilhar).
 // O nome digitado fica só no aparelho; nada é enviado.
+import { t as tr } from './i18n.js';
 import { $, store, esc, siteURL, plug } from './util.js';
 import { S, LEVELS, ACTS, K } from './state.js';
 import { modal, closeModal, share } from './ui.js';
@@ -35,7 +36,7 @@ export async function drawCert(name, ai) {
     const cx = two ? W / 2 + (col ? 30 : -30 - colW) : (W - colW) / 2, cy = 490 + row * 50;
     const st = S.prog[K(i)] || 0;
     x.textAlign = 'left'; x.fillStyle = '#e6f1ff'; fit(x, L.title, colW - 150, 28, '500'); x.fillText(L.title, cx, cy);
-    x.textAlign = 'right'; x.fillStyle = gold.includes(L.title) ? '#ffcc33' : '#ffd166'; x.font = '28px system-ui, sans-serif';
+    x.textAlign = 'right'; x.fillStyle = gold.includes(L.key || L.title) ? '#ffcc33' : '#ffd166'; x.font = '28px system-ui, sans-serif';
     x.fillText('★'.repeat(st) + '☆'.repeat(3 - st), cx + colW, cy);
   });
   x.textAlign = 'center';
@@ -82,7 +83,7 @@ export function certModal(ai) {
     $('cSave').remove(); $('cShare').textContent = 'SALVAR OU ENVIAR'; $('cShare').classList.remove('ghostb');
     $('cShare').onclick = async e => {
       if (!canvas) return; store('noc_cert_name', $('cName').value.trim());
-      const f = await file(), text = `Concluí o ${a[0]} · ${a[1]} no NOC: Última Linha de Defesa 🛡️ ${siteURL()}`;
+      const f = await file(), text = `${tr('Concluí o')} ${a[0]} · ${a[1]} ${tr('no NOC: Última Linha de Defesa 🛡️')} ${siteURL()}`;
       try {
         const w = await fs.writeFile({ path: f.name, data: canvas.toDataURL('image/png').split(',')[1], directory: 'CACHE' });
         await sh.share({ files: [w.uri], text });
@@ -92,7 +93,7 @@ export function certModal(ai) {
   }
   $('cShare').onclick = async e => {
     if (!canvas) return;
-    const f = await file(), text = `Concluí o ${a[0]} · ${a[1]} no NOC: Última Linha de Defesa 🛡️ ${siteURL()}`;
+    const f = await file(), text = `${tr('Concluí o')} ${a[0]} · ${a[1]} ${tr('no NOC: Última Linha de Defesa 🛡️')} ${siteURL()}`;
     if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], text }); } catch (er) {} }
     else share(text, e.currentTarget);
   };

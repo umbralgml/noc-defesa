@@ -49,7 +49,7 @@ export function initCards(L) {
           b.classList.add('right');
           $('lcW').textContent = q.why; sfx.ok(1);
           const done = store('noc_check') || {};
-          if (tries === 1 && !done[L.title]) { done[L.title] = 1; store('noc_check', done); addXP(5); $('lcW').textContent += ' +5 XP'; }
+          if (tries === 1 && !done[L.key || L.title]) { done[L.key || L.title] = 1; store('noc_check', done); addXP(5); $('lcW').textContent += ' +5 XP'; }
         };
         box.append(b);
       });
