@@ -1,6 +1,7 @@
 // Desafio diário: 5 perguntas com cronômetro, iguais para todo mundo no mesmo dia
 // (sorteio com a data como semente). Duas vêm dos quizzes das fases e três são geradas
 // na hora (sub-rede, wildcard, endereço de rede, faixas de IP, portas), sempre com o porquê.
+import { t as tr } from './i18n.js';
 import { $, fmt, store, siteURL } from './util.js';
 import { S, LEVELS } from './state.js';
 import { AV_Z } from './scene.js';
@@ -24,7 +25,8 @@ export function questions(d) {
   const r = rng('noc-' + d);
   // Perguntas das fases, menos as que os geradores já cobrem (evita duas de hosts no mesmo dia).
   // "dailyFrom" (AAAA-MM-DD) segura um quiz novo fora do sorteio até essa data, sem mudar o desafio do dia em curso.
-  const pool = LEVELS.filter(L => L.type === 'quiz' && !(L.dailyFrom && d < L.dailyFrom)).flatMap(L => L.qs).filter(q => !/^(Quantos hosts úteis|Qual a wildcard)/.test(q.q));
+  // O filtro olha o texto original (L.orig): assim o sorteio é o mesmo em todo idioma.
+  const pool = LEVELS.filter(L => L.type === 'quiz' && !(L.dailyFrom && d < L.dailyFrom)).flatMap(L => L.qs.map((q, i) => [q, ((L.orig || L).qs[i] || q).q])).filter(x => !/^(Quantos hosts úteis|Qual a wildcard)/.test(x[1])).map(x => x[0]);
   const gens = sh(r, Object.keys(GEN)).slice(0, N - 2).map(k => GEN[k](r));
   return sh(r, [...sh(r, pool).slice(0, 2), ...gens]);
 }
@@ -119,8 +121,8 @@ function result(rec, ch, duel, xr) {
     <div class="row">${rankOn() && !duel ? '<button class="btn ghostb" id="dRank">RANKING</button>' : ''}<button class="btn ghostb" id="mOk">VOLTAR</button></div>`);
   if (ch) $('mcard').querySelector('.vsn').textContent = ch.n.toUpperCase();
   tick();
-  $('dDuel').onclick = e => share(`⚔️ Te desafio no NOC: Última Linha de Defesa!\nDesafio #${rec.n}: ${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts\nBate isso? ${duelLink(rec)}`, e.currentTarget);
-  $('dShare').onclick = e => share(`NOC: Última Linha de Defesa · Desafio #${rec.n}\n${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts${duel ? '' : ' · 🔥 ' + st.c}\n${url()}`, e.currentTarget);
+  $('dDuel').onclick = e => share(`${tr('⚔️ Te desafio no NOC: Última Linha de Defesa!')}\n${tr('Desafio')} #${rec.n}: ${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts\n${tr('Bate isso?')} ${duelLink(rec)}`, e.currentTarget);
+  $('dShare').onclick = e => share(`${tr('NOC: Última Linha de Defesa · Desafio')} #${rec.n}\n${grid(rec)} ${h}/${N} · ${fmt(rec.total)} pts${duel ? '' : ' · 🔥 ' + st.c}\n${url()}`, e.currentTarget);
   if ($('dRank')) $('dRank').onclick = () => openRanking(board(rec.d), 1);
   $('mOk').onclick = () => { if ($('game').classList.contains('on')) goMap(); closeModal(); };
 }

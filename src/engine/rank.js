@@ -70,7 +70,7 @@ export const sendReport = row => CFG ? api('reportes', { method: 'POST', headers
 export function metric(event) {
   if (!CFG || S.cur < 0 || S.practice || ls('noc_metricas') === false || ls('noc_teste')) return;
   const secs = Math.min(7200, Math.round((Date.now() - (S.t0 || Date.now())) / 1000));
-  api('metricas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ level: S.lv.title.slice(0, 60), event, err: Math.min(99, S.err), hp: S.hp, secs, hard: !!S.hard }) }).catch(() => {});
+  api('metricas', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ level: (S.lv.key || S.lv.title).slice(0, 60), event, err: Math.min(99, S.err), hp: S.hp, secs, hard: !!S.hard }) }).catch(() => {});
 }
 
 // Envia o total da campanha quando ele melhora (o ranking guarda o melhor de cada jogador).

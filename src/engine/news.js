@@ -1,6 +1,9 @@
 // Linha do tempo de atualizações na tela inicial (dados em src/changelog.json).
 // Marca como NOVO a versão mais recente até o jogador iniciar o turno.
 import { $, esc } from './util.js';
+import { LANG } from './i18n.js';
+// Versão com tradução ("es": { title, items }) aparece no idioma do jogo; sem ela, em português.
+const loc = v => (v[LANG] && { ...v, ...v[LANG] }) || v;
 
 let latest = null;
 const seen = () => { try { return localStorage.getItem('noc_seen_ver'); } catch (e) { return null; } };
@@ -10,7 +13,7 @@ let VERS = [];
 export async function loadNews() {
   const r = await fetch(new URL('../changelog.json', import.meta.url));
   if (!r.ok) throw new Error('changelog.json: HTTP ' + r.status);
-  VERS = (await r.json()).versions;
+  VERS = (await r.json()).versions.map(loc);
   latest = VERS[0].v;
   const fresh = seen() !== latest;
   $('newsDot').classList.toggle('on', fresh);

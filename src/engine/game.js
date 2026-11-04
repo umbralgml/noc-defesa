@@ -1,5 +1,6 @@
 // Fluxo do jogo: mapa, briefing, intro animada da fase, vitória, derrota e dica.
 import { $, fmt, center, buzz, store, siteURL } from './util.js';
+import { t as tr } from './i18n.js';
 import { au, sfx, music, stopMusic, setMute, isMuted } from './audio.js';
 import { AV_ME, AV_Z, AV_CHEFE, HX, LOCNAME, GOTO, sceneSVG, heroTo } from './scene.js';
 import { S, LEVELS, ACTS, TRAILS, DIFFS, diffOf, K, num, unlocked, save, resetProgress, progress } from './state.js';
@@ -28,7 +29,7 @@ const curTrail = () => { const id = store('noc_trail'), t = TRAILS.findIndex(x =
 function trailsHTML(ct) {
   if (TRAILS.length < 2) return '';
   return `<div class="trails" role="tablist" aria-label="Trilhas de treinamento">${TRAILS.map((t, ti) => {
-    const lv = LEVELS.filter(L => L.trail === ti), st = lv.reduce((s, L) => s + (S.prog[L.title] || 0), 0), soon = !lv.length;
+    const lv = LEVELS.filter(L => L.trail === ti), st = lv.reduce((s, L) => s + (S.prog[L.key || L.title] || 0), 0), soon = !lv.length;
     return `<button class="trail${ti === ct ? ' on' : ''}${soon ? ' soon' : ''}" role="tab" aria-selected="${ti === ct}" data-t="${ti}"${soon ? ' aria-disabled="true"' : ''}>
       <span class="ti">${t.icon}</span><b>${t.name}</b><small>${soon ? 'EM BREVE' : `${lv.length} fases · ★ ${st}/${lv.length * 3}`}</small></button>`;
   }).join('')}</div><div class="traild">${TRAILS[ct].desc}</div>`;
@@ -41,7 +42,7 @@ export function renderMap() {
   ACTS.forEach((a, ai) => {
     if (a[4] !== ct) return;
     const done = LEVELS.every((L, i) => L.act !== ai || S.prog[K(i)]);
-    html += `<div class="acth"><span>${a[0]}</span>${a[5] ? '<i class="diff nivel">NIVELAMENTO</i>' : a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${a[2].toUpperCase()}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div>`
+    html += `<div class="acth"><span>${a[0]}</span>${a[5] ? '<i class="diff nivel">NIVELAMENTO</i>' : a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${tr(a[2].toUpperCase())}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div>`
       + (a[5] ? `<div class="nivn">Para quem está começando. ${LEVELS.some(L => L.act > ai && L.trail === ct) ? 'Já trabalha com isso? O próximo ato já está liberado.' : 'O plantão desta trilha chega nos próximos lotes.'}</div>` : '') + '<div class="path">';
     LEVELS.forEach((L, i) => {
       if (L.act !== ai) return;
@@ -50,7 +51,7 @@ export function renderMap() {
       const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
       html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : num(i)}</span>
         <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${L.tag}</small></span>
-        ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
+        ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.key || L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
     });
     html += '</div>';
   });
@@ -80,7 +81,7 @@ const AVS = { z: [AV_Z, 'Z3R0', 'z'], me: [AV_ME, 'VOCÊ', 'me'], chefe: [AV_CHE
 function story(L, next) {
   const a = ACTS[L.act], seen = store('noc_story') || [];
   if (!a || !a[3] || seen.includes(a[1]) || LEVELS.findIndex(x => x.act === L.act) !== LEVELS.indexOf(L)) return next();
-  modal(`<div class="tag">${a[0]}${a[2] ? ' · ' + a[2].toUpperCase() : ''}</div><h2>${a[1]}</h2>
+  modal(`<div class="tag">${a[0]}${a[2] ? ' · ' + tr(a[2].toUpperCase()) : ''}</div><h2>${a[1]}</h2>
     ${a[3].map(s => { const [av, who, cls] = AVS[s.who] || AVS.chefe; return `<div class="dlg"><div class="av">${av}</div><div class="bubble ${cls}"><span class="who">${who}</span>${s.t}</div></div>`; }).join('')}
     <div class="row"><button class="btn" id="mStory">BORA</button></div>`);
   $('mStory').onclick = () => { store('noc_story', [...seen, a[1]]); next(); };
@@ -92,13 +93,14 @@ export function brief(i) { story(LEVELS[i], () => showBrief(i)); }
 // Diálogo, aula rápida e missão.
 function showBrief(i) {
   const L = LEVELS[i];
-  modal(`<div class="tag">${ACTS[L.act][0]} · ${LOCNAME[L.loc]}</div><h2>${num(i)}. ${L.title}</h2>
+  modal(`<div class="tag">${ACTS[L.act][0]} · ${tr(LOCNAME[L.loc])}</div><h2>${num(i)}. ${L.title}</h2>
+    ${L.tr === false ? '<div class="trnote">Esta fase ainda não foi traduzida e aparece em português. Os comandos e as saídas são os mesmos.</div>' : ''}
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${L.z}</div></div>
     <div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>${L.me}</div></div>
     ${cardsHTML(L)}
     <div class="goal"><b>Missão:</b> ${L.goal}</div>
     ${diffOf(L) <= 1 && !L.tutorial ? '<button class="btn ghostb wideb pracb" id="mPrac">🛟 TREINO SEM PRESSÃO<small>Errar não tira integridade e a dica fica à mão. Não vale estrela: é para aprender antes de jogar valendo.</small></button>' : ''}
-    ${S.prog[K(i)] === 3 && !L.tutorial ? `<button class="btn ghostb wideb hardb" id="mHard">☠ MODO DIFÍCIL${(store('noc_gold') || []).includes(L.title) ? ' · ★ OURO' : ''}<small>Dano em dobro e o Z3R0 mais agressivo. Vença sem errar para ganhar a estrela de ouro.</small></button>` : ''}
+    ${S.prog[K(i)] === 3 && !L.tutorial ? `<button class="btn ghostb wideb hardb" id="mHard">☠ MODO DIFÍCIL${(store('noc_gold') || []).includes(L.key || L.title) ? ' · ★ OURO' : ''}<small>Dano em dobro e o Z3R0 mais agressivo. Vença sem errar para ganhar a estrela de ouro.</small></button>` : ''}
     <div class="row"><button class="btn ghostb" id="mCancel">VOLTAR</button><button class="btn" id="mGo">IR PARA ${GOTO[L.loc]}</button></div>`);
   $('mCancel').onclick = closeModal;
   $('mGo').onclick = () => { closeModal(); startLevel(i); };
@@ -126,7 +128,7 @@ export function play(L, name, opt = {}) {
   $('stage').classList.add('veil'); $('bank').classList.add('veil');
   show('game');
   const sc = $('scene');
-  sc.innerHTML = sceneSVG(L.loc, L.boss || L.miniboss, L.loose) + `<div class="caption"><i></i><span id="capTxt"></span></div><div class="skip">TOQUE PARA PULAR</div>`;
+  sc.innerHTML = sceneSVG(L.loc, L.boss || L.miniboss, L.loose) + `<div class="caption"><i></i><span id="capTxt" data-notr></span></div><div class="skip">TOQUE PARA PULAR</div>`;
   sc.classList.remove('defeat'); sc.classList.add('big');
   heroTo(sc, 150, true);
   const hero = sc.querySelector('.hero'); hero.classList.add('walk');
@@ -156,6 +158,7 @@ function setLesson(open) {
 }
 
 function typeCap(t) {
+  t = tr(t);   // texto de tela vindo dos motores (ex.: Academia); o da fase já chega traduzido
   const el = $('capTxt'); let i = 0; el.textContent = '';
   const iv = setInterval(() => { if (!el.isConnected) return clearInterval(iv); el.textContent = t.slice(0, ++i); if (i >= t.length) clearInterval(iv); }, 28);
 }
@@ -163,7 +166,7 @@ function finishIntro() {
   S.intro.forEach(clearTimeout); S.intro = [];
   const L = S.lv, sc = $('scene'), hero = sc.querySelector('.hero');
   heroTo(sc, HX[L.loc], true); hero.classList.remove('walk'); hero.classList.add('type');
-  $('capTxt').textContent = LOCNAME[L.loc] + (L.boss || L.miniboss ? ' · Z3R0 AO VIVO' : '');
+  $('capTxt').textContent = tr(LOCNAME[L.loc] + (L.boss || L.miniboss ? ' · Z3R0 AO VIVO' : ''));
   sc.classList.remove('big');
   // Celular: cena baixa durante a jogada; a cena inteira cabe em miniatura à direita.
   if (matchMedia('(max-width:600px),(max-height:760px)').matches) sc.querySelector('svg').setAttribute('preserveAspectRatio', 'xMaxYMax meet');
@@ -208,8 +211,8 @@ function win() {
   S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
   submitCampaign();
   // Modo difícil sem erro: estrela de ouro (uma por fase) e XP extra.
-  const gold = S.hard && S.err === 0, gl = store('noc_gold') || [], newGold = gold && !gl.includes(L.title);
-  if (newGold) { store('noc_gold', [...gl, L.title]); unlock('ouro'); }
+  const gold = S.hard && S.err === 0, gl = store('noc_gold') || [], newGold = gold && !gl.includes(L.key || L.title);
+  if (newGold) { store('noc_gold', [...gl, L.key || L.title]); unlock('ouro'); }
   const xr = addXP(20 + st * 15 + (first ? 50 : 0) + (gold ? 40 : 0));
   onLevelWin(L, st); metric('win');
   // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
@@ -243,7 +246,7 @@ function win() {
       ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
       <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`); addReport();
     $('mMap').onclick = () => { closeModal(); goMap(); };
-    if (last) $('mShare').onclick = e => { const p = progress(); share(`Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️\n★ ${p.stars}/${p.max} estrelas · ${fmt(p.pts)} pts\nVocê segura a rede? ${siteURL()}`, e.currentTarget); };
+    if (last) $('mShare').onclick = e => { const p = progress(); share(`${tr('Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️')}\n★ ${p.stars}/${p.max} ${tr('estrelas')} · ${fmt(p.pts)} pts\n${tr('Você segura a rede?')} ${siteURL()}`, e.currentTarget); };
     if (more) $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
     else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
   }, delay);

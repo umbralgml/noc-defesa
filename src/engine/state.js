@@ -24,8 +24,8 @@ try {
 export const save = () => { try { localStorage.setItem('noc_prog', JSON.stringify(S.prog)); localStorage.setItem('noc_best', JSON.stringify(S.best)); } catch (e) {} };
 export const resetProgress = () => { S.prog = {}; S.best = {}; save(); };
 
-// O progresso é indexado pelo TÍTULO da fase. Renomear uma fase apaga o progresso dela.
-export const K = i => LEVELS[i].title;
+// O progresso é indexado pelo TÍTULO da fase em português (L.key, igual em todo idioma). Renomear uma fase apaga o progresso dela.
+export const K = i => LEVELS[i].key || LEVELS[i].title;
 // Número da fase dentro da trilha dela (o que aparece no mapa e no briefing).
 export const num = i => LEVELS.slice(0, i + 1).filter(L => L.trail === LEVELS[i].trail).length;
 // Primeira fase de cada trilha: as trilhas começam liberadas (a inicial é a recomendada).
@@ -36,7 +36,7 @@ const afterNivel = i => i > 0 && LEVELS[i - 1].act !== LEVELS[i].act && LEVELS[i
 // Liberada: a primeira de cada trilha, a primeira depois de um nivelamento, as que já têm estrela (mesmo se entrou fase nova antes delas), a seguinte de uma concluída
 // e as fases novas ("novo": true) que ficam antes de alguma fase que o jogador já fez.
 export const unlocked = i => firstOfTrail(i) || afterNivel(i) || (S.prog[K(i)] || 0) > 0 || (S.prog[K(i - 1)] || 0) > 0
-  || (!!LEVELS[i].novo && LEVELS.some((L, k) => k > i && L.trail === LEVELS[i].trail && S.prog[L.title]));   // fase nova não trava quem já passou dali
+  || (!!LEVELS[i].novo && LEVELS.some((L, k) => k > i && L.trail === LEVELS[i].trail && S.prog[L.key || L.title]));   // fase nova não trava quem já passou dali
 
 // Resumo do progresso salvo: estrelas, pontos e fases concluídas.
 export function progress() {

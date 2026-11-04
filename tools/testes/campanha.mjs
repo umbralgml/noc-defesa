@@ -6,18 +6,23 @@
 // Uso:  node tools/testes/campanha.mjs            (precisa do Playwright: npm i -g playwright)
 //       node tools/testes/campanha.mjs --visivel  (abre o navegador na tela)
 import { createServer } from 'node:http';
-import { readFileSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
 import { join, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { matches, path, reach, compile } from '../../src/engine/netlib.js';
+import { merge } from '../../src/engine/util.js';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 const LV = join(ROOT, 'src/levels/');
 const read = f => JSON.parse(readFileSync(LV + f, 'utf8'));
 const IDX = read('index.json'), TRILHAS = IDX.trilhas || [{ acts: IDX.acts }];
-const levels = TRILHAS.flatMap((t, ti) => t.acts.flatMap(f => read(f).levels.map(L => ({ ...L, trail: ti }))));
+// --lang es: joga com a tradução (src/levels/es/) por cima, como o jogo faz. --coleta arq: grava os textos de tela sem tradução.
+const arg = k => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : null; };
+const LANG = arg('--lang') || 'pt', COLETA = arg('--coleta');
+const tr = f => { try { return LANG === 'pt' ? null : read(`${LANG}/${f}`); } catch { return null; } };
+const levels = TRILHAS.flatMap((t, ti) => t.acts.flatMap(f => { const x = tr(f); return read(f).levels.map((L, li) => ({ ...merge(L, x && x.levels && x.levels[li]), trail: ti })); }));
 const txt = x => typeof x === 'string' ? x : x.t, val = x => typeof x === 'string' ? x : (x.v ?? x.t);
 
 // Playwright local ou global, sem exigir package.json no projeto.
@@ -53,7 +58,7 @@ const firstWire = levels.findIndex(L => L.type === 'wire'), firstSlots = levels.
 let falhas = 0;
 try {
   await p.goto(URL0); await p.waitForSelector('#goMap:not([disabled])');   // carga inicial completa antes de recarregar
-  await p.evaluate(() => { localStorage.noc_lesson = 'false'; localStorage.noc_teste = '1'; localStorage.noc_profile = JSON.stringify({ name: '', linkedin: '', consent: false }); });
+  await p.evaluate(([lang, col]) => { localStorage.noc_lang = JSON.stringify(lang); if (col) localStorage.noc_i18n_coleta = '1'; localStorage.noc_lesson = 'false'; localStorage.noc_teste = '1'; localStorage.noc_profile = JSON.stringify({ name: '', linkedin: '', consent: false }); }, [LANG, COLETA]);
   await p.reload(); await p.waitForSelector('#goMap:not([disabled])');
   await p.click('#goMap'); await p.waitForSelector('#map.on');
   await p.click('.node[data-i="0"]');
@@ -156,6 +161,7 @@ try {
     }
   }
 } catch (e) { falhas++; console.log('✗ erro no teste:', e.message); }
+if (COLETA) writeFileSync(COLETA, JSON.stringify(await p.evaluate(async () => [...(await import('./src/engine/i18n.js')).MISS]), null, 1));
 if (errs.length) { falhas++; console.log('✗ erros no console:', errs); }
 console.log(falhas ? `\nFALHOU (${falhas})` : `\nOK: ${levels.length} fases jogadas sem erro`);
 await b.close(); srv.close();

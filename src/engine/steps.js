@@ -1,5 +1,6 @@
 // Perguntas de diagnóstico em passos, usadas pelo terminal e pela topologia.
 // Errar custa integridade, explica e entra no treino; acertar avança. No último passo, done().
+import { t as tr } from './i18n.js';
 import { $, shuffle, center, vary, missN, missInc } from './util.js';
 import { good, damage, explain, note } from './ui.js';
 import { S } from './state.js';
@@ -31,7 +32,7 @@ export function runSteps(box, L, steps, onRight, done) {
     if (!o.ok) {
       b.classList.add('wrong'); bad.add(o.t);
       explain(false, o.t, o.why || q.why, false);
-      note(q.q, `Resposta: ${opt(q.o[q.a]).t}. ${q.why}`);
+      note(q.q, `${tr('Resposta:')} ${opt(q.o[q.a]).t}. ${q.why}`);
       bankAdd(key, { lv: L.title, q: base.q, o: base.o, a: base.a, why: base.why, v: base.v });
       missInc(key); damage(15, at);
       setTimeout(show, 1200); return;

@@ -1,6 +1,26 @@
 {
   "versions": [
     {
+      "v": "1.32",
+      "date": "2026-11-04",
+      "title": "¡Hola, analista!",
+      "items": [
+        "Novo idioma: espanhol. Escolha em Opções → 🌐, ou o jogo abre em espanhol sozinho no aparelho em espanhol",
+        "Telas, glossário, Academia e desafio diário em espanhol; Prólogo e Formação N1 já traduzidos",
+        "As outras fases chegam traduzidas aos poucos e, até lá, aparecem em português com um aviso",
+        "Comandos e saídas de equipamento ficam iguais em todos os idiomas, como no equipamento de verdade"
+      ],
+      "es": {
+        "title": "¡Hola, analista!",
+        "items": [
+          "Nuevo idioma: español. Elígelo en Opciones → 🌐, o el juego se abre solo en español en un dispositivo en español",
+          "Pantallas, glosario, Academia y desafío diario en español; el Prólogo y la Formación N1 ya están traducidos",
+          "Las demás fases llegan traducidas de a poco y, mientras tanto, aparecen en portugués con un aviso",
+          "Los comandos y las salidas de los equipos quedan iguales en todos los idiomas, como en el equipo de verdad"
+        ]
+      }
+    },
+    {
       "v": "1.31",
       "date": "2026-11-03",
       "title": "Cara nova no escudo",

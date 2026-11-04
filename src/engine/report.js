@@ -35,7 +35,7 @@ export const openContact = () => openReport({ level: 'Contato' }, 'contato');
 
 export function openReport(ctx = {}, mode = 'erro') {
   const M = MODES[mode], K = M.kinds;
-  const lv = mode === 'contato' ? 'Contato' : (S.lv && S.lv.title) || ctx.level || 'Geral';
+  const lv = mode === 'contato' ? 'Contato' : (S.lv && (S.lv.key || S.lv.title)) || ctx.level || 'Geral';
   const p = profile() || {};
   const box = document.createElement('div');
   box.className = 'repwrap'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');

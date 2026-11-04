@@ -1,7 +1,7 @@
 // Utilitários sem dependências: DOM, sorteio e formatação.
 export const $ = id => document.getElementById(id);
 // Dentro do app Android (Capacitor) o endereço é https://localhost: links para compartilhar apontam para o site.
-export const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+export const NATIVE = !!(typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 export const SITE = 'https://umbralgml.github.io/noc-defesa/';
 export const siteURL = () => NATIVE ? SITE : location.origin + location.pathname;
 export const plug = n => NATIVE && window.Capacitor.Plugins ? window.Capacitor.Plugins[n] : null;
@@ -20,3 +20,10 @@ export const vary = (q, n = 0) => { const l = [q, ...(q.v || [])], x = l[n % l.l
 // Erros por pergunta (localStorage noc_vary): cada erro faz a pergunta voltar reescrita.
 export const missN = k => (store('noc_vary') || {})[k] || 0;
 export const missInc = k => { const m = store('noc_vary') || {}; m[k] = (m[k] || 0) + 1; store('noc_vary', m); };
+// Tradução de fase: objeto por chave, lista por posição, texto substitui. O que a tradução não traz fica como no original.
+export function merge(a, b) {
+  if (b === undefined || b === null) return a;
+  if (Array.isArray(a) && Array.isArray(b)) return a.map((x, i) => merge(x, b[i]));
+  if (a && typeof a === 'object' && b && typeof b === 'object' && !Array.isArray(b)) { const o = { ...a }; for (const k in b) o[k] = merge(a[k], b[k]); return o; }
+  return typeof b === typeof a || a === undefined ? b : a;
+}

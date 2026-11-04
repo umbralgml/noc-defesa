@@ -1,3 +1,4 @@
+import { PACK } from './i18n.js';
 // Glossário do NOC: termo, apelidos (como aparecem nas aulas), definição curta e, nos comandos, 'cmd'.
 // Termos em <b> nas aulas e explicações que batem com um item daqui viram tocáveis.
 export const GLOSS = [
@@ -157,6 +158,9 @@ export const GLOSS = [
   ['getent hosts', ['getent hosts', 'getent'], 'Resolve um nome do jeito que os programas da máquina resolvem: olha primeiro o /etc/hosts e depois o DNS.', 'cmd'],
   ['curl', ['curl', 'curl -i'], 'Faz um pedido a um site direto do terminal, como o navegador faria. -I mostra só o cabeçalho da resposta (o código, como 200 OK).', 'cmd']
 ];
+// Outro idioma: PACK.gloss[termo em português] = [nome, apelidos, definição]. Os apelidos em português continuam valendo
+// (fase ainda não traduzida e comandos); o nome do comando nunca muda.
+if (PACK && PACK.gloss) GLOSS.forEach((g, i) => { const x = PACK.gloss[g[0]]; if (x) GLOSS[i] = [g[3] === 'cmd' ? g[0] : x[0], [...new Set([...(x[1] || []), g[0], ...g[1]])], x[2] || g[2], ...g.slice(3)]; });
 const norm = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
 // Termos ganham o primeiro que chegar (IP continua sendo o endereço, não o comando ip). Comandos têm índice próprio.
 const IDX = new Map(), CIDX = new Map();
