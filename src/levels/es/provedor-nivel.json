@@ -1,0 +1,137 @@
+{
+ "tag": "INTRODUCCIÓN",
+ "name": "Nivelación de proveedor",
+ "story": [
+  { "t": "La guardia de un proveedor tiene vocabulario propio y cuatro fabricantes distintos en el mismo rack. Antes de tomar incidentes, nivela lo básico." },
+  { "t": "BNG, CGNAT, display, show, /ip... te vas a perder antes de que yo empiece." },
+  { "t": "Un comando cambia de nombre en cada fabricante, pero la idea es la misma. Voy a armar mi diccionario." }
+ ],
+ "levels": [
+  {
+   "title": "Vocabulario de proveedor",
+   "tag": "VOCABULARIO",
+   "cap": "Abriendo el diagrama del proveedor...",
+   "heads": ["SIGLA", "QUÉ HACE EN EL PROVEEDOR"],
+   "goal": "Conecta cada palabra del día a día del proveedor con lo que hace.",
+   "z": "Tu jefe dijo tránsito, peering y BNG en la misma frase. Tú solo asentiste con la cabeza.",
+   "me": "Del cliente hasta internet: OLT, BNG, CGNAT, y en el borde tránsito y peering.",
+   "lesson": [
+    "Sigue el camino del cliente: la fibra llega a la <b>OLT</b>, la sesión <b>PPPoE</b> termina en el <b>BNG</b> y, si falta IPv4, el <b>CGNAT</b> reparte una IP pública entre varios clientes.",
+    "En el borde, el proveedor es un <b>AS</b>: una red con número propio que intercambia rutas por <b>BGP</b>.",
+    "El <b>tránsito</b> es el enlace pagado con una operadora más grande, que entrega todo internet.",
+    "El <b>peering</b> es el intercambio directo con otras redes, sin pagar tránsito, muchas veces en un punto de intercambio como el IX.br.",
+    "Toca las palabras subrayadas para abrir la tarjeta del glosario."
+   ],
+   "check": {
+    "q": "¿En qué equipo termina la sesión PPPoE del cliente?",
+    "v": ["¿Quién recibe la autenticación PPPoE de los clientes?", "¿Hasta qué equipo llega la sesión PPPoE del abonado?"],
+    "o": ["En el BNG", { "t": "En la OLT", "why": "La OLT se encarga de la fibra hasta la casa del cliente. La sesión PPPoE pasa por ella y termina en el BNG." }, { "t": "En el router de borde", "why": "El borde habla BGP con tránsito y peering. Los clientes terminan en el BNG." }],
+    "why": "El BNG (o BRAS, o concentrador) autentica al cliente, aplica el plan de velocidad y entrega la IP."
+   },
+   "tip": "OLT = fibra del cliente. BNG = termina el PPPoE. CGNAT = reparte la IP pública. AS = la red con número. Tránsito = pagado, todo internet. Peering = intercambio directo.",
+   "learn": "El camino del abonado pasa por la OLT (fibra), el BNG (PPPoE, plan e IP) y el CGNAT (IP pública compartida). En el borde, el AS del proveedor intercambia rutas por BGP con el tránsito, que es pagado, y con el peering, que es directo.",
+   "left": [
+    { "why": "La OLT está en la central y habla con las ONU en la casa de los clientes por la fibra (GPON)." },
+    { "why": "El BNG termina las sesiones PPPoE, autentica, aplica el plan y entrega la IP del cliente." },
+    { "why": "El CGNAT pone a varios clientes detrás de una IP pública, cada uno en un rango de puertos." },
+    { "why": "AS es el Sistema Autónomo: la red del proveedor con número propio, que habla BGP con las demás." },
+    { "t": "Tránsito", "why": "El tránsito es el enlace pagado con una operadora más grande, que entrega rutas a todo internet." },
+    { "why": "El peering es el intercambio directo de tráfico con otra red, sin pagar tránsito." }
+   ],
+   "right": [
+    { "t": "Conecta la fibra de los clientes", "s": "Está en la central", "why": "Quien habla con la fibra de los clientes es la OLT." },
+    { "t": "Termina el PPPoE del cliente", "why": "La sesión PPPoE termina en el BNG." },
+    { "t": "Reparte una IP pública entre clientes", "why": "Repartir IPv4 pública entre clientes es el CGNAT." },
+    { "t": "Red con número propio en internet", "why": "Una red con número propio que habla BGP es un AS." },
+    { "t": "Enlace pagado a todo internet", "why": "Un enlace pagado con rutas a todo es tránsito." },
+    { "t": "Intercambio directo, sin pagar tránsito", "why": "El intercambio directo entre redes es peering." }
+   ]
+  },
+  {
+   "title": "Cuatro fabricantes, un comando",
+   "tag": "CLASIFICACIÓN",
+   "cap": "Abriendo las consolas del rack...",
+   "goal": "Lleva cada comando al fabricante que usa esa forma de escribir.",
+   "intro": "En el mismo proveedor hay <b>Cisco</b>, <b>Huawei</b>, <b>Juniper</b> y <b>MikroTik</b>. Los comandos hacen lo mismo, pero cada <b>CLI</b> escribe a su manera. Sepáralos por fabricante.",
+   "z": "Te memorizaste Cisco y te tiré en un Huawei. Vas a escribir show hasta cansarte.",
+   "me": "Cisco y Juniper usan show, Huawei usa display, MikroTik empieza con barra.",
+   "lesson": [
+    "Los cuatro hacen el mismo trabajo: ver rutas, interfaces y configuración. Cambia la <b>CLI</b>, la forma de escribir.",
+    "<b>Cisco IOS</b> usa show: show ip route, show ip interface brief, show running-config.",
+    "<b>Huawei VRP</b> usa display: display ip routing-table, display ip interface brief, display current-configuration.",
+    "<b>Juniper Junos</b> también usa show, pero más corto: show route, show interfaces terse, show configuration.",
+    "<b>MikroTik RouterOS</b> organiza por ruta con barra: /ip route print, /interface print, /export."
+   ],
+   "check": {
+    "q": "¿Qué fabricante usa display en lugar de show?",
+    "v": ["display ip routing-table es un comando de ¿qué fabricante?", "¿En qué equipo escribes display para ver las cosas?"],
+    "o": ["Huawei", { "t": "Juniper", "why": "Junos usa show, como Cisco, solo que con otras palabras: show route." }, { "t": "MikroTik", "why": "MikroTik usa rutas con barra y print: /ip route print." }],
+    "why": "El VRP de Huawei usa display para todo lo que muestra información."
+   },
+   "tip": "display = Huawei. Barra al principio y print = MikroTik. show ip ... y running-config = Cisco. show route, terse y show configuration = Juniper.",
+   "learn": "Ver rutas: show ip route (Cisco), display ip routing-table (Huawei), show route (Junos), /ip route print (MikroTik). Interfaces: show ip interface brief, display ip interface brief, show interfaces terse, /interface print. Configuración: show running-config, display current-configuration, show configuration, /export.",
+   "buckets": [
+    { "a": [
+     { "why": "Cisco: show ip route muestra la tabla de rutas IPv4." },
+     { "why": "Cisco: resumen de las interfaces con IP y estado." },
+     { "why": "Cisco: la configuración que está corriendo ahora." }
+    ] },
+    { "a": [
+     { "why": "Huawei: display en vez de show. Muestra la tabla de rutas." },
+     { "why": "Huawei: resumen de las interfaces, con display." },
+     { "why": "Huawei: la configuración actual. Es el equivalente al running-config." }
+    ] },
+    { "a": [
+     { "why": "Junos: show route, sin el ip en el medio, muestra las rutas." },
+     { "why": "Junos: terse es el resumen corto de las interfaces." },
+     { "why": "Junos: muestra la configuración activa." }
+    ] },
+    { "a": [
+     { "why": "MikroTik: ruta con barra (/ip route) y print para listar." },
+     { "why": "MikroTik: lista las interfaces." },
+     { "why": "MikroTik: muestra la configuración en forma de comandos." }
+    ] }
+   ]
+  },
+  {
+   "title": "IPv6 de proveedor sin susto",
+   "tag": "IPV6",
+   "cap": "Abriendo el plan IPv6 del proveedor...",
+   "heads": ["BLOQUE", "PARA QUIÉN"],
+   "goal": "Conecta cada tamaño de bloque IPv6 con quien suele usarlo.",
+   "z": "/32, /48, /56, /64... para ti todo es número. Le voy a entregar una /64 a un cliente con cinco redes.",
+   "me": "De mayor a menor: proveedor, empresa, casa, red local, una dirección.",
+   "lesson": [
+    "En IPv6, cuanto <b>menor</b> el número después de la barra, <b>mayor</b> el bloque. Un /32 es gigante; un /128 es una sola dirección.",
+    "El proveedor recibe del registro (en Brasil, el NIC.br) un bloque <b>/32</b> y lo reparte entre los clientes.",
+    "Un cliente empresa suele recibir <b>/48</b>; un cliente residencial, <b>/56</b>. Cada uno lo divide en varias /64.",
+    "Toda red local es <b>/64</b>: es el tamaño que necesita SLAAC.",
+    "El bloque llega al router del cliente por <b>DHCPv6-PD</b>, y dentro de casa los aparatos se configuran por <b>RA</b>."
+   ],
+   "check": {
+    "q": "Entre /48 y /56, ¿qué bloque es mayor?",
+    "v": ["¿Cuál tiene más direcciones: un /48 o un /56?", "¿Un /48 es mayor o menor que un /56?"],
+    "o": ["/48", { "t": "/56", "why": "Cuanto mayor el número, más bits son de red y menos quedan para adentro: el /56 es 256 veces menor que el /48." }, { "t": "Son del mismo tamaño", "why": "Cada bit de prefijo menos duplica el bloque. Son 8 bits de diferencia: 256 veces." }],
+    "why": "El /48 deja 80 bits para el cliente; el /56 deja 72. Caben 256 bloques /56 dentro de un /48."
+   },
+   "tip": "/32 = proveedor. /48 = empresa. /56 = casa. /64 = una red local. /128 = una sola dirección. fe80::/10 = link-local, que no sale del enlace.",
+   "learn": "El proveedor recibe un /32 y entrega /48 a empresas y /56 a residencias por DHCPv6-PD. Cada red local usa una /64, un /128 es una sola dirección (como la loopback de un router) y fe80::/10 es la link-local que los routers usan entre sí.",
+   "left": [
+    { "why": "/32 es el bloque que el proveedor recibe del registro (NIC.br, LACNIC) para distribuir." },
+    { "why": "/48 es el bloque típico de un cliente empresa: 65.536 redes /64." },
+    { "why": "/56 es el bloque típico de un cliente residencial: 256 redes /64." },
+    { "why": "/64 es el tamaño de una red local, lo que necesita SLAAC." },
+    { "why": "/128 es una sola dirección, como la loopback de un router." },
+    { "why": "fe80::/10 es la link-local: existe en toda interfaz y no sale del enlace." }
+   ],
+   "right": [
+    { "t": "El proveedor, desde el registro", "why": "El bloque grande que recibe el proveedor es el /32." },
+    { "t": "Cliente empresa", "why": "Una empresa suele recibir /48." },
+    { "t": "Cliente residencial", "why": "Una residencia suele recibir /56." },
+    { "t": "Una red local (VLAN)", "why": "Toda LAN IPv6 es /64." },
+    { "t": "Una sola dirección", "s": "Loopback del router", "why": "Una dirección única es /128." },
+    { "t": "Conversación entre vecinos del enlace", "s": "No se enruta", "why": "Lo que no sale del enlace es la link-local fe80::/10." }
+   ]
+  }
+ ]
+}
