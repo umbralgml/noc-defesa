@@ -6,8 +6,8 @@ const CORE = [
   './', 'index.html', 'manifest.webmanifest', 'src/style.css', 'src/main.js',
   'src/changelog.json', 'src/config.json', 'src/levels/index.json', 'src/levels/prologo.json', 'src/levels/formacao.json', 'src/levels/linux.json',
   'src/levels/ato1.json', 'src/levels/ato2.json', 'src/levels/ato3.json', 'src/levels/ato4.json', 'src/levels/ato5.json', 'src/levels/ato6.json', 'src/levels/provedor-nivel.json', 'src/levels/provedor.json', 'src/levels/linux-intro.json', 'src/levels/linux-plantao.json', 'src/levels/servidores-nivel.json',
-  'src/i18n/es.js', 'src/levels/es/prologo.json', 'src/levels/es/formacao.json', 'src/levels/es/ato1.json', 'src/levels/es/ato2.json',
-  'src/i18n/en.js', 'src/levels/en/prologo.json', 'src/levels/en/formacao.json', 'src/levels/en/ato1.json', 'src/levels/en/ato2.json',
+  'src/i18n/es.js', 'src/levels/es/prologo.json', 'src/levels/es/formacao.json', 'src/levels/es/ato1.json', 'src/levels/es/ato2.json', 'src/levels/es/linux.json',
+  'src/i18n/en.js', 'src/levels/en/prologo.json', 'src/levels/en/formacao.json', 'src/levels/en/ato1.json', 'src/levels/en/ato2.json', 'src/levels/en/linux.json',
   ...['util', 'state', 'levels', 'scene', 'audio', 'ui', 'rank', 'wire', 'drop', 'quiz', 'game', 'daily', 'news', 'pwa', 'room', 'term', 'bank', 'career', 'ach', 'z3r0', 'train', 'steps', 'defense', 'topo', 'pcap', 'netlib', 'prefs', 'cert', 'gen', 'academy', 'glossary', 'study', 'report', 'titlescene', 'board', 'i18n', 'perfil'].map(m => `src/engine/${m}.js`),
   'src/icons/icon-192.png', 'src/icons/icon-512.png',
   ...['orbitron-latin-600', 'orbitron-latin-800', 'jetbrains-mono-latin-500', 'jetbrains-mono-latin-700'].map(f => `src/fonts/${f}-normal.woff2`)
