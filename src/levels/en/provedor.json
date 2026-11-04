@@ -661,7 +661,9 @@
     "b": "stp root secondary gives SW-CORE-02 4096: it's next in line if the main core goes down.",
     "d": "The host port becomes edged: it comes up instantly and doesn't take part in the election.",
     "e": "bpdu-protection shuts an edged port that receives a BPDU: someone swapped the camera for a switch.",
-    "g": "Priority tie: the lowest MAC wins. That's how the customer's MikroTik became root."
+    "g": "Priority tie: the lowest MAC wins. That's how the customer's MikroTik became root.",
+    "c": "On the port to the customer's switch, root-protection ignores BPDUs better than the current root. The customer can run STP, but doesn't rule your network.",
+    "f": "Default priority 32768: that's why, without configuration, the election goes to the tiebreaker."
    }
   },
   {
@@ -1030,7 +1032,8 @@
     "rad": "The RADIUS accounting ties the inside IP to the PPPoE login and the session time.",
     "porta": "With CGNAT, an IP without the source port identifies nobody.",
     "lei": "The Marco Civil (Law 12.965/2014) requires keeping connection records.",
-    "tempo": "Art. 13: 1 year, in a controlled and secure environment."
+    "tempo": "Art. 13: 1 year, in a controlled and secure environment.",
+    "ip": "17:32:04 NAT ADD 100.64.12.77:49817 -> 177.10.4.9:40213: the translation for port 40213 belonged to that inside IP, and it was still valid at 17:32:07."
    }
   },
   {

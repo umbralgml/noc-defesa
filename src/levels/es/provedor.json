@@ -661,7 +661,9 @@
     "b": "stp root secondary deja al SW-CORE-02 con 4096: es el siguiente en la fila si el core principal cae.",
     "d": "El puerto de host se vuelve edged: sube al instante y no participa de la elección.",
     "e": "bpdu-protection apaga un puerto edged que reciba BPDU: alguien cambió la cámara por un switch.",
-    "g": "Empate de prioridad: gana la MAC más baja. Así fue como el MikroTik del cliente se volvió root."
+    "g": "Empate de prioridad: gana la MAC más baja. Así fue como el MikroTik del cliente se volvió root.",
+    "c": "En el puerto hacia el switch del cliente, root-protection ignora las BPDU mejores que el root actual. El cliente puede tener STP, pero no manda en tu red.",
+    "f": "Prioridad por defecto 32768: por eso, sin configurar, la elección se va al desempate."
    }
   },
   {
@@ -1030,7 +1032,8 @@
     "rad": "El accounting de RADIUS vincula la IP interna con el login PPPoE y la hora de la sesión.",
     "porta": "Con CGNAT, una IP sin puerto de origen no identifica a nadie.",
     "lei": "El Marco Civil (Ley 12.965/2014) obliga a guardar los registros de conexión.",
-    "tempo": "Art. 13: 1 año, en un entorno controlado y seguro."
+    "tempo": "Art. 13: 1 año, en un entorno controlado y seguro.",
+    "ip": "17:32:04 NAT ADD 100.64.12.77:49817 -> 177.10.4.9:40213: la traducción del puerto 40213 era de esa IP interna, y todavía valía a las 17:32:07."
    }
   },
   {

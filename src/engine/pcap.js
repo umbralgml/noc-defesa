@@ -7,6 +7,7 @@ import { S } from './state.js';
 import { good, damage, explain, info, note, setScore, flow } from './ui.js';
 import { bankAdd } from './bank.js';
 import { compile, L4 } from './netlib.js';
+import { t } from './i18n.js';
 
 let L = null, done = {}, sel = -1, vis = [], used = new Set();
 
@@ -16,7 +17,7 @@ export function renderPcap(level) {
   S.need = L.packets.length; S.placed = 0;
   const st = $('stage');
   st.innerHTML = `${L.intro ? `<div class="task">${L.intro}</div>` : ''}
-    <form class="pfilter" id="pform"><span>🔎</span><input id="pin" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="filtro de exibição, ex.: tcp.flags.syn == 1" aria-label="Filtro de exibição"><button class="cmd">APLICAR</button></form>
+    <form class="pfilter" id="pform"><span>🔎</span><input id="pin" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="filtro de exibição, ex.: tcp.flags.syn == 1" aria-label="Filtro de exibição"><button class="cmd">${t('APLICAR')}</button></form>
     <div class="pchips" id="pchips"></div>
     <div class="pcap"><div class="prow ph"><span>Nº</span><span>Origem</span><span>Destino</span><span>Proto</span><span>Info</span></div><div id="prows"></div></div>
     <div class="pdet" id="pdet"><div class="tlock">Toque num pacote para ver os detalhes e classificar.</div></div>`;
@@ -24,7 +25,7 @@ export function renderPcap(level) {
   $('pform').onsubmit = e => { e.preventDefault(); apply(); };
   const bank = $('bank');
   bank.innerHTML = `<div class="bankh"><span>CLASSIFICAR OS VISÍVEIS</span><span id="bankCnt">0/${S.need}</span></div>
-    <button class="cmd pbulk bad" id="pBad">⚠ TODOS SUSPEITOS</button><button class="cmd pbulk" id="pOk">✓ TODOS NORMAIS</button>`;
+    <button class="cmd pbulk bad" id="pBad">${t('⚠ TODOS SUSPEITOS')}</button><button class="cmd pbulk" id="pOk">${t('✓ TODOS NORMAIS')}</button>`;
   bank.style.display = 'flex';
   $('pBad').onclick = e => bulk(true, e.currentTarget); $('pOk').onclick = e => bulk(false, e.currentTarget);
   vis = L.packets.map((_, i) => i); rows();
@@ -52,7 +53,7 @@ function rows() {
     r.onclick = () => pick(i); box.append(r);
   });
   const left = vis.filter(i => !(i in done)).length;
-  $('pBad').textContent = `⚠ ${left} SUSPEITO${left === 1 ? '' : 'S'}`; $('pOk').textContent = `✓ ${left} NORMA${left === 1 ? 'L' : 'IS'}`;
+  $('pBad').textContent = t(`⚠ ${left} SUSPEITO${left === 1 ? '' : 'S'}`); $('pOk').textContent = t(`✓ ${left} NORMA${left === 1 ? 'L' : 'IS'}`);
   $('pBad').disabled = $('pOk').disabled = !left;
 }
 

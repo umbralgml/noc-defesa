@@ -8,6 +8,7 @@ import { good, damage, explain, info, note, flow } from './ui.js';
 import { bankAdd } from './bank.js';
 import { runSteps } from './steps.js';
 import { lid, path, reach } from './netlib.js';
+import { t } from './i18n.js';
 
 const MIN_PINGS = 2, HOP = 380;
 const ICO = { pc: '💻', sw: '🔀', rt: '🌐', fw: '🧱', srv: '🖥️', net: '☁️', ap: '📶' };
@@ -46,7 +47,7 @@ export function renderTopo(level) {
   print(`Origem dos testes: ${node(L.from).t}${node(L.from).ip ? ' (' + node(L.from).ip + ')' : ''}. Toque num equipamento para mandar um ping até ele.`, 'tsys');
   const bank = $('bank');
   bank.innerHTML = `<div class="bankh"><span>FERRAMENTAS</span><span id="bankCnt">0/${MIN_PINGS} PINGS</span></div>
-    <button class="cmd tool on" id="tPing">📡 PING</button><button class="cmd tool" id="tBlame" disabled>🎯 APONTAR FALHA</button>`;
+    <button class="cmd tool on" id="tPing">📡 PING</button><button class="cmd tool" id="tBlame" disabled>${t('🎯 APONTAR FALHA')}</button>`;
   bank.style.display = 'flex';
   $('tPing').onclick = () => setMode('ping'); $('tBlame').onclick = () => setMode('blame');
   setMode('ping');
@@ -119,7 +120,7 @@ function trace(p, r) {
 
 function blame(id, g) {
   const at = center(g), isNode = !!node(id);
-  const name = isNode ? node(id).t : (() => { const [a, b] = id.split('-'); return `Cabo ${node(a).t} ↔ ${node(b).t}`; })();
+  const name = isNode ? node(id).t : (() => { const [a, b] = id.split('-'); return `${t('Cabo')} ${node(a).t} ↔ ${node(b).t}`; })();
   if ((L.accept || [L.fault]).includes(id)) {
     S.busy = true; g.classList.add('fault');
     const fe = $('topo').querySelector(`[data-id="${L.fault}"]`); if (fe) fe.classList.add('fault');

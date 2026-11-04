@@ -2,16 +2,25 @@
  "tag": "ACTO 1",
  "name": "Capa física y direccionamiento",
  "story": [
-  { "t": "Primer incidente de verdad: Z3R0 entró al datacenter, arrancó cables y desordenó el direccionamiento." },
-  { "t": "Si la base se cae, nada encima funciona. Física y direcciones: veamos si aprendiste." },
-  { "t": "Cable correcto, IP correcta. Se empieza por el piso." }
+  {
+   "t": "Primer incidente de verdad: Z3R0 entró al datacenter, arrancó cables y desordenó el direccionamiento."
+  },
+  {
+   "t": "Si la base se cae, nada encima funciona. Física y direcciones: veamos si aprendiste."
+  },
+  {
+   "t": "Cable correcto, IP correcta. Se empieza por el piso."
+  }
  ],
  "levels": [
   {
    "title": "Rack derribado",
    "tag": "CABLEADO",
    "cap": "Corriendo hacia el rack del datacenter...",
-   "heads": ["TU EQUIPO", "DÓNDE CONECTAR"],
+   "heads": [
+    "TU EQUIPO",
+    "DÓNDE CONECTAR"
+   ],
    "goal": "Cada cable tiene un tipo. Conecta cada equipo de la izquierda al puerto compatible de la derecha.",
    "z": "Entré al datacenter y arranqué todos los cables de tu rack. Quiero verte reconectar esto a las 3 de la mañana.",
    "me": "Cada puerto tiene su transceptor. Basta con leer lo que dice.",
@@ -24,25 +33,70 @@
    ],
    "check": {
     "q": "¿Un transceptor 10GBASE-LR combina con qué cable?",
-    "v": ["¿Qué tipo de cable usar con un transceptor 10GBASE-LR?", "¿Para qué medio físico se hizo el módulo 10GBASE-LR?"],
-    "o": ["Fibra monomodo", { "t": "Fibra multimodo", "why": "La multimodo es la pareja del SR, de corta distancia." }, { "t": "Cable DAC", "why": "El DAC es cobre twinax con los módulos ya fijos, para pocos metros." }],
+    "v": [
+     "¿Qué tipo de cable usar con un transceptor 10GBASE-LR?",
+     "¿Para qué medio físico se hizo el módulo 10GBASE-LR?"
+    ],
+    "o": [
+     "Fibra monomodo",
+     {
+      "t": "Fibra multimodo",
+      "why": "La multimodo es la pareja del SR, de corta distancia."
+     },
+     {
+      "t": "Cable DAC",
+      "why": "El DAC es cobre twinax con los módulos ya fijos, para pocos metros."
+     }
+    ],
     "why": "LR es larga distancia (hasta 10 km): pide fibra monomodo."
    },
    "tip": "LR = larga distancia en fibra monomodo (amarilla). SR = corta distancia en multimodo (aqua). SFP28 en el mismo rack = DAC. RJ45 = cobre. El PON de la OLT va al splitter óptico.",
    "learn": "La monomodo OS2 (amarilla) atiende LR/ER, kilómetros. La multimodo OM4 (aqua) atiende SR, hasta unos 400 m en 10G. El DAC es twinax de cobre con transceptor integrado, ideal hasta ~5 m. GPON usa SC/APC (verde) por el pulido angular que reduce la reflexión.",
    "left": [
-    { "s": "SFP+ 10GBASE-LR · POP a 8 km", "why": "LR (long reach) usa láser de 1310 nm en fibra monomodo y alcanza 10 km. Para 8 km hasta el POP, solo sirve OS2." },
-    { "s": "SFP28 25G · mismo rack, 1 m", "why": "Dos equipos en el mismo rack, a 1 m: el DAC lo resuelve sin gastar en transceptores ópticos." },
-    { "s": "SFP+ 10GBASE-SR · 150 m", "why": "SR (short reach) usa láser de 850 nm en multimodo. La OM4 lleva 10G hasta unos 400 m, así que 150 m está holgado." },
-    { "t": "Estación NOC", "s": "Placa RJ45 1000BASE-T", "why": "1000BASE-T es Gigabit en cobre: cable Cat6 con RJ45, hasta 100 m." },
-    { "s": "Módulo PON clase C+", "why": "El puerto PON de la OLT sale en fibra monomodo con conector SC/APC y va hasta el splitter, que divide la señal para hasta 16 clientes." }
+    {
+     "s": "SFP+ 10GBASE-LR · POP a 8 km",
+     "why": "LR (long reach) usa láser de 1310 nm en fibra monomodo y alcanza 10 km. Para 8 km hasta el POP, solo sirve OS2."
+    },
+    {
+     "s": "SFP28 25G · mismo rack, 1 m",
+     "why": "Dos equipos en el mismo rack, a 1 m: el DAC lo resuelve sin gastar en transceptores ópticos."
+    },
+    {
+     "s": "SFP+ 10GBASE-SR · 150 m",
+     "why": "SR (short reach) usa láser de 850 nm en multimodo. La OM4 lleva 10G hasta unos 400 m, así que 150 m está holgado."
+    },
+    {
+     "t": "Estación NOC",
+     "s": "Placa RJ45 1000BASE-T",
+     "why": "1000BASE-T es Gigabit en cobre: cable Cat6 con RJ45, hasta 100 m."
+    },
+    {
+     "s": "Módulo PON clase C+",
+     "why": "El puerto PON de la OLT sale en fibra monomodo con conector SC/APC y va hasta el splitter, que divide la señal para hasta 16 clientes."
+    }
    ],
    "right": [
-    { "t": "POP remoto", "s": "DIO con fibra monomodo OS2", "why": "El POP remoto está a 8 km y el DIO es de monomodo: solo un transceptor LR llega allá." },
-    { "s": "Jaula SFP28 en el mismo rack", "why": "Puerto SFP28 de 25G en el mismo rack: pide un DAC de 25G, no fibra ni RJ45." },
-    { "s": "SFP+ SR · fibra OM4", "why": "Puerto SFP+ SR con fibra OM4: pide un transceptor SR, de corta distancia, a lo sumo a algunos cientos de metros." },
-    { "s": "Patch panel Cat6", "why": "Un patch panel Cat6 es cobre: solo recibe cable con RJ45." },
-    { "s": "Adaptador SC/APC verde", "why": "Un splitter óptico con SC/APC verde es la punta de una red GPON: aquí solo se conecta la OLT." }
+    {
+     "t": "POP remoto",
+     "s": "DIO con fibra monomodo OS2",
+     "why": "El POP remoto está a 8 km y el DIO es de monomodo: solo un transceptor LR llega allá."
+    },
+    {
+     "s": "Jaula SFP28 en el mismo rack",
+     "why": "Puerto SFP28 de 25G en el mismo rack: pide un DAC de 25G, no fibra ni RJ45."
+    },
+    {
+     "s": "SFP+ SR · fibra OM4",
+     "why": "Puerto SFP+ SR con fibra OM4: pide un transceptor SR, de corta distancia, a lo sumo a algunos cientos de metros."
+    },
+    {
+     "s": "Patch panel Cat6",
+     "why": "Un patch panel Cat6 es cobre: solo recibe cable con RJ45."
+    },
+    {
+     "s": "Adaptador SC/APC verde",
+     "why": "Un splitter óptico con SC/APC verde es la punta de una red GPON: aquí solo se conecta la OLT."
+    }
    ]
   },
   {
@@ -62,31 +116,77 @@
    ],
    "check": {
     "q": "La dirección 172.20.5.1 es:",
-    "v": ["¿Cómo se clasifica la dirección 172.20.5.1?", "¿La IP 172.20.5.1 es pública o privada?"],
-    "o": ["Privada", { "t": "Pública", "why": "172.16.0.0/12 va de 172.16 a 172.31: el 172.20 está dentro." }, { "t": "CGNAT", "why": "CGNAT es 100.64.0.0/10." }],
+    "v": [
+     "¿Cómo se clasifica la dirección 172.20.5.1?",
+     "¿La IP 172.20.5.1 es pública o privada?"
+    ],
+    "o": [
+     "Privada",
+     {
+      "t": "Pública",
+      "why": "172.16.0.0/12 va de 172.16 a 172.31: el 172.20 está dentro."
+     },
+     {
+      "t": "CGNAT",
+      "why": "CGNAT es 100.64.0.0/10."
+     }
+    ],
     "why": "172.20 cae dentro de 172.16.0.0/12, uno de los rangos privados de la RFC 1918."
    },
    "tip": "Privada: 10.0.0.0/8, 172.16.0.0/12 (172.16 a 172.31), 192.168.0.0/16. CGNAT: 100.64.0.0/10 (100.64 a 100.127). El resto aquí es público.",
    "learn": "Trampas clásicas: 172.32.x.x ya es pública porque el /12 va solo hasta 172.31. 100.128.x.x es pública porque el /10 del CGNAT termina en 100.127. 192.169.x.x también es pública.",
    "buckets": [
-    { "label": "PRIVADA · RFC 1918", "a": [
-     { "why": "Empieza con 10: está en 10.0.0.0/8, privada." },
-     { "why": "172.16 es el inicio de 172.16.0.0/12, privada." },
-     { "why": "Todo 192.168.x.x es privado (192.168.0.0/16)." },
-     { "why": "172.31 es el último tramo del /12 (172.16 a 172.31): todavía privada." }
-    ] },
-    { "label": "CGNAT · RFC 6598", "a": [
-     { "why": "100.64 es el inicio de 100.64.0.0/10, el rango de CGNAT." },
-     { "why": "100.100 está entre 100.64 y 100.127: CGNAT." },
-     { "why": "100.127 es el último tramo del /10: todavía CGNAT." }
-    ] },
-    { "label": "PÚBLICA", "a": [
-     { "why": "DNS público de Google, enrutado en internet." },
-     { "why": "172.32 pasó el fin del /12, que termina en 172.31: es pública." },
-     { "why": "100.128 pasó el fin del /10 del CGNAT, que termina en 100.127: es pública." },
-     { "why": "177.x no cae en ningún rango reservado: es pública." },
-     { "why": "Solo 192.168 es privado. 192.169 ya es pública." }
-    ] }
+    {
+     "label": "PRIVADA · RFC 1918",
+     "a": [
+      {
+       "why": "Empieza con 10: está en 10.0.0.0/8, privada."
+      },
+      {
+       "why": "172.16 es el inicio de 172.16.0.0/12, privada."
+      },
+      {
+       "why": "Todo 192.168.x.x es privado (192.168.0.0/16)."
+      },
+      {
+       "why": "172.31 es el último tramo del /12 (172.16 a 172.31): todavía privada."
+      }
+     ]
+    },
+    {
+     "label": "CGNAT · RFC 6598",
+     "a": [
+      {
+       "why": "100.64 es el inicio de 100.64.0.0/10, el rango de CGNAT."
+      },
+      {
+       "why": "100.100 está entre 100.64 y 100.127: CGNAT."
+      },
+      {
+       "why": "100.127 es el último tramo del /10: todavía CGNAT."
+      }
+     ]
+    },
+    {
+     "label": "PÚBLICA",
+     "a": [
+      {
+       "why": "DNS público de Google, enrutado en internet."
+      },
+      {
+       "why": "172.32 pasó el fin del /12, que termina en 172.31: es pública."
+      },
+      {
+       "why": "100.128 pasó el fin del /10 del CGNAT, que termina en 100.127: es pública."
+      },
+      {
+       "why": "177.x no cae en ningún rango reservado: es pública."
+      },
+      {
+       "why": "Solo 192.168 es privado. 192.169 ya es pública."
+      }
+     ]
+    }
    ]
   },
   {
@@ -105,8 +205,21 @@
    ],
    "check": {
     "q": "Para dividir una /24 en 4 subredes iguales, ¿cuál es la nueva máscara?",
-    "v": ["Dividiendo una /24 en 4 subredes del mismo tamaño, ¿qué máscara tendrá cada una?", "Una /24 debe convertirse en 4 subredes iguales. ¿Cuál es el nuevo prefijo?"],
-    "o": ["/26", { "t": "/25", "why": "/25 divide la /24 en solo 2 subredes." }, { "t": "/28", "why": "/28 da 16 subredes, más de lo pedido." }],
+    "v": [
+     "Dividiendo una /24 en 4 subredes del mismo tamaño, ¿qué máscara tendrá cada una?",
+     "Una /24 debe convertirse en 4 subredes iguales. ¿Cuál es el nuevo prefijo?"
+    ],
+    "o": [
+     "/26",
+     {
+      "t": "/25",
+      "why": "/25 divide la /24 en solo 2 subredes."
+     },
+     {
+      "t": "/28",
+      "why": "/28 da 16 subredes, más de lo pedido."
+     }
+    ],
     "why": "4 subredes = 2 bits prestados: /24 + 2 = /26, bloques de 64."
    },
    "tip": "4 subredes = 2 bits más: la /24 se vuelve /26. Cada /26 tiene 64 direcciones (62 útiles). Los bloques avanzan de 64 en 64.",
@@ -121,26 +234,61 @@
     "c1": "64 + 64 = .128.",
     "c2": "La siguiente red empieza en .192, así que el broadcast es .191.",
     "d1": "128 + 64 = .192, la última subred.",
-    "d2": "La última dirección de la /24 es siempre el broadcast de la última subred: .255."
+    "d2": "La última dirección de la /24 es siempre el broadcast de la última subred: .255.",
+    "m": "4 subredes piden 2 bits prestados: /26, que es 255.255.255.192."
    },
    "chips": [
-    { "why": "Máscara /26: bloques de 64 direcciones." },
-    { "why": "Esa es la /27: bloques de 32, lo que daría 8 subredes. Aquí son 4." },
-    { "why": "Esa es la /25: bloques de 128, lo que daría solo 2 subredes." },
-    { "why": "2^6 − 2 = 62 hosts útiles en una /26." },
-    { "why": "64 es el total de direcciones de la /26. Quita la red y el broadcast." },
-    { "why": "30 hosts útiles es el tamaño de una /27, no de una /26." },
-    { "why": ".0 es la dirección de red de la subred A." },
-    { "why": ".63 es el broadcast de la subred A (.0 a .63)." },
-    { "why": ".64 es la dirección de red de la subred B." },
-    { "why": ".127 es el broadcast de la subred B (.64 a .127)." },
-    { "why": ".128 es la dirección de red de la subred C." },
-    { "why": ".191 es el broadcast de la subred C (.128 a .191)." },
-    { "why": ".192 es la dirección de red de la subred D." },
-    { "why": ".255 es el broadcast de la subred D (.192 a .255)." },
-    { "why": ".32 es frontera de /27, que avanza de 32 en 32. Aquí los bloques son de 64." },
-    { "why": ".96 es múltiplo de 32 pero no de 64: frontera de /27, no de /26." },
-    { "why": ".224 es frontera de /27. En la /26 los bloques empiezan en .0, .64, .128 y .192." }
+    {
+     "why": "Máscara /26: bloques de 64 direcciones."
+    },
+    {
+     "why": "Esa es la /27: bloques de 32, lo que daría 8 subredes. Aquí son 4."
+    },
+    {
+     "why": "Esa es la /25: bloques de 128, lo que daría solo 2 subredes."
+    },
+    {
+     "why": "2^6 − 2 = 62 hosts útiles en una /26."
+    },
+    {
+     "why": "64 es el total de direcciones de la /26. Quita la red y el broadcast."
+    },
+    {
+     "why": "30 hosts útiles es el tamaño de una /27, no de una /26."
+    },
+    {
+     "why": ".0 es la dirección de red de la subred A."
+    },
+    {
+     "why": ".63 es el broadcast de la subred A (.0 a .63)."
+    },
+    {
+     "why": ".64 es la dirección de red de la subred B."
+    },
+    {
+     "why": ".127 es el broadcast de la subred B (.64 a .127)."
+    },
+    {
+     "why": ".128 es la dirección de red de la subred C."
+    },
+    {
+     "why": ".191 es el broadcast de la subred C (.128 a .191)."
+    },
+    {
+     "why": ".192 es la dirección de red de la subred D."
+    },
+    {
+     "why": ".255 es el broadcast de la subred D (.192 a .255)."
+    },
+    {
+     "why": ".32 es frontera de /27, que avanza de 32 en 32. Aquí los bloques son de 64."
+    },
+    {
+     "why": ".96 es múltiplo de 32 pero no de 64: frontera de /27, no de /26."
+    },
+    {
+     "why": ".224 es frontera de /27. En la /26 los bloques empiezan en .0, .64, .128 y .192."
+    }
    ]
   },
   {
@@ -159,35 +307,92 @@
    ],
    "check": {
     "q": "El ping al router vuelve, pero al servidor no. ¿Dónde buscar?",
-    "v": ["El router responde al ping, el servidor no. ¿En qué tramo buscar la falla?", "El ping llega hasta el router, pero no hasta el servidor. ¿Dónde investigar?"],
-    "o": ["Entre el router y el servidor", { "t": "En el PC desde donde salió el ping", "why": "El router respondió: el PC y el camino hasta él están bien." }, { "t": "En internet", "why": "El servidor es interno. Internet ni entra en ese camino." }],
+    "v": [
+     "El router responde al ping, el servidor no. ¿En qué tramo buscar la falla?",
+     "El ping llega hasta el router, pero no hasta el servidor. ¿Dónde investigar?"
+    ],
+    "o": [
+     "Entre el router y el servidor",
+     {
+      "t": "En el PC desde donde salió el ping",
+      "why": "El router respondió: el PC y el camino hasta él están bien."
+     },
+     {
+      "t": "En internet",
+      "why": "El servidor es interno. Internet ni entra en ese camino."
+     }
+    ],
     "why": "La falla está entre el último punto que responde y el primero que no responde."
    },
    "tip": "Haz ping a internet (¿responde?) y a un servidor (¿falla?). ¿Qué tienen en común los servidores que internet no tiene? El SW-DC y el cable que conecta el router a él.",
    "learn": "Aislar la falla comparando pruebas es la base del troubleshooting. Internet ok y servidores caídos = problema en el tramo que solo usan los servidores: el uplink entre el router y el SW-DC. Capa física primero: el cable estaba suelto.",
    "nodes": [
-    { "t": "PC FINANZAS" },
-    { "why": "Switch de acceso: conecta los PCs del piso. Es capa 2, reenvía por dirección MAC y no aparece en el traceroute." },
-    { "t": "ROUTER", "why": "Router y gateway del PC. Conecta la red de los usuarios con la red de los servidores y con la salida a internet." },
-    { "why": "Firewall de borde: todo lo que va a internet pasa por él." },
-    { "why": "8.8.8.8 es el DNS público de Google. Buen objetivo para probar si la salida a internet funciona." },
-    { "why": "Switch del datacenter: conecta los servidores. Si él, o el cable hasta él, se cae, todos los servidores desaparecen juntos." },
-    { "t": "ARCHIVOS", "why": "Servidor de archivos, donde está la carpeta de red de finanzas." },
-    { "why": "Servidor del ERP, el sistema de gestión de la empresa." }
+    {
+     "t": "PC FINANZAS"
+    },
+    {
+     "why": "Switch de acceso: conecta los PCs del piso. Es capa 2, reenvía por dirección MAC y no aparece en el traceroute."
+    },
+    {
+     "t": "ROUTER",
+     "why": "Router y gateway del PC. Conecta la red de los usuarios con la red de los servidores y con la salida a internet."
+    },
+    {
+     "why": "Firewall de borde: todo lo que va a internet pasa por él."
+    },
+    {
+     "why": "8.8.8.8 es el DNS público de Google. Buen objetivo para probar si la salida a internet funciona."
+    },
+    {
+     "why": "Switch del datacenter: conecta los servidores. Si él, o el cable hasta él, se cae, todos los servidores desaparecen juntos."
+    },
+    {
+     "t": "ARCHIVOS",
+     "why": "Servidor de archivos, donde está la carpeta de red de finanzas."
+    },
+    {
+     "why": "Servidor del ERP, el sistema de gestión de la empresa."
+    }
    ],
    "faultName": "En el uplink entre el router y el SW-DC",
    "faultWhy": "El router e internet responden, pero el SW-DC y los dos servidores no. Lo que tienen en común es el uplink del router al SW-DC: la falla está ahí.",
    "steps": [
     {
      "q": "Router e internet responden; SW-DC y servidores no. ¿Qué indica eso?",
-     "v": ["Router e internet responden, pero SW-DC y servidores no. ¿Dónde está la falla?", "El ping se detiene en el SW-DC: todo lo que está después cae, todo lo de antes responde. ¿Qué muestra eso?"],
-     "o": ["La falla está entre el router y el SW-DC", { "t": "Internet se cayó", "why": "El ping a 8.8.8.8 volvió: la salida a internet funciona." }, { "t": "El PC de finanzas está dañado", "why": "Si fuera el PC, nada respondería, ni siquiera el router, que es su gateway." }],
+     "v": [
+      "Router e internet responden, pero SW-DC y servidores no. ¿Dónde está la falla?",
+      "El ping se detiene en el SW-DC: todo lo que está después cae, todo lo de antes responde. ¿Qué muestra eso?"
+     ],
+     "o": [
+      "La falla está entre el router y el SW-DC",
+      {
+       "t": "Internet se cayó",
+       "why": "El ping a 8.8.8.8 volvió: la salida a internet funciona."
+      },
+      {
+       "t": "El PC de finanzas está dañado",
+       "why": "Si fuera el PC, nada respondería, ni siquiera el router, que es su gateway."
+      }
+     ],
      "why": "El problema está entre el último punto que responde (router) y el primero que no responde (SW-DC)."
     },
     {
      "q": "En el rack, el LED del puerto del uplink está apagado. ¿Cuál es el primer paso?",
-     "v": ["El LED del uplink en el rack está apagado. ¿Qué hacer primero?", "Puerto del uplink sin luz en el rack. ¿Cuál es la primera acción?"],
-     "o": ["Revisar el cable y reconectar: capa física primero", { "t": "Reiniciar el servidor de archivos", "why": "El servidor no tiene la culpa: el camino hasta él está cortado. Reiniciar solo genera más indisponibilidad." }, { "t": "Cambiar la IP del PC de finanzas", "why": "Una dirección IP no enciende un LED. LED apagado es problema físico (capa 1)." }],
+     "v": [
+      "El LED del uplink en el rack está apagado. ¿Qué hacer primero?",
+      "Puerto del uplink sin luz en el rack. ¿Cuál es la primera acción?"
+     ],
+     "o": [
+      "Revisar el cable y reconectar: capa física primero",
+      {
+       "t": "Reiniciar el servidor de archivos",
+       "why": "El servidor no tiene la culpa: el camino hasta él está cortado. Reiniciar solo genera más indisponibilidad."
+      },
+      {
+       "t": "Cambiar la IP del PC de finanzas",
+       "why": "Una dirección IP no enciende un LED. LED apagado es problema físico (capa 1)."
+      }
+     ],
      "why": "LED apagado = sin señal eléctrica u óptica. Cable suelto, mal crimpado o puerto deshabilitado. Resuelve la capa física antes de tocar la configuración."
     }
    ]
@@ -196,7 +401,10 @@
    "title": "Puertos y servicios",
    "tag": "CONEXIÓN",
    "cap": "Revisando los servicios expuestos...",
-   "heads": ["SERVICIO", "PUERTO ESTÁNDAR"],
+   "heads": [
+    "SERVICIO",
+    "PUERTO ESTÁNDAR"
+   ],
    "goal": "Conecta cada servicio con su puerto estándar.",
    "z": "Cambié todas las reglas de puerto. No vas a saber qué permitir.",
    "me": "El puerto estándar es tatuaje de analista.",
@@ -208,27 +416,70 @@
    ],
    "check": {
     "q": "¿Cuál es el puerto estándar de HTTPS?",
-    "v": ["¿Qué puerto usa HTTPS por defecto?", "¿Qué protocolo y puerto estándar usa HTTPS?"],
-    "o": ["TCP 443", { "t": "TCP 80", "why": "80 es HTTP sin cifrado." }, { "t": "TCP 22", "why": "22 es SSH." }],
+    "v": [
+     "¿Qué puerto usa HTTPS por defecto?",
+     "¿Qué protocolo y puerto estándar usa HTTPS?"
+    ],
+    "o": [
+     "TCP 443",
+     {
+      "t": "TCP 80",
+      "why": "80 es HTTP sin cifrado."
+     },
+     {
+      "t": "TCP 22",
+      "why": "22 es SSH."
+     }
+    ],
     "why": "HTTPS es HTTP sobre TLS, en el puerto TCP 443."
    },
    "tip": "SSH 22, DNS 53, BGP 179, SNMP 161, HTTPS 443, RDP 3389.",
    "learn": "BGP corre sobre TCP 179. SNMP usa UDP 161 (traps en la 162). DNS usa UDP 53 y pasa a TCP 53 en respuestas grandes y transferencia de zona. RDP expuesto en la 3389 es uno de los blancos favoritos del ransomware.",
    "left": [
-    { "s": "Acceso remoto seguro", "why": "SSH usa TCP 22. Reemplazó a Telnet (23), que envía hasta la contraseña en texto plano." },
-    { "s": "Resolución de nombres", "why": "DNS responde en UDP 53. Las respuestas grandes y la transferencia de zona usan TCP 53." },
-    { "s": "Enrutamiento entre AS", "why": "BGP abre una sesión TCP en el puerto 179 entre routers vecinos." },
-    { "s": "Monitoreo", "why": "SNMP consulta los equipos en UDP 161. Las alertas (traps) llegan en UDP 162." },
-    { "s": "Web cifrada", "why": "HTTPS es HTTP sobre TLS en TCP 443. HTTP sin cifrado usa el 80." },
-    { "s": "Escritorio remoto", "why": "RDP usa TCP 3389. Expuesto en internet, es blanco de fuerza bruta y ransomware." }
+    {
+     "s": "Acceso remoto seguro",
+     "why": "SSH usa TCP 22. Reemplazó a Telnet (23), que envía hasta la contraseña en texto plano."
+    },
+    {
+     "s": "Resolución de nombres",
+     "why": "DNS responde en UDP 53. Las respuestas grandes y la transferencia de zona usan TCP 53."
+    },
+    {
+     "s": "Enrutamiento entre AS",
+     "why": "BGP abre una sesión TCP en el puerto 179 entre routers vecinos."
+    },
+    {
+     "s": "Monitoreo",
+     "why": "SNMP consulta los equipos en UDP 161. Las alertas (traps) llegan en UDP 162."
+    },
+    {
+     "s": "Web cifrada",
+     "why": "HTTPS es HTTP sobre TLS en TCP 443. HTTP sin cifrado usa el 80."
+    },
+    {
+     "s": "Escritorio remoto",
+     "why": "RDP usa TCP 3389. Expuesto en internet, es blanco de fuerza bruta y ransomware."
+    }
    ],
    "right": [
-    { "why": "TCP 22 es el puerto de SSH." },
-    { "why": "53 es el puerto de DNS." },
-    { "why": "TCP 179 es el puerto de BGP." },
-    { "why": "UDP 161 es el puerto de SNMP." },
-    { "why": "TCP 443 es el puerto de HTTPS." },
-    { "why": "TCP 3389 es el puerto de RDP." }
+    {
+     "why": "TCP 22 es el puerto de SSH."
+    },
+    {
+     "why": "53 es el puerto de DNS."
+    },
+    {
+     "why": "TCP 179 es el puerto de BGP."
+    },
+    {
+     "why": "UDP 161 es el puerto de SNMP."
+    },
+    {
+     "why": "TCP 443 es el puerto de HTTPS."
+    },
+    {
+     "why": "TCP 3389 es el puerto de RDP."
+    }
    ]
   },
   {
@@ -248,25 +499,60 @@
    ],
    "check": {
     "q": "¿Cuál es la forma corta de 2001:0db8:0000:0000:0000:0000:0000:0001?",
-    "v": ["Acorta 2001:0db8:0000:0000:0000:0000:0000:0001.", "¿Cómo queda 2001:0db8:0000:0000:0000:0000:0000:0001 en forma corta?"],
-    "o": ["2001:db8::1", { "t": "2001:db8:1", "why": "Así quedarían solo 3 grupos. Sin el ::, no hay forma de saber que hay ceros en medio." }, { "t": "21:db8::1", "why": "Solo los ceros a la izquierda de cada grupo pueden desaparecer. El 2001 no tiene cero a la izquierda." }],
+    "v": [
+     "Acorta 2001:0db8:0000:0000:0000:0000:0000:0001.",
+     "¿Cómo queda 2001:0db8:0000:0000:0000:0000:0000:0001 en forma corta?"
+    ],
+    "o": [
+     "2001:db8::1",
+     {
+      "t": "2001:db8:1",
+      "why": "Así quedarían solo 3 grupos. Sin el ::, no hay forma de saber que hay ceros en medio."
+     },
+     {
+      "t": "21:db8::1",
+      "why": "Solo los ceros a la izquierda de cada grupo pueden desaparecer. El 2001 no tiene cero a la izquierda."
+     }
+    ],
     "why": "0db8 pierde el cero a la izquierda, y los cinco grupos 0000 del medio se vuelven un único ::."
    },
    "tip": "Revisa tres cosas: como máximo 8 grupos, solo dígitos de 0 a 9 y letras de a hasta f, y el :: como máximo una vez. Cada grupo tiene hasta 4 dígitos.",
    "learn": "IPv6 son 8 grupos de hasta 4 dígitos hexadecimales. Los ceros a la izquierda desaparecen y una secuencia de grupos en cero se vuelve ::, pero solo una vez. Una letra después de la f, un grupo de 5 dígitos o más de 8 grupos dejan la dirección inválida.",
    "buckets": [
-    { "label": "BIEN ESCRITA", "a": [
-     { "why": "Correcta: 2001:0db8:0000:0000:0000:0000:0000:0001 acortada, con un único ::." },
-     { "why": "Correcta: el :: esconde los 6 grupos en cero del medio. Esta es una link-local, común como dirección de router." },
-     { "why": "Correcta: los grupos en cero pueden quedar como 0, y el :: aparece una sola vez." },
-     { "why": "Correcta: son 7 grupos en cero y el último 1. Es el loopback de IPv6, como el 127.0.0.1." }
-    ] },
-    { "label": "MAL ESCRITA", "a": [
-     { "why": "Incorrecta: dos ::. No hay forma de saber cuántos grupos en cero esconde cada uno." },
-     { "why": "Incorrecta: g y h no existen en hexadecimal, que va solo hasta la f." },
-     { "why": "Incorrecta: un grupo tiene como máximo 4 dígitos (16 bits)." },
-     { "why": "Incorrecta: son 9 grupos. IPv6 tiene exactamente 8." }
-    ] }
+    {
+     "label": "BIEN ESCRITA",
+     "a": [
+      {
+       "why": "Correcta: 2001:0db8:0000:0000:0000:0000:0000:0001 acortada, con un único ::."
+      },
+      {
+       "why": "Correcta: el :: esconde los 6 grupos en cero del medio. Esta es una link-local, común como dirección de router."
+      },
+      {
+       "why": "Correcta: los grupos en cero pueden quedar como 0, y el :: aparece una sola vez."
+      },
+      {
+       "why": "Correcta: son 7 grupos en cero y el último 1. Es el loopback de IPv6, como el 127.0.0.1."
+      }
+     ]
+    },
+    {
+     "label": "MAL ESCRITA",
+     "a": [
+      {
+       "why": "Incorrecta: dos ::. No hay forma de saber cuántos grupos en cero esconde cada uno."
+      },
+      {
+       "why": "Incorrecta: g y h no existen en hexadecimal, que va solo hasta la f."
+      },
+      {
+       "why": "Incorrecta: un grupo tiene como máximo 4 dígitos (16 bits)."
+      },
+      {
+       "why": "Incorrecta: son 9 grupos. IPv6 tiene exactamente 8."
+      }
+     ]
+    }
    ]
   }
  ]

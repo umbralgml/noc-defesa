@@ -2,17 +2,28 @@
  "tag": "PROLOGUE",
  "name": "First steps on the network",
  "story": [
-  { "t": "Welcome to the NOC! From here we look after the network of an entire ISP. Today is your first shift." },
-  { "t": "First day... and why is the video wall flashing red?" },
-  { "t": "Hi, rookie. I'm Z3R0. I'll spend the night taking your network down. Try to keep up." },
-  { "t": "Easy. Start with the basics: who is who on the network. Every level has a short lesson first, and you can review it during the game." }
+  {
+   "t": "Welcome to the NOC! From here we look after the network of an entire ISP. Today is your first shift."
+  },
+  {
+   "t": "First day... and why is the video wall flashing red?"
+  },
+  {
+   "t": "Hi, rookie. I'm Z3R0. I'll spend the night taking your network down. Try to keep up."
+  },
+  {
+   "t": "Easy. Start with the basics: who is who on the network. Every level has a short lesson first, and you can review it during the game."
+  }
  ],
  "levels": [
   {
    "title": "First day at the NOC",
    "tag": "TUTORIAL",
    "cap": "Arriving for the first shift...",
-   "heads": ["DEVICE", "WHAT IT DOES"],
+   "heads": [
+    "DEVICE",
+    "WHAT IT DOES"
+   ],
    "goal": "Match each device to what it does. Start by tapping the Switch and then its job, on the right.",
    "z": "First day? How cute. I bet you don't even know the difference between a switch and a router.",
    "me": "I don't know everything yet. But I learn fast.",
@@ -31,26 +42,72 @@
     ],
     "o": [
      "Router",
-     { "t": "Switch", "why": "The switch connects devices on the same local network." },
-     { "t": "Access point", "why": "The access point brings the network to Wi-Fi, but does not connect different networks." }
+     {
+      "t": "Switch",
+      "why": "The switch connects devices on the same local network."
+     },
+     {
+      "t": "Access point",
+      "why": "The access point brings the network to Wi-Fi, but does not connect different networks."
+     }
     ],
     "why": "The router forwards packets between different networks based on the IP address."
    },
    "tip": "Switch = same network. Router = between networks. Firewall = doorman. Access point = Wi-Fi. Server = offers a service.",
    "learn": "Every device has a role: the switch connects the local network, the router connects different networks, the firewall filters, the access point brings the network to Wi-Fi and the server offers the services. That is the mental map of any NOC.",
    "left": [
-    { "t": "Switch", "s": "Box full of network ports", "why": "The switch connects the devices on the same local network and delivers each message only to whoever should get it." },
-    { "t": "Router", "s": "Sits between your network and the internet", "why": "The router picks the path between different networks. Without it, your network does not reach the internet." },
-    { "t": "Firewall", "s": "Sits at the network entrance", "why": "The firewall compares each connection with the rules and blocks what was not allowed." },
-    { "t": "Access point", "s": "Has antennas", "why": "The access point turns the wired network into Wi-Fi." },
-    { "t": "Server", "s": "Always on in the datacenter", "why": "A server is the computer that offers a service to others: website, files, email, DNS." }
+    {
+     "t": "Switch",
+     "s": "Box full of network ports",
+     "why": "The switch connects the devices on the same local network and delivers each message only to whoever should get it."
+    },
+    {
+     "t": "Router",
+     "s": "Sits between your network and the internet",
+     "why": "The router picks the path between different networks. Without it, your network does not reach the internet."
+    },
+    {
+     "t": "Firewall",
+     "s": "Sits at the network entrance",
+     "why": "The firewall compares each connection with the rules and blocks what was not allowed."
+    },
+    {
+     "t": "Access point",
+     "s": "Has antennas",
+     "why": "The access point turns the wired network into Wi-Fi."
+    },
+    {
+     "t": "Server",
+     "s": "Always on in the datacenter",
+     "why": "A server is the computer that offers a service to others: website, files, email, DNS."
+    }
    ],
    "right": [
-    { "t": "Connects the computers on the same local network", "s": "", "why": "Connecting computers on the same network is the switch's job." },
-    { "t": "Carries traffic from one network to another", "s": "And to the internet", "why": "Carrying traffic from one network to another is the router's job." },
-    { "t": "Decides what can come in and go out", "s": "", "why": "Deciding what gets through is the firewall's job." },
-    { "t": "Gives Wi-Fi access", "s": "", "why": "Wi-Fi is the access point's job." },
-    { "t": "Offers a service, like a website", "s": "", "why": "Offering a service is the server's job." }
+    {
+     "t": "Connects the computers on the same local network",
+     "s": "",
+     "why": "Connecting computers on the same network is the switch's job."
+    },
+    {
+     "t": "Carries traffic from one network to another",
+     "s": "And to the internet",
+     "why": "Carrying traffic from one network to another is the router's job."
+    },
+    {
+     "t": "Decides what can come in and go out",
+     "s": "",
+     "why": "Deciding what gets through is the firewall's job."
+    },
+    {
+     "t": "Gives Wi-Fi access",
+     "s": "",
+     "why": "Wi-Fi is the access point's job."
+    },
+    {
+     "t": "Offers a service, like a website",
+     "s": "",
+     "why": "Offering a service is the server's job."
+    }
    ]
   },
   {
@@ -76,8 +133,14 @@
     ],
     "o": [
      "Transport",
-     { "t": "Link", "why": "The link layer has the cable, Wi-Fi and the MAC." },
-     { "t": "Application", "why": "The application is the service (HTTP, DNS). The port belongs to the transport layer, along with TCP and UDP." }
+     {
+      "t": "Link",
+      "why": "The link layer has the cable, Wi-Fi and the MAC."
+     },
+     {
+      "t": "Application",
+      "why": "The application is the service (HTTP, DNS). The port belongs to the transport layer, along with TCP and UDP."
+     }
     ],
     "why": "Ports, TCP and UDP make up the transport layer: they deliver the conversation to the right program."
    },
@@ -87,34 +150,73 @@
     {
      "label": "LINK / PHYSICAL",
      "a": [
-      { "t": "Cat6 network cable", "why": "The cable is the physical medium: it carries the electrical signal from one card to another." },
-      { "t": "Wi-Fi signal", "why": "Wi-Fi radio is the wireless physical medium, like an invisible cable." },
-      { "t": "MAC address", "why": "The MAC identifies the network card on the local link. It does not cross routers." },
-      { "t": "Switch", "why": "The switch forwards frames by MAC address within the same local network." }
+      {
+       "t": "Cat6 network cable",
+       "why": "The cable is the physical medium: it carries the electrical signal from one card to another."
+      },
+      {
+       "t": "Wi-Fi signal",
+       "why": "Wi-Fi radio is the wireless physical medium, like an invisible cable."
+      },
+      {
+       "t": "MAC address",
+       "why": "The MAC identifies the network card on the local link. It does not cross routers."
+      },
+      {
+       "t": "Switch",
+       "why": "The switch forwards frames by MAC address within the same local network."
+      }
      ]
     },
     {
      "label": "INTERNET (NETWORK)",
      "a": [
-      { "t": "IP address", "why": "The IP identifies the machine across different networks. That is the internet layer." },
-      { "t": "Router", "why": "The router reads the destination IP and picks the path between networks." },
-      { "t": "Ping (ICMP)", "why": "Ping uses ICMP, which travels along with IP to test if the destination answers." }
+      {
+       "t": "IP address",
+       "why": "The IP identifies the machine across different networks. That is the internet layer."
+      },
+      {
+       "t": "Router",
+       "why": "The router reads the destination IP and picks the path between networks."
+      },
+      {
+       "t": "Ping (ICMP)",
+       "why": "Ping uses ICMP, which travels along with IP to test if the destination answers."
+      }
      ]
     },
     {
      "label": "TRANSPORT",
      "a": [
-      { "t": "Port 443", "why": "The port says which program receives the conversation. Ports belong to the transport layer." },
-      { "t": "TCP", "why": "TCP confirms delivery and resends what was lost: a transport protocol." },
-      { "t": "UDP", "why": "UDP sends without confirming, faster: also a transport protocol." }
+      {
+       "t": "Port 443",
+       "why": "The port says which program receives the conversation. Ports belong to the transport layer."
+      },
+      {
+       "t": "TCP",
+       "why": "TCP confirms delivery and resends what was lost: a transport protocol."
+      },
+      {
+       "t": "UDP",
+       "why": "UDP sends without confirming, faster: also a transport protocol."
+      }
      ]
     },
     {
      "label": "APPLICATION",
      "a": [
-      { "t": "Website (HTTP)", "why": "HTTP is the language of websites: application layer." },
-      { "t": "DNS", "why": "DNS translates names into IPs. It is a service, so it lives in the application layer." },
-      { "t": "Email (SMTP)", "why": "SMTP sends email: another application layer service." }
+      {
+       "t": "Website (HTTP)",
+       "why": "HTTP is the language of websites: application layer."
+      },
+      {
+       "t": "DNS",
+       "why": "DNS translates names into IPs. It is a service, so it lives in the application layer."
+      },
+      {
+       "t": "Email (SMTP)",
+       "why": "SMTP sends email: another application layer service."
+      }
      ]
     }
    ]
@@ -141,8 +243,14 @@
     ],
     "o": [
      "3c:22:fb:11:0a:7e",
-     { "t": "192.168.1.10", "why": "Four numbers with dots: that is an IPv4 address." },
-     { "t": "443", "why": "A single number is a port." }
+     {
+      "t": "192.168.1.10",
+      "why": "Four numbers with dots: that is an IPv4 address."
+     },
+     {
+      "t": "443",
+      "why": "A single number is a port."
+     }
     ],
     "why": "A MAC has 6 hexadecimal pairs, separated by colons or hyphens."
    },
@@ -152,26 +260,56 @@
     {
      "label": "IP ADDRESS",
      "a": [
-      { "t": "192.168.1.10", "why": "4 numbers from 0 to 255 separated by dots: IPv4 address." },
-      { "t": "8.8.8.8", "why": "IPv4 address of Google's public DNS." },
-      { "t": "10.0.0.1", "why": "IPv4 address, common on internal networks." }
+      {
+       "t": "192.168.1.10",
+       "why": "4 numbers from 0 to 255 separated by dots: IPv4 address."
+      },
+      {
+       "t": "8.8.8.8",
+       "why": "IPv4 address of Google's public DNS."
+      },
+      {
+       "t": "10.0.0.1",
+       "why": "IPv4 address, common on internal networks."
+      }
      ]
     },
     {
      "label": "PORT",
      "a": [
-      { "t": "443", "why": "A single number, up to 65535: it is a port. 443 is the secure website one (HTTPS)." },
-      { "t": "22", "why": "SSH port, secure remote access." },
-      { "t": "80", "why": "Port for the unencrypted website (HTTP)." },
-      { "t": "3389", "why": "Windows remote desktop port (RDP)." }
+      {
+       "t": "443",
+       "why": "A single number, up to 65535: it is a port. 443 is the secure website one (HTTPS)."
+      },
+      {
+       "t": "22",
+       "why": "SSH port, secure remote access."
+      },
+      {
+       "t": "80",
+       "why": "Port for the unencrypted website (HTTP)."
+      },
+      {
+       "t": "3389",
+       "why": "Windows remote desktop port (RDP)."
+      }
      ]
     },
     {
      "label": "MAC ADDRESS",
      "a": [
-      { "t": "3c:22:fb:11:0a:7e", "why": "6 hexadecimal pairs separated by colons: MAC address." },
-      { "t": "00-1A-2B-3C-4D-5E", "why": "MAC written with hyphens, the way Windows shows it." },
-      { "t": "aa:bb:cc:11:22:33", "why": "Also a MAC: 6 pairs from 00 to ff." }
+      {
+       "t": "3c:22:fb:11:0a:7e",
+       "why": "6 hexadecimal pairs separated by colons: MAC address."
+      },
+      {
+       "t": "00-1A-2B-3C-4D-5E",
+       "why": "MAC written with hyphens, the way Windows shows it."
+      },
+      {
+       "t": "aa:bb:cc:11:22:33",
+       "why": "Also a MAC: 6 pairs from 00 to ff."
+      }
      ]
     }
    ]
@@ -198,8 +336,14 @@
     ],
     "o": [
      "129",
-     { "t": "2", "why": "You only counted how many 1s there are. Each 1 is worth its position: 128 and 1." },
-     { "t": "128", "why": "You forgot to add the last bit, which is worth 1." }
+     {
+      "t": "2",
+      "why": "You only counted how many 1s there are. Each 1 is worth its position: 128 and 1."
+     },
+     {
+      "t": "128",
+      "why": "You forgot to add the last bit, which is worth 1."
+     }
     ],
     "why": "The first bit is worth 128 and the last is worth 1: 128 + 1 = 129."
    },
@@ -210,19 +354,41 @@
     "b": "An octet has 8 bits. Hence the name: octo = eight.",
     "a": "11000000: the first two bits are worth 128 and 64. 128 + 64 = 192.",
     "d": "00001010: only positions 8 and 2 are on. 8 + 2 = 10.",
-    "e": "255 is everything on: 128+64+32+16+8+4+2+1."
+    "e": "255 is everything on: 128+64+32+16+8+4+2+1.",
+    "ip": "4 octets × 8 bits = 32 bits in IPv4.",
+    "c": "10101000: 128 + 32 + 8 = 168. That is why 192.168 shows up so often."
    },
    "chips": [
-    { "why": "An octet has 8 bits." },
-    { "why": "IPv4 has 32 bits: 4 octets of 8." },
-    { "why": "128 + 64 = 192." },
-    { "why": "128 + 32 + 8 = 168." },
-    { "why": "8 + 2 = 10." },
-    { "why": "All 8 bits on: 255." },
-    { "why": "4 is the number of IPv4 octets, not bits." },
-    { "why": "8 bits can count 256 values, but they go from 0 to 255. The biggest number is 255." },
-    { "why": "10100000 would be 160. In 10101000 the 8 bit is on too: 168." },
-    { "why": "11111110 is 254: the last bit, worth 1, is missing." }
+    {
+     "why": "An octet has 8 bits."
+    },
+    {
+     "why": "IPv4 has 32 bits: 4 octets of 8."
+    },
+    {
+     "why": "128 + 64 = 192."
+    },
+    {
+     "why": "128 + 32 + 8 = 168."
+    },
+    {
+     "why": "8 + 2 = 10."
+    },
+    {
+     "why": "All 8 bits on: 255."
+    },
+    {
+     "why": "4 is the number of IPv4 octets, not bits."
+    },
+    {
+     "why": "8 bits can count 256 values, but they go from 0 to 255. The biggest number is 255."
+    },
+    {
+     "why": "10100000 would be 160. In 10101000 the 8 bit is on too: 168."
+    },
+    {
+     "why": "11111110 is 254: the last bit, worth 1, is missing."
+    }
    ]
   },
   {
@@ -246,8 +412,14 @@
     ],
     "o": [
      "On the way out to the internet",
-     { "t": "In your PC's network card", "why": "If it were the card, not even the gateway would answer." },
-     { "t": "In DNS", "why": "8.8.8.8 is an IP: the test doesn't even use DNS." }
+     {
+      "t": "In your PC's network card",
+      "why": "If it were the card, not even the gateway would answer."
+     },
+     {
+      "t": "In DNS",
+      "why": "8.8.8.8 is an IP: the test doesn't even use DNS."
+     }
     ],
     "why": "The local network works (the gateway answers); what fails is from the gateway outward."
    },
@@ -262,9 +434,18 @@
      ],
      "o": [
       "No reply came back: the server may be off, off the network or blocking ping",
-      { "t": "The server answered quickly", "why": "A quick reply shows up as a time in ms, for example \"time=12 ms\"." },
-      { "t": "The internet is faster than usual", "why": "Timeout is a lack of reply, not speed." },
-      { "t": "Your computer's cable is fiber", "why": "The cable type doesn't show up in ping." }
+      {
+       "t": "The server answered quickly",
+       "why": "A quick reply shows up as a time in ms, for example \"time=12 ms\"."
+      },
+      {
+       "t": "The internet is faster than usual",
+       "why": "Timeout is a lack of reply, not speed."
+      },
+      {
+       "t": "Your computer's cable is fiber",
+       "why": "The cable type doesn't show up in ping."
+      }
      ],
      "why": "Timeout means no reply came back in the expected time. It can be a device that is off, a broken path or a firewall blocking ping."
     },
@@ -276,9 +457,18 @@
      ],
      "o": [
       "The time the packet took to go and come back",
-      { "t": "The internet speed in megabits", "why": "Speed (bandwidth) is measured in Mbps, not ms." },
-      { "t": "How many packets were lost", "why": "Loss shows up as a percentage, like \"0% packet loss\"." },
-      { "t": "The port number used", "why": "Ping doesn't even use a port: it is ICMP." }
+      {
+       "t": "The internet speed in megabits",
+       "why": "Speed (bandwidth) is measured in Mbps, not ms."
+      },
+      {
+       "t": "How many packets were lost",
+       "why": "Loss shows up as a percentage, like \"0% packet loss\"."
+      },
+      {
+       "t": "The port number used",
+       "why": "Ping doesn't even use a port: it is ICMP."
+      }
      ],
      "why": "ms is the latency: the round-trip time. The lower, the faster the reply."
     },
@@ -290,9 +480,18 @@
      ],
      "o": [
       "The device, usually the router, through which packets leave for other networks",
-      { "t": "The server that stores the files", "why": "That is a file server." },
-      { "t": "The cable that connects the computer to the wall", "why": "The cable is the physical medium, not an exit address." },
-      { "t": "The site that opens when the browser starts", "why": "That is the home page, not the gateway." }
+      {
+       "t": "The server that stores the files",
+       "why": "That is a file server."
+      },
+      {
+       "t": "The cable that connects the computer to the wall",
+       "why": "The cable is the physical medium, not an exit address."
+      },
+      {
+       "t": "The site that opens when the browser starts",
+       "why": "That is the home page, not the gateway."
+      }
      ],
      "why": "Everything that is not on your local network goes to the gateway, which forwards it outward."
     },
@@ -304,9 +503,18 @@
      ],
      "o": [
       "In DNS, which translates the name into an IP",
-      { "t": "In the network cable", "why": "With a bad cable, not even ping to 8.8.8.8 would answer." },
-      { "t": "In Google's site", "why": "The ping never left: the name was never translated." },
-      { "t": "In the monitor", "why": "The monitor has nothing to do with the network." }
+      {
+       "t": "In the network cable",
+       "why": "With a bad cable, not even ping to 8.8.8.8 would answer."
+      },
+      {
+       "t": "In Google's site",
+       "why": "The ping never left: the name was never translated."
+      },
+      {
+       "t": "In the monitor",
+       "why": "The monitor has nothing to do with the network."
+      }
      ],
      "why": "If the IP answers, the connection works. What failed was translating the name: DNS."
     }
@@ -334,8 +542,14 @@
     ],
     "o": [
      "DHCP didn't answer and the PC gave itself a link-local IP",
-     { "t": "The ISP gave a new public IP", "why": "169.254 is reserved for link-local and is never public." },
-     { "t": "DNS changed", "why": "DNS translates names. DHCP is what hands out the IP." }
+     {
+      "t": "The ISP gave a new public IP",
+      "why": "169.254 is reserved for link-local and is never public."
+     },
+     {
+      "t": "DNS changed",
+      "why": "DNS translates names. DHCP is what hands out the IP."
+     }
     ],
     "why": "With no answer from DHCP, the device configures itself in 169.254.0.0/16."
    },
@@ -343,7 +557,9 @@
    "learn": "DHCP talks in 4 steps (Discover, Offer, Request, Ack) using UDP 67 on the server and 68 on the client, and hands out IP, mask, gateway and DNS for a while (lease). Saw 169.254.x.x? The PC found no DHCP server.",
    "html": "<div class=\"kv\">1. The PC with no IP asks by broadcast: \"any DHCP server out there?\"<span class=\"grow\"></span>[s1]</div>\n<div class=\"kv\">2. The server offers a free IP<span class=\"grow\"></span>[s2]</div>\n<div class=\"kv\">3. The PC asks for the offered IP<span class=\"grow\"></span>[s3]</div>\n<div class=\"kv\">4. The server confirms and lends the IP<span class=\"grow\"></span>[s4]</div>\n<div class=\"kv\">Besides the IP, DHCP hands out<span class=\"grow\"></span>[gw]</div>\n<div class=\"kv\">IP the PC gives itself when nobody answers<span class=\"grow\"></span>[apipa]</div>",
    "zones": {
-    "gw": ["mask, gateway and DNS"]
+    "gw": [
+     "mask, gateway and DNS"
+    ]
    },
    "explain": {
     "s1": "Discover: the PC has no IP yet, so it shouts to the whole network (broadcast).",
@@ -354,15 +570,35 @@
     "apipa": "With no answer, the PC gives itself a 169.254.x.x (link-local). It only talks to neighbors in the same situation."
    },
    "chips": [
-    { "why": "First step: the PC looks for a DHCP server by broadcast." },
-    { "why": "Second step: the server offers an IP." },
-    { "why": "Third step: the PC asks for the offered IP." },
-    { "why": "Fourth step: the server confirms." },
-    { "t": "mask, gateway and DNS", "why": "DHCP hands out the complete settings, not just the IP." },
-    { "why": "Link-local: the automatic IP for when DHCP doesn't answer." },
-    { "why": "NAK is the server's refusal, for example when the PC asks for an IP that isn't valid on this network. It is not part of the normal conversation." },
-    { "why": "127.0.0.1 is loopback, the machine itself. It always exists, with or without DHCP." },
-    { "t": "the Wi-Fi password", "why": "The Wi-Fi password is typed on the device. DHCP only comes in after the connection already exists." }
+    {
+     "why": "First step: the PC looks for a DHCP server by broadcast."
+    },
+    {
+     "why": "Second step: the server offers an IP."
+    },
+    {
+     "why": "Third step: the PC asks for the offered IP."
+    },
+    {
+     "why": "Fourth step: the server confirms."
+    },
+    {
+     "t": "mask, gateway and DNS",
+     "why": "DHCP hands out the complete settings, not just the IP."
+    },
+    {
+     "why": "Link-local: the automatic IP for when DHCP doesn't answer."
+    },
+    {
+     "why": "NAK is the server's refusal, for example when the PC asks for an IP that isn't valid on this network. It is not part of the normal conversation."
+    },
+    {
+     "why": "127.0.0.1 is loopback, the machine itself. It always exists, with or without DHCP."
+    },
+    {
+     "t": "the Wi-Fi password",
+     "why": "The Wi-Fi password is typed on the device. DHCP only comes in after the connection already exists."
+    }
    ]
   },
   {
@@ -387,21 +623,41 @@
     ],
     "o": [
      "ip route",
-     { "t": "ip a", "why": "ip a shows the interface addresses, not the gateway." },
-     { "t": "cat /etc/resolv.conf", "why": "That file shows the DNS server." }
+     {
+      "t": "ip a",
+      "why": "ip a shows the interface addresses, not the gateway."
+     },
+     {
+      "t": "cat /etc/resolv.conf",
+      "why": "That file shows the DNS server."
+     }
     ],
     "why": "In ip route, the \"default via\" line is the gateway."
    },
    "tip": "Test in layers: ping the gateway, ping an internet IP and ping a name. If only the name fails, it's DNS.",
    "learn": "Layered troubleshooting: local network (gateway), internet (public IP) and names (DNS). ip a shows your IP, ip route shows the gateway and /etc/resolv.conf shows the DNS in use.",
    "cmds": [
-    { "why": "Shows the interfaces. eth0 is the network card: IP 192.168.1.50 (inet line) and MAC 3c:22:fb:11:0a:7e (link/ether line). lo is loopback, the machine itself." },
-    { "why": "The \"default via\" line is the gateway: 192.168.1.1. Everything not in 192.168.1.0/24 goes out through it." },
-    { "why": "The gateway answers: the local network works." },
-    { "why": "An internet IP answers: the way out to the internet works." },
-    { "why": "The ping never started: the machine couldn't turn the name into an IP. Name resolution failure = DNS." },
-    { "why": "The configured DNS is 192.168.1.250. Worth testing whether it exists." },
-    { "why": "The configured DNS server doesn't answer. That's why names don't work." }
+    {
+     "why": "Shows the interfaces. eth0 is the network card: IP 192.168.1.50 (inet line) and MAC 3c:22:fb:11:0a:7e (link/ether line). lo is loopback, the machine itself."
+    },
+    {
+     "why": "The \"default via\" line is the gateway: 192.168.1.1. Everything not in 192.168.1.0/24 goes out through it."
+    },
+    {
+     "why": "The gateway answers: the local network works."
+    },
+    {
+     "why": "An internet IP answers: the way out to the internet works."
+    },
+    {
+     "why": "The ping never started: the machine couldn't turn the name into an IP. Name resolution failure = DNS."
+    },
+    {
+     "why": "The configured DNS is 192.168.1.250. Worth testing whether it exists."
+    },
+    {
+     "why": "The configured DNS server doesn't answer. That's why names don't work."
+    }
    ],
    "steps": [
     {
@@ -412,9 +668,18 @@
      ],
      "o": [
       "192.168.1.50",
-      { "t": "192.168.1.1", "why": "That is the gateway, from the \"default via\" line of ip route." },
-      { "t": "127.0.0.1", "why": "That is loopback, the machine talking to itself." },
-      { "t": "3c:22:fb:11:0a:7e", "why": "That is the MAC, not the IP." }
+      {
+       "t": "192.168.1.1",
+       "why": "That is the gateway, from the \"default via\" line of ip route."
+      },
+      {
+       "t": "127.0.0.1",
+       "why": "That is loopback, the machine talking to itself."
+      },
+      {
+       "t": "3c:22:fb:11:0a:7e",
+       "why": "That is the MAC, not the IP."
+      }
      ],
      "why": "The inet line of eth0 shows 192.168.1.50/24."
     },
@@ -426,9 +691,18 @@
      ],
      "o": [
       "The configured DNS (192.168.1.250) doesn't answer, so the name never becomes an IP",
-      { "t": "The cable is unplugged", "why": "With the cable unplugged, not even the gateway would answer." },
-      { "t": "Google is down", "why": "The ping to google.com never left: it failed before, translating the name." },
-      { "t": "The gateway is missing", "why": "The gateway exists (192.168.1.1) and answers." }
+      {
+       "t": "The cable is unplugged",
+       "why": "With the cable unplugged, not even the gateway would answer."
+      },
+      {
+       "t": "Google is down",
+       "why": "The ping to google.com never left: it failed before, translating the name."
+      },
+      {
+       "t": "The gateway is missing",
+       "why": "The gateway exists (192.168.1.1) and answers."
+      }
      ],
      "why": "The IP works and the name doesn't: it's DNS. And the configured DNS, 192.168.1.250, doesn't answer."
     },
@@ -440,9 +714,18 @@
      ],
      "o": [
       "Point the machine to a working DNS, like 1.1.1.1",
-      { "t": "Restart the router", "why": "The router works: the ping to 8.8.8.8 went through it." },
-      { "t": "Replace the network cable", "why": "The cable is fine: the machine talks to the gateway and the internet." },
-      { "t": "Turn off the firewall", "why": "Nothing points to a firewall block. The problem is the DNS that doesn't answer." }
+      {
+       "t": "Restart the router",
+       "why": "The router works: the ping to 8.8.8.8 went through it."
+      },
+      {
+       "t": "Replace the network cable",
+       "why": "The cable is fine: the machine talks to the gateway and the internet."
+      },
+      {
+       "t": "Turn off the firewall",
+       "why": "Nothing points to a firewall block. The problem is the DNS that doesn't answer."
+      }
      ],
      "why": "With a DNS server that answers, names work again. Afterwards, find out why 192.168.1.250 went down."
     }
@@ -470,20 +753,38 @@
     ],
     "o": [
      "In /etc/hosts",
-     { "t": "In the DNS server", "why": "dig already shows the DNS answer. The difference comes from something dig ignores." },
-     { "t": "In the network cable", "why": "A cable doesn't change which IP a name becomes." }
+     {
+      "t": "In the DNS server",
+      "why": "dig already shows the DNS answer. The difference comes from something dig ignores."
+     },
+     {
+      "t": "In the network cable",
+      "why": "A cable doesn't change which IP a name becomes."
+     }
     ],
     "why": "The system checks /etc/hosts before DNS; dig ignores that file."
    },
    "tip": "Compare dig (DNS only) with getent hosts (what the PC uses). If they differ, check /etc/hosts.",
    "learn": "Linux resolves names first through /etc/hosts and then through DNS (order set in /etc/nsswitch.conf). A forgotten line in hosts jumps ahead of DNS on that machine only. dig and nslookup test DNS; getent hosts shows what the system really uses.",
    "cmds": [
-    { "why": "dig asks the DNS server directly: the ERP is at 10.0.0.10." },
-    { "why": "getent shows what the system really uses. It found 10.0.0.99, different from DNS." },
-    { "why": "The ping went to 10.0.0.99, which no longer exists. The right IP, according to DNS, is 10.0.0.10." },
-    { "why": "Found it: an old line points the ERP to 10.0.0.99. /etc/hosts comes before DNS." },
-    { "why": "Another way to ask DNS. The 10.0.0.53 server answers 10.0.0.10, the right IP." },
-    { "why": "The configured DNS is 10.0.0.53, the same as the other PCs. DNS is not the problem." }
+    {
+     "why": "dig asks the DNS server directly: the ERP is at 10.0.0.10."
+    },
+    {
+     "why": "getent shows what the system really uses. It found 10.0.0.99, different from DNS."
+    },
+    {
+     "why": "The ping went to 10.0.0.99, which no longer exists. The right IP, according to DNS, is 10.0.0.10."
+    },
+    {
+     "why": "Found it: an old line points the ERP to 10.0.0.99. /etc/hosts comes before DNS."
+    },
+    {
+     "why": "Another way to ask DNS. The 10.0.0.53 server answers 10.0.0.10, the right IP."
+    },
+    {
+     "why": "The configured DNS is 10.0.0.53, the same as the other PCs. DNS is not the problem."
+    }
    ],
    "steps": [
     {
@@ -494,8 +795,14 @@
      ],
      "o": [
       "10.0.0.10",
-      { "t": "10.0.0.99", "why": "That one comes from /etc/hosts. dig asks DNS directly and ignores the file." },
-      { "t": "10.0.0.53", "why": "That is the DNS server's address, not its answer." }
+      {
+       "t": "10.0.0.99",
+       "why": "That one comes from /etc/hosts. dig asks DNS directly and ignores the file."
+      },
+      {
+       "t": "10.0.0.53",
+       "why": "That is the DNS server's address, not its answer."
+      }
      ],
      "why": "dig and nslookup show the DNS answer: 10.0.0.10."
     },
@@ -507,8 +814,14 @@
      ],
      "o": [
       "An old line in /etc/hosts jumps ahead of DNS",
-      { "t": "The DNS server has the wrong IP", "why": "dig and nslookup show 10.0.0.10, the right one. DNS is fine." },
-      { "t": "The network cable is loose", "why": "With a loose cable, DNS wouldn't even answer dig." }
+      {
+       "t": "The DNS server has the wrong IP",
+       "why": "dig and nslookup show 10.0.0.10, the right one. DNS is fine."
+      },
+      {
+       "t": "The network cable is loose",
+       "why": "With a loose cable, DNS wouldn't even answer dig."
+      }
      ],
      "why": "The system checks /etc/hosts before DNS. The forgotten test line redirects the name on this PC only."
     },
@@ -520,8 +833,14 @@
      ],
      "o": [
       "Delete the ERP line in /etc/hosts",
-      { "t": "Change the PC's DNS to 8.8.8.8", "why": "DNS already answers correctly. And /etc/hosts would still come before any DNS." },
-      { "t": "Restart the router", "why": "The problem is a file on this PC. Restarting the router takes everyone down for nothing." }
+      {
+       "t": "Change the PC's DNS to 8.8.8.8",
+       "why": "DNS already answers correctly. And /etc/hosts would still come before any DNS."
+      },
+      {
+       "t": "Restart the router",
+       "why": "The problem is a file on this PC. Restarting the router takes everyone down for nothing."
+      }
      ],
      "why": "Without the old line, the PC asks DNS and gets the right IP."
     }

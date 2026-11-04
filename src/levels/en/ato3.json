@@ -2,9 +2,15 @@
  "tag": "ACT 4",
  "name": "Switching and BGP",
  "story": [
-  { "t": "Thought I'd stay in Linux? I'm going to hop VLANs and hijack your prefixes." },
-  { "t": "Switching and BGP: mistakes here take a lot of people down at once. Careful." },
-  { "t": "Hardened trunk and strict prefix-list." }
+  {
+   "t": "Thought I'd stay in Linux? I'm going to hop VLANs and hijack your prefixes."
+  },
+  {
+   "t": "Switching and BGP: mistakes here take a lot of people down at once. Careful."
+  },
+  {
+   "t": "Hardened trunk and strict prefix-list."
+  }
  ],
  "levels": [
   {
@@ -28,19 +34,41 @@
     "a": "The camera is a host: access port, fixed to one VLAN.",
     "b": "The camera goes on VLAN 30, as the mission asks.",
     "d": "Only VLANs 10, 20 and 30 pass. The others stay off the trunk.",
-    "e": "Native VLAN on an unused VLAN (999) prevents double tagging."
+    "e": "Native VLAN on an unused VLAN (999) prevents double tagging.",
+    "c": "The uplink between switches carries several VLANs: trunk.",
+    "f": "nonegotiate turns DTP off: nobody forms a trunk with this port by negotiation."
    },
    "chips": [
-    { "why": "Host port mode: a single VLAN." },
-    { "why": "Port mode between switches: several tagged VLANs." },
-    { "why": "Tries to form a trunk via DTP with whoever is on the other side. That's exactly what enables switch spoofing." },
-    { "why": "30 is the camera's VLAN." },
-    { "why": "VLAN 1 is the factory default. Using it as native or for hosts is the classic mistake." },
-    { "why": "Explicit list of the VLANs allowed on the trunk." },
-    { "why": "Allowing all takes to the core even VLANs that shouldn't leave this switch." },
-    { "why": "A VLAN with no users: a good choice for native VLAN." },
-    { "why": "Turns DTP off on the port." },
-    { "why": "Port-security limits the MACs accepted on the port. It's useful, but it doesn't turn DTP off." }
+    {
+     "why": "Host port mode: a single VLAN."
+    },
+    {
+     "why": "Port mode between switches: several tagged VLANs."
+    },
+    {
+     "why": "Tries to form a trunk via DTP with whoever is on the other side. That's exactly what enables switch spoofing."
+    },
+    {
+     "why": "30 is the camera's VLAN."
+    },
+    {
+     "why": "VLAN 1 is the factory default. Using it as native or for hosts is the classic mistake."
+    },
+    {
+     "why": "Explicit list of the VLANs allowed on the trunk."
+    },
+    {
+     "why": "Allowing all takes to the core even VLANs that shouldn't leave this switch."
+    },
+    {
+     "why": "A VLAN with no users: a good choice for native VLAN."
+    },
+    {
+     "why": "Turns DTP off on the port."
+    },
+    {
+     "why": "Port-security limits the MACs accepted on the port. It's useful, but it doesn't turn DTP off."
+    }
    ]
   },
   {
@@ -60,39 +88,97 @@
    "tip": "Ping SW-CORE-1, the internet and SW-ANDAR3. Whatever answers is on the datacenter side. Floor 3 is behind cable Gi0/1.",
    "learn": "Redundancy only protects if it's active: the backup uplink was in shutdown, so cutting Gi0/1 isolated the floor. With both uplinks up, STP (RSTP) blocks one and releases it in seconds when the other goes down. Monitor both links to know when you're running without a backup.",
    "nodes": [
-    { "t": "FLOOR3 PC", "why": "One of the 3rd-floor PCs. It depends on SW-ANDAR3 to talk to anything." },
-    { "why": "3rd-floor access switch. It has two uplinks: Gi0/1 to SW-CORE-1 and Gi0/2 (backup) to SW-CORE-2." },
-    { "why": "Main core switch. It concentrates the floors, the servers and the exit." },
-    { "why": "Backup core switch, connected to the main core. It's the one that would take floor 3 if Gi0/2 were active." },
-    { "t": "EDGE", "why": "Edge router: the exit to the internet." },
-    { "why": "Internet exit test." },
-    { "why": "Datacenter server, hanging off the main core." },
+    {
+     "t": "FLOOR3 PC",
+     "why": "One of the 3rd-floor PCs. It depends on SW-ANDAR3 to talk to anything."
+    },
+    {
+     "why": "3rd-floor access switch. It has two uplinks: Gi0/1 to SW-CORE-1 and Gi0/2 (backup) to SW-CORE-2."
+    },
+    {
+     "why": "Main core switch. It concentrates the floors, the servers and the exit."
+    },
+    {
+     "why": "Backup core switch, connected to the main core. It's the one that would take floor 3 if Gi0/2 were active."
+    },
+    {
+     "t": "EDGE",
+     "why": "Edge router: the exit to the internet."
+    },
+    {
+     "why": "Internet exit test."
+    },
+    {
+     "why": "Datacenter server, hanging off the main core."
+    },
     {}
    ],
    "links": [
     {},
     {},
-    { "t": "Gi0/2 backup", "why": "This is the backup link, turned off (dashed). It didn't go down now: it was already out. It's part of the problem, but it isn't the cut." }
+    {
+     "t": "Gi0/2 backup",
+     "why": "This is the backup link, turned off (dashed). It didn't go down now: it was already out. It's part of the problem, but it isn't the cut."
+    }
    ],
    "faultName": "On uplink Gi0/1 between SW-ANDAR3 and SW-CORE-1",
    "faultWhy": "The monitor reaches both cores, the edge, the internet and the server, but nothing on floor 3. The cut is on uplink Gi0/1 between SW-ANDAR3 and SW-CORE-1. The floor switch's console log confirms it: Gi0/1 down. Since the backup was in shutdown, nobody took over.",
    "steps": [
     {
      "q": "Why didn't the backup link (Gi0/2) save floor 3?",
-     "v": ["If there was a backup link (Gi0/2), why did floor 3 go down?", "Floor 3 had a second uplink. Why didn't it take over?"],
-     "o": ["The backup port was in shutdown: redundancy that's turned off doesn't protect", { "t": "STP blocks the backup link forever", "why": "STP blocks the backup only while the main one is up. When the main one goes down, it releases the backup." }, { "t": "A backup link only works with BGP", "why": "Between switches on the same network, redundancy is handled by STP (or link aggregation). BGP is between networks (ASes)." }],
+     "v": [
+      "If there was a backup link (Gi0/2), why did floor 3 go down?",
+      "Floor 3 had a second uplink. Why didn't it take over?"
+     ],
+     "o": [
+      "The backup port was in shutdown: redundancy that's turned off doesn't protect",
+      {
+       "t": "STP blocks the backup link forever",
+       "why": "STP blocks the backup only while the main one is up. When the main one goes down, it releases the backup."
+      },
+      {
+       "t": "A backup link only works with BGP",
+       "why": "Between switches on the same network, redundancy is handled by STP (or link aggregation). BGP is between networks (ASes)."
+      }
+     ],
      "why": "Redundancy has to be active and tested. With STP, the backup stays blocked and takes over on its own when the main one goes down. In shutdown, it never takes over."
     },
     {
      "q": "Through SW-ANDAR3's console cable, how do you bring backup port Gi0/2 back up?",
-     "v": ["On SW-ANDAR3's console, which commands bring Gi0/2 back up?", "Connected to SW-ANDAR3's console, how do you re-enable backup port Gi0/2?"],
-     "o": ["interface gi0/2 and then no shutdown", { "t": "interface gi0/2 and then spanning-tree portfast", "why": "PortFast is for user ports (it speeds up link-up). On a port between switches it risks a loop, and the port would stay off." }, { "t": "interface gi0/2 and then shutdown", "why": "shutdown turns the port off. It's the opposite of what you want." }],
+     "v": [
+      "On SW-ANDAR3's console, which commands bring Gi0/2 back up?",
+      "Connected to SW-ANDAR3's console, how do you re-enable backup port Gi0/2?"
+     ],
+     "o": [
+      "interface gi0/2 and then no shutdown",
+      {
+       "t": "interface gi0/2 and then spanning-tree portfast",
+       "why": "PortFast is for user ports (it speeds up link-up). On a port between switches it risks a loop, and the port would stay off."
+      },
+      {
+       "t": "interface gi0/2 and then shutdown",
+       "why": "shutdown turns the port off. It's the opposite of what you want."
+      }
+     ],
      "why": "no shutdown turns the port on. STP negotiates and floor 3 comes back through SW-CORE-2."
     },
     {
      "q": "So the next cut doesn't take the floor down, the right move is:",
-     "v": ["So a future cut doesn't take the floor down, what's the best practice?", "How do you really protect floor 3 against losing an uplink?"],
-     "o": ["Keep both uplinks up with STP (or LACP aggregation) and monitor both", { "t": "Turn off STP so both uplinks forward together", "why": "Without STP, two paths between switches form a loop: a broadcast storm takes the network down in seconds." }, { "t": "Use a single uplink, on pricier fiber", "why": "A single cable is a single point of failure, whatever the price." }],
+     "v": [
+      "So a future cut doesn't take the floor down, what's the best practice?",
+      "How do you really protect floor 3 against losing an uplink?"
+     ],
+     "o": [
+      "Keep both uplinks up with STP (or LACP aggregation) and monitor both",
+      {
+       "t": "Turn off STP so both uplinks forward together",
+       "why": "Without STP, two paths between switches form a loop: a broadcast storm takes the network down in seconds."
+      },
+      {
+       "t": "Use a single uplink, on pricier fiber",
+       "why": "A single cable is a single point of failure, whatever the price."
+      }
+     ],
      "why": "Two active, watched paths. STP prevents the loop; aggregation (LACP) uses both at the same time when they connect to the same pair of switches."
     }
    ]
@@ -115,21 +201,50 @@
    "tip": "45.160.0.0/22 covers 45.160.0.0 to 45.160.3.255. Accept only prefixes inside that between /22 and /24. Default route, bogons, your own prefixes and third-party blocks are rejected.",
    "learn": "Customer filter = prefix-list 45.160.0.0/22 le 24. Reject default, RFC 1918, CGNAT, your own blocks and anything more specific than /24, which the internet drops. Add max-prefix and RPKI validation to close the net. That's what MANRS asks for.",
    "buckets": [
-    { "label": "ACCEPT", "a": [
-     { "why": "The customer's whole block, exactly as registered." },
-     { "why": "Half of the /22 (45.160.0 and 45.160.1): inside the block and not beyond /24." },
-     { "why": "A /24 inside the /22 (45.160.0 to 45.160.3), allowed by the ROA." },
-     { "why": "The last /24 of the block, still inside 45.160.0.0/22." }
-    ] },
-    { "label": "REJECT", "a": [
-     { "why": "Default route. A customer should never announce a default to the provider." },
-     { "why": "RFC 1918 private range (bogon). It doesn't travel on the internet." },
-     { "why": "CGNAT range (RFC 6598). Also a bogon." },
-     { "t": "177.10.0.0/22 (your block)", "why": "It's YOUR block. Accepting it from the customer would divert your own traffic to them." },
-     { "why": "Google's block. The customer doesn't own it: it would be a prefix hijack." },
-     { "why": "The /22 ends at 45.160.3.255. 45.160.4 is already outside the customer's block." },
-     { "why": "/25 is more specific than the /24 the ROA allows: it would be RPKI invalid." }
-    ] }
+    {
+     "label": "ACCEPT",
+     "a": [
+      {
+       "why": "The customer's whole block, exactly as registered."
+      },
+      {
+       "why": "Half of the /22 (45.160.0 and 45.160.1): inside the block and not beyond /24."
+      },
+      {
+       "why": "A /24 inside the /22 (45.160.0 to 45.160.3), allowed by the ROA."
+      },
+      {
+       "why": "The last /24 of the block, still inside 45.160.0.0/22."
+      }
+     ]
+    },
+    {
+     "label": "REJECT",
+     "a": [
+      {
+       "why": "Default route. A customer should never announce a default to the provider."
+      },
+      {
+       "why": "RFC 1918 private range (bogon). It doesn't travel on the internet."
+      },
+      {
+       "why": "CGNAT range (RFC 6598). Also a bogon."
+      },
+      {
+       "t": "177.10.0.0/22 (your block)",
+       "why": "It's YOUR block. Accepting it from the customer would divert your own traffic to them."
+      },
+      {
+       "why": "Google's block. The customer doesn't own it: it would be a prefix hijack."
+      },
+      {
+       "why": "The /22 ends at 45.160.3.255. 45.160.4 is already outside the customer's block."
+      },
+      {
+       "why": "/25 is more specific than the /24 the ROA allows: it would be RPKI invalid."
+      }
+     ]
+    }
    ]
   },
   {
@@ -151,26 +266,94 @@
    "qs": [
     {
      "q": "You announce 177.10.0.0/22. Z3R0 announces 177.10.1.0/24 from another AS. Where does traffic for 177.10.1.5 go?",
-     "v": ["You announce 177.10.0.0/22 and Z3R0 announces 177.10.1.0/24 from another AS. Where does traffic to 177.10.1.5 go?", "Your /22 against Z3R0's /24 inside it. Who gets the traffic to 177.10.1.5?"],
-     "o": ["To Z3R0, because the /24 is more specific", { "t": "To you, because you announced first", "why": "Announcement order doesn't matter between different prefixes. The most specific wins." }, { "t": "To whoever has the shorter AS-path", "why": "AS-path only breaks ties between routes for the SAME prefix. /24 and /22 are different routes." }, { "t": "It splits half and half", "why": "There's no split: for each destination, the table picks the most specific prefix." }],
+     "v": [
+      "You announce 177.10.0.0/22 and Z3R0 announces 177.10.1.0/24 from another AS. Where does traffic to 177.10.1.5 go?",
+      "Your /22 against Z3R0's /24 inside it. Who gets the traffic to 177.10.1.5?"
+     ],
+     "o": [
+      "To Z3R0, because the /24 is more specific",
+      {
+       "t": "To you, because you announced first",
+       "why": "Announcement order doesn't matter between different prefixes. The most specific wins."
+      },
+      {
+       "t": "To whoever has the shorter AS-path",
+       "why": "AS-path only breaks ties between routes for the SAME prefix. /24 and /22 are different routes."
+      },
+      {
+       "t": "It splits half and half",
+       "why": "There's no split: for each destination, the table picks the most specific prefix."
+      }
+     ],
      "why": "Longest prefix match comes before any BGP attribute. The /24 beats the /22."
     },
     {
      "q": "Z3R0 can forge your AS as the origin. Which ROA still makes a /24 inside your /22 invalid?",
-     "v": ["Even with Z3R0 forging your origin AS, which ROA makes a /24 inside your /22 invalid?", "Which ROA makes any /24 taken from your /22 invalid, even with your AS forged as the origin?"],
-     "o": ["ROA 177.10.0.0/22 with maxLength /22", { "t": "ROA 177.10.0.0/22 with maxLength /24", "why": "maxLength /24 authorizes announcements up to /24. A /24 with your forged origin would be valid." }, { "t": "No ROA at all", "why": "Without a ROA the state is \"not found\", and almost nobody drops not-found routes." }, { "t": "ROA with maxLength /32", "why": "It authorizes any piece of the block, down to /32. The opposite of what you want." }],
+     "v": [
+      "Even with Z3R0 forging your origin AS, which ROA makes a /24 inside your /22 invalid?",
+      "Which ROA makes any /24 taken from your /22 invalid, even with your AS forged as the origin?"
+     ],
+     "o": [
+      "ROA 177.10.0.0/22 with maxLength /22",
+      {
+       "t": "ROA 177.10.0.0/22 with maxLength /24",
+       "why": "maxLength /24 authorizes announcements up to /24. A /24 with your forged origin would be valid."
+      },
+      {
+       "t": "No ROA at all",
+       "why": "Without a ROA the state is \"not found\", and almost nobody drops not-found routes."
+      },
+      {
+       "t": "ROA with maxLength /32",
+       "why": "It authorizes any piece of the block, down to /32. The opposite of what you want."
+      }
+     ],
      "why": "With maxLength /22, any announcement more specific than /22 is invalid, even with the right origin."
     },
     {
      "q": "If Z3R0 announces the /22 forging YOUR AS as the origin, does RPKI ROV detect it?",
-     "v": ["Z3R0 announces your /22 with YOUR AS forged as the origin. Does RPKI ROV catch it?", "A route with the same prefix and origin AS as yours, but coming through Z3R0. Does ROV mark it invalid?"],
-     "o": ["No. ROV only validates origin and size, not the path", { "t": "Yes, always", "why": "ROV only compares the origin AS and the size with the ROA. If the forged origin matches, the route is valid." }, { "t": "Yes, if it has a community", "why": "A community is just a tag on the route. It isn't part of RPKI validation." }, { "t": "Only if it's IPv6", "why": "RPKI works the same way for IPv4 and IPv6." }],
+     "v": [
+      "Z3R0 announces your /22 with YOUR AS forged as the origin. Does RPKI ROV catch it?",
+      "A route with the same prefix and origin AS as yours, but coming through Z3R0. Does ROV mark it invalid?"
+     ],
+     "o": [
+      "No. ROV only validates origin and size, not the path",
+      {
+       "t": "Yes, always",
+       "why": "ROV only compares the origin AS and the size with the ROA. If the forged origin matches, the route is valid."
+      },
+      {
+       "t": "Yes, if it has a community",
+       "why": "A community is just a tag on the route. It isn't part of RPKI validation."
+      },
+      {
+       "t": "Only if it's IPv6",
+       "why": "RPKI works the same way for IPv4 and IPv6."
+      }
+     ],
      "why": "A forged origin passes ROV. That's why ASPA, BGPsec and transit filters exist."
     },
     {
      "q": "Your BGP customer leaked the full table (900 thousand routes) to you. What would have dropped the session before the damage?",
-     "v": ["A BGP customer sent you the full table (900 thousand routes) by mistake. Which setting would have dropped the session earlier?", "Full-table leak from a BGP customer. Which protection on the session would have prevented the damage?"],
-     "o": ["maximum-prefix on the customer session", { "t": "Add memory to the router", "why": "It helps the router survive, but traffic would still be diverted through the leaked routes." }, { "t": "no-export community", "why": "no-export limits how far routes are passed on. It doesn't stop you from receiving them." }, { "t": "High local-preference", "why": "High local-preference would make you PREFER the leaked routes. It would only make it worse." }],
+     "v": [
+      "A BGP customer sent you the full table (900 thousand routes) by mistake. Which setting would have dropped the session earlier?",
+      "Full-table leak from a BGP customer. Which protection on the session would have prevented the damage?"
+     ],
+     "o": [
+      "maximum-prefix on the customer session",
+      {
+       "t": "Add memory to the router",
+       "why": "It helps the router survive, but traffic would still be diverted through the leaked routes."
+      },
+      {
+       "t": "no-export community",
+       "why": "no-export limits how far routes are passed on. It doesn't stop you from receiving them."
+      },
+      {
+       "t": "High local-preference",
+       "why": "High local-preference would make you PREFER the leaked routes. It would only make it worse."
+      }
+     ],
      "why": "Max-prefix drops the session when the customer goes over the agreed limit. Basic protection against route leaks."
     }
    ]
