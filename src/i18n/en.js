@@ -627,7 +627,15 @@ export const EN = {
     'Na captura, o pacote "': 'In the capture, is the packet "', ': o pacote "': ': should the packet "',
     'item': 'item', 'itens': 'items', 'PRÓLOGO': 'PROLOGUE', 'Camada física e endereçamento': 'Physical layer and addressing',
     '11 fases · ★ 0/33': '11 levels · ★ 0/33',
-    '⚔️ Te desafio no NOC: Última Linha de Defesa!': '⚔️ I challenge you in NOC: Last Line of Defense!', 'Desafio': 'Challenge', 'Bate isso?': 'Can you beat it?', 'NOC: Última Linha de Defesa · Desafio': 'NOC: Last Line of Defense · Challenge'
+    '⚔️ Te desafio no NOC: Última Linha de Defesa!': '⚔️ I challenge you in NOC: Last Line of Defense!', 'Desafio': 'Challenge', 'Bate isso?': 'Can you beat it?', 'NOC: Última Linha de Defesa · Desafio': 'NOC: Last Line of Defense · Challenge',
+    'Perfil': 'Profile',
+    '🎨 Personagem': '🎨 Character',
+    '🪪 Dados': '🪪 Details',
+    '⚙ Ajustes': '⚙ Settings',
+    'AJUSTES': 'SETTINGS',
+    'Seus dados': 'Your details',
+    'SOM': 'SOUND',
+    'PROGRESSO': 'PROGRESS'
   },
   gloss: {
     'Access point': ['Access point', ['access point', 'ap'], 'Device that brings the network to Wi-Fi, connecting wireless devices to the wired network.'],

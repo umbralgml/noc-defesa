@@ -46,14 +46,15 @@ const set = (k, v) => { store('noc_prefs', { ...prefs(), [k]: v }); applyPrefs()
 
 // Prévia do analista: a cena da sala de guerra com o herói parado diante do telão.
 const HERO_PREVIEW = () => sceneSVG('war', true).replace('class="hero" id="hero"', `class="hero type" style="transform:translate(${HX.war}px,106px)"`);
-export function lookModal(after) {
+// head e onShow: abas do Perfil (perfil.js) por cima e o gancho que liga as abas.
+export function lookModal(after, head = '', onShow) {
   const p = prefs();
   const sw = (k, list, cur) => list.map((c, i) => `<button class="swc${i === cur ? ' on' : ''}" data-k="${k}" data-v="${i}" style="background:${c}" aria-label="${k === 'hair' ? 'Cabelo' : 'Pele'} ${i + 1}"></button>`).join('');
   const opt = (k, list, cur) => list.map(([id, name, ...rest]) => {
     const need = rest[rest.length - 1], ok = has(need), c = k === 'shirt' ? rest[0][0] : null;
     return `<button class="lopt${id === cur ? ' on' : ''}" data-k="${k}" data-v="${id}" ${ok ? '' : 'disabled'}>${c ? `<i style="background:${c}"></i>` : ''}${esc(name)}${ok ? '' : `<small>🔒 ${needTxt(need)}</small>`}</button>`;
   }).join('');
-  modal(`<div class="tag">VESTIÁRIO DO NOC</div><h2>Seu analista</h2>
+  modal(`${head}<div class="tag">VESTIÁRIO DO NOC</div><h2>Seu analista</h2>
     <div class="lprev">${HERO_PREVIEW()}</div>
     <div class="lsec">CAMISA</div><div class="lrow">${opt('shirt', SHIRTS, p.shirt)}</div>
     <div class="lsec">ACESSÓRIO</div><div class="lrow">${opt('acc', ACC, p.acc)}</div>
@@ -62,15 +63,17 @@ export function lookModal(after) {
     <div class="fnote">Mais camisas destravam com estrelas, com estrelas de ouro do modo difícil e derrotando o Z3R0.</div>
     <div class="row"><button class="btn" id="mOk">PRONTO</button></div>`);
   $('mcard').querySelectorAll('[data-k]').forEach(b => b.onclick = () => {
-    const k = b.dataset.k; set(k, k === 'hair' || k === 'skin' ? +b.dataset.v : b.dataset.v); lookModal(after);
+    const k = b.dataset.k; set(k, k === 'hair' || k === 'skin' ? +b.dataset.v : b.dataset.v); lookModal(after, head, onShow);
   });
   $('mOk').onclick = () => { closeModal(); after && after(); };
+  onShow && onShow();
 }
 
-export function a11yModal() {
+// extra: mais ajustes no mesmo painel (som e zerar progresso, no Perfil).
+export function a11yModal(head = '', extra = '', onShow) {
   const p = prefs(), calm = document.documentElement.classList.contains('calm');
   const row = (k, on, t, s) => `<label class="fc a11y"><input type="checkbox" data-k="${k}" ${on ? 'checked' : ''}> <span><b>${t}</b><br>${s}</span></label>`;
-  modal(`<div class="tag">ACESSIBILIDADE</div><h2>Do seu jeito</h2>
+  modal(`${head}<div class="tag">AJUSTES</div><h2>Do seu jeito</h2>${extra}<div class="lsec">ACESSIBILIDADE</div>
     ${row('hc', p.hc, 'Alto contraste', 'Textos e bordas mais fortes.')}
     ${row('big', p.big, 'Texto maior', 'Aumenta a fonte das perguntas, explicações e aulas.')}
     ${row('calm', calm, 'Menos animação', 'Sem tremida de tela, partículas e flashes. Liga sozinho se o aparelho pedir menos movimento.')}
@@ -78,4 +81,5 @@ export function a11yModal() {
     <div class="row"><button class="btn" id="mOk">PRONTO</button></div>`);
   $('mcard').querySelectorAll('input[data-k]').forEach(i => i.onchange = () => set(i.dataset.k, i.checked));
   $('mOk').onclick = closeModal;
+  onShow && onShow();
 }

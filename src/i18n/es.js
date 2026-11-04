@@ -708,7 +708,15 @@ export const ES = {
     '⚔️ Te desafio no NOC: Última Linha de Defesa!': '⚔️ ¡Te desafío en NOC: Última Línea de Defensa!',
     'Desafio': 'Desafío',
     'Bate isso?': '¿Superas esto?',
-    'NOC: Última Linha de Defesa · Desafio': 'NOC: Última Línea de Defensa · Desafío'
+    'NOC: Última Linha de Defesa · Desafio': 'NOC: Última Línea de Defensa · Desafío',
+    'Perfil': 'Perfil',
+    '🎨 Personagem': '🎨 Personaje',
+    '🪪 Dados': '🪪 Datos',
+    '⚙ Ajustes': '⚙ Ajustes',
+    'AJUSTES': 'AJUSTES',
+    'Seus dados': 'Tus datos',
+    'SOM': 'SONIDO',
+    'PROGRESSO': 'PROGRESO'
   },
   gloss: {
     'Access point': ['Access point', ['access point', 'ap', 'punto de acceso'], 'Equipo que lleva la red al Wi-Fi y conecta los dispositivos inalámbricos a la red cableada.'],

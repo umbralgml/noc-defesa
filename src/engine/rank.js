@@ -111,9 +111,9 @@ async function delData(b) {
 
 export function ensureProfile(next) { if (profile()) next(); else profileForm(next, true); }
 
-export function profileForm(after, first) {
+export function profileForm(after, first, head = '', onShow) {
   const p = profile() || {};
-  modal(`<div class="tag">IDENTIFICAÇÃO DO PLANTÃO</div><h2>${first ? 'Quem está de plantão?' : 'Seu perfil'}</h2>
+  modal(`${head}<div class="tag">IDENTIFICAÇÃO DO PLANTÃO</div><h2>${first ? 'Quem está de plantão?' : 'Seus dados'}</h2>
     <div class="fnote" style="margin-top:6px;font-size:13px;color:#c9d6ea">Como você quer aparecer no ranking? Os dois campos são <b>opcionais</b>. Em branco, você aparece como <b id="fAnon"></b>.</div>
     <label class="fl">Nome ou apelido <small>(opcional)</small><input id="fName" maxlength="24" autocomplete="nickname" placeholder="Ex.: Marcos"></label>
     <label class="fl">Perfil do LinkedIn <small>(opcional)</small><input id="fIn" inputmode="url" placeholder="linkedin.com/in/seu-perfil" autocomplete="url"></label>
@@ -139,6 +139,7 @@ export function profileForm(after, first) {
     if ((name || li) && !ok) return err('Para mostrar nome ou LinkedIn no ranking, marque a caixa. Ou deixe os campos em branco.');
     done({ name, linkedin: li || '', consent: !!(name || li) && ok, team });
   };
+  onShow && onShow();
 }
 
 const BOARDS = [['campanha', 'CAMPANHA'], [null, 'HOJE'], ['equipes', 'EQUIPES']];
