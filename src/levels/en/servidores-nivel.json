@@ -1,0 +1,533 @@
+{
+ "tag": "INTRODUCTION",
+ "name": "First steps with servers",
+ "story": [
+  {
+   "t": "Websites, names, automatic IPs, virtual machines and backups: all of it runs on servers. Before the server on-call, we learn what each one does, calmly."
+  },
+  {
+   "t": "DNS, DHCP, hypervisor... Bet you think RAID is a backup."
+  },
+  {
+   "t": "Every acronym has a card. I'll learn what each service is before touching any of them."
+  }
+ ],
+ "levels": [
+  {
+   "title": "What a server is",
+   "tag": "VOCABULARY",
+   "cap": "Opening the rookie's notebook...",
+   "heads": [
+    "WORD",
+    "WHAT IT DOES"
+   ],
+   "goal": "Connect each word from the server world to what it does.",
+   "z": "Server, client, service... to you it's all just a computer. You'll get lost before the first ticket.",
+   "me": "Think of a restaurant: one orders, the other cooks and serves. That's all.",
+   "lesson": [
+    "Think of a restaurant: the <b>client</b> orders, the kitchen cooks and serves. A network is the same: the browser or the phone is the client, and the <b>server</b> is who serves.",
+    "A server is a computer that's always on, offering a <b>service</b> to others. A single machine can run several services.",
+    "The <b>web server</b> delivers pages, with programs like nginx and Apache. <b>DNS</b> turns names into IPs and <b>DHCP</b> hands out an automatic IP to whoever joins the network.",
+    "A powerful computer can be split into several <b>virtual machines</b>, each with its own system.",
+    "And a <b>backup</b> is a copy kept somewhere else, to recover the data when something goes wrong."
+   ],
+   "check": {
+    "q": "In the restaurant, who plays the server's role?",
+    "v": [
+     "Comparing the network to a restaurant, who is the server?",
+     "If the network were a restaurant, who would the server be?"
+    ],
+    "o": [
+     "The kitchen, which cooks and serves the order",
+     {
+      "t": "The customer, who places the order",
+      "why": "Whoever orders is the client: the browser, the phone."
+     },
+     {
+      "t": "The menu",
+      "why": "The menu is like the list of services offered, but it isn't who serves."
+     }
+    ],
+    "why": "The server answers the requests, like the kitchen. The client is who asks."
+   },
+   "tip": "Client asks, server answers. Web delivers pages, DNS translates names, DHCP hands out IPs, a VM is a computer inside another and a backup is the copy to recover from.",
+   "learn": "On a network, the client asks and the server answers. A server runs services: web (pages), DNS (names become IPs), DHCP (automatic IPs). One physical machine can become several virtual machines, and the backup keeps copies to recover the data.",
+   "left": [
+    {
+     "t": "Client",
+     "s": "browser, phone",
+     "why": "The client is who asks for the service: the browser asking for a page, the phone asking for an IP."
+    },
+    {
+     "t": "Server",
+     "why": "The server is the computer that stays on answering the clients' requests."
+    },
+    {
+     "t": "Web server",
+     "why": "The web server delivers the sites' pages and files."
+    },
+    {
+     "why": "DNS turns the name (loja.com.br) into the IP where the site lives."
+    },
+    {
+     "why": "DHCP lends an IP, mask, gateway and DNS to whoever joins the network."
+    },
+    {
+     "why": "A backup is a copy of the data kept somewhere else, to recover after a loss."
+    }
+   ],
+   "right": [
+    {
+     "t": "Asks for the service",
+     "s": "The one placing the order",
+     "why": "Whoever asks is the client."
+    },
+    {
+     "t": "Answers the requests",
+     "s": "The kitchen",
+     "why": "Whoever answers is the server."
+    },
+    {
+     "t": "Delivers the sites' pages",
+     "why": "Pages are delivered by the web server."
+    },
+    {
+     "t": "Turns a name into an IP",
+     "s": "The contact list",
+     "why": "Turning a name into an IP is DNS's job."
+    },
+    {
+     "t": "Hands out automatic IPs",
+     "why": "Automatic IPs come from DHCP."
+    },
+    {
+     "t": "Copy to recover data",
+     "why": "A copy to recover from is the backup."
+    }
+   ]
+  },
+  {
+   "title": "Every service on its port",
+   "tag": "CLASSIFICATION",
+   "cap": "Checking srv01's services...",
+   "goal": "Drag each clue to the service it belongs to.",
+   "intro": "A server can run several services at the same time. What keeps the conversations apart is the <b>port</b>. Take each clue to the right service.",
+   "z": "I mixed up your services' ports. Going to look for the site on the DNS port?",
+   "me": "Each service answers on a well-known port. 443 is the site, 53 is DNS.",
+   "lesson": [
+    "Think of a building: the IP is the building's address and the <b>port</b> is the apartment number. Each service lives at a number.",
+    "A site uses <b>HTTP</b> on port 80 and <b>HTTPS</b> on 443. The S means secure: the conversation is encrypted.",
+    "<b>DNS</b> answers on port 53, over UDP and also TCP.",
+    "<b>DHCP</b> uses UDP 67 on the server and 68 on the client. The IP it hands out is a loan with a deadline, the <b>lease</b>.",
+    "<b>SSH</b> answers on port 22: it's the encrypted remote terminal the analyst uses to get into the server."
+   ],
+   "check": {
+    "q": "Which port does HTTPS use?",
+    "v": [
+     "A site with a padlock in the browser answers on which port?",
+     "What's HTTPS's default port?"
+    ],
+    "o": [
+     "443",
+     {
+      "t": "80",
+      "why": "80 is HTTP, without encryption."
+     },
+     {
+      "t": "53",
+      "why": "53 is the DNS port."
+     }
+    ],
+    "why": "HTTPS is encrypted HTTP, and its default port is 443."
+   },
+   "tip": "Web: 80 (HTTP) and 443 (HTTPS). DNS: 53. DHCP: UDP 67 and 68. SSH: 22.",
+   "learn": "Each service answers on a well-known port: web on 80 and 443, DNS on 53, DHCP on UDP 67 and 68 and SSH on 22. Knowing the port helps you read firewalls, logs and packet captures.",
+   "buckets": [
+    {
+     "a": [
+      {
+       "t": "Port 443 (HTTPS)",
+       "why": "HTTPS, the site with a padlock, answers on 443."
+      },
+      {
+       "t": "Port 80 (HTTP)",
+       "why": "Unencrypted HTTP answers on 80. Today it usually just redirects to 443."
+      },
+      {
+       "t": "nginx and Apache",
+       "why": "nginx and Apache are web server programs."
+      }
+     ]
+    },
+    {
+     "a": [
+      {
+       "t": "Port 53",
+       "why": "DNS answers on port 53, over UDP and TCP."
+      },
+      {
+       "t": "Turns loja.com.br into an IP",
+       "why": "Turning a name into an IP is DNS's job."
+      },
+      {
+       "t": "BIND and Unbound",
+       "why": "BIND and Unbound are DNS server programs widely used on Linux."
+      }
+     ]
+    },
+    {
+     "a": [
+      {
+       "t": "UDP 67 and 68",
+       "why": "The DHCP server listens on UDP 67 and answers the client on 68."
+      },
+      {
+       "t": "Gives an IP to the laptop joining the network",
+       "why": "Handing an automatic IP to newcomers is DHCP."
+      },
+      {
+       "t": "Lease: the IP is lent for a while",
+       "why": "DHCP lends the IP for a period, the lease. Near the end, the client asks to renew."
+      }
+     ]
+    },
+    {
+     "a": [
+      {
+       "t": "Port 22",
+       "why": "SSH answers on port 22."
+      },
+      {
+       "t": "Encrypted remote terminal",
+       "why": "SSH opens a terminal on another machine, all encrypted."
+      },
+      {
+       "why": "sshd is the OpenSSH service that receives SSH connections."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Asking DNS",
+   "tag": "LINUX TERMINAL",
+   "cap": "Connecting over SSH to srv01...",
+   "goal": "Find out why loja.exemplo.com.br opens and www.loja.exemplo.com.br doesn't.",
+   "intro": "A customer reports: <b>loja.exemplo.com.br</b> opens, but with <b>www</b> in front the browser says the site doesn't exist. Ask <b>DNS</b> about both names. Tap the <b>?</b> next to a command to open its card.",
+   "z": "I made your www disappear. Bet you can't figure it out without restarting the site's server.",
+   "me": "If the browser says the name doesn't exist, DNS is who answers. I'll ask it directly.",
+   "lesson": [
+    "DNS works like your phone's contact list: you look up the name and it gives back the number. Each line in the list is a <b>DNS record</b>.",
+    "The <b>A</b> record holds the name's IPv4 and <b>AAAA</b> holds the IPv6. <b>MX</b> says which server receives the domain's email.",
+    "Each answer comes with a <b>TTL</b>: how many seconds it can stay cached before asking again.",
+    "<b>dig</b> asks DNS and shows the full answer. With +short, it shows just the result. <b>nslookup</b> does the same in a simpler way.",
+    "In dig's status, NOERROR means it worked. NXDOMAIN means that name doesn't exist."
+   ],
+   "check": {
+    "q": "Which DNS record holds a name's IPv4?",
+    "v": [
+     "To find a site's IPv4, which record does DNS look up?",
+     "A name's IPv4 address lives in which record?"
+    ],
+    "o": [
+     "A",
+     {
+      "t": "AAAA",
+      "why": "AAAA holds the IPv6."
+     },
+     {
+      "t": "MX",
+      "why": "MX says which server receives the domain's email."
+     }
+    ],
+    "why": "The A record ties a name to an IPv4 address. For IPv6, the record is AAAA."
+   },
+   "tip": "dig loja.exemplo.com.br and dig www.loja.exemplo.com.br. Compare the status: NOERROR exists, NXDOMAIN doesn't.",
+   "learn": "The site was up: loja.exemplo.com.br had an A record (203.0.113.10). www didn't open because the name doesn't exist in DNS (NXDOMAIN). The fix is creating the www record in the domain's zone, without touching the site's server. dig and nslookup show this in seconds.",
+   "cmds": [
+    {
+     "why": "status: NOERROR, it worked. The ANSWER SECTION has the A record: loja.exemplo.com.br points to 203.0.113.10, with a TTL of 300 seconds. SERVER 127.0.0.53 is Ubuntu's local resolver, which passes the question to the configured DNS."
+    },
+    {
+     "why": "status: NXDOMAIN and ANSWER: 0. DNS says the name www.loja.exemplo.com.br doesn't exist. The site didn't go down: the name was never created."
+    },
+    {
+     "why": "With +short, dig shows just the answer: the IP. Great for a quick check."
+    },
+    {
+     "why": "The AAAA record shows the site also has IPv6: 2001:db8:10::10. Whoever has IPv6 arrives through it."
+    },
+    {
+     "why": "MX says where @exemplo.com.br email goes: mail.exemplo.com.br. The 10 is the priority; with several MX records, the lowest number is tried first."
+    },
+    {
+     "why": "nslookup confirms it its own way: the server couldn't find the name (NXDOMAIN). nslookup also exists on Windows, handy for testing on the customer's computer."
+    }
+   ],
+   "steps": [
+    {
+     "q": "What's loja.exemplo.com.br's IPv4?",
+     "v": [
+      "From dig, which IPv4 does the store's name point to?",
+      "The store's A record shows which address?"
+     ],
+     "o": [
+      "203.0.113.10",
+      {
+       "t": "127.0.0.53",
+       "why": "127.0.0.53 is the local resolver that answered the question, not the site's address."
+      },
+      {
+       "t": "2001:db8:10::10",
+       "why": "That's the IPv6, from the AAAA record."
+      }
+     ],
+     "why": "In the ANSWER SECTION, the A record ties loja.exemplo.com.br to 203.0.113.10."
+    },
+    {
+     "q": "What does the www's NXDOMAIN mean?",
+     "v": [
+      "Why did dig for www come back NXDOMAIN?",
+      "What does status NXDOMAIN mean?"
+     ],
+     "o": [
+      "The name www.loja.exemplo.com.br doesn't exist in DNS",
+      {
+       "t": "The site is down",
+       "why": "The site answers on the other name. NXDOMAIN is about the name, not the server."
+      },
+      {
+       "t": "DNS is turned off",
+       "why": "If DNS were off, dig would time out. Here it answered, and the answer was: that name doesn't exist."
+      }
+     ],
+     "why": "NXDOMAIN (non-existent domain) is DNS's answer for a name with no records at all."
+    },
+    {
+     "q": "The store's A record has TTL 300. What does that mean?",
+     "v": [
+      "What does the 300 before IN A mean?",
+      "What is the TTL of 300 in the answer for?"
+     ],
+     "o": [
+      "The answer can stay cached for 300 seconds",
+      {
+       "t": "The site can handle 300 visits",
+       "why": "TTL has nothing to do with visits. It's cache time."
+      },
+      {
+       "t": "DNS took 300 ms to answer",
+       "why": "The query time shows up in Query time, at the end."
+      }
+     ],
+     "why": "TTL is the answer's lifetime in cache, in seconds. Changed the IP? Whoever already asked may take up to the TTL to see the new one."
+    },
+    {
+     "q": "How do you fix the www?",
+     "v": [
+      "What do you do so www.loja.exemplo.com.br opens?",
+      "What's the fix for www's NXDOMAIN?"
+     ],
+     "o": [
+      "Create the www record in the domain's zone, pointing to the site",
+      {
+       "t": "Restart the site's nginx",
+       "why": "nginx doesn't even get the request: the browser stops earlier, because the name doesn't exist."
+      },
+      {
+       "t": "Change the server's IP",
+       "why": "The IP is right. The www name just needs to exist in DNS."
+      }
+     ],
+     "why": "Just create the record in the domain's zone: a CNAME from www to loja.exemplo.com.br, or an A with the same IP. After that, dig for www comes back NOERROR."
+    }
+   ]
+  },
+  {
+   "title": "A machine inside the machine",
+   "tag": "VIRTUALIZATION",
+   "cap": "Opening the datacenter inventory...",
+   "goal": "Drag each item to the virtualization layer it belongs to.",
+   "intro": "The rack has a physical server running <b>Proxmox</b>. Inside it run virtual machines and containers. Take each item to its layer.",
+   "z": "To you, a VM and a container are the same thing. You'll reboot the host thinking it's just a container.",
+   "me": "Building, manager, apartment and room. Each on its own floor.",
+   "lesson": [
+    "Think of a building. The <b>physical server</b> is the building: real CPU, memory, disks and network cards.",
+    "The <b>hypervisor</b> is the building manager: it shares the building's resources among the tenants. Proxmox VE, VMware ESXi and Hyper-V are hypervisors.",
+    "A <b>virtual machine</b> (VM) is a full apartment, with its own kitchen: it has its own system and its own kernel.",
+    "A <b>container</b> is a room that shares the kitchen: it runs isolated, but uses the host's kernel. That's why it's light and starts in seconds. Docker is the best known.",
+    "If the building falls, every apartment falls with it. That's why an important service lives on more than one physical server."
+   ],
+   "check": {
+    "q": "What's the main difference between a VM and a container?",
+    "v": [
+     "What does a VM have that a container doesn't?",
+     "VM and container: what changes inside?"
+    ],
+    "o": [
+     "The VM has its own kernel, the container uses the host's kernel",
+     {
+      "t": "The container is always more secure",
+      "why": "The container isolates less, precisely because it shares the kernel with the host."
+     },
+     {
+      "t": "The VM doesn't need a hypervisor",
+      "why": "The VM only exists because the hypervisor splits the physical server."
+     }
+    ],
+    "why": "A VM is a complete computer, with its own system and kernel. A container shares the kernel with the host: it's lighter, but isolates less."
+   },
+   "tip": "Physical = the building (the real hardware). Hypervisor = the manager (Proxmox, ESXi). VM = apartment with its own kernel. Container = room sharing the host's kernel (Docker).",
+   "learn": "Virtualization splits one physical server among many machines. The hypervisor shares CPU, memory and disk; each VM has its own system and kernel; a container shares the host's kernel, which is why it's light. If the physical server goes down, everything running on it goes down too.",
+   "buckets": [
+    {
+     "label": "PHYSICAL SERVER",
+     "a": [
+      {
+       "t": "Dell PowerEdge in the rack",
+       "why": "The PowerEdge is the real hardware, screwed into the rack."
+      },
+      {
+       "t": "Real disks and network cards",
+       "why": "Disks and cards you can touch belong to the physical server. VMs use virtual versions of them."
+      },
+      {
+       "t": "If the power supply burns out, everything on it stops",
+       "why": "A burned-out power supply takes the hardware down, and with it every VM and container running there."
+      }
+     ]
+    },
+    {
+     "label": "HYPERVISOR",
+     "a": [
+      {
+       "why": "Proxmox VE is a hypervisor: it runs directly on the server and creates the VMs and containers."
+      },
+      {
+       "why": "ESXi is VMware's hypervisor, widely used in companies."
+      },
+      {
+       "t": "Shares CPU and memory among the VMs",
+       "why": "Sharing the physical server's resources among the virtual machines is the hypervisor's job."
+      }
+     ]
+    },
+    {
+     "label": "VIRTUAL MACHINE",
+     "a": [
+      {
+       "t": "Windows Server running inside Proxmox",
+       "why": "Running a whole other system, with a kernel different from the host's, only works in a VM."
+      },
+      {
+       "t": "Has its own kernel",
+       "why": "Having its own kernel is what separates a VM from a container."
+      },
+      {
+       "t": "Can move hosts without shutting down",
+       "why": "With shared storage, the hypervisor moves the running VM to another server: live migration."
+      }
+     ]
+    },
+    {
+     "label": "CONTAINER",
+     "a": [
+      {
+       "t": "nginx running in Docker",
+       "why": "Docker runs applications in containers, like a packaged nginx."
+      },
+      {
+       "t": "Uses the host's kernel",
+       "why": "A container has no kernel of its own: it uses the host's, isolated in compartments."
+      },
+      {
+       "t": "Starts in seconds",
+       "why": "With no kernel to boot, a container starts much faster than a VM."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Backup that saves you",
+   "tag": "BACKUP",
+   "cap": "Reviewing the backup policy...",
+   "goal": "Separate what's a real backup from what only looks like one.",
+   "intro": "Ransomware encrypted the file server's files. Now it's time to find out what really saves the data. Separate the real <b>backup</b> from what only looks like one.",
+   "z": "I encrypted everything. Your RAID neatly mirrored the encryption onto both disks.",
+   "me": "RAID protects against a dead disk, not deleted data. Backup is something else.",
+   "lesson": [
+    "A backup is a separate copy, which doesn't change when the original changes. If the original is deleted or encrypted, the copy is still there.",
+    "<b>RAID</b> mirrors disks so the server survives a dead disk. But deleted on one is deleted on the other: RAID isn't backup.",
+    "<b>Sync</b>, like a Drive folder, repeats changes on both sides, including deletion and encryption.",
+    "The <b>3-2-1 rule</b>: 3 copies of the data, on 2 different kinds of media, with 1 copy offsite. Better still if one of them can't be deleted over the network.",
+    "A backup that was never restored is a hope, not a backup. Test restoring every so often."
+   ],
+   "check": {
+    "q": "Why doesn't RAID replace backup?",
+    "v": [
+     "The server has RAID 1. Does it still need a backup?",
+     "Which problem doesn't RAID solve?"
+    ],
+    "o": [
+     "Because what's deleted or encrypted on one disk disappears on the other too",
+     {
+      "t": "Because RAID is slower",
+      "why": "Speed isn't the issue. RAID just doesn't keep old versions of the data."
+     },
+     {
+      "t": "Because RAID only exists on physical servers",
+      "why": "There's software and hardware RAID. Neither keeps a separate copy."
+     }
+    ],
+    "why": "RAID protects against a dead disk. Against deletion, ransomware or human error, only a separate copy saves you."
+   },
+   "tip": "A real backup is a separate, tested copy, with one offsite (3-2-1 rule). RAID, sync and a copy on the same disk don't save you from deletion or ransomware.",
+   "learn": "A backup is a separate copy that survives when the original is deleted or encrypted. RAID and sync repeat the damage. Follow the 3-2-1 rule (3 copies, 2 media, 1 offsite) and test restoring.",
+   "buckets": [
+    {
+     "label": "REAL BACKUP",
+     "a": [
+      {
+       "t": "Daily copy to a separate storage",
+       "why": "A copy on another device doesn't change when the server is attacked. With several versions, you can go back to the day before."
+      },
+      {
+       "t": "Weekly copy in another building or in the cloud",
+       "why": "The offsite copy is the 1 in the 3-2-1 rule: it saves you even from a fire or theft in the building."
+      },
+      {
+       "t": "Copy that can't be deleted over the network",
+       "why": "An immutable or disconnected copy resists ransomware, which tries to delete the backups it can reach."
+      },
+      {
+       "t": "Restore tested every month",
+       "why": "Testing the restore proves the copy works before the day you need it."
+      }
+     ]
+    },
+    {
+     "label": "ONLY LOOKS LIKE BACKUP",
+     "a": [
+      {
+       "t": "RAID 1 mirroring two disks",
+       "why": "RAID 1 writes the same data to both disks. Delete or encrypt it on one, and the other repeats it."
+      },
+      {
+       "t": "Folder synced with Drive",
+       "why": "Sync repeats the deletion and the encryption on the other side."
+      },
+      {
+       "t": "Copy in another folder on the same disk",
+       "why": "If the disk dies or ransomware passes through, original and copy go together."
+      },
+      {
+       "t": "Snapshot kept on the VM's same storage",
+       "why": "A snapshot helps undo a change, but it lives on the same storage: if that fails, you lose both."
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
