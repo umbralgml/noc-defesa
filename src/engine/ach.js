@@ -3,6 +3,7 @@ import { $, store, esc } from './util.js';
 import { S, LEVELS, ACTS, K, progress } from './state.js';
 import { addXP } from './career.js';
 import { sfx } from './audio.js';
+import { cyberConfetti } from './particles.js';
 
 export const ACH = [
   ['primeiro', '🎖️', 'Primeiro plantão', 'Vença a primeira fase.'],
@@ -30,6 +31,8 @@ export const ACH = [
   ['academia_tudo', '🧑‍🏫', 'Professor do NOC', 'Domine todos os temas da Academia.'],
   ['treino10', '📚', 'Revisão em dia', 'Tire 10 itens do treino dos seus erros.'],
   ['metade', '⭐', 'Meio caminho', 'Junte metade de todas as estrelas.'],
+  ['cracha', '🪪', 'Identidade Confirmada', 'Emita o seu crachá oficial de analista do NOC.'],
+  ['easter', '🕵️', 'Curiosidade Hacker', 'Descubra um comando secreto no terminal.'],
   ['tudo', '🏆', 'Arquiteto do NOC', 'Conclua todas as fases.']
 ];
 const got = () => store('noc_ach') || {};
@@ -48,7 +51,7 @@ function banner(a) {
   const el = $('achv'); if (!el) return;
   el.innerHTML = `<span class="ai">${a[1]}</span><span><small>CONQUISTA · +50 XP</small><b>${esc(a[2])}</b></span>`;
   el.className = 'achv'; void el.offsetWidth; el.className = 'achv on';
-  try { sfx.ok(5); } catch (e) {}
+  try { sfx.ok(5); cyberConfetti({ count: 35 }); } catch (e) {}
   clearTimeout(bt); bt = setTimeout(() => { el.className = 'achv'; }, 3200);
 }
 

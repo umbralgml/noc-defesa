@@ -1,6 +1,38 @@
 {
   "versions": [
     {
+      "v": "1.36",
+      "date": "2026-11-05",
+      "title": "Crachá do Analista e Efeitos Cyber",
+      "items": [
+        "Crachá Oficial do Analista: emita sua credencial de segurança do NOC com avatar, nível e download em PNG",
+        "Efeitos visuais de comemoração: explosão de confetes cyber e bits neon em vitórias e grandes combos",
+        "Voz tática da central via sintetizador nativo de áudio para alertas em tempo real",
+        "Comandos secretos e easter eggs no terminal com som de digitação de teclado mecânico",
+        "Novas conquistas: Identidade Confirmada e Curiosidade Hacker"
+      ],
+      "es": {
+        "title": "Credencial de Analista y Efectos Cyber",
+        "items": [
+          "Credencial Oficial de Analista: emite tu tarjeta de seguridad del NOC con avatar, nivel y descarga en PNG",
+          "Efectos visuales: explosión de confeti cyber y bits de neón en victorias y combos altos",
+          "Voz táctica de la central vía sintetizador nativo de audio para alertas en tiempo real",
+          "Comandos secretos y easter eggs en la terminal con sonido de teclado mecánico",
+          "Nuevos logros: Identidad Confirmada y Curiosidad Hacker"
+        ]
+      },
+      "en": {
+        "title": "Analyst Badge and Cyber Effects",
+        "items": [
+          "Official Analyst Badge: issue your NOC security ID with avatar, clearance level and PNG export",
+          "Cyber celebratory effects: canvas confetti and neon bits on victory and big combos",
+          "Tactical dispatcher voice via native audio synthesis for real-time intrusion alerts",
+          "Secret commands and terminal easter eggs with tactile mechanical keyboard sounds",
+          "New achievements: Confirmed Identity and Hacker Curiosity"
+        ]
+      }
+    },
+    {
       "v": "1.35",
       "date": "2026-11-05",
       "title": "Caderno de exercícios cheio",

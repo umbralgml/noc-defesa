@@ -8,6 +8,7 @@ import { info, flow, glossCard } from './ui.js';
 import { cmdGloss } from './glossary.js';
 import { runSteps } from './steps.js';
 import { stat, unlock } from './ach.js';
+import { cyberConfetti } from './particles.js';
 
 const MIN_CMDS = 2;   // comandos diferentes antes de liberar o diagnóstico
 const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
@@ -32,6 +33,11 @@ export function renderTerm(level) {
     }
     run(val);
     $('tin').value = '';
+  };
+  let lastKey = 0;
+  $('tin').oninput = () => {
+    const now = performance.now();
+    if (now - lastKey > 55) { lastKey = now; sfx.key(); }
   };
   $('tin').onkeydown = e => {
     if (e.key === 'ArrowUp') {
@@ -79,6 +85,42 @@ function run(raw) {
   print(`${ps} ${raw.trim()}`, 'tcmd'); sfx.key();
   if (n === '?' || n === 'help') { print('Comandos disponíveis:\n' + L.cmds.map(c => '  ' + c.c).join('\n'), 'tsys'); return; }
   if (n === 'clear' || n === 'cls') { $('tlog').innerHTML = ''; return; }
+  if (n === 'matrix') {
+    unlock('easter');
+    sfx.whoosh();
+    cyberConfetti({ count: 65 });
+    print('10100110 01001111 01000011 ... Conectando à Matrix do NOC ...', 'tok');
+    print('Wake up, Analyst. The NOC has you. Follow the green packet.', 'tsys');
+    return;
+  }
+  if (n === 'z3r0' || n === 'hacker') {
+    unlock('easter');
+    sfx.bad();
+    const stage = $('stage');
+    if (stage) { stage.classList.add('alarm'); setTimeout(() => stage.classList.remove('alarm'), 1200); }
+    print('>>> [Z3R0 INTERCEPT]: Achou que estava no controle da rede?', 'terr');
+    print('[Z3R0]: Cada byte que passa por esse switch passa pelos meus olhos. Desconecte enquanto ainda há tempo...', 'terr');
+    return;
+  }
+  if (n === 'sudo rm -rf /' || n === 'rm -rf /' || n === 'sudo rm -rf /*') {
+    unlock('easter');
+    sfx.bad();
+    print('⚠️ KERNEL PANIC ABORTADO: Tentativa de autodestruição do NOC bloqueada.', 'terr');
+    print('O estagiário foi escoltado para fora da sala do datacenter com segurança.', 'tsys');
+    return;
+  }
+  if (n === 'cat /etc/shadow') {
+    unlock('easter');
+    print('root:$6$Z3R0$k9xLq... [HASH SHA-512]: ACESSO NEGADO!', 'terr');
+    print('Dica do NOC: senhas em /etc/shadow são protegidas; use sempre senhas fortes e MFA!', 'tsys');
+    return;
+  }
+  if (n === 'neofetch' || n === 'fastfetch') {
+    unlock('easter');
+    sfx.sel();
+    print('   _  _  ___   ____\n  | \\| |/ _ \\ / ___|   OS: NOC-Defense Linux v2.4 (x86_64)\n  | .` | (_) | |___    Kernel: 6.8.0-noc-hardened\n  |_|\\_|\\___/ \\____|   Uptime: 03:12:44 (PLANTÃO ATIVO)\n                       Shell: bash 5.2.21', 'tok');
+    return;
+  }
   const c = L.cmds.find(c => norm(c.c) === n || (c.alias || []).some(a => norm(a) === n));
   if (!c) { print('% Comando inválido ou indisponível neste cenário. Digite ? para ver a lista.', 'terr'); return; }
   print(c.out);

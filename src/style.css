@@ -905,3 +905,28 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tlb svg{width:21px;height:14px;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
 .tlb.on{border-color:var(--acc);color:var(--text);background:rgba(0,224,168,.1)}
 .tlb:hover,.tlb:focus-visible{border-color:var(--acc)}
+
+/* ---------- crachá oficial do analista (badge.js) ---------- */
+.badge-card{position:relative;overflow:hidden;background:linear-gradient(145deg,#070f1e,#0a172e);border:1.5px solid var(--acc);border-radius:16px;padding:18px 16px;box-shadow:0 0 25px rgba(0,224,168,.18),inset 0 0 15px rgba(0,0,0,.6);margin:12px 0 16px}
+.badge-holo{position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(0,224,168,.1) 50%,rgba(77,210,255,.14) 55%,transparent 65%);pointer-events:none}
+.badge-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,224,168,.25);padding-bottom:10px;margin-bottom:14px}
+.badge-org{display:flex;align-items:center;gap:8px;text-align:left}
+.badge-org b{font:800 11px 'Orbitron',monospace;letter-spacing:1px;color:#fff;display:block}
+.badge-org small{font:600 8.5px 'JetBrains Mono',monospace;color:var(--acc);display:block}
+.badge-sec{font:800 10.5px 'Orbitron',monospace;color:#ffe8a3;background:rgba(255,184,0,.15);border:1px solid rgba(255,184,0,.4);padding:3px 8px;border-radius:6px;letter-spacing:1px}
+.badge-body{display:flex;gap:14px;align-items:center;text-align:left}
+.badge-photo{position:relative;width:72px;height:86px;background:#081222;border:1px solid rgba(44,61,92,.8);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;box-shadow:inset 0 0 10px rgba(0,0,0,.8);flex:0 0 72px}
+.badge-av{width:54px;height:54px}
+.badge-status{font:700 8px 'JetBrains Mono',monospace;color:var(--acc);margin-top:4px}
+.badge-info{flex:1;min-width:0}
+.b-lbl{font:700 8.5px 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.5px}
+.b-val{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b-name{font:800 15px 'Orbitron',monospace;color:#fff;letter-spacing:1px}
+.b-rank{font:700 12.5px 'JetBrains Mono',monospace;color:#4dd2ff;margin-bottom:6px}
+.badge-stats{display:flex;flex-wrap:wrap;gap:6px;font:700 9.5px 'JetBrains Mono',monospace;color:#b9c7dc;margin-top:6px}
+.badge-stats span{background:rgba(18,29,51,.6);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
+.badge-bottom{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed rgba(44,61,92,.8);margin-top:14px;padding-top:10px}
+.badge-barcode{display:flex;gap:2px;align-items:center;height:18px}
+.badge-barcode i{display:inline-block;height:100%;background:var(--acc)}
+.badge-auth{font:700 9px 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.8px}
+.badge-actions{display:flex;gap:8px;justify-content:center;margin-top:12px}
