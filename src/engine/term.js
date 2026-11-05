@@ -11,10 +11,10 @@ import { stat, unlock } from './ach.js';
 
 const MIN_CMDS = 2;   // comandos diferentes antes de liberar o diagnóstico
 const norm = s => s.trim().toLowerCase().replace(/\s+/g, ' ');
-let L = null, ran = new Set(), ps = '';
+let L = null, ran = new Set(), ps = '', hist = [], histIdx = -1;
 
 export function renderTerm(level) {
-  L = level; ran = new Set(); ps = L.prompt || L.host + '#';
+  L = level; ran = new Set(); ps = L.prompt || L.host + '#'; hist = []; histIdx = -1;
   const st = $('stage');
   st.innerHTML = `${L.intro ? `<div class="task">${L.intro}</div>` : ''}
     <div class="term"><div class="tlog" id="tlog"></div>
@@ -22,7 +22,35 @@ export function renderTerm(level) {
     <div class="tstep" id="tstep"></div>`;
   st.querySelector('.tps').textContent = ps;
   print(`${L.host}: digite um comando ou toque num dos sugeridos abaixo. "?" lista os comandos.`, 'tsys');
-  $('tform').onsubmit = e => { e.preventDefault(); if ($('tin').value.trim() && stat('typed') >= 10) unlock('teclado'); run($('tin').value); $('tin').value = ''; };
+  $('tform').onsubmit = e => {
+    e.preventDefault();
+    const val = $('tin').value.trim();
+    if (val) {
+      if (stat('typed') >= 10) unlock('teclado');
+      hist.push(val);
+      histIdx = hist.length;
+    }
+    run(val);
+    $('tin').value = '';
+  };
+  $('tin').onkeydown = e => {
+    if (e.key === 'ArrowUp') {
+      if (!hist.length) return;
+      e.preventDefault();
+      if (histIdx > 0) histIdx--;
+      $('tin').value = hist[histIdx] || '';
+    } else if (e.key === 'ArrowDown') {
+      if (!hist.length) return;
+      e.preventDefault();
+      if (histIdx < hist.length - 1) {
+        histIdx++;
+        $('tin').value = hist[histIdx];
+      } else {
+        histIdx = hist.length;
+        $('tin').value = '';
+      }
+    }
+  };
   const bank = $('bank');
   const cards = L.cmds.some(c => cmdGloss(c.c));
   bank.innerHTML = `<div class="bankh"><span>COMANDOS · TOQUE PARA EXECUTAR${cards ? ' · ? EXPLICA' : ''}</span><span id="bankCnt">0/${MIN_CMDS}</span></div>`;

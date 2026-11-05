@@ -30,3 +30,28 @@ export function merge(a, b) {
   if (a && typeof a === 'object' && b && typeof b === 'object' && !Array.isArray(b)) { const o = { ...a }; for (const k in b) o[k] = merge(a[k], b[k]); return o; }
   return typeof b === typeof a || a === undefined ? b : a;
 }
+// Efeito de decodificação hacker (Matrix / cyber decode) em títulos e slogans.
+export function decodeText(el, targetText, duration = 480) {
+  if (!el || !targetText) return;
+  if (typeof document !== 'undefined' && document.documentElement.classList.contains('calm')) {
+    el.textContent = targetText; return;
+  }
+  const chars = '01<>/\\_#$@%*!&~[]';
+  const start = performance.now(), len = targetText.length;
+  let rafId;
+  const step = now => {
+    const progress = Math.min(1, (now - start) / duration);
+    const solved = Math.floor(progress * len);
+    let out = '';
+    for (let i = 0; i < len; i++) {
+      if (targetText[i] === ' ' || targetText[i] === '·') out += targetText[i];
+      else if (i < solved) out += targetText[i];
+      else out += chars[Math.floor(Math.random() * chars.length)];
+    }
+    el.textContent = out;
+    if (progress < 1) rafId = requestAnimationFrame(step);
+    else el.textContent = targetText;
+  };
+  rafId = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(rafId);
+}
