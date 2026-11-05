@@ -1,5 +1,5 @@
 // Ponto de entrada: monta a tela de título, carrega as fases e liga os botões.
-import { $, fmt } from './engine/util.js';
+import { $, fmt, decodeText } from './engine/util.js';
 import { LANG, LANGS, setLang, initI18n } from './engine/i18n.js';
 import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
 import { AV_ME } from './engine/scene.js';
@@ -34,7 +34,8 @@ $('mA').innerHTML = AV_ME;
 const PLAY_URL = '';
 if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) $('tPlay').hidden = true;
 else if (PLAY_URL) { const a = $('tPlay'); a.href = PLAY_URL; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('role'); a.classList.add('live'); $('tPlayK').textContent = 'JÁ DISPONÍVEL'; $('tPlayT').textContent = 'Baixe na Play Store'; a.setAttribute('aria-label', 'Baixar o app na Play Store'); }
-$('tScene').innerHTML = titleSVG() + `<div class="caption"><i></i>03:12 · ALERTA CRÍTICO NO NOC</div>`;
+$('tScene').innerHTML = titleSVG() + `<div class="caption"><div><i></i><span>03:12:44 · ALERTA CRÍTICO</span></div><span class="hud-stat">Z3R0 NA REDE</span></div>`;
+decodeText($('tSlogan'), $('tSlogan')?.textContent.trim() || 'ÚLTIMA LINHA DE DEFESA');
 
 $('sndM').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music('menu'); };
 setMute(isMuted());
@@ -86,7 +87,7 @@ hooks.profile = () => { showWho(); };
 showWho();
 $('tWhoEdit').onclick = () => { au(); openPerfil('data', home); };
 // Mapa → tela inicial, com resumo e ranking atualizados.
-$('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); show('title'); };
+$('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); decodeText($('tSlogan'), $('tSlogan')?.textContent.trim() || 'ÚLTIMA LINHA DE DEFESA'); show('title'); };
 document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openBoard('rank'); });
 $('tUpdBtn').onclick = () => { au(); openBoard('news'); };
 loadNews().catch(e => { console.error(e); $('tUpdBtn').hidden = true; });

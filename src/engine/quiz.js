@@ -81,3 +81,27 @@ function answer(btn) {
     S.qi++; showQ();
   };
 }
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', e => {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+    const game = $('game');
+    if (!game || !game.classList.contains('on') || !L || L.type !== 'quiz') return;
+    const nextBtn = $('qNext');
+    if (nextBtn) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextBtn.click();
+      }
+      return;
+    }
+    const num = parseInt(e.key, 10);
+    if (num >= 1 && num <= 4) {
+      const all = $('opts')?.querySelectorAll('.opt');
+      if (all && all[num - 1] && !all[num - 1].disabled) {
+        e.preventDefault();
+        all[num - 1].click();
+      }
+    }
+  });
+}

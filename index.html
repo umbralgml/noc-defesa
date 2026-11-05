@@ -11,7 +11,7 @@
 <meta property="og:description" content="Jogo de redes e segurança: cabeamento, sub-redes, firewall, BGP e resposta a incidente. Você é o analista de plantão contra o Z3R0.">
 <meta property="og:image" content="https://umbralgml.github.io/noc-defesa/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070d18'/%3E%3Ctext x='32' y='42' font-size='26' font-family='monospace' font-weight='bold' text-anchor='middle' fill='%2300e0a8'%3ENOC%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="src/icons/icon.svg">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="src/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -28,8 +28,14 @@
     <div class="tmain">
       <div class="scene title" id="tScene"></div>
       <div class="content">
-        <h1 class="logo">NOC</h1>
-        <div class="slogan">ÚLTIMA LINHA DE DEFESA</div>
+        <div class="tbrand">
+          <div class="tbadge">
+            <img class="tbadge-img" src="src/icons/icon.svg" alt="NOC Escudo" width="48" height="48">
+            <div class="tbadge-glow"></div>
+          </div>
+          <h1 class="logo">NOC</h1>
+        </div>
+        <div class="slogan" id="tSlogan">ÚLTIMA LINHA DE DEFESA</div>
         <a class="tplay" id="tPlay" role="note" aria-label="App Android em breve na Play Store">
           <svg class="tpi" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="tpg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00e0a8"/><stop offset="1" stop-color="#4dd2ff"/></linearGradient></defs><path d="M6 3.5v17a1 1 0 0 0 1.5.9l14-8.5a1 1 0 0 0 0-1.8l-14-8.5A1 1 0 0 0 6 3.5z" fill="url(#tpg)"/></svg>
           <span><small id="tPlayK">APP ANDROID</small><b id="tPlayT">Em breve na Play Store</b></span>
