@@ -1,6 +1,32 @@
 {
   "versions": [
     {
+      "v": "1.35",
+      "date": "2026-11-05",
+      "title": "Caderno de exercícios cheio",
+      "items": [
+        "Dois novos temas na Academia: Modelo OSI e Permissões Linux",
+        "Pratique camadas, PDUs, equipamentos e octal (755) à vontade sem perder integridade",
+        "Conquista Professor do NOC atualizada para os novos temas dominados"
+      ],
+      "es": {
+        "title": "Cuaderno de ejercicios lleno",
+        "items": [
+          "Dos nuevos temas en la Academia: Modelo OSI y Permisos Linux",
+          "Practica capas, PDUs, equipos y octal (755) sin perder integridad",
+          "Logro Profesor del NOC actualizado para los nuevos temas dominados"
+        ]
+      },
+      "en": {
+        "title": "Full workbook",
+        "items": [
+          "Two new topics in the Academy: OSI Model and Linux Permissions",
+          "Practice layers, PDUs, devices and octal (755) freely without losing integrity",
+          "NOC Teacher achievement updated for the newly mastered topics"
+        ]
+      }
+    },
+    {
       "v": "1.34",
       "date": "2026-11-04",
       "title": "Seu crachá de analista",
