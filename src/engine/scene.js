@@ -1,5 +1,5 @@
 // Cenas em SVG (NOC, rack, firewall, sala de guerra, servidor), herói animado, avatares e mídias de cabo.
-import { $ } from './util.js';
+import { $, store } from './util.js';
 
 // ---------- avatars ----------
 export const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#12324a"/><path d="M11 64c2-12 10-18 21-18s19 6 21 18z" style="fill:var(--hs,#00a884)"/><path d="M26 46l6 7 6-7" style="fill:var(--hs3,#0b6e57)"/><rect x="38" y="53" width="8" height="6" rx="1" fill="#e6f1ff"/><circle cx="32" cy="29" r="12" style="fill:var(--hk,#d9a77f)"/><path d="M20 27c0-9 6-14 12-14s12 5 12 13c-3-4-8-6-12-6s-9 2-12 7z" style="fill:var(--hh,#2b1d14)"/><rect x="24" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><rect x="33" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><path d="M31 28.5h2" stroke="#0b1220" stroke-width="1.4"/><path d="M28.5 35.5q3.5 2.5 7 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/><g class="hset"><path d="M19 30a13 13 0 0 1 26 0" fill="none" stroke="#1b2a44" stroke-width="3"/><rect x="16" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><rect x="43" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><path d="M19 35c0 5 4 8 9 8" stroke="#1b2a44" stroke-width="2" fill="none"/><circle cx="29" cy="43" r="2.2" fill="#00e0a8"/></g></svg>`;
@@ -91,13 +91,45 @@ function screen(x, y, w, h, id, c, chart) {
   return s + shine(x, y, w * .5, h);
 }
 function deskS(x, id) {
+  const ach = store('noc_ach') || {};
+  let trophies = '';
+  // Troféu do Prólogo: Alicate de crimpagem dourado
+  if (ach.prologo) {
+    trophies += `<g class="trophy-crimp" title="Troféu: Alicate de Crimpar Dourado">
+      <rect x="${x + 6}" y="79" width="10" height="2.5" rx="1" fill="#ffe8a3" stroke="#d49b00" stroke-width=".4"/>
+      <rect x="${x + 8}" y="77" width="2" height="4" rx=".5" fill="#ffd166"/>
+      <circle cx="${x + 13}" cy="80.2" r=".7" fill="#00e0a8"/>
+    </g>`;
+  }
+  // Troféu Linux: Mascote Tux em pixel art
+  if (ach.linux) {
+    trophies += `<g class="trophy-tux" title="Troféu: Pinguim Tux do NOC">
+      <ellipse cx="${x + 18}" cy="77" rx="3.5" ry="4.5" fill="#080e18"/>
+      <ellipse cx="${x + 18}" cy="77.5" rx="2.2" ry="3.2" fill="#f0f6fc"/>
+      <circle cx="${x + 17}" cy="74.5" r=".5" fill="#fff"/>
+      <circle cx="${x + 19}" cy="74.5" r=".5" fill="#fff"/>
+      <polygon points="${x + 17.5},75.5 ${x + 18.5},75.5 ${x + 18},77" fill="#ffb800"/>
+    </g>`;
+  }
+  // Troféu Z3R0: Máscara quebrada do chefe derrotado
+  if (ach.chefe) {
+    trophies += `<g class="trophy-z3r0" title="Troféu: Máscara do Z3R0 Neutralizado">
+      <rect x="${x + 94}" y="79" width="6" height="2" rx="1" fill="#2a3b58"/>
+      <ellipse cx="${x + 97}" cy="75" rx="3" ry="4" fill="#e8e8ee" stroke="#ff2e63" stroke-width=".5"/>
+      <path d="M${x + 95.5} 74l2 1-2 1z" fill="#ff2e63"/>
+      <path d="M${x + 98.5} 74l-2 1 2 1z" fill="#ff2e63"/>
+      <path d="M${x + 96} 72L${x + 98} 76" stroke="#ff2e63" stroke-width=".4"/>
+    </g>`;
+  }
+
   return `<ellipse cx="${x + 52}" cy="84" rx="56" ry="7" fill="url(#sgSpill)"/>
   <rect x="${x}" y="82" width="104" height="3" rx="1.5" fill="#1a2840"/><path d="M${x + 2} 82H${x + 102}" stroke="rgba(77,210,255,.35)" stroke-width=".5"/>
   <rect x="${x + 8}" y="85" width="2.4" height="19" fill="#101b2e"/><rect x="${x + 93}" y="85" width="2.4" height="19" fill="#101b2e"/>
   ${screen(x + 20, 44, 62, 34, id, '#00e0a8', true)}
   <rect x="${x + 49}" y="78" width="4" height="4" fill="#1a2840"/><rect x="${x + 40}" y="81" width="22" height="1.2" rx=".6" fill="#2a3b58"/>
   <rect x="${x + 24}" y="79.6" width="30" height="2.2" rx="1" fill="#0d1a2e" stroke="rgba(0,224,168,.35)" stroke-width=".4"/>
-  <rect x="${x + 86}" y="74" width="7" height="8" rx="1.5" fill="#0d1a2e" stroke="rgba(255,122,69,.6)" stroke-width=".6"/>`;
+  <rect x="${x + 86}" y="74" width="7" height="8" rx="1.5" fill="#0d1a2e" stroke="rgba(255,122,69,.6)" stroke-width=".6"/>
+  ${trophies}`;
 }
 function fwS(x, id) {
   let s = `<ellipse cx="${x + 20}" cy="81" rx="26" ry="5" fill="url(#sgSpill)"/><rect x="${x}" y="80" width="40" height="2.4" rx="1.2" fill="#1a2840"/><rect x="${x + 18.5}" y="82" width="3" height="21" fill="#101b2e"/>

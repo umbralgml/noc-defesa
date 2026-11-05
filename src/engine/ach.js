@@ -33,6 +33,8 @@ export const ACH = [
   ['metade', '⭐', 'Meio caminho', 'Junte metade de todas as estrelas.'],
   ['cracha', '🪪', 'Identidade Confirmada', 'Emita o seu crachá oficial de analista do NOC.'],
   ['easter', '🕵️', 'Curiosidade Hacker', 'Descubra um comando secreto no terminal.'],
+  ['sobrevivente', '⚡', 'Sobrevivente do Plantão', 'Sobreviva ao Plantão Caótico com pelo menos 75% de SLA.'],
+  ['threat_hunter', '🌐', 'Vigilância Global', 'Abra o Monitor de Ameaças e aplique a defesa total.'],
   ['tudo', '🏆', 'Arquiteto do NOC', 'Conclua todas as fases.']
 ];
 const got = () => store('noc_ach') || {};

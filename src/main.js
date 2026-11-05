@@ -18,6 +18,8 @@ import { initZ3r0 } from './engine/z3r0.js';
 import { initTrain } from './engine/train.js';
 import { initAcademy } from './engine/academy.js';
 import { initStudy } from './engine/study.js';
+import { initArcade } from './engine/arcade.js';
+import { openThreatMap } from './engine/threats.js';
 import { initReport, openContact } from './engine/report.js';
 import { rankOf, RANKS } from './engine/career.js';
 import { achHTML, achCount, ACH } from './engine/ach.js';
@@ -60,7 +62,7 @@ function showProgress() {
   el.innerHTML = p.done ? `Seu plantão: <b>★ ${p.stars}/${p.max}</b> · ${p.done}/${p.max / 3} fases` : '';
 }
 
-initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy(); initStudy(); initReport();
+initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy(); initStudy(); initArcade(); initReport();
 loadRankConfig();
 // Cargo e XP na tela inicial.
 function showRank() {
@@ -90,7 +92,31 @@ $('tWhoEdit').onclick = () => { au(); openPerfil('data', home); };
 $('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); decodeText($('tSlogan'), $('tSlogan')?.textContent.trim() || 'ÚLTIMA LINHA DE DEFESA'); show('title'); };
 document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openBoard('rank'); });
 $('tUpdBtn').onclick = () => { au(); openBoard('news'); };
+if ($('threatBtn')) $('threatBtn').onclick = () => { au(); openThreatMap(); };
 loadNews().catch(e => { console.error(e); $('tUpdBtn').hidden = true; });
+
+// Ticker de notícias e telemetria cyber em tempo real
+const TICKER_MSGS = [
+  '⚡ BGP RPKI: 99.8% de integridade nas rotas de borda.',
+  '🛡️ FIREWALL: 14.820 pacotes maliciosos bloqueados no último turno.',
+  '🚨 INTEL: Varredura de portas 22 e 80 detectada na WAN.',
+  '💡 DICA TÉCNICA: Handshake TCP de três vias: SYN → SYN-ACK → ACK.',
+  '🚀 UPTIME: SLA da infraestrutura em 99.99%. Todos os links verdes.',
+  '👾 ALERTA C2: Z3R0 tentando movimentação lateral no datacenter.',
+  '🔥 PLANTÃO ATIVO: Defenda a última linha de defesa.'
+];
+let tIdx = 0;
+const tickEl = $('tickerMsg');
+if (tickEl) {
+  setInterval(() => {
+    tIdx = (tIdx + 1) % TICKER_MSGS.length;
+    tickEl.style.opacity = '0';
+    setTimeout(() => {
+      tickEl.textContent = TICKER_MSGS[tIdx];
+      tickEl.style.opacity = '1';
+    }, 250);
+  }, 4500);
+}
 
 const go = $('goMap'), daily = $('dailyT');
 go.disabled = daily.disabled = true;
