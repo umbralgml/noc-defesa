@@ -16,7 +16,7 @@ export async function loadNews() {
   VERS = (await r.json()).versions.map(loc);
   latest = VERS[0].v;
   const fresh = seen() !== latest;
-  $('newsDot').classList.toggle('on', fresh);
+  $('newsDot')?.classList.toggle('on', fresh);
   $('tUpdLast').textContent = `v${VERS[0].v}: ${VERS[0].title}`;
   $('tUpdBtn').classList.toggle('fresh', fresh);
 }
@@ -40,5 +40,5 @@ export function wireNews() {
 export function markNewsSeen() {
   if (!latest) return;
   try { localStorage.setItem('noc_seen_ver', latest); } catch (e) {}
-  $('newsDot').classList.remove('on'); $('tUpdBtn')?.classList.remove('fresh');
+  $('newsDot')?.classList.remove('on'); $('tUpdBtn')?.classList.remove('fresh');
 }

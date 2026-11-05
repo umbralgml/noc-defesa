@@ -122,7 +122,6 @@ button{font-family:inherit;cursor:pointer}
   #title .content>:first-child{margin-top:auto}
   #title .content>:last-child{margin-bottom:auto}
   .news{flex:0 0 360px;overflow-y:auto;border-top:none;border-left:1px solid var(--line)}
-  #newsBtn{display:none}
 }
 
 /* ---------- map ---------- */
@@ -742,15 +741,6 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 .tact span{font-size:22px;line-height:1}
 .tact:active,.tact:focus-visible{background:var(--panel)}
 .tact[hidden]{display:none}
-.tmore{margin-top:10px;width:100%;max-width:340px}
-.tmore summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:max-content;margin:0 auto;padding:10px 22px;border-radius:999px;border:1px solid rgba(120,190,255,.28);background:var(--panel);color:var(--text);font-size:13px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-.tmore summary:hover,.tmore summary:focus-visible{border-color:var(--acc)}
-.tmore[open] summary{border-color:rgba(0,224,168,.55)}
-.tmi{font-size:15px;line-height:1;color:var(--acc)}
-.tmore summary::-webkit-details-marker{display:none}
-.tmore summary::after{content:' ▾'}
-.tmore[open] summary::after{content:' ▴'}
-.tmorel{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:4px 0 6px}
 .credit{margin-top:22px}
 .news{background:transparent}
 
@@ -875,7 +865,7 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 /* idioma: aviso de fase sem tradução */
 .trnote{margin:8px 0 4px;padding:8px 12px;border-radius:10px;border:1px dashed rgba(255,209,102,.5);color:var(--warn);font-size:13px}
 
-/* idioma: bandeiras na tela inicial, logo abaixo de Opções */
+/* idioma: bandeiras na tela inicial */
 .tlang{display:flex;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
 .tlb{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;border:1px solid rgba(120,190,255,.2);background:transparent;color:var(--muted);font:600 12px system-ui,sans-serif;cursor:pointer}
 .tlb svg{width:21px;height:14px;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.15)}

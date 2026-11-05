@@ -42,7 +42,7 @@ setMute(isMuted());
 const home = () => { showProgress(); showWho(); showRank(); };
 $('lookBtn').onclick = () => { au(); openPerfil('char', home); };
 $('contactT').onclick = $('contactM').onclick = () => { au(); openContact(); };
-// Idioma: bandeiras logo abaixo de Opções. A troca recarrega a página (fases, glossário e telas são montados no idioma escolhido).
+// Idioma: bandeiras na tela inicial. A troca recarrega a página (fases, glossário e telas são montados no idioma escolhido).
 const FLAGS = {
   pt: '<rect width="30" height="20" fill="#009c3b"/><path d="M15 2.6 27.4 10 15 17.4 2.6 10z" fill="#ffdf00"/><circle cx="15" cy="10" r="4.4" fill="#002776"/><path d="M10.8 9.2q4.2-1.3 8.4 1.2" stroke="#fff" stroke-width=".9" fill="none"/>',
   en: '<rect width="30" height="20" fill="#b22234"/>' + [1, 3, 5, 7, 9, 11].map(k => `<rect y="${k * 20 / 13}" width="30" height="${20 / 13}" fill="#fff"/>`).join('') + '<rect width="13" height="10.8" fill="#3c3b6e"/>',
@@ -88,7 +88,7 @@ $('tWhoEdit').onclick = () => { au(); openPerfil('data', home); };
 // Mapa → tela inicial, com resumo e ranking atualizados.
 $('homeBtn').onclick = () => { showProgress(); showWho(); showRank(); show('title'); };
 document.querySelectorAll('.rankBtn').forEach(b => b.onclick = () => { au(); openBoard('rank'); });
-$('newsBtn').onclick = $('tUpdBtn').onclick = () => { au(); openBoard('news'); };
+$('tUpdBtn').onclick = () => { au(); openBoard('news'); };
 loadNews().catch(e => { console.error(e); $('tUpdBtn').hidden = true; });
 
 const go = $('goMap'), daily = $('dailyT');
