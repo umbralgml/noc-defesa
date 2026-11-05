@@ -30,7 +30,6 @@ export const EN = {
     'Ranking': 'Ranking',
     'Conquistas': 'Achievements',
     'Analista': 'Analyst',
-    'Opções': 'Options',
     'SOM: ON': 'SOUND: ON',
     'SOM: OFF': 'SOUND: OFF',
     '♿ ACESSIBILIDADE': '♿ ACCESSIBILITY',
