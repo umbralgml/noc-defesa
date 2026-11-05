@@ -9,7 +9,7 @@ import { findGloss } from './glossary.js';
 import { cyberConfetti } from './particles.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
-export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, good() {}, report: null };
+export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, arcade() {}, good() {}, report: null };
 
 const TAUNT = ['Hahaha, errou feio!', 'Seu firewall é de papel?', 'Mais um erro e a rede é minha.', 'Nem o estagiário erra isso.', 'Tic tac, analista...', 'Obrigado pelo acesso!'];
 const PRAISE = ['Link UP!', 'Boa!', 'Na mosca.', 'Isso aí.', 'Perfeito.', 'Segue o baile.'];
@@ -67,6 +67,16 @@ export function setHP() {
   $('hpFill').style.width = S.hp + '%';
   $('hpFill').classList.toggle('low', S.hp <= 40);
   $('hpTxt').textContent = 'REDE ' + S.hp + '%';
+  const game = $('game');
+  if (game) {
+    const isCritical = S.hp > 0 && S.hp <= 30;
+    const wasCritical = game.classList.contains('critical-alarm');
+    game.classList.toggle('critical-alarm', isCritical);
+    if (isCritical && !wasCritical) {
+      sfx.siren();
+      buzz([100, 100, 200]);
+    }
+  }
 }
 export function setScore() {
   $('scoreTxt').textContent = fmt(S.score);

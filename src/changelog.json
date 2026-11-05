@@ -1,6 +1,38 @@
 {
   "versions": [
     {
+      "v": "1.37",
+      "date": "2026-11-05",
+      "title": "Telão Global de Ameaças e Plantão Caótico",
+      "items": [
+        "Telão Global de Ameaças: radar vetorial do SOC com ataques em tempo real convergindo para o NOC",
+        "Modo Arcade Sobrevivência: Plantão Caótico de 60s onde você mitiga incidentes e protege o SLA",
+        "Troféus físicos na mesa do analista: alicate dourado, mascote Tux e máscara do Z3R0",
+        "Live Ticker Cyber na tela inicial transmitindo telemetria e notícias da infraestrutura",
+        "Alarme de emergência com Red Alert visual quando a integridade cai abaixo de 30%"
+      ],
+      "es": {
+        "title": "Monitor Global de Amenazas y Turno Caótico",
+        "items": [
+          "Monitor Global de Amenazas: radar vectorial del SOC con ataques en tiempo real hacia el NOC",
+          "Modo Arcade Supervivencia: Turno Caótico de 60s donde mitigas incidentes y proteges el SLA",
+          "Trofeos físicos en el escritorio del analista: pinza dorada, mascota Tux y máscara de Z3R0",
+          "Live Ticker Cyber en la pantalla de inicio con telemetría y noticias de infraestructura",
+          "Alarma de emergencia con Red Alert visual cuando la integridad cae por debajo del 30%"
+        ]
+      },
+      "en": {
+        "title": "Global Threat Map and Chaotic Shift",
+        "items": [
+          "Global Threat Map: vector SOC radar with real-time cyber attacks converging on the NOC",
+          "Survival Arcade Mode: 60s Chaotic Shift to mitigate rapid incidents and maintain SLA",
+          "Physical desk trophies: golden crimper, Tux mascot and Z3R0 cracked mask on your terminal desk",
+          "Live Cyber Ticker on the title screen broadcasting infrastructure telemetry and intel",
+          "Visual Red Alert emergency lockdown when network integrity drops below 30%"
+        ]
+      }
+    },
+    {
       "v": "1.36",
       "date": "2026-11-05",
       "title": "Crachá do Analista e Efeitos Cyber",

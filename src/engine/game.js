@@ -58,11 +58,17 @@ export function renderMap() {
     html += '</div>';
   });
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
-  // Trilhas no topo; desafio, treino, academia e sala de estudo num bloco compacto logo abaixo.
-  $('mapList').innerHTML = trailsHTML(ct) + '<div class="hub"><div id="dailyBox"></div><div id="trainBox"></div><div id="acadBox"></div><div id="studyBox"></div></div>' + html;
-  flow.map(); flow.room(); flow.train(); flow.acad(); flow.study();
+  // Trilhas no topo; desafio, arcade, treino, academia e sala de estudo num bloco compacto logo abaixo.
+  $('mapList').innerHTML = trailsHTML(ct) + '<div class="hub"><div id="dailyBox"></div><div id="arcadeBox"></div><div id="trainBox"></div><div id="acadBox"></div><div id="studyBox"></div></div>' + html;
+  flow.map(); flow.room(); flow.train(); flow.acad(); flow.study(); if (flow.arcade) flow.arcade();
   $('mapReset').onclick = () => askReset(renderMap);
   $('starsTot').innerHTML = `★ ${tot}/${LEVELS.length * 3}${gold.length ? ` <i class="gold">★${gold.length}</i>` : ''}<small>${fmt(pts)} PTS</small>`;
+  const st = store('noc_streak') || { c: 1 };
+  const strkEl = $('mapStreak');
+  if (strkEl) {
+    strkEl.textContent = `🔥 ${st.c}d`;
+    strkEl.onclick = () => { au(); $('dailyT')?.click(); };
+  }
   const p = profile(), r = rankOf();
   $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
   $('mapRank').textContent = `${r.name} · ${fmt(r.v)} XP`;
