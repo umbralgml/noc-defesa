@@ -20,6 +20,8 @@ import { onLevelWin, unlock } from './ach.js';
 import { certModal } from './cert.js';
 import { cardsHTML, initCards } from './study.js';
 import { metric } from './rank.js';
+import { cyberConfetti } from './particles.js';
+import { speakRadio } from './radio.js';
 
 const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm, defense: renderDefense, topo: renderTopo, pcap: renderPcap };
 
@@ -171,6 +173,8 @@ function finishIntro() {
   // Celular: cena baixa durante a jogada; a cena inteira cabe em miniatura à direita.
   if (matchMedia('(max-width:600px),(max-height:760px)').matches) sc.querySelector('svg').setAttribute('preserveAspectRatio', 'xMaxYMax meet');
   S.busy = false;
+  if (L.boss || L.miniboss) speakRadio('Alerta crítico: Invasão do Z3R0 na rede.');
+  else if (L.type === 'defense') speakRadio('Alerta de tráfego: configure o firewall.');
   ENGINES[L.type](L);
   linkGloss($('stage').querySelector('.task'));
   startZ3r0(L);
@@ -224,11 +228,15 @@ function win() {
     if (hero) { hero.classList.remove('type'); }
     const cap = $('capTxt'); if (cap) cap.textContent = L.boss ? 'C2 DESCONECTADO · Z3R0 OFFLINE' : 'ATAQUE CONTIDO · Z3R0 RECUOU';
     sfx.zap(); setTimeout(sfx.boom, 250); buzz([100, 50, 200]);
+    cyberConfetti({ count: 70 });
+    speakRadio(L.boss ? 'Ameaça final neutralizada. Z3R0 desconectado.' : 'Ataque contido. Z3R0 recuou.');
     setTimeout(() => { const c = center(sc); for (let k = 0; k < 5; k++) setTimeout(() => burst(c.x + (k - 2) * 60, c.y - 20, ['#ff2e63', '#ffd166', '#00e0a8', '#4dd2ff', '#ff7ad9'][k], 18), k * 120); }, 700);
     setTimeout(() => { if (hero) hero.classList.add('cheer'); sfx.win(); }, 1300);
     setTimeout(() => music('menu'), 3000);
   } else {
     sfx.win(); buzz([40, 60, 40]);
+    cyberConfetti({ count: 45 });
+    speakRadio('Incidente contido. Bom trabalho, analista.');
     if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
     const c = center($('scene')); for (let k = 0; k < 3; k++) setTimeout(() => burst(c.x + (k - 1) * 80, c.y, ['#00e0a8', '#ffd166', '#4dd2ff'][k], 16), k * 150);
   }

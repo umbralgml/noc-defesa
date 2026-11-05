@@ -6,6 +6,7 @@ import { sfx } from './audio.js';
 import { unlock } from './ach.js';
 import { S, diffOf } from './state.js';
 import { findGloss } from './glossary.js';
+import { cyberConfetti } from './particles.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
 export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, good() {}, report: null };
@@ -116,6 +117,7 @@ function comboBanner(m) {
   const el = document.createElement('div'); el.className = 'combob'; el.textContent = `COMBO x${m}!`;
   $('fx').append(el); setTimeout(() => el.remove(), 1100);
   sfx.combo(m); vignette('good');
+  if (m >= 4) cyberConfetti({ count: 28 });
 }
 export const stars = () => S.err === 0 ? 3 : S.err <= 2 ? 2 : 1;
 
