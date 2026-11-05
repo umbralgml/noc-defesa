@@ -16,7 +16,17 @@ export const TOPICS = [
   ['net', '🧭', 'Rede e broadcast', 'em que bloco o IP cai', ['Tamanho do bloco = 256 − último octeto da máscara (/26 → blocos de 64).', 'Os blocos começam em múltiplos do tamanho: .0, .64, .128, .192.', 'A <b>rede</b> é o primeiro endereço do bloco e o <b>broadcast</b>, o último.']],
   ['range', '🏷️', 'Tipos de IP', 'privado, público, CGNAT', ['Privado (RFC 1918): <b>10/8</b>, <b>172.16/12</b> (172.16 a 172.31) e <b>192.168/16</b>.', 'CGNAT (RFC 6598): <b>100.64/10</b>, de 100.64 a 100.127.', 'Link-local: <b>169.254/16</b>. O resto que não é reservado é público.']],
   ['port', '🚪', 'Portas e serviços', 'SSH 22, HTTPS 443...', ['A porta diz qual programa atende: <b>22</b> SSH, <b>53</b> DNS, <b>80</b> HTTP, <b>443</b> HTTPS.', '<b>123</b> NTP, <b>161</b> SNMP, <b>179</b> BGP, <b>3389</b> RDP.', 'DNS, NTP e SNMP usam <b>UDP</b>; SSH, HTTP(S), BGP e RDP usam <b>TCP</b>.']],
-  ['wild', '🃏', 'Wildcard (ACL)', 'o inverso da máscara', ['A ACL Cisco usa <b>wildcard</b>: 255 menos cada octeto da máscara.', '/24 → 0.0.0.255, /30 → 0.0.0.3.', 'Bit 0 na wildcard = "tem que bater"; bit 1 = "tanto faz".']]
+  ['wild', '🃏', 'Wildcard (ACL)', 'o inverso da máscara', ['A ACL Cisco usa <b>wildcard</b>: 255 menos cada octeto da máscara.', '/24 → 0.0.0.255, /30 → 0.0.0.3.', 'Bit 0 na wildcard = "tem que bater"; bit 1 = "tanto faz".']],
+  ['osi', '🥞', 'Modelo OSI', 'camadas e protocolos', [
+    'O Modelo OSI divide a rede em <b>7 camadas</b>, da Física (1) à Aplicação (7).',
+    '<b>Equipamentos:</b> Hub/cabo na Camada 1, Switch e MAC na Camada 2, Roteador e IP na Camada 3.',
+    '<b>PDUs e protocolos:</b> Quadro no L2 (Ethernet), Pacote no L3 (IP), Segmento no L4 (TCP/UDP), Dados no L7 (HTTP/DNS/SSH).'
+  ]],
+  ['perm', '🔐', 'Permissões Linux', 'octal (755) ↔ rwx', [
+    'No Linux, as permissões são divididas em <b>usuário (u)</b>, <b>grupo (g)</b> e <b>outros (o)</b>.',
+    'Cada letra tem um peso octal: <b>r (leitura) = 4</b>, <b>w (escrita) = 2</b> e <b>x (execução) = 1</b> (máximo 7 = rwx).',
+    '<b>Casos comuns:</b> 755 (rwxr-xr-x) para scripts/pastas, 644 (rw-r--r--) para arquivos e 600 (rw-------) para chaves SSH.'
+  ]]
 ];
 const rec = () => store('noc_acad') || {};
 const top = id => ({ streak: 0, best: 0, total: 0, hits: 0, ...(rec()[id] || {}) });
