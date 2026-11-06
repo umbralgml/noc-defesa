@@ -8,9 +8,10 @@ import { askReset } from './game.js';
 import { modal, closeModal } from './ui.js';
 import { badgeHTML, wireBadge } from './badge.js';
 import { isRadioOn, setRadioOn, speakRadio } from './radio.js';
+import { t } from './i18n.js';
 
 const TABS = [['char', '🎨 Personagem'], ['badge', '🪪 Crachá'], ['data', '📋 Dados'], ['set', '⚙ Ajustes']];
-const head = cur => `<div class="ptabs" role="tablist">${TABS.map(([k, n]) => `<button class="ptab${k === cur ? ' on' : ''}" role="tab" aria-selected="${k === cur}" data-p="${k}">${n}</button>`).join('')}</div>`;
+const head = cur => `<div class="ptabs" role="tablist">${TABS.map(([k, n]) => `<button class="ptab${k === cur ? ' on' : ''}" role="tab" aria-selected="${k === cur}" data-p="${k}">${t(n)}</button>`).join('')}</div>`;
 let after = null;   // atualiza a tela inicial quando algo muda
 const wire = () => $('mcard').querySelectorAll('.ptab').forEach(b => b.onclick = () => openPerfil(b.dataset.p));
 
@@ -25,15 +26,18 @@ export function openPerfil(tab = 'char', done) {
   }
   if (tab === 'data') return profileForm(after, false, head('data'), wire);
   if (tab === 'set') {
-    const extra = `<div class="lsec">ÁUDIO E VOZ</div><button class="btn ghostb wideb" id="sndP">SOM GERAL: ${isMuted() ? 'OFF' : 'ON'}</button>
-      <button class="btn ghostb wideb" id="voiceP" style="margin-top:6px">VOZ TÁTICA DO NOC: ${isRadioOn() ? 'LIGADA' : 'DESLIGADA'}</button>
-      <div class="lsec">PROGRESSO</div><button class="btn ghostb wideb danger" id="resetP">ZERAR PROGRESSO</button>`;
+    const extra = `<div class="lsec">${t('ÁUDIO E VOZ')}</div><button class="btn ghostb wideb" id="sndP">${isMuted() ? t('SOM GERAL: OFF') : t('SOM GERAL: ON')}</button>
+      <button class="btn ghostb wideb" id="voiceP" style="margin-top:6px">${isRadioOn() ? t('VOZ TÁTICA DO NOC: LIGADA') : t('VOZ TÁTICA DO NOC: DESLIGADA')}</button>
+      <div class="lsec">${t('PROGRESSO')}</div><button class="btn ghostb wideb danger" id="resetP">${t('ZERAR PROGRESSO')}</button>`;
     return a11yModal(head('set'), extra, () => {
       wire();
-      $('sndP').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(MUS.cur || 'menu'); };
+      $('sndP').onclick = () => {
+        au(); setMute(!isMuted()); if (!isMuted()) music(MUS.cur || 'menu');
+        $('sndP').textContent = isMuted() ? t('SOM GERAL: OFF') : t('SOM GERAL: ON');
+      };
       $('voiceP').onclick = () => {
         setRadioOn(!isRadioOn());
-        $('voiceP').textContent = `VOZ TÁTICA DO NOC: ${isRadioOn() ? 'LIGADA' : 'DESLIGADA'}`;
+        $('voiceP').textContent = isRadioOn() ? t('VOZ TÁTICA DO NOC: LIGADA') : t('VOZ TÁTICA DO NOC: DESLIGADA');
         if (isRadioOn()) speakRadio('Voz tática da central ativada.');
       };
       $('resetP').onclick = () => askReset(() => { after && after(); openPerfil('set'); });

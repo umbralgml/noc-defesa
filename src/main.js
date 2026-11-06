@@ -1,6 +1,6 @@
 // Ponto de entrada: monta a tela de título, carrega as fases e liga os botões.
 import { $, fmt, decodeText } from './engine/util.js';
-import { LANG, LANGS, setLang, initI18n } from './engine/i18n.js';
+import { LANG, LANGS, setLang, initI18n, t } from './engine/i18n.js';
 import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
 import { AV_ME } from './engine/scene.js';
 import { titleSVG } from './engine/titlescene.js';
@@ -108,11 +108,12 @@ const TICKER_MSGS = [
 let tIdx = 0;
 const tickEl = $('tickerMsg');
 if (tickEl) {
+  tickEl.textContent = t(TICKER_MSGS[0]);
   setInterval(() => {
     tIdx = (tIdx + 1) % TICKER_MSGS.length;
     tickEl.style.opacity = '0';
     setTimeout(() => {
-      tickEl.textContent = TICKER_MSGS[tIdx];
+      tickEl.textContent = t(TICKER_MSGS[tIdx]);
       tickEl.style.opacity = '1';
     }, 250);
   }, 4500);

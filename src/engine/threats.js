@@ -7,6 +7,7 @@ import { unlock } from './ach.js';
 import { addXP } from './career.js';
 import { cyberConfetti } from './particles.js';
 import { speakRadio } from './radio.js';
+import { t } from './i18n.js';
 
 let animId = null;
 
@@ -36,15 +37,15 @@ export function openThreatMap() {
   speakRadio('Monitor global de ameaças ativado.');
 
   modal(`
-    <div class="tag">CENTRO DE OPERAÇÕES DE SEGURANÇA</div>
-    <h2>Telão Global de Ameaças</h2>
-    <div class="fnote" style="margin-top:2px;margin-bottom:10px">Radar de ataques cibernéticos em tempo real convergindo para a infraestrutura do NOC.</div>
+    <div class="tag">${t('CENTRO DE OPERAÇÕES DE SEGURANÇA')}</div>
+    <h2>${t('Telão Global de Ameaças')}</h2>
+    <div class="fnote" style="margin-top:2px;margin-bottom:10px">${t('Radar de ataques cibernéticos em tempo real convergindo para a infraestrutura do NOC.')}</div>
 
     <div class="threat-frame">
       <div class="threat-hud">
-        <div class="th-stat"><small>STATUS DO NOC</small><b style="color:var(--acc)">● SOB DEFESA ATIVA</b></div>
-        <div class="th-stat"><small>VOLUME DE TRÁFEGO</small><b id="thPps">1.482.300 pps</b></div>
-        <div class="th-stat"><small>MITIGAÇÕES / MIN</small><b style="color:var(--warn)" id="thMit">42.810</b></div>
+        <div class="th-stat"><small>${t('STATUS DO NOC')}</small><b style="color:var(--acc)">${t('● SOB DEFESA ATIVA')}</b></div>
+        <div class="th-stat"><small>${t('VOLUME DE TRÁFEGO')}</small><b id="thPps">1.482.300 pps</b></div>
+        <div class="th-stat"><small>${t('MITIGAÇÕES / MIN')}</small><b style="color:var(--warn)" id="thMit">42.810</b></div>
       </div>
 
       <div class="threat-canvas-box">
@@ -53,14 +54,14 @@ export function openThreatMap() {
       </div>
 
       <div class="threat-log" id="thLog">
-        <div class="th-row"><span class="th-time">03:12:48</span><span class="th-type">SYN Flood</span><span>Virgínia → NOC São Paulo</span><b class="th-drop">DROPADO</b></div>
-        <div class="th-row"><span class="th-time">03:12:47</span><span class="th-type">BGP Hijack</span><span>Moscou → Rota 200.147.0/20</span><b class="th-drop">FILTRADO</b></div>
+        <div class="th-row"><span class="th-time">03:12:48</span><span class="th-type">SYN Flood</span><span>Virgínia → NOC São Paulo</span><b class="th-drop">${t('DROPADO')}</b></div>
+        <div class="th-row"><span class="th-time">03:12:47</span><span class="th-type">BGP Hijack</span><span>Moscou → Rota 200.147.0/20</span><b class="th-drop">${t('FILTRADO')}</b></div>
       </div>
     </div>
 
     <div class="row" style="margin-top:12px;gap:8px">
-      <button class="btn" id="thMitigate">🛡️ ATIVAR DEFESA TOTAL (+25 XP)</button>
-      <button class="btn ghostb" id="mOk">FECHAR</button>
+      <button class="btn" id="thMitigate">${t('🛡️ ATIVAR DEFESA TOTAL (+25 XP)')}</button>
+      <button class="btn ghostb" id="mOk">${t('FECHAR')}</button>
     </div>
   `);
 
@@ -77,7 +78,7 @@ export function openThreatMap() {
     cyberConfetti({ count: 40 });
     addXP(25);
     speakRadio('Contramedidas globais aplicadas. Tráfego anômalo mitigado.');
-    $('thMitigate').textContent = 'DEFESA APLICADA ✓ (+25 XP)';
+    $('thMitigate').textContent = t('DEFESA APLICADA ✓ (+25 XP)');
     $('thMitigate').disabled = true;
   };
 
@@ -228,7 +229,7 @@ function updateLog(arc) {
   
   const div = document.createElement('div');
   div.className = 'th-row';
-  div.innerHTML = `<span class="th-time">${time}</span><span class="th-type">${arc.type.split(' ')[0]}</span><span>${arc.srcName.split(' ')[0]} → NOC</span><b class="th-drop">DROPADO</b>`;
+  div.innerHTML = `<span class="th-time">${time}</span><span class="th-type">${arc.type.split(' ')[0]}</span><span>${arc.srcName.split(' ')[0]} → NOC</span><b class="th-drop">${t('DROPADO')}</b>`;
   
   log.prepend(div);
   if (log.children.length > 5) log.removeChild(log.lastChild);

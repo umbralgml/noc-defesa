@@ -8,6 +8,7 @@ import { publicName, profile } from './rank.js';
 import { AV_ME } from './scene.js';
 import { cyberConfetti } from './particles.js';
 import { sfx } from './audio.js';
+import { t } from './i18n.js';
 
 export function badgeHTML() {
   unlock('cracha');
@@ -20,9 +21,9 @@ export function badgeHTML() {
   const serial = 'NOC-' + Math.abs(name.split('').reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) | 0, 1337)).toString(16).toUpperCase().padStart(6, '0');
 
   return `
-    <div class="tag">CREDENCIAL OFICIAL</div>
-    <h2>Crachá do Analista</h2>
-    <div class="fnote" style="margin-top:2px;margin-bottom:12px">Identidade de segurança do operador para acesso aos servidores e racks do NOC.</div>
+    <div class="tag">${t('CREDENCIAL OFICIAL')}</div>
+    <h2>${t('Crachá do Analista')}</h2>
+    <div class="fnote" style="margin-top:2px;margin-bottom:12px">${t('Identidade de segurança do operador para acesso aos servidores e racks do NOC.')}</div>
 
     <div class="badge-card" id="badgeCard">
       <div class="badge-holo"></div>
@@ -30,28 +31,28 @@ export function badgeHTML() {
         <div class="badge-org">
           <img src="src/icons/icon.svg" width="28" height="28" alt="NOC Escudo">
           <div>
-            <b>NOC DEFENSE DIVISION</b>
-            <small>NETWORK SECURITY OPERATOR</small>
+            <b>${t('NOC DEFENSE DIVISION')}</b>
+            <small>${t('NETWORK SECURITY OPERATOR')}</small>
           </div>
         </div>
-        <div class="badge-sec">CLASSE ${clearance}</div>
+        <div class="badge-sec">${t('CLASSE')} ${clearance}</div>
       </div>
 
       <div class="badge-body">
         <div class="badge-photo">
           <div class="badge-av">${AV_ME}</div>
-          <span class="badge-status">● ATIVO</span>
+          <span class="badge-status">${t('● ATIVO')}</span>
         </div>
         <div class="badge-info">
-          <div class="b-lbl">ANALISTA</div>
+          <div class="b-lbl">${t('ANALISTA')}</div>
           <b class="b-val b-name">${esc(name)}</b>
           
-          <div class="b-lbl" style="margin-top:6px">PATENTE / CARGO</div>
-          <b class="b-val b-rank">${esc(r.name)}</b>
+          <div class="b-lbl" style="margin-top:6px">${t('PATENTE / CARGO')}</div>
+          <b class="b-val b-rank">${esc(t(r.name))}</b>
 
           <div class="badge-stats">
-            <span><b>${prog.stars}</b> ★ ESTRELAS</span>
-            <span><b>${aCount}</b> 🎖️ CONQUISTAS</span>
+            <span><b>${prog.stars}</b> ${t('★ ESTRELAS')}</span>
+            <span><b>${aCount}</b> ${t('🎖️ CONQUISTAS')}</span>
             <span><b>${serial}</b></span>
           </div>
         </div>
@@ -61,13 +62,13 @@ export function badgeHTML() {
         <div class="badge-barcode">
           ${Array.from({ length: 32 }, (_, i) => `<i style="width:${(i % 3 === 0 ? 3 : i % 2 === 0 ? 1.5 : 2.5)}px;opacity:${(i % 5 === 0 ? 0.4 : 0.85)}"></i>`).join('')}
         </div>
-        <div class="badge-auth">AUTORIZADO · SLA 99.9%</div>
+        <div class="badge-auth">${t('AUTORIZADO · SLA {n}%').replace('{n}', '99.9')}</div>
       </div>
     </div>
 
     <div class="badge-actions">
-      <button class="btn" id="bDl">📥 BAIXAR IMAGEM (PNG)</button>
-      <button class="btn ghostb" id="bShare">📲 COMPARTILHAR</button>
+      <button class="btn" id="bDl">${t('📥 BAIXAR IMAGEM (PNG)')}</button>
+      <button class="btn ghostb" id="bShare">${t('📲 COMPARTILHAR')}</button>
     </div>
   `;
 }
@@ -89,7 +90,7 @@ export function wireBadge() {
       const name = publicName();
       const r = rankOf();
       const prog = progress();
-      const text = `🛡️ Meu Crachá do NOC: Última Linha de Defesa!\nCodinome: ${name}\nCargo: ${r.name} (${prog.stars}★)\nJogue e defenda o NOC contra o Z3R0: https://umbralgml.github.io/noc-defesa/`;
+      const text = `🛡️ ${t('Meu Crachá do NOC: Última Linha de Defesa!')}\n${t('Codinome')}: ${name}\n${t('Cargo')}: ${t(r.name)} (${prog.stars}★)\n${t('Jogue e defenda o NOC contra o Z3R0:')} https://umbralgml.github.io/noc-defesa/`;
 
       if (navigator.share) {
         try {
@@ -105,8 +106,8 @@ export function wireBadge() {
       if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(text);
-          shareBtn.textContent = 'COPIADO! ✓';
-          setTimeout(() => { shareBtn.textContent = '📲 COMPARTILHAR'; }, 2200);
+          shareBtn.textContent = t('COPIADO! ✓');
+          setTimeout(() => { shareBtn.textContent = t('📲 COMPARTILHAR'); }, 2200);
         } catch (e) {}
       }
     };
@@ -163,10 +164,10 @@ function exportBadgePNG() {
 
   ctx.fillStyle = '#00e0a8';
   ctx.font = 'bold 15px monospace';
-  ctx.fillText('NOC DEFENSE DIVISION', 24, 28);
+  ctx.fillText(t('NOC DEFENSE DIVISION'), 24, 28);
   ctx.fillStyle = '#7f94b6';
   ctx.font = '9px monospace';
-  ctx.fillText('NETWORK SECURITY OPERATOR · ID CARD', 24, 42);
+  ctx.fillText(t('NETWORK SECURITY OPERATOR · ID CARD'), 24, 42);
 
   // Clearance badge
   ctx.fillStyle = 'rgba(255, 184, 0, 0.2)';
@@ -177,7 +178,7 @@ function exportBadgePNG() {
   ctx.fillStyle = '#ffe8a3';
   ctx.font = 'bold 10px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText(`CLASSE ${clearance}`, w - 65, 29);
+  ctx.fillText(`${t('CLASSE')} ${clearance}`, w - 65, 29);
   ctx.textAlign = 'left';
 
   // Foto do analista (Placeholder estilizado de segurança)
@@ -194,13 +195,13 @@ function exportBadgePNG() {
 
   ctx.fillStyle = '#00e0a8';
   ctx.font = 'bold 9px monospace';
-  ctx.fillText('● ATIVO', 74, 184);
+  ctx.fillText(t('● ATIVO'), 74, 184);
   ctx.textAlign = 'left';
 
   // Informações do jogador
   ctx.fillStyle = '#7f94b6';
   ctx.font = '9px monospace';
-  ctx.fillText('NOME DO ANALISTA', 144, 82);
+  ctx.fillText(t('NOME DO ANALISTA'), 144, 82);
 
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 18px monospace';
@@ -208,19 +209,19 @@ function exportBadgePNG() {
 
   ctx.fillStyle = '#7f94b6';
   ctx.font = '9px monospace';
-  ctx.fillText('CARGO / PATENTE', 144, 126);
+  ctx.fillText(t('PATENTE / CARGO'), 144, 126);
 
   ctx.fillStyle = '#4dd2ff';
   ctx.font = 'bold 14px monospace';
-  ctx.fillText(r.name, 144, 146);
+  ctx.fillText(t(r.name), 144, 146);
 
   ctx.fillStyle = '#ffe8a3';
   ctx.font = '11px monospace';
-  ctx.fillText(`★ ${prog.stars} Estrelas  ·  🎖️ ${aCount} Conquistas`, 144, 172);
+  ctx.fillText(`★ ${prog.stars} ${t('Estrelas')}  ·  🎖️ ${aCount} ${t('Conquistas')}`, 144, 172);
 
   ctx.fillStyle = '#7f94b6';
   ctx.font = '10px monospace';
-  ctx.fillText(`REGISTRO: ${serial}`, 144, 190);
+  ctx.fillText(`${t('REGISTRO')}: ${serial}`, 144, 190);
 
   // Faixa inferior com código de barras
   ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -238,9 +239,9 @@ function exportBadgePNG() {
   ctx.fillStyle = '#7f94b6';
   ctx.font = 'bold 10px monospace';
   ctx.textAlign = 'right';
-  ctx.fillText('AUTORIZADO · UPTIME 99.9%', w - 24, h - 22);
+  ctx.fillText(t('AUTORIZADO · UPTIME 99.9%'), w - 24, h - 22);
   ctx.font = '8px monospace';
-  ctx.fillText('SISTEMA NOC DE DEFESA', w - 24, h - 10);
+  ctx.fillText(t('SISTEMA NOC DE DEFESA'), w - 24, h - 10);
   ctx.textAlign = 'left';
 
   // Dispara download da imagem PNG
