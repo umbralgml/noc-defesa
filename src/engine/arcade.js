@@ -7,6 +7,7 @@ import { addXP, xpHTML } from './career.js';
 import { unlock } from './ach.js';
 import { cyberConfetti } from './particles.js';
 import { speakRadio } from './radio.js';
+import { t } from './i18n.js';
 
 const INCIDENTS = [
   {
@@ -115,24 +116,24 @@ export function startArcade() {
 
 function showArcadeModal() {
   modal(`
-    <div class="tag">MODO SOBREVIVÊNCIA</div>
-    <h2>Plantão Caótico</h2>
+    <div class="tag">${t('MODO SOBREVIVÊNCIA')}</div>
+    <h2>${t('Plantão Caótico')}</h2>
 
     <div class="arc-hud">
       <div class="arc-stat">
-        <small>TEMPO RESTANTE</small>
+        <small>${t('TEMPO RESTANTE')}</small>
         <b id="arcTime">60s</b>
       </div>
       <div class="arc-stat">
-        <small>DISPONIBILIDADE (SLA)</small>
+        <small>${t('DISPONIBILIDADE (SLA)')}</small>
         <b id="arcSla" style="color:var(--acc)">100%</b>
       </div>
       <div class="arc-stat">
-        <small>SCORE</small>
+        <small>${t('SCORE')}</small>
         <b id="arcScore" style="color:var(--warn)">0</b>
       </div>
       <div class="arc-stat">
-        <small>COMBO</small>
+        <small>${t('COMBO')}</small>
         <b id="arcCombo">x1</b>
       </div>
     </div>
@@ -140,7 +141,7 @@ function showArcadeModal() {
     <div class="arc-sla-bar"><div class="arc-sla-fill" id="arcSlaFill" style="width:100%"></div></div>
 
     <div class="arc-card" id="arcCard">
-      <div class="arc-q" id="arcQ">Preparando incidentes...</div>
+      <div class="arc-q" id="arcQ">${t('Preparando incidentes...')}</div>
       <div class="arc-desc" id="arcDesc"></div>
       <div class="arc-opts">
         <button class="btn arc-btn" id="arcA"></button>
@@ -149,7 +150,7 @@ function showArcadeModal() {
     </div>
 
     <div class="row" style="margin-top:14px">
-      <button class="btn ghostb danger" id="arcQuit">ABORTAR PLANTÃO</button>
+      <button class="btn ghostb danger" id="arcQuit">${t('ABORTAR PLANTÃO')}</button>
     </div>
   `);
 
@@ -188,10 +189,10 @@ function nextIncident() {
 
   if (!q || !btnA || !btnB) return;
 
-  q.textContent = currentInc.q;
-  d.textContent = currentInc.desc;
-  btnA.textContent = currentInc.a;
-  btnB.textContent = currentInc.b;
+  q.textContent = t(currentInc.q);
+  d.textContent = t(currentInc.desc);
+  btnA.textContent = t(currentInc.a);
+  btnB.textContent = t(currentInc.b);
 
   btnA.className = 'btn arc-btn';
   btnB.className = 'btn arc-btn';
@@ -247,16 +248,16 @@ function endArcade() {
   }
 
   modal(`
-    <div class="tag">RELATÓRIO DO PLANTÃO CAÓTICO</div>
-    <h2>${survived ? 'Turno Sobrevivido!' : 'SLA Esgotado!'}</h2>
-    <div class="pts"><span>Disponibilidade Final (SLA)</span><b style="color:${sla > 60 ? 'var(--acc)' : 'var(--z)'}">${sla}%</b></div>
-    <div class="pts"><span>Pontuação do Turno</span><b>${score.toLocaleString('pt-BR')} pts</b></div>
-    <div class="pts"><span>Seu Recorde</span><b style="color:var(--warn)">${best.toLocaleString('pt-BR')} pts</b></div>
+    <div class="tag">${t('RELATÓRIO DO PLANTÃO CAÓTICO')}</div>
+    <h2>${survived ? t('Turno Sobrevivido!') : t('SLA Esgotado!')}</h2>
+    <div class="pts"><span>${t('Disponibilidade Final (SLA)')}</span><b style="color:${sla > 60 ? 'var(--acc)' : 'var(--z)'}">${sla}%</b></div>
+    <div class="pts"><span>${t('Pontuação do Turno')}</span><b>${score.toLocaleString('pt-BR')} pts</b></div>
+    <div class="pts"><span>${t('Seu Recorde')}</span><b style="color:var(--warn)">${best.toLocaleString('pt-BR')} pts</b></div>
     ${xpHTML(xr)}
-    <div class="learn"><b>ANÁLISE PÓS-INCIDENTE</b>No mundo real, SLAs de 99.9% permitem menos de 43 minutos de downtime por mês. Respostas táticas rápidas salvam a infraestrutura.</div>
+    <div class="learn"><b>${t('ANÁLISE PÓS-INCIDENTE')}</b>${t('No mundo real, SLAs de 99.9% permitem menos de 43 minutos de downtime por mês. Respostas táticas rápidas salvam a infraestrutura.')}</div>
     <div class="row">
-      <button class="btn ghostb" id="arcClose">FECHAR</button>
-      <button class="btn" id="arcAgain">JOGAR DE NOVO</button>
+      <button class="btn ghostb" id="arcClose">${t('FECHAR')}</button>
+      <button class="btn" id="arcAgain">${t('JOGAR DE NOVO')}</button>
     </div>
   `);
 
@@ -279,10 +280,10 @@ function card() {
     <button class="daily arc-hub-btn" id="arcadeBtn">
       <span class="di">⚡</span>
       <span class="dt">
-        <b>Plantão Caótico</b>
-        <small>Sobrevivência rápida · 60s contra o relógio ${best ? `· Recorde: ${best} pts` : ''}</small>
+        <b>${t('Plantão Caótico')}</b>
+        <small>${best ? t('Sobrevivência rápida · 60s contra o relógio · Recorde: {n} pts').replace('{n}', best) : t('Sobrevivência rápida · 60s contra o relógio')}</small>
       </span>
-      <span class="dg">SOBREVIVER</span>
+      <span class="dg">${t('SOBREVIVER')}</span>
     </button>
   `;
   $('arcadeBtn').onclick = startArcade;

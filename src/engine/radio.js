@@ -2,6 +2,7 @@
 // 100% nativo, sem bibliotecas externas, ativado junto com o áudio do jogo.
 import { store } from './util.js';
 import { isMuted, sfx } from './audio.js';
+import { t, LANG } from './i18n.js';
 
 let radioEnabled = true;
 try {
@@ -25,10 +26,17 @@ export function speakRadio(text) {
 
   try {
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
+    const translated = t(text);
+    const u = new SpeechSynthesisUtterance(translated);
     const voices = window.speechSynthesis.getVoices();
-    const pt = voices.find(v => v.lang && (v.lang.startsWith('pt-BR') || v.lang.startsWith('pt')));
-    if (pt) u.voice = pt;
+    const langPrefix = LANG === 'es' ? 'es' : LANG === 'en' ? 'en' : 'pt';
+    const voice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(langPrefix));
+    if (voice) {
+      u.voice = voice;
+      u.lang = voice.lang;
+    } else {
+      u.lang = { pt: 'pt-BR', es: 'es-ES', en: 'en-US' }[LANG] || 'pt-BR';
+    }
     u.pitch = 0.86;  // tom tático mais grave / robótico
     u.rate = 1.05;   // ritmo direto e objetivo
     u.volume = 0.75;
