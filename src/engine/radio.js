@@ -36,8 +36,10 @@ export function speakRadio(text, { force = false } = {}) {
   if (document.documentElement.classList.contains('calm')) return;
 
   const now = Date.now();
-  // Evita spam de falas muito próximas, a menos que seja forçado (ex: fim de fase ou combo importante)
-  if (!force && now - lastSpeakTime < 1400) return;
+  // Evita spam de falas (cooldown de 7 segundos para falas normais)
+  if (!force && now - lastSpeakTime < 7000) return;
+  // Mesmo forçado, evita sobrepor falas ocorridas há menos de 2.2s
+  if (force && now - lastSpeakTime < 2200) return;
   lastSpeakTime = now;
 
   try {
@@ -90,4 +92,46 @@ export function speakRadio(text, { force = false } = {}) {
   } catch (e) {
     // Web Speech silencioso em navegadores sem suporte
   }
+}
+
+// Voz robotizada e sinistra do antagonista Z3R0 para provocações e desafios
+export function speakZ3R0(text) {
+  if (!radioEnabled || isMuted()) return;
+  if (typeof window === 'undefined' || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+  if (document.documentElement.classList.contains('calm')) return;
+
+  try {
+    window.speechSynthesis.cancel();
+    try { sfx.zap(); } catch (e) {}
+
+    const translated = t(text);
+    const u = new SpeechSynthesisUtterance(translated);
+    const voices = window.speechSynthesis.getVoices();
+    const langPrefix = LANG === 'es' ? 'es' : LANG === 'en' ? 'en' : 'pt';
+    const langVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(langPrefix));
+
+    const maleNames = [
+      'daniel', 'felipe', 'ricardo', 'jorge', 'carlos', 'diego', 'enrique', 'pablo', 'miguel',
+      'david', 'mark', 'george', 'alex', 'fred', 'male', 'guy', 'luciano'
+    ];
+    let voice = langVoices.find(v => {
+      const n = (v.name || '').toLowerCase();
+      return maleNames.some(m => n.includes(m));
+    }) || langVoices[0];
+
+    if (voice) {
+      u.voice = voice;
+      u.lang = voice.lang;
+    } else {
+      u.lang = { pt: 'pt-BR', es: 'es-ES', en: 'en-US' }[LANG] || 'pt-BR';
+    }
+
+    // Configurações para voz grave, robótica e mecânica
+    u.pitch = 0.52;
+    u.rate = 0.92;
+    u.volume = 1.0;
+
+    window.speechSynthesis.speak(u);
+    lastSpeakTime = Date.now();
+  } catch (e) {}
 }

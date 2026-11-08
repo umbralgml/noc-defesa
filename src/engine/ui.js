@@ -104,8 +104,9 @@ export function damage(n, at) {
   const st = $('stage'); st.classList.remove('shk', 'overdrive'); void st.offsetWidth; st.classList.add('shk');
   if (at) floatTxt(at.x, at.y, n ? '-' + n + '%' : 'TREINO', n ? '#ff4d6d' : '#ffd166');
   toast(TAUNT[Math.random() * TAUNT.length | 0], false);
-  // Alerta motivacional de rádio quando erra
-  if (S.hp > 0 && (S.err === 1 || S.hp <= 40)) {
+  // Alerta motivacional de rádio em perigo real (apenas uma vez por queda crítica)
+  if (S.hp > 0 && S.hp <= 30 && !S.dangerWarned) {
+    S.dangerWarned = true;
     speakRadio(tr('Não desista!'));
   }
   // Iniciante/básico: depois do 2º erro, a dica da fase aparece sozinha no painel.
@@ -136,9 +137,8 @@ function comboBanner(m) {
   if (m >= 3) {
     const st = $('stage');
     if (st) st.classList.add('overdrive');
-    if (m === 3) speakRadio(tr('Incrível!'), { force: true });
-    else if (m === 4) speakRadio(tr('Continue assim!'), { force: true });
-    else if (m >= 5) speakRadio(tr('Excelente!'), { force: true });
+    if (m === 3) speakRadio(tr('Incrível!'));
+    else if (m === 5) speakRadio(tr('Excelente!'));
   }
   if (m >= 4) cyberConfetti({ count: 28 });
 }

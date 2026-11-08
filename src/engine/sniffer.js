@@ -5,6 +5,7 @@
 import { sfx, au } from './audio.js';
 import { openCircuitPuzzle } from './circuit.js';
 import { cyberConfetti } from './particles.js';
+import { speakZ3R0 } from './radio.js';
 import { t as tr } from './i18n.js';
 import { $ } from './util.js';
 
@@ -67,6 +68,7 @@ export function spawnPacket() {
     cyberConfetti({ count: 20, x: e.clientX, y: e.clientY });
     if (el.parentNode) el.parentNode.removeChild(el);
     activePacket = null;
+    speakZ3R0(tr('Acha que consegue decodificar meu pacote? Tente a sorte, analista!'));
     openCircuitPuzzle();
   });
 

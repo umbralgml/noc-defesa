@@ -69,7 +69,7 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
 
     if (isWalking) {
       try {
-        setTimeout(() => store('noc_walk_from', null), 2200);
+        setTimeout(() => store('noc_walk_from', null), 3500);
       } catch (e) {}
     }
 
@@ -194,7 +194,7 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
         heroTransform = '';
         const midY = (pFrom.y + pTo.y) / 2;
         const walkPath = `M ${pFrom.x} ${pFrom.y + 8} C ${pFrom.x} ${midY + 8}, ${pTo.x} ${midY + 8}, ${pTo.x} ${pTo.y + 8}`;
-        motionTag = `<animateMotion path="${walkPath}" dur="1.8s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" />`;
+        motionTag = `<animateMotion path="${walkPath}" dur="3.2s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" />`;
       }
 
       svg += `<g class="rpg-hero-token${isWalking ? ' rpg-hero-walking' : ''}" ${heroTransform}>

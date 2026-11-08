@@ -262,7 +262,6 @@ function finishIntro() {
   S.busy = false;
   if (L.boss || L.miniboss) speakRadio('Alerta crítico: Invasão do Z3R0 na rede.');
   else if (L.type === 'defense') speakRadio('Alerta de tráfego: configure o firewall.');
-  else if (Math.random() < 0.4) speakRadio('Bora pra cima! Turno ativo!');
   ENGINES[L.type](L);
   linkGloss($('stage').querySelector('.task'));
   startZ3r0(L);
@@ -355,18 +354,116 @@ function win() {
       ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}
       ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
       <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`); addReport();
-    $('mMap').onclick = () => { closeModal(); goMap(); };
     if (last) $('mShare').onclick = e => { const p = progress(); share(`${tr('Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️')}\n★ ${p.stars}/${p.max} ${tr('estrelas')} · ${fmt(p.pts)} pts\n${tr('Você segura a rede?')} ${siteURL()}`, e.currentTarget); };
-    if (more) $('mNext').onclick = () => {
-      closeModal();
-      if (isActEnd) {
-        showActTransition(L.act, nextL.act, () => brief(S.cur + 1));
-      } else {
-        brief(S.cur + 1);
-      }
-    };
-    else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
+    if (more) {
+      let autoTimer = null;
+      const doNext = () => {
+        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+        transitionToNextLevel(S.cur, S.cur + 1, xr);
+      };
+      $('mNext').onclick = doNext;
+      // Auto-avanço com transição de caminhada após 4.5 segundos se o jogador apenas assistir
+      autoTimer = setTimeout(() => {
+        if ($('modal')?.classList.contains('on') && $('mNext')) {
+          doNext();
+        }
+      }, 4500);
+      $('mMap').onclick = () => {
+        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+        closeModal();
+        goMap();
+      };
+    } else {
+      $('mMap').onclick = () => { closeModal(); goMap(); };
+      $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
+    }
   }, delay);
+}
+
+// Transição dinâmica de 3-4 segundos com o analista caminhando pela fibra 3D até o próximo nó
+export function transitionToNextLevel(fromIdx, toIdx, xr) {
+  closeModal();
+  cleanup();
+  store('noc_walk_from', fromIdx);
+  renderMap();
+  show('map');
+  music('menu');
+
+  const fromL = LEVELS[fromIdx];
+  const toL = LEVELS[toIdx];
+  if (!toL) {
+    goMap();
+    return;
+  }
+
+  const r = rankOf();
+  const isActEnd = toL.act !== fromL.act;
+
+  // Garante foco e centralização no nó de destino no mapa 3D
+  requestAnimationFrame(() => {
+    const toNode = $('mapList')?.querySelector(`.node[data-i="${toIdx}"]`);
+    if (toNode) toNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // Cria e anexa o HUD de subida de nível e avanço no plantão
+  const oldOverlay = $('lvlTransOverlay');
+  if (oldOverlay) oldOverlay.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'level-transition-overlay';
+  overlay.id = 'lvlTransOverlay';
+  overlay.innerHTML = `
+    <div class="lto-content">
+      <div class="lto-badge">⚡ ${tr('SUBINDO DE NÍVEL · AVANÇANDO NO PLANTÃO')}</div>
+      <div class="lto-rank-wrap">
+        <span class="lto-rank-icon">🎖️</span>
+        <div class="lto-rank-info">
+          <b class="lto-rank-title">${r.name}</b>
+          <span class="lto-rank-xp">${r.v} XP · ${r.pct}% ${tr('para o próximo cargo')}</span>
+        </div>
+      </div>
+      <div class="lto-bar"><div class="lto-bar-fill"></div></div>
+      <div class="lto-route">
+        <span class="lto-from">✓ ${num(fromIdx)}. ${fromL.title}</span>
+        <span class="lto-arr">➔</span>
+        <span class="lto-to">⚡ ${num(toIdx)}. ${toL.title}</span>
+      </div>
+      <button class="btn ghostb lto-skip-btn" id="ltoSkipBtn" type="button">${tr('AVANÇAR AGORA ➔')}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    const bar = overlay.querySelector('.lto-bar-fill');
+    if (bar) bar.style.width = '100%';
+  });
+
+  // Passos do analista caminhando pela fibra óptica
+  sfx.sel();
+  for (let k = 1; k <= 6; k++) {
+    setTimeout(() => { try { sfx.step(); } catch (e) {} }, k * 450);
+  }
+
+  let finished = false;
+  const proceed = () => {
+    if (finished) return;
+    finished = true;
+    overlay.classList.add('lto-fade');
+    setTimeout(() => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (isActEnd) {
+        showActTransition(fromL.act, toL.act, () => brief(toIdx));
+      } else {
+        brief(toIdx);
+      }
+    }, 320);
+  };
+
+  const skipBtn = overlay.querySelector('#ltoSkipBtn');
+  if (skipBtn) skipBtn.onclick = () => { au(); proceed(); };
+
+  // Avança automaticamente após 3.4 segundos (3-4 segundos conforme solicitado)
+  setTimeout(proceed, 3400);
 }
 // Botão de reportar erro no fim da fase, acima dos botões do modal.
 function addReport() {

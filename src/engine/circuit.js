@@ -6,8 +6,8 @@ import { t as tr } from './i18n.js';
 import { sfx, au } from './audio.js';
 import { cyberConfetti } from './particles.js';
 import { addXP } from './career.js';
-import { speakRadio } from './radio.js';
-import { S } from './state.js';
+import { speakRadio, speakZ3R0 } from './radio.js';
+import { S, progress } from './state.js';
 import { setHP, modal, closeModal } from './ui.js';
 import { $ } from './util.js';
 
@@ -18,14 +18,20 @@ import { $ } from './util.js';
 // 'T': junção [3, 0, 1] (0: L-U-R, 1: U-R-D, 2: R-D-L, 3: D-L-U)
 // 'B': bloqueador (chip inativo) []
 
+// Puzzles com escala progressiva de dificuldade divididos em 4 Tiers:
+// Tier 1 (Iniciante): Malha 3x3 direta com 1 bloqueador
+// Tier 2 (Intermediário): Malha 3x3 com 2 bloqueadores e rotas em U
+// Tier 3 (Avançado): Malha 3x3 com bifurcações T e nós com loop STP
+// Tier 4 (Especialista): Malha expandida 4x3 com múltiplos bloqueadores e rotas longas
 const PUZZLES = [
+  // --- TIER 1: Introdutório ---
   {
+    tier: 1,
     name: 'Bypass de Roteamento SYN-ACK',
     desc: 'Alinhe os circuitos para conduzir o pacote interceptado até o buffer de decodificação.',
     cols: 3, rows: 3,
-    in: { r: 1, c: 0, side: 3 }, // Entra pela esquerda no meio (cell 3)
-    out: { r: 1, c: 2, side: 1 }, // Sai pela direita no meio (cell 5)
-    // Caminho da solução: 3(L:3,0) -> 0(L:1,2) -> 1(I:1,3) -> 2(L:2,3) -> 5(L:0,1)
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 2, side: 1 },
     grid: [
       { t: 'L', sol: 1 }, { t: 'I', sol: 1 }, { t: 'L', sol: 2 },
       { t: 'L', sol: 3 }, { t: 'B', sol: 0 }, { t: 'L', sol: 0 },
@@ -33,25 +39,27 @@ const PUZZLES = [
     ]
   },
   {
+    tier: 1,
     name: 'Túnel de Enlace BGP Seguro',
     desc: 'Restaure o circuito da rota para fechar o emparelhamento com o sistema autônomo.',
     cols: 3, rows: 3,
-    in: { r: 1, c: 0, side: 3 }, // Entra pela esquerda no meio (cell 3)
-    out: { r: 1, c: 2, side: 1 }, // Sai pela direita no meio (cell 5)
-    // Caminho da solução: 3(L:2,3) -> 6(L:0,1) -> 7(I:1,3) -> 8(L:3,0) -> 5(L:1,2)
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 2, side: 1 },
     grid: [
       { t: 'L', sol: 1 }, { t: 'I', sol: 1 }, { t: 'L', sol: 2 },
       { t: 'L', sol: 2 }, { t: 'B', sol: 0 }, { t: 'L', sol: 1 },
       { t: 'L', sol: 0 }, { t: 'I', sol: 1 }, { t: 'L', sol: 3 }
     ]
   },
+
+  // --- TIER 2: Intermediário ---
   {
+    tier: 2,
     name: 'Decodificador de Header RPKI',
     desc: 'Complete a ponte lógica para validar a assinatura ROA da rota de borda.',
     cols: 3, rows: 3,
-    in: { r: 1, c: 0, side: 3 }, // Entra pela esquerda no meio (cell 3)
-    out: { r: 1, c: 2, side: 1 }, // Sai pela direita no meio (cell 5)
-    // Caminho da solução: 3(L:3,0) -> 0(L:1,2) -> 1(L:2,3) -> 4(L:0,1) -> 5(I:1,3)
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 2, side: 1 },
     grid: [
       { t: 'L', sol: 1 }, { t: 'L', sol: 2 }, { t: 'B', sol: 0 },
       { t: 'L', sol: 3 }, { t: 'L', sol: 0 }, { t: 'I', sol: 1 },
@@ -59,12 +67,27 @@ const PUZZLES = [
     ]
   },
   {
+    tier: 2,
+    name: 'Alinhador de Rota Anycast DNS',
+    desc: 'Ajuste os enlaces para direcionar a consulta DNS até o nó Anycast mais próximo.',
+    cols: 3, rows: 3,
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 2, side: 1 },
+    grid: [
+      { t: 'B', sol: 0 }, { t: 'I', sol: 0 }, { t: 'B', sol: 0 },
+      { t: 'L', sol: 2 }, { t: 'L', sol: 1 }, { t: 'I', sol: 1 },
+      { t: 'L', sol: 0 }, { t: 'L', sol: 3 }, { t: 'I', sol: 0 }
+    ]
+  },
+
+  // --- TIER 3: Avançado ---
+  {
+    tier: 3,
     name: 'Mitigação de Loop STP',
     desc: 'Gire os segmentos para desviar o fluxo do nó corrompido e restabelecer o link root.',
     cols: 3, rows: 3,
-    in: { r: 1, c: 0, side: 3 }, // Entra pela esquerda no meio (cell 3)
-    out: { r: 1, c: 2, side: 1 }, // Sai pela direita no meio (cell 5)
-    // Caminho: 3(L:2,3) -> 6(L:0,1) -> 7(T:3,0,1) -> 4(I:0,2) -> 1(L:1,2) -> 2(L:2,3) -> 5(L:0,1)
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 2, side: 1 },
     grid: [
       { t: 'B', sol: 0 }, { t: 'L', sol: 1 }, { t: 'L', sol: 2 },
       { t: 'L', sol: 2 }, { t: 'I', sol: 0 }, { t: 'L', sol: 0 },
@@ -72,19 +95,64 @@ const PUZZLES = [
     ]
   },
   {
+    tier: 3,
+    name: 'Filtro Anti-Spoofing uRPF',
+    desc: 'Conecte o circuito de verificação reversa para descartar pacotes com IP forjado.',
+    cols: 3, rows: 3,
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 2, side: 1 },
+    grid: [
+      { t: 'L', sol: 1 }, { t: 'T', sol: 2 }, { t: 'B', sol: 0 },
+      { t: 'L', sol: 3 }, { t: 'L', sol: 0 }, { t: 'I', sol: 1 },
+      { t: 'B', sol: 0 }, { t: 'L', sol: 1 }, { t: 'L', sol: 2 }
+    ]
+  },
+
+  // --- TIER 4: Especialista / Endgame ---
+  {
+    tier: 4,
     name: 'Buffer de Desfragmentação MTU',
     desc: 'Conecte o canal de reordenação de pacotes para evitar descarte por MSS inconsistente.',
     cols: 4, rows: 3,
-    in: { r: 1, c: 0, side: 3 }, // Entra pela esquerda no meio (cell 4)
-    out: { r: 1, c: 3, side: 1 }, // Sai pela direita no meio (cell 7)
-    // Caminho: 4(L:3,0) -> 0(L:1,2) -> 1(I:1,3) -> 2(I:1,3) -> 3(L:2,3) -> 7(L:0,1)
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 3, side: 1 },
     grid: [
       { t: 'L', sol: 1 }, { t: 'I', sol: 1 }, { t: 'I', sol: 1 }, { t: 'L', sol: 2 },
       { t: 'L', sol: 3 }, { t: 'B', sol: 0 }, { t: 'B', sol: 0 }, { t: 'L', sol: 0 },
       { t: 'I', sol: 1 }, { t: 'L', sol: 1 }, { t: 'I', sol: 0 }, { t: 'L', sol: 3 }
     ]
+  },
+  {
+    tier: 4,
+    name: 'Canal de Mitigação DDoS Scrubbing',
+    desc: 'Encaminhe o tráfego volumétrico pela matriz de filtragem antes do enlace central.',
+    cols: 4, rows: 3,
+    in: { r: 1, c: 0, side: 3 },
+    out: { r: 1, c: 3, side: 1 },
+    grid: [
+      { t: 'B', sol: 0 }, { t: 'I', sol: 0 }, { t: 'B', sol: 0 }, { t: 'L', sol: 1 },
+      { t: 'L', sol: 2 }, { t: 'B', sol: 0 }, { t: 'L', sol: 1 }, { t: 'I', sol: 1 },
+      { t: 'L', sol: 0 }, { t: 'I', sol: 1 }, { t: 'L', sol: 3 }, { t: 'B', sol: 0 }
+    ]
   }
 ];
+
+function getPuzzleForProgress() {
+  let done = 0;
+  try {
+    const p = progress();
+    done = p ? (p.done || 0) : 0;
+  } catch (e) {}
+
+  let targetTier = 1;
+  if (done >= 40) targetTier = 4;
+  else if (done >= 22) targetTier = 3;
+  else if (done >= 8) targetTier = 2;
+  else targetTier = 1;
+
+  const tierPuzzles = PUZZLES.filter(pz => pz.tier === targetTier);
+  return (tierPuzzles.length ? tierPuzzles[Math.floor(Math.random() * tierPuzzles.length)] : null) || PUZZLES[0];
+}
 
 const BASE_PORTS = {
   I: [0, 2],
@@ -100,7 +168,7 @@ export function openCircuitPuzzle() {
   // Congela cronômetros de perguntas e modos de tempo enquanto o minigame estiver aberto
   S.paused = true;
 
-  const pz = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+  const pz = getPuzzleForProgress();
   let solved = false;
 
   // Estado das rotações atuais (embaralha a solução inicial)
@@ -292,7 +360,7 @@ export function openCircuitPuzzle() {
         S.hp = Math.min(100, S.hp + 15);
         setHP();
       }
-      speakRadio(tr('Excelente! Circuito restaurado com perfeição!'), { force: true });
+      speakZ3R0(tr('Eu vou voltar!'));
 
       const actEl = $('circActions');
       if (actEl) actEl.hidden = false;

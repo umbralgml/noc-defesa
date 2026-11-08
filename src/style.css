@@ -479,7 +479,7 @@ button{font-family:inherit;cursor:pointer}
   50% { transform: translate(0, -2.5px); }
 }
 .rpg-pin-delayed {
-  animation: pinDrop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.8s backwards;
+  animation: pinDrop 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3.1s backwards;
 }
 @keyframes pinDrop {
   0% { transform: translateY(-28px) scale(0.2); opacity: 0; }
@@ -554,6 +554,134 @@ button{font-family:inherit;cursor:pointer}
 @keyframes ptsFlow {
   0% { left: -30%; }
   100% { left: 100%; }
+}
+
+/* ---------- Overlay de Transição de Nível com Caminhada do Analista (3-4s) ---------- */
+.level-transition-overlay {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 440px;
+  z-index: 120;
+  pointer-events: auto;
+  animation: ltoSlideDown 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.level-transition-overlay.lto-fade {
+  opacity: 0;
+  transform: translate(-50%, -18px);
+  pointer-events: none;
+}
+@keyframes ltoSlideDown {
+  from { opacity: 0; transform: translate(-50%, -24px) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.lto-content {
+  background: rgba(8, 18, 32, 0.94);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(0, 240, 255, 0.25);
+  border-radius: 16px;
+  padding: 14px 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lto-badge {
+  font-family: Orbitron, monospace;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #00f0ff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lto-rank-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(14, 30, 52, 0.65);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 224, 168, 0.3);
+}
+.lto-rank-icon {
+  font-size: 24px;
+}
+.lto-rank-info {
+  display: flex;
+  flex-direction: column;
+}
+.lto-rank-title {
+  font-family: Orbitron, monospace;
+  font-size: 13px;
+  color: #00e0a8;
+  font-weight: 700;
+}
+.lto-rank-xp {
+  font-size: 11px;
+  color: #8da4c4;
+}
+.lto-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.lto-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00e0a8, #00f0ff);
+  box-shadow: 0 0 10px #00f0ff;
+  transition: width 3.2s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+.lto-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #c8d8ea;
+}
+.lto-from {
+  color: #00e0a8;
+  font-weight: 600;
+  max-width: 44%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lto-arr {
+  color: #00f0ff;
+  font-weight: bold;
+}
+.lto-to {
+  color: #ffd166;
+  font-weight: 700;
+  max-width: 44%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lto-skip-btn {
+  margin-top: 2px;
+  padding: 7px 14px;
+  font-size: 11px;
+  border-color: rgba(0, 240, 255, 0.4);
+  color: #00f0ff;
+  width: 100%;
+  text-align: center;
+  background: rgba(0, 240, 255, 0.08);
+}
+.lto-skip-btn:hover {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: #00f0ff;
 }
 
 /* ---------- Inter-Act Gateway ---------- */

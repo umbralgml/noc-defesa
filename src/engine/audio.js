@@ -1,7 +1,7 @@
 // Som 100% sintetizado com Web Audio: efeitos (sfx) e um sequenciador de música simples.
 // Nada é tocado antes de au() ser chamado num gesto do usuário (política de autoplay).
 
-let AC = null, MASTER, MUSG, SFXG, DLY, muted = false;
+let AC = null, MASTER, MUSG, SFXG, DLY, GTR_BUS = null, muted = false;
 try { muted = localStorage.getItem('noc_mute') === '1'; } catch (e) {}
 export function au() {
   if (!AC) {
@@ -10,11 +10,12 @@ export function au() {
       const comp = AC.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4;
       MASTER = AC.createGain(); MASTER.gain.value = muted ? 0 : 0.9;
       MASTER.connect(comp); comp.connect(AC.destination);
-      MUSG = AC.createGain(); MUSG.gain.value = 0.32; MUSG.connect(MASTER);
+      MUSG = AC.createGain(); MUSG.gain.value = 0.38; MUSG.connect(MASTER);
       SFXG = AC.createGain(); SFXG.gain.value = 1; SFXG.connect(MASTER);
       DLY = AC.createDelay(); DLY.delayTime.value = 0.19;
       const fb = AC.createGain(); fb.gain.value = 0.32; const wet = AC.createGain(); wet.gain.value = 0.3;
       DLY.connect(fb); fb.connect(DLY); DLY.connect(wet); wet.connect(MASTER);
+      initGuitarBus();
     } catch (e) { AC = null; }
   } else if (AC.state === 'suspended') AC.resume();
 }
@@ -58,8 +59,35 @@ export const sfx = {
 };
 
 // ---------- Rock'n'Roll Music Engine ----------
-// Síntese de guitarras overdrive (power chords com afinação de 5ª e 8ª), baixo encorpado,
-// bateria rock (kick pesado, caixa acústica com esteira e pratos) e solos de guitarra pentatônicos.
+// Síntese de guitarras overdrive (power chords com afinação de 5ª e 8ª), amplificador valvulado,
+// baixo encorpado, bateria rock pesada (kick punchy, caixa com esteira e pratos) e solos pentatônicos.
+
+function makeDistCurve(k = 28) {
+  const n = 4096, curve = new Float32Array(n), deg = Math.PI / 180;
+  for (let i = 0; i < n; ++i) {
+    const x = (i * 2) / n - 1;
+    curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+  }
+  return curve;
+}
+
+function initGuitarBus() {
+  if (!AC || GTR_BUS) return;
+  try {
+    const gIn = AC.createGain();
+    const drv = AC.createGain(); drv.gain.value = 1.8;
+    const ws = AC.createWaveShaper(); ws.curve = makeDistCurve(28); ws.oversample = '2x';
+    // Gabinete de guitarra 4x12 (corte de frequências acima de 4200Hz para som quente e encorpado)
+    const cab = AC.createBiquadFilter(); cab.type = 'lowpass'; cab.frequency.value = 4200; cab.Q.value = 1.2;
+    // Boost de médios agressivos (1600Hz)
+    const mid = AC.createBiquadFilter(); mid.type = 'peaking'; mid.frequency.value = 1600; mid.gain.value = 4; mid.Q.value = 1.0;
+    const gOut = AC.createGain(); gOut.gain.value = 0.55;
+    gIn.connect(drv); drv.connect(ws); ws.connect(cab); cab.connect(mid); mid.connect(gOut); gOut.connect(MUSG);
+    GTR_BUS = gIn;
+  } catch (e) {
+    GTR_BUS = MUSG;
+  }
+}
 
 const SONGS = {
   menu: {
@@ -86,45 +114,84 @@ const SONGS = {
 const ROCK_LICK_1 = [0, null, 3, null, 5, 7, 5, null, 10, null, 12, 10, 7, 5, 3, 0];
 const ROCK_LICK_2 = [12, null, 10, 12, null, 15, 12, null, 10, 7, 5, 3, 5, null, 7, null];
 
-function rockGuitar(root, dur, at, isMute = false, vol = 0.075) {
+function rockGuitar(root, dur, at, isMute = false, vol = 0.12) {
   if (!AC) return;
+  if (!GTR_BUS) initGuitarBus();
+  const bus = GTR_BUS || MUSG;
+
   const f1 = mtof(root);
   const f2 = mtof(root + 7);  // 5ª justa
   const f3 = mtof(root + 12); // Oitava
-  const d = isMute ? dur * 0.45 : dur * 0.95;
-  const v = isMute ? vol * 0.65 : vol;
+  const d = isMute ? dur * 0.48 : dur * 0.98;
+  const v = isMute ? vol * 0.7 : vol;
 
-  // Duplo sawtooth com leve desvio de afinação (micro-detune) criando distorção natural de amplificador valvulado
-  osc(f1, d, { type: 'sawtooth', v: v * 0.45, at, bus: MUSG, att: 0.003, det: -4 });
-  osc(f2, d, { type: 'sawtooth', v: v * 0.40, at, bus: MUSG, att: 0.003, det: 5 });
-  osc(f3, d, { type: 'sawtooth', v: v * 0.35, at, bus: MUSG, att: 0.003, det: -2 });
+  // Duplo sawtooth com micro-detune para emular cordas duplas e distorção analógica
+  osc(f1, d, { type: 'sawtooth', v: v * 0.48, at, bus, att: 0.002, det: -4 });
+  osc(f2, d, { type: 'sawtooth', v: v * 0.44, at, bus, att: 0.002, det: 5 });
+  osc(f3, d, { type: 'sawtooth', v: v * 0.38, at, bus, att: 0.002, det: -2 });
 
   if (!isMute) {
-    // Harmônico de drive para morder a mix
-    osc(f1 * 2, d * 0.5, { type: 'sawtooth', v: v * 0.18, at, bus: MUSG, att: 0.004 });
+    // Harmônico de palhetada aberta para dar mordente à guitarra
+    osc(f1 * 2, d * 0.4, { type: 'sawtooth', v: v * 0.22, at, bus, att: 0.003 });
   }
 }
 
-function rockSnare(at, vol = 0.16) {
+function rockSnare(at, vol = 0.28) {
   if (!AC) return;
-  // Impacto de tambor acústico (grave que cai rápido)
-  osc(185, 0.11, { type: 'triangle', v: vol * 0.7, sl: -100, at, bus: MUSG });
-  // Esteira de metal de alta frequência
-  noise(0.16, { v: vol * 0.85, type: 'bandpass', f: 2200, q: 0.85, at, bus: MUSG });
+  // Impacto do tambor da caixa (queda rápida de 240Hz para 92Hz)
+  osc(240, 0.11, { type: 'triangle', v: vol * 0.75, sl: -148, at, bus: MUSG });
+  // Crack e esteira metálica de alta presença
+  noise(0.03, { v: vol * 0.65, type: 'highpass', f: 1200, at, bus: MUSG });
+  noise(0.18, { v: vol * 0.9, type: 'bandpass', f: 2400, q: 0.9, at, bus: MUSG });
 }
 
-function rockBass(root, dur, at, vol = 0.11) {
+function rockKick(at, v = 0.62) {
+  if (!AC) return;
+  // Sub-bass thump (drop potente de 175Hz para 42Hz)
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(175, at);
+  o.frequency.exponentialRampToValueAtTime(42, at + 0.12);
+  g.gain.setValueAtTime(v * 0.9, at);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
+  o.connect(g); g.connect(MUSG);
+  o.start(at); o.stop(at + 0.25);
+
+  // Beater click (impacto do pedal na pele do bumbo)
+  noise(0.025, { v: v * 0.45, type: 'bandpass', f: 2800, q: 2, at, bus: MUSG });
+}
+
+function rockHiHat(at, isAccent = false) {
+  if (!AC) return;
+  noise(isAccent ? 0.055 : 0.035, {
+    v: isAccent ? 0.09 : 0.05,
+    type: 'highpass',
+    f: isAccent ? 6500 : 8000,
+    at,
+    bus: MUSG
+  });
+}
+
+function rockCrash(at, vol = 0.26) {
+  if (!AC) return;
+  noise(0.65, { v: vol, type: 'highpass', f: 3800, at, bus: MUSG });
+  noise(0.45, { v: vol * 0.5, type: 'bandpass', f: 7200, q: 1.2, at, bus: MUSG });
+}
+
+function rockBass(root, dur, at, vol = 0.13) {
   if (!AC) return;
   const f = mtof(root - 12); // oitava grave
-  osc(f, dur * 0.85, { type: 'sawtooth', v: vol * 0.45, at, bus: MUSG, att: 0.004 });
-  osc(f, dur * 0.95, { type: 'sine', v: vol * 0.75, at, bus: MUSG, att: 0.005 });
+  osc(f, dur * 0.88, { type: 'sawtooth', v: vol * 0.52, at, bus: MUSG, att: 0.003 });
+  osc(f, dur * 0.96, { type: 'sine', v: vol * 0.82, at, bus: MUSG, att: 0.004 });
 }
 
-function rockLead(note, dur, at, vol = 0.045) {
+function rockLead(note, dur, at, vol = 0.085) {
   if (!AC) return;
+  if (!GTR_BUS) initGuitarBus();
+  const bus = GTR_BUS || MUSG;
   const f = mtof(note);
-  osc(f, dur * 1.1, { type: 'sawtooth', v: vol * 0.75, at, bus: MUSG, echo: true, att: 0.008, det: 3 });
-  osc(f, dur * 1.1, { type: 'square', v: vol * 0.30, at, bus: MUSG, echo: true, att: 0.01, det: -3 });
+  osc(f, dur * 1.15, { type: 'sawtooth', v: vol * 0.85, at, bus, echo: true, att: 0.006, det: 4 });
+  osc(f, dur * 1.15, { type: 'square', v: vol * 0.35, at, bus, echo: true, att: 0.008, det: -4 });
 }
 
 export const MUS = { cur: null, step: 0, next: 0, timer: null };
@@ -146,42 +213,44 @@ function schedule() {
     const st = s % 16;        // semicolcheia de 0 a 15 no compasso
     const root = sg.prog[bar];
 
-    // 1. Bateria Rock
+    // 1. Bateria Rock Pesada (Kick, Snare, HiHat, Crash)
     // Kick drum: padrão dinâmico de rock
     if (sg.style === 'metal') {
-      if (st === 0 || st === 2 || st === 6 || st === 8 || st === 10 || st === 14) kick(t, 0.52);
+      if (st === 0 || st === 2 || st === 6 || st === 8 || st === 10 || st === 14) rockKick(t, 0.65);
     } else if (sg.style === 'hard') {
-      if (st === 0 || st === 2 || st === 8 || st === 10) kick(t, 0.48);
+      if (st === 0 || st === 3 || st === 8 || st === 10) rockKick(t, 0.60);
     } else {
-      if (st === 0 || st === 6 || st === 8) kick(t, 0.44);
+      if (st === 0 || st === 6 || st === 8 || st === 11) rockKick(t, 0.55);
     }
 
-    // Caixa de Rock nos tempos 4 e 12 (backbeat)
+    // Caixa de Rock nos tempos 4 e 12 (backbeat) + ghost note no 15 em compassos ímpares
     if (st === 4 || st === 12) {
-      rockSnare(t, sg.style === 'metal' ? 0.22 : 0.18);
+      rockSnare(t, sg.style === 'metal' ? 0.32 : 0.26);
+    } else if (st === 15 && bar % 2 === 1) {
+      rockSnare(t, 0.12);
     }
 
-    // Prato de condução / Chimbau em colcheias
+    // Prato de condução / Chimbau em colcheias com acentuação
     if (st % 2 === 0) {
       const isAccent = st === 2 || st === 6 || st === 10 || st === 14;
-      noise(0.04, { v: isAccent ? 0.06 : 0.035, f: 7500, at: t, bus: MUSG });
+      rockHiHat(t, isAccent);
     }
 
-    // Crash no primeiro tempo da primeira barra
+    // Crash no primeiro tempo da primeira barra de cada ciclo
     if (bar === 0 && st === 0) {
-      noise(0.45, { v: 0.12, type: 'highpass', f: 4500, at: t, bus: MUSG });
+      rockCrash(t, 0.28);
     }
 
     // 2. Contrabaixo Rock (P-Bass)
     if (st % 2 === 0) {
       const bassNote = (st === 14) ? root + 7 : (st === 6 ? root + 12 : root);
-      rockBass(bassNote, sd * 1.8, t, 0.12);
+      rockBass(bassNote, sd * 1.8, t, 0.13);
     }
 
-    // 3. Guitarra Base (Power Chords com distorção e palm-mute chugs)
+    // 3. Guitarra Base (Power Chords com overdrive e palm-mute chugs)
     const isChug = (st !== 0 && st !== 4 && st !== 12);
     if (st % 2 === 0) {
-      rockGuitar(root, sd * 1.8, t, isChug, 0.08);
+      rockGuitar(root, sd * 1.8, t, isChug, 0.12);
     }
 
     // 4. Guitarra Solo / Riff de Rock (nos compassos ímpares)
@@ -189,7 +258,7 @@ function schedule() {
       const lick = (bar === 1) ? ROCK_LICK_1 : ROCK_LICK_2;
       const noteRel = lick[st];
       if (noteRel !== null) {
-        rockLead(root + 12 + noteRel, sd * 1.4, t, 0.05);
+        rockLead(root + 12 + noteRel, sd * 1.4, t, 0.085);
       }
     }
 
