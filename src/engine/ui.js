@@ -7,6 +7,8 @@ import { unlock } from './ach.js';
 import { S, diffOf } from './state.js';
 import { findGloss } from './glossary.js';
 import { cyberConfetti } from './particles.js';
+import { speakRadio } from './radio.js';
+import { t as tr } from './i18n.js';
 
 // Ganchos preenchidos por game.js (win, fail) e daily.js (map). Quem chama não precisa importar quem trata.
 export const flow = { win() {}, fail() {}, map() {}, room() {}, train() {}, acad() {}, study() {}, arcade() {}, good() {}, report: null };
@@ -99,7 +101,7 @@ export function damage(n, at) {
   if (S.practice) n = 0;   // treino sem pressão: o erro conta, mas não tira integridade
   S.err++; S.streak = 0; S.hp = Math.max(0, S.hp - n); setHP(); setScore();
   sfx.bad(); if (S.hp <= 40) setTimeout(sfx.siren, 250); buzz(90); sceneFx('alarm', 900); heroState('hit', 450); vignette('bad');
-  const st = $('stage'); st.classList.remove('shk'); void st.offsetWidth; st.classList.add('shk');
+  const st = $('stage'); st.classList.remove('shk', 'overdrive'); void st.offsetWidth; st.classList.add('shk');
   if (at) floatTxt(at.x, at.y, n ? '-' + n + '%' : 'TREINO', n ? '#ff4d6d' : '#ffd166');
   toast(TAUNT[Math.random() * TAUNT.length | 0], false);
   // Iniciante/básico: depois do 2º erro, a dica da fase aparece sozinha no painel.
@@ -127,6 +129,12 @@ function comboBanner(m) {
   const el = document.createElement('div'); el.className = 'combob'; el.textContent = `COMBO x${m}!`;
   $('fx').append(el); setTimeout(() => el.remove(), 1100);
   sfx.combo(m); vignette('good');
+  if (m >= 3) {
+    const st = $('stage');
+    if (st) st.classList.add('overdrive');
+    if (m === 3) speakRadio(tr('Modo Overdrive ativado! Foco máximo na mitigação.'));
+    else if (m >= 5) speakRadio(tr('Defesa impenetrável! Combo máximo alcançado.'));
+  }
   if (m >= 4) cyberConfetti({ count: 28 });
 }
 export const stars = () => S.err === 0 ? 3 : S.err <= 2 ? 2 : 1;

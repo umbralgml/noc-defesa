@@ -13,7 +13,7 @@ import { addXP, xpHTML } from './career.js';
 import { unlock } from './ach.js';
 import { rng, sh, GEN } from './gen.js';
 
-const START = '2026-10-01', N = 5, TIME = 20;
+const START = '2026-10-01', N = 5, TIME = 35;
 
 // Data no fuso de Brasília (sem horário de verão desde 2019: UTC-3 fixo).
 export const today = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
@@ -40,7 +40,7 @@ export function startDaily(ch) {
   const official = d === today() && !playedToday;
   modal(`<div class="tag">${ch ? '⚔️ DESAFIO DE UM COLEGA' : 'DESAFIO DIÁRIO'} #${dayNum(d)}</div><h2>${ch ? 'Bate esse placar?' : 'Plantão relâmpago'}</h2>
     ${ch ? `<div class="vs"><b class="vsn"></b> fez <span class="dgrid sm">${grid({ log: ch.g })}</span> <b>${ch.h}/${N} · ${fmt(ch.p)} pts</b></div>` : ''}
-    <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>Cinco perguntas, vinte segundos cada${ch ? ', as mesmas que o seu colega pegou' : ', um placar por dia'}. Quero ver se você é rápido.</div></div>
+    <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>Cinco perguntas, 35 segundos cada${ch ? ', as mesmas que o seu colega pegou' : ', um placar por dia'}. Quero ver se você é rápido.</div></div>
     <div class="lesson"><span class="lh">REGRAS</span><ul>
       <li>${ch ? `As mesmas <b>${N} perguntas</b> do desafio #${dayNum(d)}.` : `As mesmas <b>${N} perguntas</b> para todo mundo hoje.`}</li>
       <li><b>${TIME} segundos</b> por pergunta. O relógio para enquanto você lê a explicação.</li>
