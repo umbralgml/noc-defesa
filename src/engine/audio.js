@@ -60,214 +60,212 @@ export const sfx = {
   glitch() { if (!AC) return; const t = AC.currentTime; osc(180, .2, { type: 'sawtooth', v: .08, sl: -100, at: t }); osc(90, .22, { type: 'square', v: .06, sl: -45, at: t }); noise(.14, { v: .07, type: 'bandpass', f: 850, q: 3, at: t }); }
 };
 
-// ---------- Rock'n'Roll Music Engine ----------
-// Síntese de guitarras overdrive (power chords com afinação de 5ª e 8ª), amplificador valvulado,
-// baixo encorpado, bateria rock pesada (kick punchy, caixa com esteira e pratos) e solos pentatônicos.
+// ---------- Banda de rock sintetizada ----------
+// Guitarra: corda dedilhada por Karplus-Strong (ruído que vira nota num laço com atraso), duas guitarras
+// gravadas em L e R, distorção valvulada e simulação de caixa 4x12. Baixo também em Karplus-Strong.
+// Bateria: bumbo, caixa com esteira, chimbal e pratos metálicos (osciladores em razão inarmônica) e sala.
+// Quatro músicas originais, uma por clima: menu (hino lento), classic (hard rock), gallop (galope de
+// heavy metal com guitarras gêmeas) e boss (riff de pedal em semicolcheias, para chefe, quiz e fase difícil).
 
-function makeDistCurve(k = 28) {
-  const n = 4096, curve = new Float32Array(n), deg = Math.PI / 180;
-  for (let i = 0; i < n; ++i) {
-    const x = (i * 2) / n - 1;
-    curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+let GTR = null, LEAD = null, BASS = null, DRUM = null, VERB = null;
+const KS = new Map();
+
+// Corda dedilhada: guarda um buffer por nota (gerado uma vez só).
+// Atraso fracionário (interpolado) no laço: a nota sai afinada sem mexer na velocidade de reprodução.
+function ksRaw(m, len, decay, sr) {
+  const D = sr / mtof(m) - .5, N = Math.floor(D), fr = D - N, d = new Float32Array(len);
+  let p = 0; for (let i = 0; i < N + 2 && i < len; i++) { p = p * .5 + (Math.random() * 2 - 1) * .5; d[i] = p; }   // palhetada: ruído levemente filtrado
+  for (let i = N + 2; i < len; i++) {   // média de duas amostras (perde agudos como a corda) lidas no atraso exato D
+    const y0 = d[i - N] * (1 - fr) + d[i - N - 1] * fr, y1 = d[i - N - 1] * (1 - fr) + d[i - N - 2] * fr;
+    d[i] = decay * .5 * (y0 + y1);
   }
-  return curve;
+  return d;
 }
+function ksBuf(m, dur = 1.8, decay = .996) {
+  const k = `${m}|${dur}|${decay}`; if (KS.has(k)) return KS.get(k);
+  const sr = AC.sampleRate, len = Math.floor(sr * dur), b = AC.createBuffer(1, len, sr);
+  b.copyToChannel(ksRaw(m, len, decay, sr), 0);
+  const v = { b, rate: 1 }; KS.set(k, v); return v;
+}
+// Power chord já mixado (tônica, quinta, oitava, com a palhetada descendo pelas cordas): uma fonte por guitarra.
+function ksChord(r, mute) {
+  const k = `c${r}|${mute}`; if (KS.has(k)) return KS.get(k);
+  const sr = AC.sampleRate, len = Math.floor(sr * (mute ? .5 : 2.2)), b = AC.createBuffer(1, len, sr), out = b.getChannelData(0);
+  [0, 7, 12].forEach((n, j) => { const off = Math.floor(j * .006 * sr), d = ksRaw(r + n, len - off, mute ? .985 : .997, sr), v = j === 2 ? .6 : .85; for (let i = 0; i < d.length; i++) out[i + off] += d[i] * v; });
+  const v = { b, rate: 1 }; KS.set(k, v); return v;
+}
+function shaper(k) { const c = new Float32Array(2048); for (let i = 0; i < 2048; i++) { const x = i / 1024 - 1; c[i] = Math.tanh(k * x) / Math.tanh(k); } return c; }
+function chain(nodes) { for (let i = 0; i < nodes.length - 1; i++) nodes[i].connect(nodes[i + 1]); return nodes[0]; }
+function bq(type, f, q = .7, gain = 0) { const b = AC.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; b.gain.value = gain; return b; }
+function gn(v) { const g = AC.createGain(); g.gain.value = v; return g; }
 
+// Amplificador: pré, distorção, equalização e caixa. pan = posição no estéreo.
+function amp(drive, out, pan, mids = 2) {
+  const ws = AC.createWaveShaper(); ws.curve = shaper(drive); ws.oversample = '2x';
+  const p = AC.createStereoPanner ? AC.createStereoPanner() : gn(1); if (p.pan) p.pan.value = pan;
+  const o = gn(out);
+  const head = chain([bq('highpass', 110), gn(1), ws, bq('peaking', 110, 1, 3), bq('peaking', 650, 1.2, -3), bq('peaking', 1900, 1, mids), bq('lowpass', 5200, .9), bq('lowpass', 7500, .7), o, p]);
+  p.connect(MUSG); o.connect(VERB.in);
+  return head;
+}
 function initGuitarBus() {
-  if (!AC || GTR_BUS) return;
+  if (!AC || GTR) return;
   try {
-    const gIn = AC.createGain();
-    const drv = AC.createGain(); drv.gain.value = 1.8;
-    const ws = AC.createWaveShaper(); ws.curve = makeDistCurve(28); ws.oversample = '2x';
-    // Gabinete de guitarra 4x12 (corte de frequências acima de 4200Hz para som quente e encorpado)
-    const cab = AC.createBiquadFilter(); cab.type = 'lowpass'; cab.frequency.value = 4200; cab.Q.value = 1.2;
-    // Boost de médios agressivos (1600Hz)
-    const mid = AC.createBiquadFilter(); mid.type = 'peaking'; mid.frequency.value = 1600; mid.gain.value = 4; mid.Q.value = 1.0;
-    const gOut = AC.createGain(); gOut.gain.value = 0.55;
-    gIn.connect(drv); drv.connect(ws); ws.connect(cab); cab.connect(mid); mid.connect(gOut); gOut.connect(MUSG);
-    GTR_BUS = gIn;
-  } catch (e) {
-    GTR_BUS = MUSG;
-  }
+    // Sala: reverb curto gerado em ruído (nada de arquivo externo).
+    const cv = AC.createConvolver(), len = AC.sampleRate * 1.4, ir = AC.createBuffer(2, len, AC.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2); }
+    cv.buffer = ir; const vin = gn(.22); vin.connect(cv); cv.connect(MUSG); VERB = { in: vin };
+    GTR = [amp(14, .16, -.75), amp(14, .16, .75)];   // guitarra dobrada esquerda/direita
+    LEAD = amp(30, .1, 0, 5);
+    const bws = AC.createWaveShaper(); bws.curve = shaper(2.2);
+    BASS = chain([bq('lowpass', 1400, .8), bws, bq('peaking', 90, 1, 4), gn(.42)]); BASS.connect(MUSG);
+    const comp = AC.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 5; comp.attack.value = .003; comp.release.value = .12;
+    DRUM = gn(1); DRUM.connect(comp); comp.connect(MUSG); const dv = gn(.5); DRUM.connect(dv); dv.connect(VERB.in);
+  } catch (e) { GTR = null; }
 }
 
+// Toca uma corda: palm mute = som abafado e curto; bend = semitons subindo do tom de baixo até a nota.
+function pluck(m, at, dur, dest, { v = 1, mute = false, bend = 0, vib = false, decay, buf } = {}) {
+  const { b, rate } = buf || ksBuf(m, mute ? .5 : 2.2, decay || (mute ? .985 : .997));
+  const s = AC.createBufferSource(), g = AC.createGain(); s.buffer = b;
+  if (bend) { s.playbackRate.setValueAtTime(rate * Math.pow(2, -bend / 12), at); s.playbackRate.linearRampToValueAtTime(rate, at + Math.min(.12, dur * .5)); }
+  else s.playbackRate.setValueAtTime(rate, at);
+  if (vib) { const l = AC.createOscillator(), lg = gn(rate * .012); l.frequency.value = 5.5; l.connect(lg); lg.connect(s.playbackRate); l.start(at + dur * .35); l.stop(at + dur + .2); }
+  g.gain.setValueAtTime(v, at); g.gain.setTargetAtTime(0, at + dur * (mute ? .4 : .92), mute ? .03 : .06);
+  if (mute) { const f = bq('lowpass', 900, .8); s.connect(f); f.connect(g); } else s.connect(g);
+  g.connect(dest); s.start(at); s.stop(at + dur + .5);
+}
+// Power chord (tônica, quinta e oitava) nas duas guitarras, com palhetada levemente desencontrada.
+function chord(r, at, dur, mute = false, v = 1) {
+  if (!GTR) return;
+  const buf = ksChord(r, mute);
+  GTR.forEach((bus, side) => pluck(r, at + side * .011, dur, bus, { v, mute, buf }));   // segunda guitarra 11 ms atrás: som dobrado
+}
+const lead = (m, at, dur, o = {}) => LEAD && pluck(m, at, dur, LEAD, { v: .9, vib: dur > .3, ...o });
+function bass(m, at, dur, v = 1) {
+  if (!BASS) return;
+  pluck(m - 12, at, dur, BASS, { v: v * 1.1, decay: .995 });
+  const o = AC.createOscillator(), g = gn(0); o.type = 'sine'; o.frequency.value = mtof(m - 24);   // peso no subgrave
+  g.gain.setValueAtTime(.0001, at); g.gain.linearRampToValueAtTime(.32 * v, at + .01); g.gain.setTargetAtTime(0, at + dur * .8, .05);
+  o.connect(g); g.connect(MUSG); o.start(at); o.stop(at + dur + .3);
+}
+// Bateria
+function bdKick(at, v = 1) {
+  const o = AC.createOscillator(), g = gn(0); o.frequency.setValueAtTime(135, at); o.frequency.exponentialRampToValueAtTime(46, at + .09);
+  g.gain.setValueAtTime(v, at); g.gain.exponentialRampToValueAtTime(.001, at + .38); o.connect(g); g.connect(DRUM); o.start(at); o.stop(at + .4);
+  noise(.012, { v: .35 * v, type: 'highpass', f: 2500, at, bus: DRUM });
+}
+function snare(at, v = 1) {
+  [185, 330].forEach((f, i) => osc(f, .09, { type: 'triangle', v: (i ? .25 : .5) * v, sl: -40, at, bus: DRUM }));
+  noise(.22, { v: .55 * v, type: 'bandpass', f: 2600, q: .6, at, bus: DRUM });
+  noise(.08, { v: .3 * v, type: 'highpass', f: 5000, at, bus: DRUM });
+}
+const METAL = [263, 400, 421, 474, 587, 845];   // razões inarmônicas de prato
+function cymbal(at, dur, v, hp) {
+  const g = gn(0), f = bq('highpass', hp, .7), b = bq('bandpass', hp * 1.4, .5); g.connect(DRUM);
+  b.connect(f); f.connect(g);
+  METAL.forEach(fr => { const o = AC.createOscillator(); o.type = 'square'; o.frequency.value = fr * (hp > 6000 ? 1.9 : 1.2); o.connect(b); o.start(at); o.stop(at + dur + .05); });
+  g.gain.setValueAtTime(v, at); g.gain.exponentialRampToValueAtTime(.001, at + dur);
+}
+const hat = (at, open = false, v = 1) => { noise(open ? .26 : .045, { v: .2 * v, type: 'highpass', f: 7500, at, bus: DRUM }); noise(open ? .2 : .03, { v: .1 * v, type: 'bandpass', f: 10500, q: 1.5, at, bus: DRUM }); };
+const crash = (at, v = 1) => { cymbal(at, 1.7, .22 * v, 4500); noise(1.4, { v: .1 * v, type: 'highpass', f: 6000, at, bus: DRUM }); };
+const ride = at => cymbal(at, .45, .09, 5500);
+const tom = (at, f) => { osc(f, .3, { type: 'sine', v: .55, sl: -f * .35, at, bus: DRUM }); noise(.05, { v: .12, type: 'lowpass', f: 1500, at, bus: DRUM }); };
+// Virada nos 4 últimos tempos de semicolcheia
+function fill(t, q) { [0, 1, 2, 3].forEach(k => Q.tom(t + 12 * q + k * q, [200, 170, 140, 110][k])); }
+
+// Fila: a música "escreve" o compasso inteiro, mas cada nota só vira nó de áudio ~0,25 s antes de tocar.
+// Assim, trocar de música ou parar corta na hora, sem sobrar meio compasso tocando.
+let CAP = null;
+const qd = (fn, ti) => (...a) => CAP ? CAP.push([a[ti], () => fn(...a)]) : fn(...a);
+const Q = { chord: qd(chord, 1), lead: qd(lead, 1), bass: qd(bass, 1), kick: qd(bdKick, 0), snare: qd(snare, 0), hat: qd(hat, 0), crash: qd(crash, 0), ride: qd(ride, 0), tom: qd(tom, 0) };
+
+// Músicas: cada uma toca um compasso por vez (bar = número do compasso, t = início, q = semicolcheia).
+// Todas em mi menor, compostas para o jogo; lembram os estilos, sem copiar riff nenhum.
+const E = 40, G = 43, A = 45, B = 47, C = 48, D = 50, Fs = 42;
 const SONGS = {
-  menu: {
-    bpm: 108,
-    // Progressão clássica de Classic Rock (Am - C - D - G)
-    prog: [45, 48, 50, 43],
-    style: 'classic'
-  },
-  play: {
-    bpm: 128,
-    // Driving Hard Rock (Em - G - A - C)
-    prog: [40, 43, 45, 48],
-    style: 'hard'
-  },
-  boss: {
-    bpm: 148,
-    // Heavy Metal / Cyber Shred (Dm - F - G - Bb)
-    prog: [38, 41, 43, 46],
-    style: 'metal'
-  }
+  // Hino lento e pesado, acordes soando e solo em menor harmônico (o ré sustenido dá o ar "oriental").
+  menu: { bpm: 98, bars: 16, play(bar, t, q) {
+    const P = [E, E, C, D, E, E, G, B][bar % 8], hits = [0, 6, 12];
+    hits.forEach((s, i) => { Q.chord(P, t + s * q, (i === 2 ? 4 : 6) * q * .95); Q.bass(P, t + s * q, (i === 2 ? 4 : 6) * q); });
+    for (let s = 0; s < 16; s += 2) { if (s === 0 && bar % 2 === 0) Q.crash(t); else if (s % 4 === 0) Q.ride(t + s * q); else Q.hat(t + s * q, false, .7); }
+    [0, 6, 10].forEach(s => Q.kick(t + s * q)); [4, 12].forEach(s => Q.snare(t + s * q));
+    if (bar >= 8) {   // solo de guitarra na segunda metade
+      const L = [[76, 0, 4], [75, 4, 2], [76, 6, 2], [79, 8, 4], [78, 12, 4]], L2 = [[83, 0, 6], [81, 6, 2], [79, 8, 2], [78, 10, 2], [76, 12, 4]];
+      ((bar % 2) ? L2 : L).forEach(([m, s, d]) => Q.lead(m - (bar % 4 === 2 ? 0 : 0), t + s * q, d * q, { bend: s === 0 ? 2 : 0 }));
+    }
+    if (bar % 8 === 7) fill(t, q);
+  } },
+  // Hard rock de bar: chimbal aberto, groove reto, riff com abafado e acorde no contratempo, solo com bend.
+  classic: { bpm: 122, bars: 16, play(bar, t, q) {
+    const P = [A, A, D, E, A, A, G, E][bar % 8];
+    for (let s = 0; s < 16; s += 2) {
+      const open = s === 0 || s === 6 || s === 10;
+      Q.chord(P, t + s * q, open ? 3 * q : 1.6 * q, !open);
+      Q.bass(P + (s === 14 ? 7 : 0), t + s * q, 1.8 * q, .9);
+      Q.hat(t + s * q, s % 4 === 2, s % 4 === 0 ? 1 : .7);
+    }
+    if (bar % 4 === 0) Q.crash(t); [0, 7, 8].forEach(s => Q.kick(t + s * q)); [4, 12].forEach(s => Q.snare(t + s * q));
+    if (bar >= 8 && bar % 2 === 1) [[69, 0, 2, 2], [72, 2, 2], [69, 4, 2], [67, 6, 2], [64, 8, 4, 2], [67, 12, 2], [69, 14, 2]].forEach(([m, s, d, b]) => Q.lead(m + (bar % 4 === 3 ? 12 : 0), t + s * q, d * q, { bend: b || 0 }));
+    if (bar % 8 === 7) fill(t, q);
+  } },
+  // Galope de heavy metal: colcheia + duas semicolcheias abafadas, guitarras gêmeas em terças.
+  gallop: { bpm: 156, bars: 16, play(bar, t, q) {
+    const P = [E, E, C, D, E, E, C, B][bar % 8];
+    for (let b = 0; b < 4; b++) [0, 2, 3].forEach(s => { const at = t + (b * 4 + s) * q; Q.chord(P, at, (s ? 1 : 2) * q * .95, true, .9); Q.bass(P, at, (s ? 1 : 2) * q * .9, .85); });
+    for (let s = 0; s < 16; s += 2) Q.hat(t + s * q, false, .8);
+    [0, 2, 3, 8, 10, 11].forEach(s => Q.kick(t + s * q, .8)); [4, 12].forEach(s => Q.snare(t + s * q));
+    if (bar % 4 === 0) Q.crash(t);
+    if (bar >= 8) {   // duas guitarras solo: melodia e a mesma melodia uma terça acima (escala de mi menor)
+      const SC = [64, 66, 67, 69, 71, 72, 74, 76, 78, 79, 81, 83], mel = [[7, 0, 4], [6, 4, 2], [4, 6, 2], [5, 8, 4], [4, 12, 2], [2, 14, 2]], mel2 = [[4, 0, 2], [5, 2, 2], [7, 4, 4], [9, 8, 2], [7, 10, 2], [4, 12, 4]];
+      ((bar % 2) ? mel2 : mel).forEach(([i, s, d]) => { Q.lead(SC[i], t + s * q, d * q); Q.lead(SC[i + 2], t + s * q + .004, d * q, { v: .6 }); });
+    }
+    if (bar % 8 === 7) fill(t, q);
+  } },
+  // Chefe, quiz e fases difíceis: riff de semicolcheias com nota de pedal, a banda entra no 3º compasso.
+  boss: { bpm: 136, bars: 16, play(bar, t, q) {
+    const ped = 71, line = [[78, 76, 74, 76], [79, 78, 76, 78], [81, 79, 78, 79], [83, 81, 79, 78]][bar % 4];
+    for (let s = 0; s < 16; s++) Q.lead(s % 2 ? line[(s >> 1) % 4] : ped, t + s * q, q * .95, { v: .7, decay: .99 });
+    if (bar < 2) { for (let s = 0; s < 16; s += 4) Q.hat(t + s * q, false, .6); return; }   // intro só com o riff
+    if (bar < 4) { [0, 4, 8, 12].forEach(s => { Q.kick(t + s * q, .7); Q.tom(t + s * q, 90); }); if (bar === 3) fill(t, q); return; }
+    const P = [E, E, A, E, D, A, E, E][bar % 8];
+    for (let s = 0; s < 16; s += 2) { Q.chord(P, t + s * q, s % 8 === 0 ? 3.6 * q : 1.6 * q, s % 8 !== 0, .9); Q.bass(P, t + s * q, 1.8 * q); Q.hat(t + s * q, s % 4 === 2); }
+    [0, 2, 8, 10].forEach(s => Q.kick(t + s * q)); [4, 12].forEach(s => Q.snare(t + s * q, 1.1));
+    if (bar % 2 === 0) Q.crash(t, bar % 8 === 4 ? 1.2 : .9);
+    if (bar % 8 === 7) fill(t, q);
+  } }
 };
+SONGS.play = SONGS.classic;   // nome antigo
 
-// Riffs de guitarra solo em escala pentatônica de rock [semitons relativos ao acorde]
-const ROCK_LICK_1 = [0, null, 3, null, 5, 7, 5, null, 10, null, 12, 10, 7, 5, 3, 0];
-const ROCK_LICK_2 = [12, null, 10, 12, null, 15, 12, null, 10, 7, 5, 3, 5, null, 7, null];
-
-function rockGuitar(root, dur, at, isMute = false, vol = 0.12) {
-  if (!AC) return;
-  if (!GTR_BUS) initGuitarBus();
-  const bus = GTR_BUS || MUSG;
-
-  const f1 = mtof(root);
-  const f2 = mtof(root + 7);  // 5ª justa
-  const f3 = mtof(root + 12); // Oitava
-  const d = isMute ? dur * 0.48 : dur * 0.98;
-  const v = isMute ? vol * 0.7 : vol;
-
-  // Duplo sawtooth com micro-detune para emular cordas duplas e distorção analógica
-  osc(f1, d, { type: 'sawtooth', v: v * 0.48, at, bus, att: 0.002, det: -4 });
-  osc(f2, d, { type: 'sawtooth', v: v * 0.44, at, bus, att: 0.002, det: 5 });
-  osc(f3, d, { type: 'sawtooth', v: v * 0.38, at, bus, att: 0.002, det: -2 });
-
-  if (!isMute) {
-    // Harmônico de palhetada aberta para dar mordente à guitarra
-    osc(f1 * 2, d * 0.4, { type: 'sawtooth', v: v * 0.22, at, bus, att: 0.003 });
-  }
-}
-
-function rockSnare(at, vol = 0.28) {
-  if (!AC) return;
-  // Impacto do tambor da caixa (queda rápida de 240Hz para 92Hz)
-  osc(240, 0.11, { type: 'triangle', v: vol * 0.75, sl: -148, at, bus: MUSG });
-  // Crack e esteira metálica de alta presença
-  noise(0.03, { v: vol * 0.65, type: 'highpass', f: 1200, at, bus: MUSG });
-  noise(0.18, { v: vol * 0.9, type: 'bandpass', f: 2400, q: 0.9, at, bus: MUSG });
-}
-
-function rockKick(at, v = 0.62) {
-  if (!AC) return;
-  // Sub-bass thump (drop potente de 175Hz para 42Hz)
-  const o = AC.createOscillator(), g = AC.createGain();
-  o.type = 'sine';
-  o.frequency.setValueAtTime(175, at);
-  o.frequency.exponentialRampToValueAtTime(42, at + 0.12);
-  g.gain.setValueAtTime(v * 0.9, at);
-  g.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
-  o.connect(g); g.connect(MUSG);
-  o.start(at); o.stop(at + 0.25);
-
-  // Beater click (impacto do pedal na pele do bumbo)
-  noise(0.025, { v: v * 0.45, type: 'bandpass', f: 2800, q: 2, at, bus: MUSG });
-}
-
-function rockHiHat(at, isAccent = false) {
-  if (!AC) return;
-  noise(isAccent ? 0.055 : 0.035, {
-    v: isAccent ? 0.09 : 0.05,
-    type: 'highpass',
-    f: isAccent ? 6500 : 8000,
-    at,
-    bus: MUSG
-  });
-}
-
-function rockCrash(at, vol = 0.26) {
-  if (!AC) return;
-  noise(0.65, { v: vol, type: 'highpass', f: 3800, at, bus: MUSG });
-  noise(0.45, { v: vol * 0.5, type: 'bandpass', f: 7200, q: 1.2, at, bus: MUSG });
-}
-
-function rockBass(root, dur, at, vol = 0.13) {
-  if (!AC) return;
-  const f = mtof(root - 12); // oitava grave
-  osc(f, dur * 0.88, { type: 'sawtooth', v: vol * 0.52, at, bus: MUSG, att: 0.003 });
-  osc(f, dur * 0.96, { type: 'sine', v: vol * 0.82, at, bus: MUSG, att: 0.004 });
-}
-
-function rockLead(note, dur, at, vol = 0.085) {
-  if (!AC) return;
-  if (!GTR_BUS) initGuitarBus();
-  const bus = GTR_BUS || MUSG;
-  const f = mtof(note);
-  osc(f, dur * 1.15, { type: 'sawtooth', v: vol * 0.85, at, bus, echo: true, att: 0.006, det: 4 });
-  osc(f, dur * 1.15, { type: 'square', v: vol * 0.35, at, bus, echo: true, att: 0.008, det: -4 });
-}
-
-export const MUS = { cur: null, step: 0, next: 0, timer: null };
+export const MUS = { cur: null, bar: 0, next: 0, timer: null, ev: [] };
+// Corta o que ainda soa (cordas e pratos têm cauda longa) com um fade rápido no canal da música.
+function hush() { MUS.ev = []; if (MUSG) { const t = AC.currentTime; MUSG.gain.cancelScheduledValues(t); MUSG.gain.setTargetAtTime(0, t, .04); MUSG.gain.setTargetAtTime(.38, t + .3, .02); } }
 export function music(name) {
+  if (!SONGS[name]) name = 'play';
   if (MUS.cur === name && MUS.timer) return;
-  MUS.cur = name;
+  const changed = MUS.cur !== name && MUS.timer; MUS.cur = name;
   if (!AC || muted) return;
-  if (!MUS.timer) { MUS.next = AC.currentTime + .08; MUS.step = 0; MUS.timer = setInterval(schedule, 25); }
+  if (!GTR) initGuitarBus();
+  if (changed) { hush(); MUS.bar = 0; MUS.next = AC.currentTime + .32; }
+  if (!MUS.timer) { MUS.next = AC.currentTime + .1; MUS.bar = 0; MUS.ev = []; MUS.timer = setInterval(schedule, 40); }
 }
-export function stopMusic() { clearInterval(MUS.timer); MUS.timer = null; }
+export function stopMusic() { clearInterval(MUS.timer); MUS.timer = null; if (AC) hush(); }
 
+// Agenda um compasso inteiro por vez, com folga para o navegador não engasgar.
 function schedule() {
-  const sg = SONGS[MUS.cur]; if (!sg || !AC) return;
-  const sd = 60 / sg.bpm / 4;
-
-  while (MUS.next < AC.currentTime + .15) {
-    const s = MUS.step, t = MUS.next;
-    const bar = (s >> 4) % 4; // compasso de 0 a 3
-    const st = s % 16;        // semicolcheia de 0 a 15 no compasso
-    const root = sg.prog[bar];
-
-    // 1. Bateria Rock Pesada (Kick, Snare, HiHat, Crash)
-    // Kick drum: padrão dinâmico de rock
-    if (sg.style === 'metal') {
-      if (st === 0 || st === 2 || st === 6 || st === 8 || st === 10 || st === 14) rockKick(t, 0.65);
-    } else if (sg.style === 'hard') {
-      if (st === 0 || st === 3 || st === 8 || st === 10) rockKick(t, 0.60);
-    } else {
-      if (st === 0 || st === 6 || st === 8 || st === 11) rockKick(t, 0.55);
-    }
-
-    // Caixa de Rock nos tempos 4 e 12 (backbeat) + ghost note no 15 em compassos ímpares
-    if (st === 4 || st === 12) {
-      rockSnare(t, sg.style === 'metal' ? 0.32 : 0.26);
-    } else if (st === 15 && bar % 2 === 1) {
-      rockSnare(t, 0.12);
-    }
-
-    // Prato de condução / Chimbau em colcheias com acentuação
-    if (st % 2 === 0) {
-      const isAccent = st === 2 || st === 6 || st === 10 || st === 14;
-      rockHiHat(t, isAccent);
-    }
-
-    // Crash no primeiro tempo da primeira barra de cada ciclo
-    if (bar === 0 && st === 0) {
-      rockCrash(t, 0.28);
-    }
-
-    // 2. Contrabaixo Rock (P-Bass)
-    if (st % 2 === 0) {
-      const bassNote = (st === 14) ? root + 7 : (st === 6 ? root + 12 : root);
-      rockBass(bassNote, sd * 1.8, t, 0.13);
-    }
-
-    // 3. Guitarra Base (Power Chords com overdrive e palm-mute chugs)
-    const isChug = (st !== 0 && st !== 4 && st !== 12);
-    if (st % 2 === 0) {
-      rockGuitar(root, sd * 1.8, t, isChug, 0.12);
-    }
-
-    // 4. Guitarra Solo / Riff de Rock (nos compassos ímpares)
-    if (bar % 2 === 1) {
-      const lick = (bar === 1) ? ROCK_LICK_1 : ROCK_LICK_2;
-      const noteRel = lick[st];
-      if (noteRel !== null) {
-        rockLead(root + 12 + noteRel, sd * 1.4, t, 0.085);
-      }
-    }
-
-    MUS.next += sd;
-    MUS.step = (MUS.step + 1) % 64;
+  const sg = SONGS[MUS.cur]; if (!sg || !AC || !GTR) return;
+  const q = 60 / sg.bpm / 4;
+  const now = AC.currentTime;
+  if (MUS.next < now) { MUS.next = now + .05; MUS.ev = []; }   // aba voltou do segundo plano: recomeça sem atraso acumulado
+  while (MUS.next < now + .6) {
+    CAP = []; try { sg.play(MUS.bar % sg.bars, MUS.next, q); } catch (e) {}
+    MUS.ev.push(...CAP); CAP = null;
+    MUS.next += 16 * q; MUS.bar++;
   }
+  const due = MUS.ev.filter(e => e[0] < now + .25); MUS.ev = MUS.ev.filter(e => e[0] >= now + .25);
+  due.forEach(e => { if (e[0] >= now - .02) try { e[1](); } catch (x) {} });
 }
+
 export function setMute(m) {
   muted = m; try { localStorage.setItem('noc_mute', m ? '1' : '0'); } catch (e) {}
   if (MASTER) MASTER.gain.setTargetAtTime(m ? 0 : .9, AC.currentTime, .05);

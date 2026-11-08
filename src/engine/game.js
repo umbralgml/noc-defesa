@@ -223,7 +223,7 @@ export function play(L, name, opt = {}) {
   const hero = sc.querySelector('.hero'); hero.classList.add('walk');
   requestAnimationFrame(() => requestAnimationFrame(() => heroTo(sc, HX[L.loc])));
   typeCap(L.cap);
-  music(L.boss || L.miniboss ? 'boss' : 'play'); sfx.whoosh();
+  music(trackOf(L)); sfx.whoosh();
   for (let k = 0; k < 8; k++) S.intro.push(setTimeout(sfx.step, k * 170));
   for (let k = 0; k < 7; k++) S.intro.push(setTimeout(sfx.key, 1500 + k * 90 + Math.random() * 40));
   if (L.boss || L.miniboss) S.intro.push(setTimeout(sfx.siren, 300), setTimeout(sfx.siren, 1100));
@@ -516,6 +516,8 @@ function fail(msg) {
   $('mMap').onclick = () => { closeModal(); goMap(); };
   $('mRetry').onclick = () => { closeModal(); if (S.cur >= 0) startLevel(S.cur, S.hard); else goMap(); };
 }
+// Trilha sonora por fase: chefe, quiz e fase avançada = riff rápido; intermediário = galope de metal; resto = hard rock.
+const trackOf = L => L.boss || L.miniboss || L.type === 'quiz' || diffOf(L) >= 3 ? 'boss' : diffOf(L) === 2 ? 'gallop' : 'classic';
 export function goMap() { cleanup(); renderMap(); show('map'); music('menu'); }
 
 export function initGame() {
@@ -564,7 +566,7 @@ export function initGame() {
     const L = S.lv;
     modal(`<div class="tag">DICA TÉCNICA</div><h2>${L.title}</h2><div class="learn">${L.tip}</div>${lessonHTML(L)}<div class="row"><button class="btn ghostb" id="sndG">SOM: ${isMuted() ? 'OFF' : 'ON'}</button><button class="btn" id="mOk">ENTENDI</button></div>`);
     $('mOk').onclick = closeModal;
-    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(S.lv.boss || S.lv.miniboss ? 'boss' : 'play'); };
+    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(trackOf(S.lv)); };
   };
   $('modal').addEventListener('click', e => { if (e.target.id === 'modal' && $('mcard').querySelector('#mCancel,#mOk,#mNo')) closeModal(); });
 }

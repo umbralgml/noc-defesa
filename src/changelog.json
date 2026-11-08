@@ -1,6 +1,38 @@
 {
   "versions": [
     {
+      "v": "1.39",
+      "date": "2026-11-08",
+      "title": "Banda de rock no plantão",
+      "items": [
+        "Trilha nova com cara de banda: guitarras distorcidas dobradas, baixo, bateria com pratos e sala",
+        "Tela inicial e mapa com um hino pesado e solo de guitarra",
+        "Fases iniciantes no hard rock, intermediárias no galope de heavy metal com guitarras gêmeas",
+        "Chefes, quizzes e fases avançadas com riff acelerado de semicolcheias",
+        "Troca de música na hora, sem sobrar meio compasso tocando"
+      ],
+      "es": {
+        "title": "Banda de rock en la guardia",
+        "items": [
+          "Banda sonora nueva con sonido de banda: guitarras distorsionadas dobladas, bajo, batería con platos y sala",
+          "Pantalla de inicio y mapa con un himno pesado y solo de guitarra",
+          "Fases iniciales con hard rock, intermedias con galope de heavy metal y guitarras gemelas",
+          "Jefes, quizzes y fases avanzadas con riff acelerado en semicorcheas",
+          "Cambio de música al instante, sin que quede medio compás sonando"
+        ]
+      },
+      "en": {
+        "title": "Rock band on call",
+        "items": [
+          "New soundtrack that sounds like a band: double-tracked distorted guitars, bass, drums with cymbals and room",
+          "Home screen and map with a heavy anthem and guitar solo",
+          "Beginner levels get hard rock, intermediate ones a heavy metal gallop with twin guitars",
+          "Bosses, quizzes and advanced levels get a fast sixteenth-note riff",
+          "Music switches instantly, with no half bar left ringing"
+        ]
+      }
+    },
+    {
       "v": "1.38",
       "date": "2026-11-08",
       "title": "O Z3R0 engrossou a voz",
