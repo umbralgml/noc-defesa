@@ -64,8 +64,12 @@ try {
   await p.click('.node[data-i="0"]');
   for (let i = 0; i < levels.length; i++) {
     const L = levels[i], mistake = i % 3 === 1 || (['defense', 'pcap'].includes(L.type) && i === levels.findIndex(x => x.type === L.type));
-    if (await p.waitForSelector('#mStory, #mGo').then(e => e.getAttribute('id')) === 'mStory') await p.click('#mStory');
-    await p.waitForSelector('#mGo');
+    // Até o briefing: pula a caminhada no mapa, a passagem de ato e a história.
+    for (;;) {
+      const id = await p.waitForSelector('#mStory, #mGo, #warpNext, #ltoSkipBtn', { state: 'visible' }).then(e => e.getAttribute('id'));
+      if (id === 'mGo') break;
+      await p.evaluate(id => document.getElementById(id)?.click(), id); await p.waitForTimeout(450);   // a transição some sozinha: clique sem esperar
+    }
     await p.click('#mGo'); await p.waitForTimeout(300); await p.click('#scene'); await p.waitForTimeout(700);
     if (L.type === 'wire') {
       if (mistake) { await p.click(`#colL .port[data-id="${L.left[0].id}"]`); await p.click(`#colR .port[data-id="${L.left[1].id}"]`); }

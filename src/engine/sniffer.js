@@ -7,14 +7,24 @@ import { openCircuitPuzzle } from './circuit.js';
 import { cyberConfetti } from './particles.js';
 import { speakZ3R0 } from './radio.js';
 import { t as tr } from './i18n.js';
-import { $ } from './util.js';
+import { $, store } from './util.js';
+import { S, diffOf } from './state.js';
 
 let snifferTimer = null;
 let activePacket = null;
 
+// Mesmas regras dos eventos do Z3R0: fora da fase pode sempre; dentro, só de intermediário para cima,
+// nunca em tutorial, treino, desafio diário/arcade (onWin), defesa em tempo real nem no teste automático.
+function allowed() {
+  if (store('noc_teste')) return false;
+  if (!$('game')?.classList.contains('on')) return true;
+  const L = S.lv;
+  return !!L && !S.busy && !S.practice && !L.tutorial && !L.onWin && L.type !== 'defense' && diffOf(L) >= 2;
+}
+
 export function spawnPacket() {
   if (activePacket || document.hidden || $('modal')?.classList.contains('on')) return;
-  if (document.documentElement.classList.contains('calm')) return;
+  if (document.documentElement.classList.contains('calm') || !allowed()) return;
 
   const w = window.innerWidth;
   const h = window.innerHeight;

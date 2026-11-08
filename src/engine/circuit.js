@@ -313,7 +313,7 @@ export function openCircuitPuzzle() {
 
       <div class="circ-actions" id="circActions" hidden>
         <div class="circ-reward">
-          <b>✓ +40 ${tr('XP DE CARREIRA')} · +15% HP</b>
+          <b>✓ +40 ${tr('XP DE CARREIRA')}${$('game').classList.contains('on') ? ' · +15% HP' : ''}</b>
           <span>${tr('Telemetria recuperada · Dados decodificados com sucesso')}</span>
         </div>
         <button class="btn" id="circCloseBtn" type="button">${tr('CONTINUAR O PLANTÃO')}</button>
@@ -337,7 +337,8 @@ export function openCircuitPuzzle() {
   $('circAbortX').onclick = exitPuzzle;
   $('circAbortBtn').onclick = exitPuzzle;
 
-  container.addEventListener('click', e => {
+  // Ouvinte na grade (nova a cada abertura): no #mcard ele se acumulava e girava peças de quebra-cabeças antigos.
+  container.querySelector('.circ-grid').addEventListener('click', e => {
     if (solved) return;
     const tile = e.target.closest('.circ-tile');
     if (!tile || tile.classList.contains('block')) return;
@@ -356,11 +357,11 @@ export function openCircuitPuzzle() {
       try { sfx.whoosh(); } catch (err) {}
       cyberConfetti({ count: 45 });
       addXP(40);
-      if (S && S.hp !== undefined && S.hp < 100) {
+      if ($('game').classList.contains('on') && S.hp < 100) {   // integridade só vale dentro da fase
         S.hp = Math.min(100, S.hp + 15);
         setHP();
       }
-      speakZ3R0(tr('Eu vou voltar!'));
+      speakZ3R0(tr('Isso não acabou, analista. Eu volto mais forte!'));
 
       const actEl = $('circActions');
       if (actEl) actEl.hidden = false;

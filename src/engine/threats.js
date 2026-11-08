@@ -196,7 +196,7 @@ function startThreatAnim() {
 
       ctx.fillStyle = '#b9c7dc';
       ctx.font = '7.5px monospace';
-      ctx.fillText(c.name.split(' ')[0], c.x + 6, c.y + 3);
+      ctx.fillText(t(c.name).split(' (')[0], c.x + 6, c.y + 3);   // nome inteiro ("São Paulo"), sem a região entre parênteses
     });
 
     // Atualiza log a cada ~1.8s
@@ -229,7 +229,7 @@ function updateLog(arc) {
   
   const div = document.createElement('div');
   div.className = 'th-row';
-  div.innerHTML = `<span class="th-time">${time}</span><span class="th-type">${arc.type.split(' ')[0]}</span><span>${arc.srcName.split(' ')[0]} → NOC</span><b class="th-drop">${t('DROPADO')}</b>`;
+  div.innerHTML = `<span class="th-time">${time}</span><span class="th-type">${t(arc.type).split(' (')[0]}</span><span>${t(arc.srcName).split(' (')[0]} → NOC</span><b class="th-drop">${t('DROPADO')}</b>`;
   
   log.prepend(div);
   if (log.children.length > 5) log.removeChild(log.lastChild);

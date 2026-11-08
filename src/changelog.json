@@ -1,6 +1,70 @@
 {
   "versions": [
     {
+      "v": "1.39",
+      "date": "2026-11-08",
+      "title": "Banda de rock no plantão",
+      "items": [
+        "Trilha nova com cara de banda: guitarras distorcidas dobradas, baixo, bateria com pratos e sala",
+        "Tela inicial e mapa com um hino pesado e solo de guitarra",
+        "Fases iniciantes no hard rock, intermediárias no galope de heavy metal com guitarras gêmeas",
+        "Chefes, quizzes e fases avançadas com riff acelerado de semicolcheias",
+        "Troca de música na hora, sem sobrar meio compasso tocando"
+      ],
+      "es": {
+        "title": "Banda de rock en la guardia",
+        "items": [
+          "Banda sonora nueva con sonido de banda: guitarras distorsionadas dobladas, bajo, batería con platos y sala",
+          "Pantalla de inicio y mapa con un himno pesado y solo de guitarra",
+          "Fases iniciales con hard rock, intermedias con galope de heavy metal y guitarras gemelas",
+          "Jefes, quizzes y fases avanzadas con riff acelerado en semicorcheas",
+          "Cambio de música al instante, sin que quede medio compás sonando"
+        ]
+      },
+      "en": {
+        "title": "Rock band on call",
+        "items": [
+          "New soundtrack that sounds like a band: double-tracked distorted guitars, bass, drums with cymbals and room",
+          "Home screen and map with a heavy anthem and guitar solo",
+          "Beginner levels get hard rock, intermediate ones a heavy metal gallop with twin guitars",
+          "Bosses, quizzes and advanced levels get a fast sixteenth-note riff",
+          "Music switches instantly, with no half bar left ringing"
+        ]
+      }
+    },
+    {
+      "v": "1.38",
+      "date": "2026-11-08",
+      "title": "O Z3R0 engrossou a voz",
+      "items": [
+        "Central do NOC com voz mais animada e natural, e frases variadas a cada vitória",
+        "Z3R0 com voz grave de chefão, rosnado por baixo e provocações quando você perde ou enfrenta o chefe",
+        "Fim de fase sem pressa: o resumo e a revisão dos erros esperam você tocar em PRÓXIMA",
+        "Plantão Caótico agora mostra no relatório a explicação de cada incidente que escapou",
+        "Mapa 3D funciona no teclado e o pacote voador não interrompe fases iniciantes nem o tutorial"
+      ],
+      "es": {
+        "title": "Z3R0 engrosó la voz",
+        "items": [
+          "Central del NOC con voz más animada y natural, y frases variadas en cada victoria",
+          "Z3R0 con voz grave de jefe final, gruñido de fondo y provocaciones cuando pierdes o enfrentas al jefe",
+          "Fin de fase sin prisa: el resumen y el repaso de errores esperan a que toques SIGUIENTE",
+          "El Turno Caótico ahora muestra en el informe la explicación de cada incidente que se escapó",
+          "El mapa 3D funciona con teclado y el paquete volador no interrumpe las fases iniciales ni el tutorial"
+        ]
+      },
+      "en": {
+        "title": "Z3R0 got a deeper voice",
+        "items": [
+          "NOC dispatcher with a livelier, more natural voice and varied lines on every win",
+          "Z3R0 with a deep boss voice, a growl underneath and taunts when you lose or face the boss",
+          "No rush at the end of a level: the summary and mistake review wait until you tap NEXT",
+          "Chaotic Shift report now explains every incident that slipped through",
+          "The 3D map works with the keyboard and the flying packet no longer interrupts beginner levels or the tutorial"
+        ]
+      }
+    },
+    {
       "v": "1.37",
       "date": "2026-11-05",
       "title": "Telão Global de Ameaças e Plantão Caótico",

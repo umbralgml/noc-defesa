@@ -3,7 +3,7 @@
 // com caminhos de fibra óptica iluminados, plataformas de incidentes e o analista marcando o plantão atual.
 
 import { t as tr } from './i18n.js';
-import { fmt, store } from './util.js';
+import { fmt, store, esc } from './util.js';
 import { K, num, unlocked } from './state.js';
 
 export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
@@ -38,8 +38,9 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
       return;
     }
 
+    // Mesmo texto da lista clássica: só promete o próximo ato se ele existir nesta trilha.
     if (a[5]) {
-      html += `<div class="nivn">${tr('Para quem está começando. Já trabalha com isso? O próximo ato já está liberado.')}</div>`;
+      html += `<div class="nivn">${tr(LEVELS.some(L => L.act > ai && L.trail === ct) ? 'Para quem está começando. Já trabalha com isso? O próximo ato já está liberado.' : 'Para quem está começando. O plantão desta trilha chega nos próximos lotes.')}</div>`;
     }
 
     // Gerador SVG do mapa isométrico com curvas e plataformas 3D
@@ -122,6 +123,7 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
     }
 
     // 2. Plataformas Isométricas 3D de cada nó
+    let beacon = '';
     pts.forEach(p => {
       const { L, i, x, y } = p;
       const st = S.prog[K(i)] || 0;
@@ -137,7 +139,7 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
       const strokeColor = isBoss ? '#ff2e63' : isNext ? '#00f0ff' : st ? '#00e0a8' : '#223859';
       const plateFill = isBoss ? 'url(#pedBoss)' : isNext ? 'url(#pedNext)' : st ? 'url(#pedDone)' : 'url(#pedLock)';
 
-      svg += `<g class="${cls}" data-i="${i}" tabindex="${lock ? -1 : 0}" role="button" aria-label="${num(i)}. ${L.title}">`;
+      svg += `<g class="${cls}" data-i="${i}" tabindex="${lock ? -1 : 0}" role="button" aria-label="${num(i)}. ${esc(L.title)}">`;
 
       // Sombra projetada no solo
       svg += `<ellipse cx="${x}" cy="${y + 20}" rx="28" ry="9" fill="rgba(0,0,0,0.65)"/>`;
@@ -150,8 +152,7 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
 
       // Efeitos de sonar sobre a plataforma ativa
       if (isNext) {
-        svg += `<circle cx="${x}" cy="${y + 8}" r="22" class="rpg-beacon-wave"/>`;
-        svg += `<circle cx="${x}" cy="${y + 8}" r="15" class="rpg-beacon-wave-2"/>`;
+        beacon = `<g pointer-events="none"><circle cx="${x}" cy="${y + 8}" r="22" class="rpg-beacon-wave"/><circle cx="${x}" cy="${y + 8}" r="15" class="rpg-beacon-wave-2"/></g>`;
       } else {
         // Ícone central sobre a plataforma
         if (lock) {
@@ -178,12 +179,13 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
 
       svg += `<g class="rpg-label" transform="translate(${x},${y + (st > 0 ? 36 : 30)})">
         <rect x="-60" y="-8" width="120" height="28" rx="8" fill="rgba(6,14,26,0.92)" stroke="${labelStroke}" stroke-width="${isNext ? 1.5 : 1}"/>
-        <text y="4" text-anchor="middle" font-family="Orbitron,monospace" font-size="7.5" font-weight="700" fill="${titleColor}">${num(i)}. ${shortTitle}</text>
-        <text y="14" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="6" fill="#8095b5">${L.tag}${best ? ' · ' + fmt(best) + ' pts' : ''}</text>
+        <text y="4" text-anchor="middle" font-family="Orbitron,monospace" font-size="7.5" font-weight="700" fill="${titleColor}">${num(i)}. ${esc(shortTitle)}</text>
+        <text y="14" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="6" fill="#8095b5">${esc(L.tag || '')}${best ? ' · ' + fmt(best) + ' pts' : ''}</text>
       </g>`;
 
       svg += `</g>`; // fecha rpg-node
     });
+    svg += beacon;
 
     // 3. Personagem Operador 3D (Renderizado no topo do z-order sobre o disco ativo)
     if (hasNext && pTo) {

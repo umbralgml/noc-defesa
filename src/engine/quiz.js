@@ -87,7 +87,7 @@ if (typeof window !== 'undefined') {
   window.addEventListener('keydown', e => {
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
     const game = $('game');
-    if (!game || !game.classList.contains('on') || !L || L.type !== 'quiz') return;
+    if (!game || !game.classList.contains('on') || !L || L.type !== 'quiz' || $('modal')?.classList.contains('on')) return;   // modal aberto (dica, minigame) tem prioridade
     const nextBtn = $('qNext');
     if (nextBtn) {
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {

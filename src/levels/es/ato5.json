@@ -2,16 +2,25 @@
  "tag": "ACTO 6",
  "name": "IPv6, Wi-Fi y servicios",
  "story": [
-  { "t": "¿Creíste que había terminado? Volví. Ahora por IPv6 y por el Wi-Fi." },
-  { "t": "Temporada 2. IPv6, Wi-Fi y los servicios de base: DHCP, DNS y NTP." },
-  { "t": "Una dirección de 128 bits no me asusta." }
+  {
+   "t": "¿Creíste que había terminado? Volví. Ahora por IPv6 y por el Wi-Fi."
+  },
+  {
+   "t": "Temporada 2. IPv6, Wi-Fi y los servicios de base: DHCP, DNS y NTP."
+  },
+  {
+   "t": "Una dirección de 128 bits no me asusta."
+  }
  ],
  "levels": [
   {
    "title": "Direcciones IPv6",
    "tag": "IPV6",
    "cap": "Abriendo la tabla de vecinos IPv6...",
-   "heads": ["DIRECCIÓN", "TIPO"],
+   "heads": [
+    "DIRECCIÓN",
+    "TIPO"
+   ],
    "goal": "Conecta cada dirección IPv6 con su tipo.",
    "z": "Volví. Ahora por IPv6, que tu firewall ni mira. Apuesto a que ni sabes leer estas direcciones.",
    "me": "Una dirección IPv6 se lee por el comienzo. Basta con mirar el prefijo.",
@@ -25,20 +34,52 @@
    "tip": "Mira el comienzo: 2 o 3 es global, fe80 es link-local, fd es ULA, ff es multicast, ::1 es loopback y 2001:db8 es documentación.",
    "learn": "Clasificar IPv6 es leer el prefijo: ::1/128 loopback, fe80::/10 link-local, fc00::/7 ULA, ff00::/8 multicast y 2000::/3 global unicast. 2001:db8::/32 es solo para documentación (RFC 3849).",
    "left": [
-    { "s": "Responde solo en la propia máquina", "why": "::1 es el loopback de IPv6, el equivalente a 127.0.0.1." },
-    { "s": "Aparece en toda interfaz", "why": "fe80::/10 es link-local: toda interfaz IPv6 genera una sola, y no atraviesa routers." },
-    { "s": "Servidor web del proveedor", "why": "Empieza con 2: está en 2000::/3, el global unicast, enrutable en internet." },
-    { "s": "Red interna del laboratorio", "why": "fc00::/7 es ULA (Unique Local), el \"privado\" de IPv6. En la práctica se usa fd00::/8." },
-    { "s": "Destino de un anuncio", "why": "ff00::/8 es multicast. ff02::1 es \"todos los nodos del enlace\", lo que cumple el papel del broadcast." },
-    { "s": "Vista en una diapositiva", "why": "2001:db8::/32 está reservado para documentación y ejemplos (RFC 3849). Nunca debería aparecer en internet." }
+    {
+     "s": "Responde solo en la propia máquina",
+     "why": "::1 es el loopback de IPv6, el equivalente a 127.0.0.1."
+    },
+    {
+     "s": "Aparece en toda interfaz",
+     "why": "fe80::/10 es link-local: toda interfaz IPv6 genera una sola, y no atraviesa routers."
+    },
+    {
+     "s": "Servidor web del proveedor",
+     "why": "Empieza con 2: está en 2000::/3, el global unicast, enrutable en internet."
+    },
+    {
+     "s": "Red interna del laboratorio",
+     "why": "fc00::/7 es ULA (Unique Local), el \"privado\" de IPv6. En la práctica se usa fd00::/8."
+    },
+    {
+     "s": "Destino de un anuncio",
+     "why": "ff00::/8 es multicast. ff02::1 es \"todos los nodos del enlace\", lo que cumple el papel del broadcast."
+    },
+    {
+     "s": "Vista en una diapositiva",
+     "why": "2001:db8::/32 está reservado para documentación y ejemplos (RFC 3849). Nunca debería aparecer en internet."
+    }
    ],
    "right": [
-    { "why": "Loopback es solo ::1, el propio host." },
-    { "why": "Link-local empieza con fe80 (fe80::/10)." },
-    { "why": "Global unicast es 2000::/3 (empieza con 2 o 3), quitando los rangos reservados como 2001:db8::/32." },
-    { "t": "ULA (privada)", "why": "ULA empieza con fc o fd (fc00::/7)." },
-    { "why": "Multicast empieza con ff (ff00::/8)." },
-    { "t": "Documentación", "why": "Documentación es el bloque 2001:db8::/32." }
+    {
+     "why": "Loopback es solo ::1, el propio host."
+    },
+    {
+     "why": "Link-local empieza con fe80 (fe80::/10)."
+    },
+    {
+     "why": "Global unicast es 2000::/3 (empieza con 2 o 3), quitando los rangos reservados como 2001:db8::/32."
+    },
+    {
+     "t": "ULA (privada)",
+     "why": "ULA empieza con fc o fd (fc00::/7)."
+    },
+    {
+     "why": "Multicast empieza con ff (ff00::/8)."
+    },
+    {
+     "t": "Documentación",
+     "why": "Documentación es el bloque 2001:db8::/32."
+    }
    ]
   },
   {
@@ -59,34 +100,94 @@
    "tip": "proto ra en la ruta quiere decir que vino del anuncio del router (SLAAC). El gateway es el default via fe80::1. Los vecinos IPv6 aparecen en ip -6 neigh, gracias a NDP.",
    "learn": "La estación obtuvo IPv6 por SLAAC: el router anunció 2001:db8:cafe:10::/64 en el RA y ella armó su propia dirección. El gateway es la link-local fe80::1 del router, y quien descubre su MAC es NDP, que corre sobre ICMPv6.",
    "cmds": [
-    { "why": "Dos direcciones: la global 2001:db8:cafe:10:...:3456 (dynamic, con plazo de validez) y la link-local fe80::... Aquí el final se armó a partir de la MAC 52:54:00:12:34:56 (EUI-64). Muchos sistemas hoy usan un final aleatorio por privacidad." },
-    { "why": "proto ra: la red y el gateway vinieron del anuncio del router. El gateway es fe80::1, una link-local, lo que es normal en IPv6." },
-    { "why": "La tabla de vecinos, que en IPv4 sería la tabla ARP. fe80::1 tiene la MAC 3c:22:fb:00:00:01 y está marcado como router." },
-    { "why": "El servidor de la VLAN 20 responde por IPv6. El TTL 63 (hop limit, en IPv6) muestra que pasó por un router." }
+    {
+     "why": "Dos direcciones: la global 2001:db8:cafe:10:...:3456 (dynamic, con plazo de validez) y la link-local fe80::... Aquí el final se armó a partir de la MAC 52:54:00:12:34:56 (EUI-64). Muchos sistemas hoy usan un final aleatorio por privacidad."
+    },
+    {
+     "why": "proto ra: la red y el gateway vinieron del anuncio del router. El gateway es fe80::1, una link-local, lo que es normal en IPv6."
+    },
+    {
+     "why": "La tabla de vecinos, que en IPv4 sería la tabla ARP. fe80::1 tiene la MAC 3c:22:fb:00:00:01 y está marcado como router."
+    },
+    {
+     "why": "El servidor de la VLAN 20 responde por IPv6. El TTL 63 (hop limit, en IPv6) muestra que pasó por un router."
+    }
    ],
    "steps": [
     {
      "q": "¿Cuál es la dirección IPv6 global de la estación?",
-     "v": ["Por ip -6 addr, ¿qué dirección vale en toda la red?", "¿Cuál de las direcciones de eth0 es la global?"],
-     "o": ["2001:db8:cafe:10:5054:ff:fe12:3456", { "t": "fe80::5054:ff:fe12:3456", "why": "Esa es la link-local (scope link): solo vale en el enlace." }, { "t": "fe80::1", "why": "fe80::1 es la link-local del router, el gateway." }],
+     "v": [
+      "Por ip -6 addr, ¿qué dirección vale en toda la red?",
+      "¿Cuál de las direcciones de eth0 es la global?"
+     ],
+     "o": [
+      "2001:db8:cafe:10:5054:ff:fe12:3456",
+      {
+       "t": "fe80::5054:ff:fe12:3456",
+       "why": "Esa es la link-local (scope link): solo vale en el enlace."
+      },
+      {
+       "t": "fe80::1",
+       "why": "fe80::1 es la link-local del router, el gateway."
+      }
+     ],
      "why": "Es la que tiene scope global. La fe80:: tiene scope link y no atraviesa routers."
     },
     {
      "q": "Nadie configuró IPv6. ¿De dónde vino esa dirección?",
-     "v": ["¿Cómo obtuvo la estación el IPv6 sin configuración?", "¿Quién le dio la dirección IPv6 a la estación?"],
-     "o": ["De SLAAC: el router anunció el prefijo en el RA y la estación armó la dirección", { "t": "Del DHCP de IPv4", "why": "El DHCP de IPv4 entrega solo direcciones IPv4." }, { "t": "Alguien escribió la dirección a mano", "why": "Una dirección fija no tendría plazo de validez (dynamic) ni proto ra en la ruta." }],
+     "v": [
+      "¿Cómo obtuvo la estación el IPv6 sin configuración?",
+      "¿Quién le dio la dirección IPv6 a la estación?"
+     ],
+     "o": [
+      "De SLAAC: el router anunció el prefijo en el RA y la estación armó la dirección",
+      {
+       "t": "Del DHCP de IPv4",
+       "why": "El DHCP de IPv4 entrega solo direcciones IPv4."
+      },
+      {
+       "t": "Alguien escribió la dirección a mano",
+       "why": "Una dirección fija no tendría plazo de validez (dynamic) ni proto ra en la ruta."
+      }
+     ],
      "why": "proto ra y la dirección dynamic con plazo muestran que vino del anuncio del router. Es SLAAC."
     },
     {
      "q": "¿Cuál es el gateway IPv6 de la estación?",
-     "v": ["Por ip -6 route, ¿por dónde sale la estación hacia otras redes?", "¿Quién es el default via en IPv6?"],
-     "o": ["fe80::1, la link-local del router", { "t": "2001:db8:cafe:10::/64", "why": "Esa es la red local, no el gateway." }, { "t": "No tiene gateway, IPv6 no lo necesita", "why": "Para salir de la red local siempre hace falta un gateway. Aquí es el default via fe80::1." }],
+     "v": [
+      "Por ip -6 route, ¿por dónde sale la estación hacia otras redes?",
+      "¿Quién es el default via en IPv6?"
+     ],
+     "o": [
+      "fe80::1, la link-local del router",
+      {
+       "t": "2001:db8:cafe:10::/64",
+       "why": "Esa es la red local, no el gateway."
+      },
+      {
+       "t": "No tiene gateway, IPv6 no lo necesita",
+       "why": "Para salir de la red local siempre hace falta un gateway. Aquí es el default via fe80::1."
+      }
+     ],
      "why": "default via fe80::1: en IPv6 el gateway suele ser la link-local del router, que no cambia aunque cambie el prefijo global."
     },
     {
      "q": "En IPv6 no existe ARP. ¿Quién descubre la MAC del router?",
-     "v": ["¿Qué protocolo cumple el papel de ARP en IPv6?", "¿Cómo descubre IPv6 la MAC de un vecino?"],
-     "o": ["NDP, con mensajes ICMPv6", { "t": "ARP, igual que en IPv4", "why": "IPv6 no usa ARP. La tabla que viste es de ip -6 neigh, llenada por NDP." }, { "t": "El DNS", "why": "DNS traduce nombre a IP, no IP a MAC." }],
+     "v": [
+      "¿Qué protocolo cumple el papel de ARP en IPv6?",
+      "¿Cómo descubre IPv6 la MAC de un vecino?"
+     ],
+     "o": [
+      "NDP, con mensajes ICMPv6",
+      {
+       "t": "ARP, igual que en IPv4",
+       "why": "IPv6 no usa ARP. La tabla que viste es de ip -6 neigh, llenada por NDP."
+      },
+      {
+       "t": "El DNS",
+       "why": "DNS traduce nombre a IP, no IP a MAC."
+      }
+     ],
      "why": "NDP (neighbor discovery) corre sobre ICMPv6 y también lleva el RA. Por eso bloquear todo ICMPv6 rompe IPv6."
     }
    ]
@@ -118,21 +219,51 @@
     "res": "Práctica común para casa: /56, que da 256 redes /64."
    },
    "chips": [
-    { "why": "Tamaño estándar de una LAN IPv6: es lo que exige SLAAC." },
-    { "why": "/48 es el bloque entero del NOC, no una LAN." },
-    { "why": "/24 es tamaño de red IPv4. En IPv6 la LAN es /64." },
-    { "why": "De /48 a /64 son 16 bits: 2^16 = 65.536 redes." },
-    { "why": "256 es la cantidad de /64 dentro de un /56, no de un /48." },
-    { "why": "16 es la cantidad de bits entre /48 y /64, no la cantidad de redes." },
-    { "why": "El 4.º grupo identifica la red dentro del /48." },
-    { "why": "Aquí el 10 cayó en la parte de host, al final de la dirección. Esta sería la red cafe:0." },
-    { "why": "Forma corta: los ceros a la izquierda desaparecen y los grupos en cero se vuelven ::." },
-    { "why": "Tres dos puntos no existen. El :: aparece una vez, con dos puntos." },
-    { "why": "Sin el ::, la dirección tiene que tener los 8 grupos. Aquí faltan cuatro." },
-    { "why": "Link-local: toda interfaz IPv6 genera una sola." },
-    { "why": "fc00::/7 es ULA, la privada. Link-local es fe80::/10." },
-    { "why": "Práctica común para cliente residencial: /56, que da 256 redes /64." },
-    { "why": "/128 es una única dirección. El cliente necesita varias redes /64." }
+    {
+     "why": "Tamaño estándar de una LAN IPv6: es lo que exige SLAAC."
+    },
+    {
+     "why": "/48 es el bloque entero del NOC, no una LAN."
+    },
+    {
+     "why": "/24 es tamaño de red IPv4. En IPv6 la LAN es /64."
+    },
+    {
+     "why": "De /48 a /64 son 16 bits: 2^16 = 65.536 redes."
+    },
+    {
+     "why": "256 es la cantidad de /64 dentro de un /56, no de un /48."
+    },
+    {
+     "why": "16 es la cantidad de bits entre /48 y /64, no la cantidad de redes."
+    },
+    {
+     "why": "El 4.º grupo identifica la red dentro del /48."
+    },
+    {
+     "why": "Aquí el 10 cayó en la parte de host, al final de la dirección. Esta sería la red cafe:0."
+    },
+    {
+     "why": "Forma corta: los ceros a la izquierda desaparecen y los grupos en cero se vuelven ::."
+    },
+    {
+     "why": "Tres dos puntos no existen. El :: aparece una vez, con dos puntos."
+    },
+    {
+     "why": "Sin el ::, la dirección tiene que tener los 8 grupos. Aquí faltan cuatro."
+    },
+    {
+     "why": "Link-local: toda interfaz IPv6 genera una sola."
+    },
+    {
+     "why": "fc00::/7 es ULA, la privada. Link-local es fe80::/10."
+    },
+    {
+     "why": "Práctica común para cliente residencial: /56, que da 256 redes /64."
+    },
+    {
+     "why": "/128 es una única dirección. El cliente necesita varias redes /64."
+    }
    ]
   },
   {
@@ -153,20 +284,54 @@
    "tip": "Seguro: WPA3, 802.1X, PMF, visitantes aislados y firmware al día. Vulnerable: WEP, TKIP, WPS, contraseña por defecto y SSID oculto como \"protección\".",
    "learn": "El Wi-Fi seguro va en capas: WPA3-SAE o 802.1X, PMF obligatorio, WPS apagado, visitantes aislados y firmware actualizado. WEP, TKIP y la contraseña por defecto entregan la red; el SSID oculto es solo oscuridad.",
    "buckets": [
-    { "label": "SEGURO", "a": [
-     { "why": "SAE resiste el ataque de diccionario offline: capturar el handshake no alcanza para descubrir la contraseña." },
-     { "why": "Cada usuario entra con su propia credencial vía RADIUS. Si alguien se va, solo cae esa cuenta." },
-     { "t": "Red de visitantes aislada de la interna", "why": "El visitante solo llega a internet. La notebook de un tercero no ve tus servidores." },
-     { "t": "PMF (802.11w) obligatorio", "why": "Protege las tramas de gestión e impide el deauth que tumba a los clientes." },
-     { "t": "Firmware del AP actualizado", "why": "Corrige fallas conocidas, como el KRACK de WPA2." }
-    ] },
-    { "label": "VULNERABLE", "a": [
-     { "why": "WEP se rompe en minutos con herramientas listas. No existe WEP seguro." },
-     { "t": "WPS activado", "why": "El PIN de WPS cae por fuerza bruta y entrega la contraseña de la red." },
-     { "t": "WPA2 con TKIP", "why": "TKIP es legado y vulnerable. WPA2 debe usar solo AES (CCMP)." },
-     { "t": "Contraseña por defecto del fabricante en el AP", "why": "Las contraseñas por defecto están en listas públicas: es el primer intento de cualquier atacante." },
-     { "t": "Ocultar el SSID como protección", "why": "Los propios clientes anuncian el nombre de la red al buscarla. Ocultar el SSID no protege nada." }
-    ] }
+    {
+     "label": "SEGURO",
+     "a": [
+      {
+       "why": "SAE resiste el ataque de diccionario offline: capturar el handshake no alcanza para descubrir la contraseña."
+      },
+      {
+       "why": "Cada usuario entra con su propia credencial vía RADIUS. Si alguien se va, solo cae esa cuenta.",
+       "t": "WPA2/WPA3-Enterprise con 802.1X"
+      },
+      {
+       "t": "Red de visitantes aislada de la interna",
+       "why": "El visitante solo llega a internet. La notebook de un tercero no ve tus servidores."
+      },
+      {
+       "t": "PMF (802.11w) obligatorio",
+       "why": "Protege las tramas de gestión e impide el deauth que tumba a los clientes."
+      },
+      {
+       "t": "Firmware del AP actualizado",
+       "why": "Corrige fallas conocidas, como el KRACK de WPA2."
+      }
+     ]
+    },
+    {
+     "label": "VULNERABLE",
+     "a": [
+      {
+       "why": "WEP se rompe en minutos con herramientas listas. No existe WEP seguro."
+      },
+      {
+       "t": "WPS activado",
+       "why": "El PIN de WPS cae por fuerza bruta y entrega la contraseña de la red."
+      },
+      {
+       "t": "WPA2 con TKIP",
+       "why": "TKIP es legado y vulnerable. WPA2 debe usar solo AES (CCMP)."
+      },
+      {
+       "t": "Contraseña por defecto del fabricante en el AP",
+       "why": "Las contraseñas por defecto están en listas públicas: es el primer intento de cualquier atacante."
+      },
+      {
+       "t": "Ocultar el SSID como protección",
+       "why": "Los propios clientes anuncian el nombre de la red al buscarla. Ocultar el SSID no protege nada."
+      }
+     ]
+    }
    ]
   },
   {
@@ -188,32 +353,117 @@
    "qs": [
     {
      "q": "¿En qué orden ocurren los mensajes de DHCP?",
-     "v": ["¿Cuál es la secuencia de los mensajes DHCP?", "Del pedido a la confirmación, ¿en qué orden intercambia mensajes DHCP?"],
-     "o": ["Discover, Offer, Request, Ack", { "t": "Request, Offer, Discover, Ack", "why": "El cliente primero busca un servidor (Discover). Solo después pide (Request)." }, { "t": "Offer, Discover, Ack, Request", "why": "El servidor solo ofrece después de que el cliente pregunta." }, { "t": "Discover, Request, Offer, Ack", "why": "El cliente solo puede pedir (Request) lo que se ofreció (Offer)." }],
+     "v": [
+      "¿Cuál es la secuencia de los mensajes DHCP?",
+      "Del pedido a la confirmación, ¿en qué orden intercambia mensajes DHCP?"
+     ],
+     "o": [
+      "Discover, Offer, Request, Ack",
+      {
+       "t": "Request, Offer, Discover, Ack",
+       "why": "El cliente primero busca un servidor (Discover). Solo después pide (Request)."
+      },
+      {
+       "t": "Offer, Discover, Ack, Request",
+       "why": "El servidor solo ofrece después de que el cliente pregunta."
+      },
+      {
+       "t": "Discover, Request, Offer, Ack",
+       "why": "El cliente solo puede pedir (Request) lo que se ofreció (Offer)."
+      }
+     ],
      "why": "DORA: Discover, Offer, Request, Ack. El cliente busca, el servidor ofrece, el cliente pide y el servidor confirma."
     },
     {
      "q": "Alguien conectó un router doméstico a la red y está repartiendo IPs equivocadas por DHCP. ¿Qué lo bloquea en el switch?",
-     "v": ["Un router doméstico conectado a la red está entregando IPs equivocadas por DHCP. ¿Qué recurso del switch lo impide?", "DHCP falso en la red: ¿qué protección en el switch bloquea servidores DHCP no autorizados?"],
-     "o": ["DHCP snooping", { "t": "Port mirroring", "why": "El port mirroring copia tráfico para análisis. No bloquea nada." }, { "t": "Spanning Tree", "why": "STP evita bucles de capa 2. No mira DHCP." }, { "t": "Cambiar la native VLAN", "why": "La native VLAN no tiene relación con un servidor DHCP falso." }],
+     "v": [
+      "Un router doméstico conectado a la red está entregando IPs equivocadas por DHCP. ¿Qué recurso del switch lo impide?",
+      "DHCP falso en la red: ¿qué protección en el switch bloquea servidores DHCP no autorizados?"
+     ],
+     "o": [
+      "DHCP snooping",
+      {
+       "t": "Port mirroring",
+       "why": "El port mirroring copia tráfico para análisis. No bloquea nada."
+      },
+      {
+       "t": "Spanning Tree",
+       "why": "STP evita bucles de capa 2. No mira DHCP."
+      },
+      {
+       "t": "Cambiar la native VLAN",
+       "why": "La native VLAN no tiene relación con un servidor DHCP falso."
+      }
+     ],
      "why": "DHCP snooping solo deja salir respuestas DHCP de puertos confiables, los del servidor real. Un servidor pirata en un puerto de usuario se descarta."
     },
     {
      "q": "¿Qué registro DNS apunta un nombre a una dirección IPv6?",
-     "v": ["¿Qué tipo de registro DNS vincula un nombre a un IPv6?", "Para que un nombre resuelva a una dirección IPv6, ¿qué registro crear?"],
-     "o": ["AAAA", { "t": "A", "why": "El registro A apunta a IPv4." }, { "t": "PTR", "why": "PTR hace el camino inverso: de IP a nombre." }, { "t": "MX", "why": "MX indica el servidor de correo del dominio." }],
+     "v": [
+      "¿Qué tipo de registro DNS vincula un nombre a un IPv6?",
+      "Para que un nombre resuelva a una dirección IPv6, ¿qué registro crear?"
+     ],
+     "o": [
+      "AAAA",
+      {
+       "t": "A",
+       "why": "El registro A apunta a IPv4."
+      },
+      {
+       "t": "PTR",
+       "why": "PTR hace el camino inverso: de IP a nombre."
+      },
+      {
+       "t": "MX",
+       "why": "MX indica el servidor de correo del dominio."
+      }
+     ],
      "why": "AAAA (\"quad A\") guarda el IPv6; el A guarda el IPv4."
     },
     {
      "q": "Cambiaste la IP del sitio en el DNS, pero la mitad de los usuarios todavía cae en la IP vieja. ¿Qué lo explica?",
-     "v": ["La IP del sitio cambió en el DNS, pero parte de los usuarios todavía accede a la vieja. ¿Por qué?", "Después de cambiar el registro DNS, la mitad sigue en la IP vieja. ¿Qué lo explica?"],
-     "o": ["El TTL: los resolvers guardan la respuesta vieja hasta que expire", { "t": "El DNS solo se actualiza a medianoche", "why": "No hay horario fijo: cada respuesta vale lo que dura su TTL." }, { "t": "Falta reiniciar el servidor web", "why": "El problema es la respuesta vieja guardada en la caché del DNS, no el servidor web." }, { "t": "El registro MX está mal", "why": "MX es de correo. No afecta el acceso al sitio." }],
+     "v": [
+      "La IP del sitio cambió en el DNS, pero parte de los usuarios todavía accede a la vieja. ¿Por qué?",
+      "Después de cambiar el registro DNS, la mitad sigue en la IP vieja. ¿Qué lo explica?"
+     ],
+     "o": [
+      "El TTL: los resolvers guardan la respuesta vieja hasta que expire",
+      {
+       "t": "El DNS solo se actualiza a medianoche",
+       "why": "No hay horario fijo: cada respuesta vale lo que dura su TTL."
+      },
+      {
+       "t": "Falta reiniciar el servidor web",
+       "why": "El problema es la respuesta vieja guardada en la caché del DNS, no el servidor web."
+      },
+      {
+       "t": "El registro MX está mal",
+       "why": "MX es de correo. No afecta el acceso al sitio."
+      }
+     ],
      "why": "Toda respuesta DNS tiene un TTL. Hasta que venza, resolvers y clientes reutilizan la respuesta en caché. Antes de una migración, baja el TTL."
     },
     {
      "q": "Los logs de dos servidores tienen 7 minutos de diferencia. ¿Por qué eso complica la investigación, y qué lo resuelve?",
-     "v": ["Dos servidores tienen 7 minutos de diferencia en el reloj. ¿Cuál es el problema para la investigación y la solución?", "Logs con horas desfasadas 7 minutos entre servidores. ¿Por qué complica y cómo corregirlo?"],
-     "o": ["Se vuelve imposible correlacionar los eventos; NTP sincroniza los relojes", { "t": "Solo afecta el backup; el DHCP lo resuelve", "why": "DHCP entrega IP. Quien ajusta el reloj es NTP." }, { "t": "No complica: la hora del log es solo informativa", "why": "Sin hora confiable no se puede armar la línea de tiempo del ataque." }, { "t": "El DNS sincroniza las horas por el TTL", "why": "El TTL es tiempo de caché, no reloj." }],
+     "v": [
+      "Dos servidores tienen 7 minutos de diferencia en el reloj. ¿Cuál es el problema para la investigación y la solución?",
+      "Logs con horas desfasadas 7 minutos entre servidores. ¿Por qué complica y cómo corregirlo?"
+     ],
+     "o": [
+      "Se vuelve imposible correlacionar los eventos; NTP sincroniza los relojes",
+      {
+       "t": "Solo afecta el backup; el DHCP lo resuelve",
+       "why": "DHCP entrega IP. Quien ajusta el reloj es NTP."
+      },
+      {
+       "t": "No complica: la hora del log es solo informativa",
+       "why": "Sin hora confiable no se puede armar la línea de tiempo del ataque."
+      },
+      {
+       "t": "El DNS sincroniza las horas por el TTL",
+       "why": "El TTL es tiempo de caché, no reloj."
+      }
+     ],
      "why": "Con relojes desalineados, la línea de tiempo del incidente sale mal. NTP (UDP 123) sincroniza a todos con la misma fuente. Kerberos y los certificados también fallan con el reloj mal."
     }
    ]

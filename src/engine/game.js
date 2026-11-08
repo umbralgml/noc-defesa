@@ -22,7 +22,7 @@ import { worldMapHTML } from './worldmap.js';
 import { cardsHTML, initCards } from './study.js';
 import { metric } from './rank.js';
 import { cyberConfetti } from './particles.js';
-import { speakRadio } from './radio.js';
+import { speakRadio, speakZ3R0 } from './radio.js';
 
 const ENGINES = { wire: renderWire, drop: renderDrop, quiz: renderQuiz, term: renderTerm, defense: renderDefense, topo: renderTopo, pcap: renderPcap };
 
@@ -210,7 +210,7 @@ function startLevel(i, hard, practice) { play(LEVELS[i], num(i) + '. ' + LEVELS[
 // podem trazer L.onWin(res) para tratar o fim do jeito delas.
 export function play(L, name, opt = {}) {
   cleanup();
-  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [], hard: !!opt.hard, practice: !!opt.practice, t0: Date.now() });
+  Object.assign(S, { lv: L, cur: LEVELS.indexOf(L), hp: 100, err: 0, placed: 0, busy: true, pairs: [], score: 0, streak: 0, miss: [], dangerWarned: false, hard: !!opt.hard, practice: !!opt.practice, t0: Date.now() });
   $('lvName').textContent = name || L.title;
   setHP(); setScore(); hideCoach(); lessonBar(L);
   $('stage').innerHTML = ''; $('bank').style.display = 'none';
@@ -223,7 +223,7 @@ export function play(L, name, opt = {}) {
   const hero = sc.querySelector('.hero'); hero.classList.add('walk');
   requestAnimationFrame(() => requestAnimationFrame(() => heroTo(sc, HX[L.loc])));
   typeCap(L.cap);
-  music(L.boss || L.miniboss ? 'boss' : 'play'); sfx.whoosh();
+  music(trackOf(L)); sfx.whoosh();
   for (let k = 0; k < 8; k++) S.intro.push(setTimeout(sfx.step, k * 170));
   for (let k = 0; k < 7; k++) S.intro.push(setTimeout(sfx.key, 1500 + k * 90 + Math.random() * 40));
   if (L.boss || L.miniboss) S.intro.push(setTimeout(sfx.siren, 300), setTimeout(sfx.siren, 1100));
@@ -260,7 +260,7 @@ function finishIntro() {
   // Celular: cena baixa durante a jogada; a cena inteira cabe em miniatura à direita.
   if (matchMedia('(max-width:600px),(max-height:760px)').matches) sc.querySelector('svg').setAttribute('preserveAspectRatio', 'xMaxYMax meet');
   S.busy = false;
-  if (L.boss || L.miniboss) speakRadio('Alerta crítico: Invasão do Z3R0 na rede.');
+  if (L.boss || L.miniboss) { speakRadio('Alerta crítico: Invasão do Z3R0 na rede.', { force: true }); speakZ3R0(['Ajoelhe-se, analista. Esta rede agora me pertence!', 'Seu firewall não passa de papel. Lute!']); }
   else if (L.type === 'defense') speakRadio('Alerta de tráfego: configure o firewall.');
   ENGINES[L.type](L);
   linkGloss($('stage').querySelector('.task'));
@@ -326,7 +326,7 @@ function win() {
   } else {
     sfx.win(); buzz([40, 60, 40]);
     cyberConfetti({ count: 45 });
-    speakRadio('Bom trabalho analista, siga em frente!', { force: true });
+    speakRadio(['Bom trabalho analista, siga em frente!', 'Mandou bem, analista! Rede de pé, bora pro próximo!', 'Isso aí! Incidente fechado, próximo chamado!'], { force: true });
     if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
     const c = center($('scene')); for (let k = 0; k < 3; k++) setTimeout(() => burst(c.x + (k - 1) * 80, c.y, ['#00e0a8', '#ffd166', '#4dd2ff'][k], 16), k * 150);
   }
@@ -356,20 +356,11 @@ function win() {
       <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`); addReport();
     if (last) $('mShare').onclick = e => { const p = progress(); share(`${tr('Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️')}\n★ ${p.stars}/${p.max} ${tr('estrelas')} · ${fmt(p.pts)} pts\n${tr('Você segura a rede?')} ${siteURL()}`, e.currentTarget); };
     if (more) {
-      let autoTimer = null;
       const doNext = () => {
-        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
         transitionToNextLevel(S.cur, S.cur + 1, xr);
       };
-      $('mNext').onclick = doNext;
-      // Auto-avanço com transição de caminhada após 4.5 segundos se o jogador apenas assistir
-      autoTimer = setTimeout(() => {
-        if ($('modal')?.classList.contains('on') && $('mNext')) {
-          doNext();
-        }
-      }, 4500);
+      $('mNext').onclick = doNext;   // sem auto-avanço: o jogador precisa de tempo para ler o resumo e a revisão dos erros
       $('mMap').onclick = () => {
-        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
         closeModal();
         goMap();
       };
@@ -516,6 +507,7 @@ export function showActTransition(prevActIdx, nextActIdx, onDone) {
 
 function fail(msg) {
   metric('fail'); cleanup(); sfx.lose(); stopMusic(); setTimeout(() => music('menu'), 2500);
+  speakZ3R0(['Patético! Sua rede caiu diante de mim!', 'Fraco demais, analista. A rede é minha!']);
   modal(`<div class="tag">FALHA NA DEFESA</div><h2>Rede comprometida</h2>
     <div class="dlg"><div class="av">${AV_Z}</div><div class="bubble z"><span class="who">Z3R0</span>${msg} Hahaha!</div></div>
     <div class="learn"><b>DICA</b>${S.lv.tip}</div>
@@ -524,6 +516,8 @@ function fail(msg) {
   $('mMap').onclick = () => { closeModal(); goMap(); };
   $('mRetry').onclick = () => { closeModal(); if (S.cur >= 0) startLevel(S.cur, S.hard); else goMap(); };
 }
+// Trilha sonora por fase: chefe, quiz e fase avançada = riff rápido; intermediário = galope de metal; resto = hard rock.
+const trackOf = L => L.boss || L.miniboss || L.type === 'quiz' || diffOf(L) >= 3 ? 'boss' : diffOf(L) === 2 ? 'gallop' : 'classic';
 export function goMap() { cleanup(); renderMap(); show('map'); music('menu'); }
 
 export function initGame() {
@@ -559,6 +553,12 @@ export function initGame() {
     if (!unlocked(i)) { buzz(30); return; }
     au(); brief(i);
   });
+  // Nós e portais do mapa 3D são <g>/<div> com tabindex: Enter e espaço valem como toque.
+  $('mapList').addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target.closest && e.target.closest('.rpg-node,.rpg-act-gateway'); if (!el) return;
+    e.preventDefault(); el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  });
   $('backBtn').onclick = goMap;
   $('lbh').onclick = () => { const open = $('lbar').classList.contains('shut'); store('noc_lesson', open); setLesson(open); };
   // Dica durante a fase: repete a aula e mostra a dica técnica.
@@ -566,7 +566,7 @@ export function initGame() {
     const L = S.lv;
     modal(`<div class="tag">DICA TÉCNICA</div><h2>${L.title}</h2><div class="learn">${L.tip}</div>${lessonHTML(L)}<div class="row"><button class="btn ghostb" id="sndG">SOM: ${isMuted() ? 'OFF' : 'ON'}</button><button class="btn" id="mOk">ENTENDI</button></div>`);
     $('mOk').onclick = closeModal;
-    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(S.lv.boss || S.lv.miniboss ? 'boss' : 'play'); };
+    $('sndG').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music(trackOf(S.lv)); };
   };
   $('modal').addEventListener('click', e => { if (e.target.id === 'modal' && $('mcard').querySelector('#mCancel,#mOk,#mNo')) closeModal(); });
 }
