@@ -62,7 +62,7 @@ export function badgeHTML() {
         <div class="badge-barcode">
           ${Array.from({ length: 32 }, (_, i) => `<i style="width:${(i % 3 === 0 ? 3 : i % 2 === 0 ? 1.5 : 2.5)}px;opacity:${(i % 5 === 0 ? 0.4 : 0.85)}"></i>`).join('')}
         </div>
-        <div class="badge-auth">${t('AUTORIZADO · SLA {n}%').replace('{n}', '99.9')}</div>
+        <div class="badge-auth">${t('AUTORIZADO · SLA 99.9%')}</div>
       </div>
     </div>
 

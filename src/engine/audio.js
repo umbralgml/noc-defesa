@@ -277,3 +277,21 @@ export function setMute(m) {
   document.querySelectorAll('#sndM').forEach(b => b.style.opacity = m ? .4 : 1);
 }
 export const isMuted = () => muted;
+
+// Rosnado grave por baixo da fala do Z3R0: a voz do navegador não passa pelo Web Audio,
+// então o peso vem de um subgrave distorcido que liga no início da fala e desliga no fim.
+let ZD = null;
+export function zDrone(on) {
+  if (!AC || muted) return;
+  const t = AC.currentTime;
+  if (!on) { if (ZD) { ZD.g.gain.setTargetAtTime(.0001, t, .12); const z = ZD; setTimeout(() => z.o.forEach(o => { try { o.stop(); } catch (e) {} }), 600); ZD = null; } return; }
+  if (ZD) return;
+  const g = AC.createGain(), lp = AC.createBiquadFilter(), ws = AC.createWaveShaper(), cv = new Float32Array(256);
+  for (let i = 0; i < 256; i++) { const x = i / 128 - 1; cv[i] = Math.tanh(x * 3); }
+  ws.curve = cv; lp.type = 'lowpass'; lp.frequency.value = 220; lp.Q.value = 4;
+  const o = [41, 43.5, 82].map((f, i) => { const x = AC.createOscillator(); x.type = i < 2 ? 'sawtooth' : 'square'; x.frequency.value = f; x.connect(ws); x.start(t); return x; });
+  const lfo = AC.createOscillator(), lg = AC.createGain(); lfo.frequency.value = 5.5; lg.gain.value = 60; lfo.connect(lg); lg.connect(lp.frequency); lfo.start(t); o.push(lfo);
+  ws.connect(lp); lp.connect(g); g.connect(SFXG); g.connect(DLY);
+  g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(.16, t + .25);
+  ZD = { g, o };
+}

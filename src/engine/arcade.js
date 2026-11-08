@@ -1,6 +1,6 @@
 // Modo Arcade "Plantão Caótico": sobrevivência rápida contra incidentes em tempo real.
 // O objetivo é manter o SLA acima de zero durante um turno intenso de 60 segundos.
-import { $, store } from './util.js';
+import { $, store, fmt, esc } from './util.js';
 import { flow, modal, closeModal } from './ui.js';
 import { sfx, music, stopMusic } from './audio.js';
 import { addXP, xpHTML } from './career.js';
@@ -44,7 +44,7 @@ const INCIDENTS = [
     why: 'O Fail2ban bloqueia IPs suspeitos no firewall após falhas repetidas de login.'
   },
   {
-    q: '🧪 DNS SPOOFING NO ROTEADOR RECURSIVO!',
+    q: '🧪 DNS SPOOFING NO RESOLVEDOR RECURSIVO!',
     desc: 'Usuários sendo redirecionados para site clone do banco.',
     a: 'Limpar cache DNS e validar DNSSEC',
     b: 'Configurar IP 127.0.0.1 em todos os clientes',
@@ -68,8 +68,8 @@ const INCIDENTS = [
     why: 'Bloquear a porta de C2 e isolar o host contaminado impede a movimentação lateral do atacante.'
   },
   {
-    q: '💣 PING OF DEATH / FLOOD ICMP!',
-    desc: 'Buffer do roteador estourando com pacotes ICMP gigantes.',
+    q: '💣 PING FLOOD ICMP NA BORDA!',
+    desc: 'Milhares de echo request por segundo saturando a CPU do roteador.',
     a: 'Aplicar rate limit de ICMP no firewall',
     b: 'Mudar o IP de broadcast para 0.0.0.0',
     ok: 0,
@@ -79,7 +79,7 @@ const INCIDENTS = [
     q: '⚠️ CONFLITO DE IP: GATEWAY INALCANÇÁVEL!',
     desc: 'Duas máquinas brigando pelo IP 192.168.1.1.',
     a: 'Aumentar MTU para 9000 bytes',
-    b: 'Localizar MAC invasor e reconfigurar DHCP',
+    b: 'Achar o MAC duplicado na tabela ARP e corrigir o IP fixo',
     ok: 1,
     why: 'Dois equipamentos com o mesmo IP causam instabilidade ARP e derrubam o gateway.'
   },
@@ -93,13 +93,13 @@ const INCIDENTS = [
   }
 ];
 
-let timer = null, timeLeft = 60, sla = 100, score = 0, combo = 1, currentInc = null;
+let timer = null, timeLeft = 60, sla = 100, score = 0, combo = 1, currentInc = null, missed = [];   // missed: incidentes errados, revistos no relatório
 
 export function startArcade() {
   timeLeft = 60;
   sla = 100;
   score = 0;
-  combo = 1;
+  combo = 1; missed = [];
   speakRadio('Iniciando plantão caótico. Mantenha o SLA de pé!');
 
   showArcadeModal();
@@ -178,12 +178,13 @@ function updateHUD() {
     fill.style.width = `${sla}%`;
     fill.style.background = sla > 60 ? 'var(--acc)' : sla > 30 ? 'var(--warn)' : 'var(--z)';
   }
-  if (sc) sc.textContent = score.toLocaleString('pt-BR');
+  if (sc) sc.textContent = fmt(score);
   if (cm) cm.textContent = `x${combo}`;
 }
 
 function nextIncident() {
-  currentInc = INCIDENTS[Math.floor(Math.random() * INCIDENTS.length)];
+  const prev = currentInc;   // não repete o mesmo incidente duas vezes seguidas
+  do currentInc = INCIDENTS[Math.floor(Math.random() * INCIDENTS.length)]; while (currentInc === prev);
   const q = document.getElementById('arcQ');
   const d = document.getElementById('arcDesc');
   const btnA = document.getElementById('arcA');
@@ -220,6 +221,7 @@ function answer(idx, chosen, other) {
     sfx.bad();
     combo = 1;
     sla = Math.max(0, sla - 25);
+    if (!missed.includes(currentInc)) missed.push(currentInc);
   }
 
   updateHUD();
@@ -253,10 +255,11 @@ function endArcade() {
     <div class="tag">${t('RELATÓRIO DO PLANTÃO CAÓTICO')}</div>
     <h2>${survived ? t('Turno Sobrevivido!') : t('SLA Esgotado!')}</h2>
     <div class="pts"><span>${t('Disponibilidade Final (SLA)')}</span><b style="color:${sla > 60 ? 'var(--acc)' : 'var(--z)'}">${sla}%</b></div>
-    <div class="pts"><span>${t('Pontuação do Turno')}</span><b>${score.toLocaleString('pt-BR')} pts</b></div>
-    <div class="pts"><span>${t('Seu Recorde')}</span><b style="color:var(--warn)">${best.toLocaleString('pt-BR')} pts</b></div>
+    <div class="pts"><span>${t('Pontuação do Turno')}</span><b>${fmt(score)} pts</b></div>
+    <div class="pts"><span>${t('Seu Recorde')}</span><b style="color:var(--warn)">${fmt(best)} pts</b></div>
+    ${missed.length ? `<div class="learn"><b>${t('REVISE O QUE ESCAPOU')}</b>${missed.map(x => `<p><b>${esc(t(x.q))}</b><br>✓ ${esc(t(x.ok ? x.b : x.a))}. ${esc(t(x.why))}</p>`).join('')}</div>` : ''}
     ${xpHTML(xr)}
-    <div class="learn"><b>${t('ANÁLISE PÓS-INCIDENTE')}</b>${t('No mundo real, SLAs de 99.9% permitem menos de 43 minutos de downtime por mês. Respostas táticas rápidas salvam a infraestrutura.')}</div>
+    <div class="learn"><b>${t('ANÁLISE PÓS-INCIDENTE')}</b>${t('No mundo real, SLAs de 99,9% permitem cerca de 43 minutos de indisponibilidade por mês. Respostas táticas rápidas salvam a infraestrutura.')}</div>
     <div class="row">
       <button class="btn ghostb" id="arcClose">${t('FECHAR')}</button>
       <button class="btn" id="arcAgain">${t('JOGAR DE NOVO')}</button>

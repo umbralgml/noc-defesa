@@ -1,165 +1,87 @@
-// Voz Tática do NOC e Voz do Antagonista Z3R0 (Web Speech API).
-// 100% nativo, sem bibliotecas externas, ativado junto com o áudio do jogo.
-// Configurado com seleção rigorosa de timbres masculinos e pitches graves para máxima imponência e autoridade.
+// Vozes do jogo pela Web Speech API (nativa, sem biblioteca), ligadas junto com o som.
+// Central do NOC: voz animada e natural (sem rebaixar o tom, que deixa a voz robótica).
+// Z3R0: voz de vilão de luta, grave, lenta e com um rosnado subgrave do Web Audio por baixo.
 
 import { store } from './util.js';
-import { isMuted, sfx } from './audio.js';
+import { isMuted, sfx, zDrone } from './audio.js';
 import { t, LANG } from './i18n.js';
 
-let radioEnabled = true;
-let lastSpeakTime = 0;
-let cachedVoices = [];
+let radioEnabled = true, lastSpeakTime = 0, cachedVoices = [], droneOff = null;
+try { const saved = store('noc_voice'); if (saved !== null && saved !== undefined) radioEnabled = !!saved; } catch (e) {}
 
-try {
-  const saved = store('noc_voice');
-  if (saved !== null && saved !== undefined) radioEnabled = !!saved;
-} catch (e) {}
-
-function updateVoices() {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  try {
-    const list = window.speechSynthesis.getVoices();
-    if (list && list.length) cachedVoices = list;
-  } catch (e) {}
-}
-
-if (typeof window !== 'undefined' && window.speechSynthesis) {
-  updateVoices();
-  if (window.speechSynthesis.onvoiceschanged !== undefined) {
-    window.speechSynthesis.onvoiceschanged = updateVoices;
-  }
-}
+const SS = () => (typeof window !== 'undefined' && window.speechSynthesis && window.SpeechSynthesisUtterance) ? window.speechSynthesis : null;
+function updateVoices() { try { const l = SS() && SS().getVoices(); if (l && l.length) cachedVoices = l; } catch (e) {} }
+if (SS()) { updateVoices(); if (SS().onvoiceschanged !== undefined) SS().onvoiceschanged = updateVoices; }
 
 export const isRadioOn = () => radioEnabled;
 export function setRadioOn(v) {
-  radioEnabled = !!v;
-  store('noc_voice', radioEnabled);
-  if (!radioEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
+  radioEnabled = !!v; store('noc_voice', radioEnabled);
+  if (!radioEnabled && SS()) { SS().cancel(); zDrone(false); }
 }
 
-// Identificadores de vozes masculinas em diversos sistemas operacionais (Android, Windows, macOS, iOS, Linux)
-const MALE_TERMS = [
-  'male', 'homem', 'masculino', 'man', 'boy', 'guy',
-  'daniel', 'felipe', 'ricardo', 'jorge', 'carlos', 'diego', 'enrique', 'pablo', 'miguel',
-  'antonio', 'alvaro', 'rodrigo', 'fabio', 'guilherme', 'manuel', 'gonzalo', 'juan',
-  'david', 'mark', 'george', 'alex', 'fred', 'ryan', 'oliver', 'luciano', 'tom',
-  'ptd', 'ptb', 'esb', 'esd', 'sfg', 'neural2-d', 'neural2-j', 'standard-b', 'standard-d',
-  'wavenet-b', 'wavenet-d', 'wavenet-j', 'm1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'
-];
+// Nomes casam por palavra inteira: "ana" não pode pegar "Mariana" nem "man" pegar "German".
+const word = list => new RegExp(`(^|[^a-z])(${list.join('|')})([^a-z]|$)`);
+const MALE = word(['male', 'man', 'masculino', 'homem', 'daniel', 'felipe', 'ricardo', 'antonio', 'fabio', 'julio', 'donato', 'humberto', 'nicolau', 'valerio',
+  'jorge', 'diego', 'enrique', 'pablo', 'alvaro', 'juan', 'carlos', 'gonzalo', 'jorge', 'tomas', 'raul', 'dario', 'gerardo', 'liam',
+  'guy', 'davis', 'tony', 'andrew', 'brian', 'eric', 'roger', 'christopher', 'steffan', 'ryan', 'thomas', 'george', 'arthur', 'oliver', 'fred', 'alex', 'aaron', 'gordon', 'rishi',
+  'ptd', 'pte', 'esd', 'esf', 'iom', 'tpd', 'iol']);
+const FEMALE = word(['female', 'woman', 'feminino', 'mulher', 'maria', 'helena', 'luciana', 'francisca', 'fernanda', 'vitoria', 'camila', 'raquel', 'thalita', 'yara', 'leila', 'manuela', 'giovanna', 'leticia', 'brenda', 'elza',
+  'zira', 'samantha', 'victoria', 'karen', 'monica', 'paulina', 'laura', 'elena', 'elvira', 'dalia', 'sofia', 'carmen', 'conchita', 'lucia', 'aria', 'jenny', 'emma', 'ava', 'michelle', 'sonia', 'libby', 'susan', 'hazel', 'moira', 'tessa', 'fiona',
+  'afs', 'pta', 'ptc', 'esa', 'esc', 'sfb', 'tpf', 'tpc']);
+const NATURAL = /natural|neural|online|enhanced|premium|wavenet|studio|siri/;
+const LOC = { pt: 'pt-br', es: 'es', en: 'en-us' };
 
-// Identificadores de vozes femininas para exclusão estrita
-const FEMALE_TERMS = [
-  'female', 'mulher', 'feminino', 'woman', 'girl',
-  'maria', 'helena', 'luciana', 'francisca', 'yelda', 'fernanda', 'vitória', 'vitoria',
-  'camila', 'raquel', 'zira', 'samantha', 'victoria', 'karen', 'monica', 'paulina', 'laura',
-  'elena', 'elisa', 'sofia', 'carmen', 'conchita', 'mia', 'aria', 'jenny', 'ana', 'leticia',
-  'joana', 'catarina', 'ines', 'inês', 'marta', 'teresa', 'clara',
-  'afs', 'afn', 'pta', 'ptc', 'esa', 'esc', 'neural2-a', 'neural2-c', 'neural2-f',
-  'standard-a', 'standard-c', 'standard-e', 'standard-f',
-  'wavenet-a', 'wavenet-c', 'wavenet-e', 'wavenet-f',
-  'f1', 'f2', 'f3', 'f4', 'f5'
-];
-
-function pickImposingVoice(langPrefix) {
+// Pontua as vozes do aparelho: idioma certo, voz natural (não robótica) e, se possível, masculina.
+function pickVoice(villain) {
   if (!cachedVoices.length) updateVoices();
-  const all = cachedVoices.length ? cachedVoices : (typeof window !== 'undefined' && window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
-  if (!all || !all.length) return null;
+  const pre = LANG === 'pt' ? 'pt' : LANG, loc = LOC[LANG] || 'pt-br';
+  const pool = cachedVoices.filter(v => (v.lang || '').toLowerCase().replace('_', '-').startsWith(pre));
+  if (!pool.length) return null;
+  const score = v => {
+    const raw = `${v.name || ''} ${v.voiceURI || ''}`.toLowerCase(), lang = (v.lang || '').toLowerCase().replace('_', '-');
+    let s = lang.startsWith(loc) ? 4 : 0;
+    if (NATURAL.test(raw)) s += 3;
+    if (MALE.test(raw) && !FEMALE.test(raw)) s += villain ? 6 : 3; else if (FEMALE.test(raw)) s -= villain ? 4 : 1;
+    if (v.localService) s += .5;   // offline também funciona no app
+    return s;
+  };
+  return pool.slice().sort((a, b) => score(b) - score(a))[0];
+}
+const isMale = v => !!v && MALE.test(`${v.name} ${v.voiceURI}`.toLowerCase()) && !FEMALE.test(`${v.name} ${v.voiceURI}`.toLowerCase());
+const canSpeak = () => radioEnabled && !isMuted() && SS() && !document.documentElement.classList.contains('calm');
+const pick = x => Array.isArray(x) ? x[Math.random() * x.length | 0] : x;
 
-  const targetVoices = all.filter(v => v.lang && v.lang.toLowerCase().startsWith(langPrefix));
-  const pool = targetVoices.length ? targetVoices : all;
-
-  // 1. Busca por voz estritamente masculina
-  let best = pool.find(v => {
-    const raw = `${v.name || ''} ${v.voiceURI || ''}`.toLowerCase();
-    const isMale = MALE_TERMS.some(m => raw.includes(m));
-    const isFemale = FEMALE_TERMS.some(f => raw.includes(f));
-    return isMale && !isFemale;
-  });
-
-  // 2. Se não encontrou uma com nome masculino explícito, busca qualquer uma que NÃO seja feminina
-  if (!best) {
-    best = pool.find(v => {
-      const raw = `${v.name || ''} ${v.voiceURI || ''}`.toLowerCase();
-      return !FEMALE_TERMS.some(f => raw.includes(f));
-    });
-  }
-
-  // 3. Fallback: se o dispositivo só tiver 1 voz instalada, retorna ela (o pitch baixo vai deixá-la grave)
-  if (!best && pool.length) best = pool[0];
-
-  return best || null;
+function utter(text, villain) {
+  const u = new SpeechSynthesisUtterance(t(pick(text))), v = pickVoice(villain);
+  if (v) { u.voice = v; u.lang = v.lang; } else u.lang = { pt: 'pt-BR', es: 'es-ES', en: 'en-US' }[LANG] || 'pt-BR';
+  return { u, male: isMale(v) };
 }
 
-// Voz Tática e Imponente da Central do NOC
+// Central do NOC: animada, ritmo de narrador. Aceita uma lista de frases e sorteia uma.
 export function speakRadio(text, { force = false } = {}) {
-  if (!radioEnabled || isMuted()) return;
-  if (typeof window === 'undefined' || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
-  if (document.documentElement.classList.contains('calm')) return;
-
+  if (!canSpeak()) return;
   const now = Date.now();
-  // Cooldown de 7 segundos para falas normais, e 2.2s mesmo para falas forçadas
-  if (!force && now - lastSpeakTime < 7000) return;
-  if (force && now - lastSpeakTime < 2200) return;
+  if (now - lastSpeakTime < (force ? 2200 : 7000)) return;
   lastSpeakTime = now;
-
   try {
-    window.speechSynthesis.cancel();
-    const translated = t(text);
-    const u = new SpeechSynthesisUtterance(translated);
-    const langPrefix = LANG === 'es' ? 'es' : LANG === 'en' ? 'en' : 'pt';
-    const voice = pickImposingVoice(langPrefix);
-
-    if (voice) {
-      u.voice = voice;
-      u.lang = voice.lang;
-    } else {
-      u.lang = { pt: 'pt-BR', es: 'es-ES', en: 'en-US' }[LANG] || 'pt-BR';
-    }
-
-    // Parâmetros para voz grave, imponente, com autoridade e presença de comandante de operações
-    u.pitch = 0.80;  // Registro barítono encorpado (abaixo de 1.0 garante voz masculina imponente)
-    u.rate = 1.02;   // Cadência firme, resoluta e segura
-    u.volume = 1.0;
-
-    // Bip tático de abertura de canal de rádio
-    try { if (sfx.radio) sfx.radio(); else sfx.sel(); } catch (e) {}
-
-    window.speechSynthesis.speak(u);
-  } catch (e) {
-    // Web Speech silencioso em navegadores sem suporte
-  }
+    SS().cancel(); zDrone(false);
+    const { u, male } = utter(text, false);
+    u.rate = 1.12; u.pitch = male ? 1.05 : 0.98; u.volume = 1;   // tom quase natural: rebaixar demais deixa a voz metálica
+    try { sfx.radio ? sfx.radio() : sfx.sel(); } catch (e) {}
+    SS().speak(u);
+  } catch (e) {}
 }
 
-// Voz Robótica, Sinistra e Imponente do Antagonista Z3R0
+// Z3R0: imponente e ameaçador. Entra na fila depois da central em vez de cortar a fala dela.
 export function speakZ3R0(text) {
-  if (!radioEnabled || isMuted()) return;
-  if (typeof window === 'undefined' || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
-  if (document.documentElement.classList.contains('calm')) return;
-
+  if (!canSpeak()) return;
   try {
-    window.speechSynthesis.cancel();
-    try { if (sfx.glitch) sfx.glitch(); else sfx.zap(); } catch (e) {}
-
-    const translated = t(text);
-    const u = new SpeechSynthesisUtterance(translated);
-    const langPrefix = LANG === 'es' ? 'es' : LANG === 'en' ? 'en' : 'pt';
-    const voice = pickImposingVoice(langPrefix);
-
-    if (voice) {
-      u.voice = voice;
-      u.lang = voice.lang;
-    } else {
-      u.lang = { pt: 'pt-BR', es: 'es-ES', en: 'en-US' }[LANG] || 'pt-BR';
-    }
-
-    // Configuração robótica ultra-grave e imponente de vilão cibernético
-    u.pitch = 0.44;  // Sub-grave mecânico ameaçador e imponente
-    u.rate = 0.88;   // Cadência calculada e implacável
-    u.volume = 1.0;
-
-    window.speechSynthesis.speak(u);
+    const { u, male } = utter(text, true);
+    u.rate = 0.8; u.pitch = male ? 0.35 : 0.2; u.volume = 1;
+    const stop = () => { clearTimeout(droneOff); zDrone(false); };
+    u.onstart = () => { try { sfx.boom(); } catch (e) {} zDrone(true); clearTimeout(droneOff); droneOff = setTimeout(stop, 1500 + u.text.length * 110); };
+    u.onend = stop; u.onerror = stop;
+    SS().speak(u);
     lastSpeakTime = Date.now();
   } catch (e) {}
 }

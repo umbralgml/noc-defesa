@@ -1,6 +1,38 @@
 {
   "versions": [
     {
+      "v": "1.38",
+      "date": "2026-11-08",
+      "title": "O Z3R0 engrossou a voz",
+      "items": [
+        "Central do NOC com voz mais animada e natural, e frases variadas a cada vitória",
+        "Z3R0 com voz grave de chefão, rosnado por baixo e provocações quando você perde ou enfrenta o chefe",
+        "Fim de fase sem pressa: o resumo e a revisão dos erros esperam você tocar em PRÓXIMA",
+        "Plantão Caótico agora mostra no relatório a explicação de cada incidente que escapou",
+        "Mapa 3D funciona no teclado e o pacote voador não interrompe fases iniciantes nem o tutorial"
+      ],
+      "es": {
+        "title": "Z3R0 engrosó la voz",
+        "items": [
+          "Central del NOC con voz más animada y natural, y frases variadas en cada victoria",
+          "Z3R0 con voz grave de jefe final, gruñido de fondo y provocaciones cuando pierdes o enfrentas al jefe",
+          "Fin de fase sin prisa: el resumen y el repaso de errores esperan a que toques SIGUIENTE",
+          "El Turno Caótico ahora muestra en el informe la explicación de cada incidente que se escapó",
+          "El mapa 3D funciona con teclado y el paquete volador no interrumpe las fases iniciales ni el tutorial"
+        ]
+      },
+      "en": {
+        "title": "Z3R0 got a deeper voice",
+        "items": [
+          "NOC dispatcher with a livelier, more natural voice and varied lines on every win",
+          "Z3R0 with a deep boss voice, a growl underneath and taunts when you lose or face the boss",
+          "No rush at the end of a level: the summary and mistake review wait until you tap NEXT",
+          "Chaotic Shift report now explains every incident that slipped through",
+          "The 3D map works with the keyboard and the flying packet no longer interrupts beginner levels or the tutorial"
+        ]
+      }
+    },
+    {
       "v": "1.37",
       "date": "2026-11-05",
       "title": "Telão Global de Ameaças e Plantão Caótico",

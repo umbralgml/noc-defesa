@@ -2,6 +2,7 @@
 // (digitando ou tocando nos sugeridos) e depois responde os passos de diagnóstico e correção.
 // Errar um passo custa integridade e explica o porquê, mas dá para tentar de novo.
 import { $ } from './util.js';
+import { t } from './i18n.js';
 import { sfx } from './audio.js';
 import { S } from './state.js';
 import { info, flow, glossCard } from './ui.js';
@@ -89,8 +90,8 @@ function run(raw) {
     unlock('easter');
     sfx.whoosh();
     cyberConfetti({ count: 65 });
-    print('10100110 01001111 01000011 ... Conectando à Matrix do NOC ...', 'tok');
-    print('Wake up, Analyst. The NOC has you. Follow the green packet.', 'tsys');
+    print(t('10100110 01001111 01000011 ... Conectando à Matrix do NOC ...'), 'tok');
+    print(t('Acorde, analista. O plantão é real. Siga o pacote verde.'), 'tsys');
     return;
   }
   if (n === 'z3r0' || n === 'hacker') {
@@ -98,21 +99,21 @@ function run(raw) {
     sfx.bad();
     const stage = $('stage');
     if (stage) { stage.classList.add('alarm'); setTimeout(() => stage.classList.remove('alarm'), 1200); }
-    print('>>> [Z3R0 INTERCEPT]: Achou que estava no controle da rede?', 'terr');
-    print('[Z3R0]: Cada byte que passa por esse switch passa pelos meus olhos. Desconecte enquanto ainda há tempo...', 'terr');
+    print(t('>>> [Z3R0 INTERCEPT]: Achou que estava no controle da rede?'), 'terr');
+    print(t('[Z3R0]: Cada byte que passa por esse switch passa pelos meus olhos. Desconecte enquanto ainda há tempo...'), 'terr');
     return;
   }
   if (n === 'sudo rm -rf /' || n === 'rm -rf /' || n === 'sudo rm -rf /*') {
     unlock('easter');
     sfx.bad();
-    print('⚠️ KERNEL PANIC ABORTADO: Tentativa de autodestruição do NOC bloqueada.', 'terr');
-    print('O estagiário foi escoltado para fora da sala do datacenter com segurança.', 'tsys');
+    print(t('⚠️ KERNEL PANIC ABORTADO: Tentativa de autodestruição do NOC bloqueada.'), 'terr');
+    print(t('O estagiário foi escoltado para fora da sala do datacenter com segurança.'), 'tsys');
     return;
   }
   if (n === 'cat /etc/shadow') {
     unlock('easter');
-    print('root:$6$Z3R0$k9xLq... [HASH SHA-512]: ACESSO NEGADO!', 'terr');
-    print('Dica do NOC: senhas em /etc/shadow são protegidas; use sempre senhas fortes e MFA!', 'tsys');
+    print(t('root:$6$Z3R0$k9xLq... [HASH SHA-512]: ACESSO NEGADO!'), 'terr');
+    print(t('Dica do NOC: o /etc/shadow só o root lê e guarda as senhas em hash; use sempre senhas fortes e MFA.'), 'tsys');
     return;
   }
   if (n === 'neofetch' || n === 'fastfetch') {

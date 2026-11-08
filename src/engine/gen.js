@@ -157,7 +157,7 @@ export const ACAD = {
       const item = pick(r, pool);
       const name = LANG === 'es' ? item[1] : LANG === 'en' ? item[2] : item[0];
       return {
-        q: g(`Em qual camada do Modelo OSI opera o ${name}?`, `¿En qué capa del Modelo OSI opera el ${name}?`, `At which layer of the OSI Model does ${name} operate?`),
+        q: g(`Em qual camada do Modelo OSI fica: ${name}?`, `¿En qué capa del Modelo OSI está: ${name}?`, `Which OSI Model layer does this belong to: ${name}?`),
         a: 0,
         why: item[4],
         o: uniq([item[3], ...item[5]])
@@ -242,11 +242,11 @@ export const ACAD = {
       ['755', 'rwxr-xr-x', g('dono: rwx (4+2+1=7); grupo: r-x (4+1=5); outros: r-x (4+1=5)', 'dueño: rwx (4+2+1=7); grupo: r-x (4+1=5); otros: r-x (4+1=5)', 'owner: rwx (4+2+1=7); group: r-x (4+1=5); others: r-x (4+1=5)')],
       ['644', 'rw-r--r--', g('dono: rw- (4+2=6); grupo: r-- (4); outros: r-- (4)', 'dueño: rw- (4+2=6); grupo: r-- (4); otros: r-- (4)', 'owner: rw- (4+2=6); group: r-- (4); others: r-- (4)')],
       ['600', 'rw-------', g('dono: rw- (4+2=6); grupo: --- (0); outros: --- (0)', 'dueño: rw- (4+2=6); grupo: --- (0); otros: --- (0)', 'owner: rw- (4+2=6); group: --- (0); others: --- (0)')],
-      ['700', 'rwx------', g('dono: rwx (4+2+1=7); grupo: --- (0); outros: --- (0)', 'dueño: rwx (4+2+1=7); grupo: --- (0); outros: --- (0)', 'owner: rwx (4+2+1=7); group: --- (0); others: --- (0)')],
+      ['700', 'rwx------', g('dono: rwx (4+2+1=7); grupo: --- (0); outros: --- (0)', 'dueño: rwx (4+2+1=7); grupo: --- (0); otros: --- (0)', 'owner: rwx (4+2+1=7); group: --- (0); others: --- (0)')],
       ['777', 'rwxrwxrwx', g('dono: rwx (7); grupo: rwx (7); outros: rwx (7) — permissão total', 'dueño: rwx (7); grupo: rwx (7); otros: rwx (7) — permiso total', 'owner: rwx (7); group: rwx (7); others: rwx (7) — full permissions')],
       ['664', 'rw-rw-r--', g('dono: rw- (6); grupo: rw- (6); outros: r-- (4)', 'dueño: rw- (6); grupo: rw- (6); otros: r-- (4)', 'owner: rw- (6); group: rw- (6); others: r-- (4)')],
-      ['750', 'rwxr-x---', g('dono: rwx (7); grupo: r-x (5); outros: --- (0)', 'dueño: rwx (7); grupo: r-x (5); outros: --- (0)', 'owner: rwx (7); group: r-x (5); others: --- (0)')],
-      ['640', 'rw-r-----', g('dono: rw- (6); grupo: r-- (4); outros: --- (0)', 'dueño: rw- (6); grupo: r-- (4); outros: --- (0)', 'owner: rw- (6); group: r-- (4); others: --- (0)')]
+      ['750', 'rwxr-x---', g('dono: rwx (7); grupo: r-x (5); outros: --- (0)', 'dueño: rwx (7); grupo: r-x (5); otros: --- (0)', 'owner: rwx (7); group: r-x (5); others: --- (0)')],
+      ['640', 'rw-r-----', g('dono: rw- (6); grupo: r-- (4); outros: --- (0)', 'dueño: rw- (6); grupo: r-- (4); otros: --- (0)', 'owner: rw- (6); group: r-- (4); others: --- (0)')]
     ];
 
     if (kind === 0) {
@@ -290,7 +290,7 @@ export const ACAD = {
         'chmod 600',
         g('Chaves privadas exigem rw------- (600): apenas o dono pode ler/escrever. Permissão aberta faz o cliente SSH abortar.', 'Las claves privadas exigen rw------- (600): solo el dueño puede leer/escribir. Si está abierta, SSH aborta la conexión.', 'Private keys require rw------- (600): only owner can read/write. If too open, SSH client refuses connection.'),
         [
-          { t: 'chmod 644', why: g('644 permitiria que outros usuários do sistema lessem sua chave privada.', '644 permitiría que otros usuarios del sistema lean tu clave privada.', '644 would allow other system users to read your private key.') },
+          { t: 'chmod 644', why: g('644 deixa grupo e outros lerem a chave privada, e o cliente SSH recusa a chave (UNPROTECTED PRIVATE KEY FILE).', '644 deja que el grupo y los otros lean la clave privada, y el cliente SSH rechaza la clave (UNPROTECTED PRIVATE KEY FILE).', '644 lets group and others read the private key, and the SSH client refuses it (UNPROTECTED PRIVATE KEY FILE).') },
           { t: 'chmod 777', why: g('777 daria acesso total a qualquer um no sistema: o SSH bloqueia imediatamente.', '777 daría acceso total a cualquiera en el sistema: SSH lo bloquea de inmediato.', '777 gives full access to anyone: SSH blocks it immediately.') },
           { t: 'chmod 755', why: g('755 dá execução desnecessária e permite que grupo e outros leiam a chave privada.', '755 da ejecución innecesaria y permite que grupo y otros lean la clave privada.', '755 gives unnecessary execution and lets group/others read the key.') }
         ]
