@@ -5,8 +5,11 @@ import { $, store } from './util.js';
 import { sfx, au } from './audio.js';
 import { ROOM_W, STATIONS, LOCNAME, roomSVG } from './scene.js';
 import { S, LEVELS, K, num, unlocked } from './state.js';
-import { flow, modal, closeModal } from './ui.js';
+import { flow, modal, closeModal, floatTxt } from './ui.js';
 import { brief } from './game.js';
+import { cyberConfetti } from './particles.js';
+import { addXP } from './career.js';
+import { speakRadio } from './radio.js';
 
 const SPEED = 240, MINX = 14, MAXX = ROOM_W - 14;   // unidades do SVG por segundo
 let x = 0, dir = 1, walkT = null, stepT = null, svg, hero, rh;
@@ -48,7 +51,11 @@ function walk(nx, done) {
   }, dur * 1000);
 }
 
-function goStation(t) { au(); walk(t.stand, () => { hero.classList.add('type'); openStation(t); }); }
+function goStation(t, at) {
+  au();
+  if (at) floatTxt(at.x, at.y, `${t.name} · ONLINE`, '#00f0ff');
+  walk(t.stand, () => { hero.classList.add('type'); openStation(t); });
+}
 
 // Incidentes do local: lista com estado e acesso ao briefing.
 function openStation(t) {
@@ -90,12 +97,35 @@ export function initRoom() {
   svg.addEventListener('click', e => {
     const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY;
     const sx = p.matrixTransform(svg.getScreenCTM().inverse()).x, t = stationAt(sx);
-    if (t && e.target.closest('.stn')) goStation(t); else { au(); walk(sx); }
+    if (t && e.target.closest('.stn')) goStation(t, { x: e.clientX, y: e.clientY }); else { au(); walk(sx); }
   });
   svg.addEventListener('keydown', e => {
     const g = e.target.closest && e.target.closest('.stn');
     if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); goStation(STATIONS.find(t => t.loc === g.dataset.loc)); }
   });
+  // Scan interativo do NOC (+15 XP)
+  const scanBtn = $('roomScanBtn');
+  if (scanBtn) {
+    let scanned = false;
+    scanBtn.onclick = () => {
+      au();
+      if (scanned) {
+        sfx.sel();
+        speakRadio('Varredura já realizada. Rede operando com estabilidade.');
+        return;
+      }
+      scanned = true;
+      sfx.win();
+      cyberConfetti({ count: 35 });
+      addXP(15);
+      scanBtn.textContent = tr('✓ REDE 100% OPERACIONAL');
+      scanBtn.style.borderColor = '#00e0a8';
+      scanBtn.style.color = '#00e0a8';
+      scanBtn.style.boxShadow = '0 0 16px rgba(0, 224, 168, 0.4)';
+      speakRadio('Varredura completa. Todos os enlaces e roteadores em 100% de integridade.');
+      floatTxt(window.innerWidth / 2, window.innerHeight * 0.35, '+15 XP · TELEMETRIA OK', '#00e0a8');
+    };
+  }
   // Teclado no mapa: setas andam, Enter abre o equipamento mais próximo.
   addEventListener('keydown', e => {
     if (!$('map').classList.contains('on') || $('modal').classList.contains('on') || e.target.closest('input,textarea')) return;

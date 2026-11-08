@@ -3,33 +3,68 @@ import { $, store } from './util.js';
 import { t } from './i18n.js';
 
 // ---------- avatars ----------
-export const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#12324a"/><path d="M11 64c2-12 10-18 21-18s19 6 21 18z" style="fill:var(--hs,#00a884)"/><path d="M26 46l6 7 6-7" style="fill:var(--hs3,#0b6e57)"/><rect x="38" y="53" width="8" height="6" rx="1" fill="#e6f1ff"/><circle cx="32" cy="29" r="12" style="fill:var(--hk,#d9a77f)"/><path d="M20 27c0-9 6-14 12-14s12 5 12 13c-3-4-8-6-12-6s-9 2-12 7z" style="fill:var(--hh,#2b1d14)"/><rect x="24" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><rect x="33" y="26.5" width="7" height="5" rx="1.6" fill="rgba(160,220,255,.25)" stroke="#0b1220" stroke-width="1.4"/><path d="M31 28.5h2" stroke="#0b1220" stroke-width="1.4"/><path d="M28.5 35.5q3.5 2.5 7 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/><g class="hset"><path d="M19 30a13 13 0 0 1 26 0" fill="none" stroke="#1b2a44" stroke-width="3"/><rect x="16" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><rect x="43" y="27" width="5" height="9" rx="2" fill="#1b2a44"/><path d="M19 35c0 5 4 8 9 8" stroke="#1b2a44" stroke-width="2" fill="none"/><circle cx="29" cy="43" r="2.2" fill="#00e0a8"/></g></svg>`;
+export const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="avBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#081426"/><stop offset="1" stop-color="#050a14"/></linearGradient>
+    <radialGradient id="avGlow" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="rgba(0,224,168,.28)"/><stop offset="1" stop-color="rgba(0,224,168,0)"/></radialGradient>
+    <linearGradient id="avVisor" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(77,210,255,.45)"/><stop offset=".5" stop-color="rgba(0,224,168,.5)"/><stop offset="1" stop-color="rgba(77,210,255,.25)"/></linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="url(#avBg)" stroke="rgba(77,210,255,.3)" stroke-width="1.2"/>
+  <circle cx="32" cy="32" r="31" fill="url(#avGlow)"/>
+  <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(0,224,168,.18)" stroke-width=".8" stroke-dasharray="3 4"/>
+  <path d="M32 2V5 M32 59V62 M2 32H5 M59 32H62" stroke="#00e0a8" stroke-width="1.2"/>
+  <path d="M10 64 C11 49 18 43 32 43 C46 43 53 49 54 64 Z" style="fill:var(--hs,#00a884)"/>
+  <path d="M22 64 C23 51 26 45 32 45 C38 45 41 51 42 64 Z" fill="#0d1b30"/>
+  <path d="M25 45 L32 53 L39 45" style="fill:var(--hs3,#0b6e57)"/>
+  <line x1="32" y1="52" x2="32" y2="64" stroke="#00e0a8" stroke-width="1.2"/>
+  <rect x="38" y="52" width="9" height="12" rx="1.5" fill="#f0f6fc" stroke="#0b1728" stroke-width=".8"/>
+  <rect x="40" y="54" width="5" height="1.8" rx=".5" fill="#00a884"/>
+  <rect x="40" y="57" width="5" height="4.5" rx=".5" fill="#1b2a44"/>
+  <rect x="28" y="37" width="8" height="8" rx="2" style="fill:var(--hk,#d9a77f)"/>
+  <path d="M28 41 C30 44 34 44 36 41" stroke="rgba(0,0,0,.25)" stroke-width="1.2" fill="none"/>
+  <path d="M20 27 C20 18 24 15 32 15 C40 15 44 18 44 27 C44 35 38 40 32 40 C26 40 20 35 20 27 Z" style="fill:var(--hk,#d9a77f)"/>
+  <path d="M18 24 C18 14 24 10 32 10 C40 10 46 14 46 23 C44 19 40 17 35 17 C28 17 24 20 21 25 C19 25 18 24 18 24 Z" style="fill:var(--hh,#2b1d14)"/>
+  <path d="M32 10 C36 10 42 12 44 17 C41 15 36 14 32 14 C27 14 22 16 20 20 C22 13 27 10 32 10 Z" fill="rgba(255,255,255,.15)"/>
+  <rect x="22" y="23" width="20" height="7.5" rx="2.5" fill="url(#avVisor)" stroke="#0e1e34" stroke-width="1.2"/>
+  <line x1="24" y1="26.5" x2="40" y2="26.5" stroke="#ffffff" stroke-width=".8" opacity=".7"/>
+  <circle cx="39" cy="26.5" r="1" fill="#ff2e63"/>
+  <path d="M29 34.5 Q32 36.5 35 34.5" stroke="#7a4a33" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <g class="hset">
+    <path d="M19 27 A13 13 0 0 1 45 27" fill="none" stroke="#182b45" stroke-width="2.6"/>
+    <rect x="16" y="24" width="5" height="9" rx="2.5" fill="#182b45" stroke="#00e0a8" stroke-width=".6"/>
+    <rect x="43" y="24" width="5" height="9" rx="2.5" fill="#182b45" stroke="#00e0a8" stroke-width=".6"/>
+    <path d="M18 32 C18 39 24 42 29 42" stroke="#182b45" stroke-width="2" fill="none"/>
+    <circle cx="30" cy="42" r="2.2" fill="#00e0a8"/>
+    <circle cx="30" cy="42" r="1" fill="#fff"/>
+  </g>
+</svg>`;
 export const AV_Z = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#2a0d18"/><path d="M8 64c0-22 9-42 24-46 15 4 24 24 24 46z" fill="#12050a"/><path d="M14 64c1-16 8-30 18-33 10 3 17 17 18 33z" fill="#1f0a12"/><ellipse cx="32" cy="35" rx="11" ry="13" fill="#e8e8ee"/><path d="M23 31l7 2.5-7 2.5z" fill="#ff2e63"/><path d="M41 31l-7 2.5 7 2.5z" fill="#ff2e63"/><path d="M26 42q6 4 12 0" stroke="#12050a" stroke-width="1.6" fill="none"/><path d="M28 44v2M32 45v2M36 44v2" stroke="#12050a" stroke-width="1.2"/></svg>`;
 
 export const AV_CHEFE = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#2b2547"/><path d="M10 64c2-13 10-19 22-19s20 6 22 19z" fill="#3a4d6e"/><path d="M27 45l5 8 5-8z" fill="#e6f1ff"/><path d="M31 47h2l1 9-2 3-2-3z" fill="#ff7a45"/><circle cx="32" cy="29" r="12" fill="#c98f6a"/><path d="M20 27c0-8 5-13 12-13s12 5 12 12c-2-3-6-5-12-5s-10 2-12 6z" fill="#b8c2d6"/><circle cx="27.5" cy="29" r="3.2" fill="none" stroke="#0b1220" stroke-width="1.3"/><circle cx="36.5" cy="29" r="3.2" fill="none" stroke="#0b1220" stroke-width="1.3"/><path d="M30.7 29h2.6" stroke="#0b1220" stroke-width="1.3"/><path d="M28 36q4 2.5 8 0" stroke="#7a4a33" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
 
 // ---------- scenes ----------
-// Analista: formas lisas, sombra lateral e luz de contorno. As cores vêm das variáveis do vestiário (prefs.js).
+// Analista moderno: silhueta tática de operador, jaqueta cibernética com costuras e crachá, relógio-terminal holográfico e headset tático.
 const HERO = `<g class="hero" id="hero"><g class="bob">
-<ellipse cx="0" cy="0" rx="12" ry="2.2" fill="rgba(0,0,0,.45)"/><ellipse cx="0" cy="0" rx="7" ry="1.2" fill="rgba(0,224,168,.18)"/>
-<g class="legL"><path d="M-6.2 -22 h5.6 l-.4 19.5 h-4.6z" fill="#16233a"/><path d="M-7.4 -3 h7.2 q1 0 1 1.4 v1.6 h-8.6 q-.4-3 .4-3z" fill="#04070d"/></g>
-<g class="legR"><path d="M.6 -22 h5.6 l-.2 19.5 h-4.8z" fill="#1d2d4a"/><path d="M.8 -3 h7.2 q1 0 1 1.4 v1.6 h-8.4z" fill="#04070d"/><path d="M1 -1.2 h7.6" stroke="#00e0a8" stroke-width=".5" opacity=".6"/></g>
-<g class="armL"><rect x="-12.4" y="-43.5" width="4.6" height="17.5" rx="2.3" style="fill:var(--hs2,#008f70)"/><circle cx="-10.1" cy="-25" r="2.3" style="fill:var(--hk,#d9a77f)"/></g>
-<path d="M-9.6 -43.6 Q-9.6 -46.4 -6.4 -46.6 H6.4 Q9.6 -46.4 9.6 -43.6 L9.8 -21.6 Q9.8 -19.6 7.8 -19.6 H-7.8 Q-9.8 -19.6 -9.8 -21.6Z" style="fill:var(--hs,#00a884)"/>
-<path d="M2 -46.6 H6.4 Q9.6 -46.4 9.6 -43.6 L9.8 -21.6 Q9.8 -19.6 7.8 -19.6 H3z" fill="rgba(0,0,0,.2)"/>
-<path d="M-9.6 -43.6 L-9.8 -21.6" stroke="rgba(255,255,255,.25)" stroke-width=".7"/>
-<path d="M-4 -46.6 L0 -41.5 L4 -46.6" style="fill:var(--hs3,#0b6e57)"/>
-<rect x="2.6" y="-37.5" width="4.6" height="5.6" rx=".8" fill="#e6f1ff"/><rect x="3.3" y="-36.6" width="3.2" height="1" fill="#00a884"/>
-<g class="armR"><rect x="7.8" y="-43.5" width="4.6" height="17.5" rx="2.3" style="fill:var(--hs,#00a884)"/><circle cx="10.1" cy="-25" r="2.3" style="fill:var(--hk,#d9a77f)"/></g>
-<rect x="-2.4" y="-49.6" width="4.8" height="4" rx="1" style="fill:var(--hk,#d9a77f)"/>
-<ellipse cx="0" cy="-55.4" rx="7.6" ry="8.2" style="fill:var(--hk,#d9a77f)"/>
-<path d="M3 -63 Q7.6 -61 7.6 -55.4 Q7.6 -50 3 -47.6 Q6 -52 6 -55.4 Q6 -59.6 3 -63z" fill="rgba(0,0,0,.12)"/>
-<path d="M-8 -55.4 C-8.4 -64 -2.4 -66.4 1.6 -65.6 C6.4 -64.8 9 -61.6 8 -56.4 C6 -59.8 1.6 -60.6 -2.4 -59.6 C-5 -59 -6.6 -57.6 -8 -55.4Z" style="fill:var(--hh,#2b1d14)"/>
-<rect x="1.4" y="-57.4" width="5.4" height="3.2" rx="1.2" fill="rgba(160,220,255,.22)" stroke="rgba(11,18,32,.8)" stroke-width=".7"/>
-<g class="hset"><path d="M-8.5 -55 A8.6 8.6 0 0 1 8.2 -58.5" stroke="#14233a" stroke-width="1.8" fill="none"/>
-<rect x="-10.2" y="-58" width="3.6" height="6.5" rx="1.6" fill="#14233a"/>
-<path d="M-7 -52 C-6 -48 -1 -47 3 -48" stroke="#14233a" stroke-width="1.1" fill="none"/><circle cx="3.6" cy="-48" r="1.2" fill="#00e0a8"/></g>
-<g class="hcap"><path d="M-8.8 -57 C-8.6 -66.5 8.6 -66.5 8.8 -57 Z" style="fill:var(--hs,#00a884)"/><rect x="3" y="-58.6" width="9" height="2.4" rx="1.1" style="fill:var(--hs3,#0b6e57)"/></g>
+<ellipse cx="0" cy="1" rx="14" ry="2.6" fill="rgba(0,0,0,.55)"/><ellipse cx="0" cy="1" rx="8" ry="1.4" fill="rgba(0,224,168,.25)"/>
+<g class="legL"><path d="M-6.2 -22 h5.6 l-.4 19.5 h-4.6z" fill="#111c2e"/><path d="M-6.4 -14 h5.8 v2.2 h-5.8z" fill="#182b45"/><path d="M-7.6 -3 h7.8 q1.2 0 1.2 1.6 v1.6 h-9.2 q-.4-3.2 .2-3.2z" fill="#060c18"/><path d="M-7.2 .2 h8" stroke="var(--hs,#00a884)" stroke-width=".6" fill="none"/></g>
+<g class="legR"><path d="M.6 -22 h5.6 l-.2 19.5 h-4.8z" fill="#16253c"/><path d="M.6 -14 h5.8 v2.2 h-5.8z" fill="#1e3454"/><path d="M.4 -3 h7.8 q1.2 0 1.2 1.6 v1.6 h-9 q-.2-3.2 .2-3.2z" fill="#060c18"/><path d="M.8 .2 h8" stroke="var(--hs,#00a884)" stroke-width=".6" fill="none"/><path d="M1 -1.2 h7.6" stroke="#4dd2ff" stroke-width=".5" opacity=".7"/></g>
+<g class="armL"><rect x="-12.8" y="-43.5" width="4.8" height="18" rx="2.4" style="fill:var(--hs2,#008f70)"/><rect x="-13.4" y="-32" width="6" height="4.5" rx="1.2" fill="#081426" stroke="#4dd2ff" stroke-width=".5"/><line x1="-12.2" y1="-29.8" x2="-8.6" y2="-29.8" stroke="#00e0a8" stroke-width=".8"/><circle cx="-10.4" cy="-24.5" r="2.3" fill="#142236"/><circle cx="-10.4" cy="-24.5" r="1.4" style="fill:var(--hk,#d9a77f)"/></g>
+<path d="M-9.8 -44 Q-9.8 -47 -6.4 -47.2 H6.4 Q9.8 -47 9.8 -44 L10 -21.4 Q10 -19.4 7.8 -19.4 H-7.8 Q-9.8 -19.4 -9.8 -21.4Z" style="fill:var(--hs,#00a884)"/>
+<path d="M2.5 -47.2 H6.4 Q9.8 -47 9.8 -44 L10 -21.4 Q10 -19.4 7.8 -19.4 H2.5z" fill="rgba(0,0,0,.22)"/>
+<path d="M-5 -47.2 L0 -40 L5 -47.2" style="fill:var(--hs3,#0b6e57)"/>
+<line x1="0" y1="-40" x2="0" y2="-21.4" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>
+<line x1="0" y1="-38" x2="0" y2="-36" stroke="#00e0a8" stroke-width="1.2"/>
+<rect x="2.8" y="-38.5" width="4.8" height="6.2" rx="1" fill="#f0f6fc" stroke="#0d1b30" stroke-width=".5"/><rect x="3.4" y="-37.6" width="3.6" height="1.2" fill="#00a884"/><circle cx="6" cy="-34" r=".6" fill="#00e0a8"/>
+<g class="armR"><rect x="8" y="-43.5" width="4.8" height="18" rx="2.4" style="fill:var(--hs,#00a884)"/><circle cx="10.4" cy="-24.5" r="2.3" fill="#142236"/><circle cx="10.4" cy="-24.5" r="1.4" style="fill:var(--hk,#d9a77f)"/></g>
+<rect x="-2.5" y="-50.2" width="5" height="4.4" rx="1.2" style="fill:var(--hk,#d9a77f)"/>
+<path d="M-7.6 -56.5 C-7.6 -64.5 -2.4 -67 1.6 -66.2 C6.4 -65.4 9 -62 8 -56.5 C6 -51.5 3 -47 0 -47 C-4 -47 -7.6 -51.5 -7.6 -56.5 Z" style="fill:var(--hk,#d9a77f)"/>
+<path d="M-8.2 -56 C-8.6 -65 -2.4 -67.5 1.6 -66.8 C6.8 -66 9.4 -62.5 8.4 -57 C6.2 -60.8 1.6 -61.6 -2.4 -60.6 C-5.2 -60 -6.8 -58.4 -8.2 -56Z" style="fill:var(--hh,#2b1d14)"/>
+<path d="M0 -66.8 C3 -66.8 7 -64 7 -60 C5.5 -61.5 2.5 -62 0 -62 Z" fill="rgba(255,255,255,.16)"/>
+<rect x="1.2" y="-58.5" width="6.2" height="3.6" rx="1.5" fill="rgba(77,210,255,.3)" stroke="#0b172a" stroke-width=".8"/><line x1="1.8" y1="-56.7" x2="6.8" y2="-56.7" stroke="#00e0a8" stroke-width=".5"/>
+<g class="hset"><path d="M-8.8 -56 A9 9 0 0 1 8.6 -59.5" stroke="#14233a" stroke-width="2.2" fill="none"/>
+<rect x="-10.6" y="-59" width="4" height="7.2" rx="1.8" fill="#14233a" stroke="#00e0a8" stroke-width=".5"/>
+<path d="M-7.5 -53 C-6.5 -48.5 -1.2 -47.5 3.2 -48.5" stroke="#14233a" stroke-width="1.3" fill="none"/><circle cx="3.8" cy="-48.5" r="1.4" fill="#00e0a8"/><circle cx="3.8" cy="-48.5" r=".7" fill="#fff"/></g>
+<g class="hcap"><path d="M-9.2 -58 C-9 -67.5 9 -67.5 9.2 -58 Z" style="fill:var(--hs,#00a884)"/><rect x="3.2" y="-59.8" width="9.6" height="2.6" rx="1.2" style="fill:var(--hs3,#0b6e57)"/><circle cx="-1" cy="-62" r="1.2" fill="#00e0a8"/></g>
 </g></g>`;
 const led = (x, y, c, d, cls = 'led') => `<circle class="${cls}" style="animation-delay:${d.toFixed(2)}s" cx="${x}" cy="${y}" r="1.3" fill="${c}"/>`;
 function lines(id, x, y, w, h, c) {
@@ -148,8 +183,9 @@ function warS(boss, id) {
   <rect x="200" y="18" width="190" height="62" rx="3" fill="${boss ? 'rgba(255,46,99,.08)' : 'url(#sgScr)'}"/>`;
   if (boss) {
     s += `<g class="glitch"><path d="M318 80 C318 50 330 30 350 28 C370 30 382 50 382 80Z" fill="#0c0306"/><ellipse cx="350" cy="52" rx="14" ry="18" fill="#e8e8ee"/><path d="M338 46l9 3.5-9 3.5z" fill="#ff2e63"/><path d="M362 46l-9 3.5 9 3.5z" fill="#ff2e63"/><path d="M344 62q6 4 12 0" stroke="#1a0610" stroke-width="2" fill="none"/>
-    <text x="208" y="32" font-family="Orbitron,monospace" font-size="9" font-weight="800" fill="#ff2e63" class="led">Z3R0</text><text x="208" y="42" font-family="JetBrains Mono,monospace" font-size="6" fill="#ff8aa5">pwned.exe</text>
-    <rect class="sg-sweep" x="200" y="18" width="190" height="3" fill="rgba(255,46,99,.35)"/></g>
+    <circle cx="350" cy="52" r="24" fill="none" stroke="#ff2e63" stroke-width=".6" stroke-dasharray="4 3"/>
+    <text x="208" y="32" font-family="Orbitron,monospace" font-size="9" font-weight="800" fill="#ff2e63" class="led">Z3R0</text><text x="208" y="42" font-family="JetBrains Mono,monospace" font-size="6" fill="#ff8aa5">pwned.exe // ROOT BREACH</text>
+    <rect class="sg-sweep" x="200" y="18" width="190" height="3" fill="rgba(255,46,99,.4)"/></g>
     <g class="zdef"><rect x="200" y="18" width="190" height="62" rx="3" fill="#03130d"/><text x="208" y="32" font-family="Orbitron,monospace" font-size="7" font-weight="800" fill="#00e0a8">THREAT NEUTRALIZED</text>
     <text x="345" y="46" text-anchor="middle" font-family="Orbitron,monospace" font-size="9" font-weight="800" fill="#00e0a8">Z3R0 OFFLINE</text>
     <text x="345" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="5.5" fill="#9fe8d5">C2 em blackhole</text>
@@ -158,7 +194,12 @@ function warS(boss, id) {
     let p = '', q = '';
     for (let i = 0; i <= 18; i++) { p += `${206 + i * 10},${70 - (12 + ((i * 7) % 11) + (i > 11 ? 20 + (i % 3) * 6 : 0))} `; q += `${206 + i * 10},${72 - (6 + ((i * 5) % 7))} `; }
     s += `<polygon points="${q} 386,76 206,76" fill="rgba(0,224,168,.12)"/><polyline class="graph" points="${p}" fill="none" stroke="#ff4d6d" stroke-width="1.4"/><polyline points="${q}" fill="none" stroke="#00e0a8" stroke-width="1.1"/>
-    <text x="208" y="30" font-family="Orbitron,monospace" font-size="7" font-weight="800" fill="#ff4d6d" class="led">DDoS 80 Gbps</text><rect class="sg-sweep" x="200" y="18" width="190" height="3" fill="rgba(77,210,255,.18)"/>`;
+    <text x="208" y="30" font-family="Orbitron,monospace" font-size="7" font-weight="800" fill="#ff4d6d" class="led">DDoS 80 Gbps</text>
+    <text x="208" y="40" font-family="JetBrains Mono,monospace" font-size="5" fill="#00e0a8">4.820.000 pps · MITIGAÇÃO ATIVA</text>
+    <rect x="296" y="22" width="90" height="11" rx="2" fill="rgba(255,46,99,.15)" stroke="#ff2e63" stroke-width=".5"/>
+    <circle cx="302" cy="27.5" r="1.5" fill="#ff2e63" class="redled"/>
+    <text x="307" y="29.5" font-family="Orbitron,monospace" font-size="4.5" font-weight="800" fill="#ff8aa5">INTRUSION DETECTED</text>
+    <rect class="sg-sweep" x="200" y="18" width="190" height="3" fill="rgba(77,210,255,.22)"/>`;
   }
   s += shine(200, 18, 90, 62) + deskS(215, id);
   return s;

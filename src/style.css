@@ -882,6 +882,29 @@ svg.wires{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:n
 @keyframes ttZf{0%,62%{opacity:0}63%{opacity:1}64%{opacity:0}65%{opacity:.6}66%,100%{opacity:0}}
 :root.calm .tt-zflash,:root.calm .tt-mote{opacity:0}
 
+/* Radar rotativo no painel de topologia da tela inicial */
+.tt-radar-wrap{transform-box:fill-box;transform-origin:center;animation:ttRadar 5s linear infinite}
+@keyframes ttRadar{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+:root.calm .tt-radar-wrap{animation:none}
+
+/* Cascata de dados matrix nas laterais do telão */
+.tt-stream-left{animation:ttStream 6s linear infinite}
+.tt-stream-right{animation:ttStream 8s linear infinite reverse}
+@keyframes ttStream{0%{transform:translateY(0)}50%{opacity:.6}100%{transform:translateY(6px)}}
+
+/* Barra de alerta do HUD tático */
+.tt-hud-alert{animation:ttAlertPulse 2s ease-in-out infinite alternate}
+@keyframes ttAlertPulse{from{opacity:.85}to{opacity:1;filter:drop-shadow(0 0 4px rgba(255,46,99,.5))}}
+
+/* Modo Overdrive / Defesa Máxima */
+.stage.overdrive{box-shadow:inset 0 0 35px rgba(0,224,168,.4),0 0 25px rgba(0,224,168,.25)!important;border-color:var(--acc)!important;animation:overdrivePulse 1.2s ease-in-out infinite alternate}
+@keyframes overdrivePulse{0%{box-shadow:inset 0 0 25px rgba(0,224,168,.35),0 0 15px rgba(0,224,168,.2)}100%{box-shadow:inset 0 0 45px rgba(77,210,255,.55),0 0 30px rgba(0,224,168,.45)}}
+
+/* Botão de diagnóstico rápido na sala do NOC */
+.room-scan-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;background:linear-gradient(135deg,rgba(0,224,168,.16),rgba(11,24,44,.8));border:1px solid var(--acc);color:var(--acc);font:800 10.5px 'Orbitron',monospace;letter-spacing:1px;cursor:pointer;box-shadow:0 0 16px rgba(0,224,168,.2);transition:all .2s}
+.room-scan-btn:hover{transform:translateY(-1px);box-shadow:0 0 24px rgba(0,224,168,.4);background:linear-gradient(135deg,rgba(0,224,168,.28),rgba(11,24,44,.9))}
+.room-scan-btn:active{transform:scale(.97)}
+
 /* ---------- selo da Play Store na tela inicial ---------- */
 .tplay{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:12px;margin:2px auto 18px;padding:10px 20px 10px 14px;border-radius:14px;background:linear-gradient(135deg,#0d1d33,#091426);border:1px solid rgba(0,224,168,.55);box-shadow:0 0 0 4px rgba(0,224,168,.08),0 8px 30px rgba(0,224,168,.18);color:var(--text);text-decoration:none;text-align:left}
 .tplay[hidden]{display:none}

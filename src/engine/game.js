@@ -121,6 +121,7 @@ function showBrief(i) {
 function cleanup() {
   clearInterval(S.timer); S.timer = null; S.intro.forEach(clearTimeout); S.intro = [];
   resetDrop(); resetWire(); resetDefense(); resetTopo(); stopZ3r0();
+  const st = $('stage'); if (st) st.classList.remove('overdrive');
   document.querySelectorAll('.ghost').forEach(g => g.remove());
 }
 function startLevel(i, hard, practice) { play(LEVELS[i], num(i) + '. ' + LEVELS[i].title + (hard ? ' ☠' : practice ? ' 🛟' : ''), { hard, practice }); }

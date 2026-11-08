@@ -1,11 +1,11 @@
 // Ponto de entrada: monta a tela de título, carrega as fases e liga os botões.
 import { $, fmt, decodeText } from './engine/util.js';
 import { LANG, LANGS, setLang, initI18n, t } from './engine/i18n.js';
-import { au, music, setMute, isMuted, MUS } from './engine/audio.js';
+import { au, music, setMute, isMuted, MUS, sfx } from './engine/audio.js';
 import { AV_ME } from './engine/scene.js';
 import { titleSVG } from './engine/titlescene.js';
 import { loadLevels } from './engine/levels.js';
-import { show, modal, closeModal } from './engine/ui.js';
+import { show, modal, closeModal, burst, floatTxt } from './engine/ui.js';
 import { initGame, renderMap } from './engine/game.js';
 import { progress } from './engine/state.js';
 import { loadNews, markNewsSeen } from './engine/news.js';
@@ -37,6 +37,10 @@ const PLAY_URL = '';
 if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) $('tPlay').hidden = true;
 else if (PLAY_URL) { const a = $('tPlay'); a.href = PLAY_URL; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('role'); a.classList.add('live'); $('tPlayK').textContent = 'JÁ DISPONÍVEL'; $('tPlayT').textContent = 'Baixe na Play Store'; a.setAttribute('aria-label', 'Baixar o app na Play Store'); }
 $('tScene').innerHTML = titleSVG() + `<div class="caption"><div><i></i><span>03:12:44 · ALERTA CRÍTICO</span></div><span class="hud-stat">Z3R0 NA REDE</span></div>`;
+$('tScene').addEventListener('click', e => {
+  au(); sfx.zap(); burst(e.clientX, e.clientY, '#00f0ff');
+  floatTxt(e.clientX, e.clientY - 12, '⚡ TELEMETRIA NOC ATIVA', '#00f0ff');
+});
 decodeText($('tSlogan'), $('tSlogan')?.textContent.trim() || 'ÚLTIMA LINHA DE DEFESA');
 
 $('sndM').onclick = () => { au(); setMute(!isMuted()); if (!isMuted()) music('menu'); };
