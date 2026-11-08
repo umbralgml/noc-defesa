@@ -989,6 +989,7 @@ export const ES = {
     'Continue assim!': '¡Sigue así!',
     'Excelente!': '¡Excelente!',
     'Não desista!': '¡No te rindas!',
+    '4.820.000 pps · MITIGAÇÃO ATIVA': '4.820.000 pps · MITIGACIÓN ACTIVA',
     'São Paulo (NOC Central)': 'São Paulo (NOC Central)',
     'Virgínia (US-East)': 'Virginia (US-East)',
     'Londres (UK)': 'Londres (UK)',
