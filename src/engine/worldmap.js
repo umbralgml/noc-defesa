@@ -3,7 +3,7 @@
 // com caminhos de fibra óptica iluminados, plataformas de incidentes e o analista marcando o plantão atual.
 
 import { t as tr } from './i18n.js';
-import { fmt } from './util.js';
+import { fmt, store } from './util.js';
 import { K, num, unlocked } from './state.js';
 
 export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
@@ -12,9 +12,10 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
     return `<div class="rpg-empty">${tr('Nenhum ato disponível para esta trilha ainda.')}</div>`;
   }
 
+  const walkFrom = store('noc_walk_from');
   let html = `<div class="rpg-map-canvas">`;
 
-  currentActs.forEach(({ a, ai }) => {
+  currentActs.forEach(({ a, ai }, actIdx) => {
     const actLevels = LEVELS.map((L, i) => ({ L, i })).filter(({ L }) => L.act === ai);
     const done = actLevels.length > 0 && actLevels.every(({ i }) => S.prog[K(i)]);
     const doneCount = actLevels.filter(({ i }) => S.prog[K(i)]).length;
@@ -58,6 +59,19 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
       const y = startY + idx * stepY;
       return { ...item, idx, x, y };
     });
+
+    const hasNext = actLevels.some(item => item.i === nextI);
+    const pTo = hasNext ? pts.find(p => p.i === nextI) : null;
+    const pFrom = (walkFrom !== null && walkFrom !== undefined && walkFrom !== nextI)
+      ? pts.find(p => p.i === walkFrom)
+      : null;
+    const isWalking = !!(hasNext && pTo && pFrom);
+
+    if (isWalking) {
+      try {
+        setTimeout(() => store('noc_walk_from', null), 2200);
+      } catch (e) {}
+    }
 
     let svg = `<svg class="rpg-realm-svg" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMidYMid meet">
       <defs>
@@ -125,7 +139,7 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
 
       svg += `<g class="${cls}" data-i="${i}" tabindex="${lock ? -1 : 0}" role="button" aria-label="${num(i)}. ${L.title}">`;
 
-      // Sombra projetada
+      // Sombra projetada no solo
       svg += `<ellipse cx="${x}" cy="${y + 20}" rx="28" ry="9" fill="rgba(0,0,0,0.65)"/>`;
 
       // Cilindro / prisma de elevação 3D
@@ -134,30 +148,10 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
       // Plataforma superior iluminada
       svg += `<ellipse cx="${x}" cy="${y + 8}" rx="24" ry="12" fill="${plateFill}" stroke="${strokeColor}" stroke-width="${isNext ? 2.4 : 1.6}" ${isNext || isBoss ? 'filter="url(#rpgGlow)"' : ''}/>`;
 
-      // Se for o plantão atual (next), desenha anéis de sonar e o mini analista holográfico
+      // Efeitos de sonar sobre a plataforma ativa
       if (isNext) {
         svg += `<circle cx="${x}" cy="${y + 8}" r="22" class="rpg-beacon-wave"/>`;
         svg += `<circle cx="${x}" cy="${y + 8}" r="15" class="rpg-beacon-wave-2"/>`;
-
-        // Mini Avatar do Operador no mapa
-        svg += `<g class="rpg-hero-token" transform="translate(${x},${y - 10})">
-          <ellipse cx="0" cy="12" rx="10" ry="2.2" fill="rgba(0,0,0,0.5)"/>
-          <path d="M -4 2 L -2 12 M 4 2 L 2 12" stroke="#111c2e" stroke-width="3" stroke-linecap="round"/>
-          <path d="M -6 -8 H 6 L 5 4 H -5 Z" fill="#00a884" stroke="#00e0a8" stroke-width=".6"/>
-          <rect x="-7" y="-7" width="2" height="8" rx="1" fill="#008f70"/>
-          <rect x="5" y="-7" width="2" height="8" rx="1" fill="#008f70"/>
-          <circle cx="0" cy="-14" r="5" fill="#d9a77f"/>
-          <path d="M -5 -16 C -5 -20 5 -20 5 -16 Z" fill="#2b1d14"/>
-          <rect x="0" y="-15" width="5.5" height="2.2" rx="1" fill="rgba(0,240,255,0.85)"/>
-          <line x1="4.5" y1="-13" x2="6.5" y2="-11" stroke="#00e0a8" stroke-width=".8"/>
-          <circle cx="6.5" cy="-11" r=".8" fill="#fff"/>
-        </g>`;
-
-        // Tag indicadora flutuante
-        svg += `<g class="rpg-pin-tag" transform="translate(${x},${y - 40})">
-          <rect x="-35" y="-8.5" width="70" height="17" rx="8.5" fill="#00e0a8" filter="url(#rpgGlow)"/>
-          <text y="3.5" text-anchor="middle" font-family="Orbitron,monospace" font-size="7.5" font-weight="900" fill="#040913">SEU PLANTÃO</text>
-        </g>`;
       } else {
         // Ícone central sobre a plataforma
         if (lock) {
@@ -191,8 +185,91 @@ export function worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS }) {
       svg += `</g>`; // fecha rpg-node
     });
 
+    // 3. Personagem Operador 3D (Renderizado no topo do z-order sobre o disco ativo)
+    if (hasNext && pTo) {
+      let heroTransform = `transform="translate(${pTo.x},${pTo.y + 8})"`;
+      let motionTag = '';
+
+      if (isWalking && pFrom) {
+        heroTransform = '';
+        const midY = (pFrom.y + pTo.y) / 2;
+        const walkPath = `M ${pFrom.x} ${pFrom.y + 8} C ${pFrom.x} ${midY + 8}, ${pTo.x} ${midY + 8}, ${pTo.x} ${pTo.y + 8}`;
+        motionTag = `<animateMotion path="${walkPath}" dur="1.8s" fill="freeze" calcMode="spline" keySplines="0.4 0 0.2 1" />`;
+      }
+
+      svg += `<g class="rpg-hero-token${isWalking ? ' rpg-hero-walking' : ''}" ${heroTransform}>
+        ${motionTag}
+        <!-- Sombra 3D projetada na plataforma -->
+        <ellipse cx="0" cy="0" rx="14" ry="5.5" fill="rgba(0,0,0,0.6)" filter="url(#rpgGlow)"/>
+        <ellipse cx="0" cy="0" rx="10" ry="3.8" fill="none" stroke="rgba(0, 240, 255, 0.4)" stroke-width="1.2" stroke-dasharray="2 2"/>
+
+        <!-- Bobbing & Animação corporal -->
+        <g class="rpg-hero-bob">
+          <!-- Pernas e Botas Táticas 3D -->
+          <g class="rpg-leg-l">
+            <path d="M -5 -8 L -5 0" stroke="#0e1a2c" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M -7 -1 L -3 -1 L -2 1.5 L -8 1.5 Z" fill="#14243b" stroke="#00f0ff" stroke-width="0.6"/>
+            <line x1="-8" y1="1.5" x2="-2" y2="1.5" stroke="#00f0ff" stroke-width="1.2"/>
+          </g>
+          <g class="rpg-leg-r">
+            <path d="M 5 -8 L 5 0" stroke="#0e1a2c" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M 3 -1 L 7 -1 L 8 1.5 L 2 1.5 Z" fill="#14243b" stroke="#00f0ff" stroke-width="0.6"/>
+            <line x1="2" y1="1.5" x2="8" y2="1.5" stroke="#00f0ff" stroke-width="1.2"/>
+          </g>
+
+          <!-- Torso / Colete Cibernético 3D -->
+          <g class="rpg-hero-torso-g">
+            <path d="M -7 -20 L 7 -20 L 5 -8 L -5 -8 Z" fill="#008f70"/>
+            <path d="M -6 -19 L 6 -19 L 4.5 -9 L -4.5 -9 Z" fill="#00a884" stroke="#00e0a8" stroke-width="0.8"/>
+            <circle cx="0" cy="-14" r="1.8" fill="#00f0ff" filter="url(#rpgGlow)"/>
+            <path d="M -4.5 -19 L -2 -9 M 4.5 -19 L 2 -9" stroke="rgba(0,0,0,0.3)" stroke-width="0.7"/>
+
+            <!-- Braços e Terminal Tático -->
+            <path d="M -6 -18 L -9 -12 L -7 -8" stroke="#008f70" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 6 -18 L 9 -13 L 5 -10" stroke="#008f70" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <polygon points="5,-10 1,-6 7,-6" fill="rgba(0, 240, 255, 0.4)"/>
+            <line x1="1" y1="-6" x2="7" y2="-6" stroke="#00f0ff" stroke-width="0.8"/>
+
+            <!-- Cabeça e Viseira Curva 3D -->
+            <circle cx="0" cy="-25" r="5.2" fill="#d9a77f"/>
+            <path d="M -5.2 -26 C -5.2 -31 5.2 -31 5.2 -26 C 3 -27 -3 -27 -5.2 -26 Z" fill="#1b283d"/>
+            <path d="M -4.5 -25.5 C -2 -27.5 2 -27.5 4.5 -25.5 L 4 -23.5 C 2 -24.5 -2 -24.5 -4 -23.5 Z" fill="#00f0ff" filter="url(#rpgGlow)"/>
+            <line x1="-3" y1="-25" x2="1" y2="-25" stroke="#ffffff" stroke-width="0.7" stroke-linecap="round"/>
+            <path d="M 4.5 -24 L 6 -22 L 3 -21" fill="none" stroke="#223859" stroke-width="0.8" stroke-linecap="round"/>
+            <circle cx="2.5" cy="-21" r="0.9" fill="#00e0a8"/>
+          </g>
+        </g>
+      </g>`;
+
+      // Tag flutuante "SEU PLANTÃO"
+      svg += `<g class="rpg-pin-wrap" transform="translate(${pTo.x},${pTo.y - 34})">
+        <g class="rpg-pin-tag${isWalking ? ' rpg-pin-delayed' : ''}">
+          <rect x="-35" y="-8.5" width="70" height="17" rx="8.5" fill="#00e0a8" filter="url(#rpgGlow)"/>
+          <text y="3.5" text-anchor="middle" font-family="Orbitron,monospace" font-size="7.5" font-weight="900" fill="#040913">${tr('SEU PLANTÃO')}</text>
+        </g>
+      </g>`;
+    }
+
     svg += `</svg></div>`; // fecha rpg-realm
     html += svg;
+
+    // Portal / Gateway Inter-Atos conectando ao próximo ato
+    if (actIdx < currentActs.length - 1) {
+      const nextAct = currentActs[actIdx + 1];
+      const prevActLevels = actLevels;
+      const prevActDone = prevActLevels.length > 0 && prevActLevels.every(({ i }) => S.prog[K(i)]);
+
+      html += `<div class="rpg-act-gateway" data-next-act="${nextAct.ai}" role="button" tabindex="0">
+        <div class="rag-portal">
+          <span class="rag-pulse">⚡</span>
+          <div class="rag-core">
+            <b>${prevActDone ? tr('TRONCO METROPOLITANO ATIVO') : tr('ENLACE INTER-SETORIAL')}</b>
+            <small>${prevActDone ? tr('Salto liberado para') : tr('Requer')} ${nextAct.a[0]} · ${nextAct.a[1]}</small>
+          </div>
+          <span class="rag-arrow">➔</span>
+        </div>
+      </div>`;
+    }
   });
 
   html += `</div>`; // fecha rpg-map-canvas

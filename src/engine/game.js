@@ -245,6 +245,7 @@ function win() {
   const first = !S.prog[K(S.cur)];
   S.prog[K(S.cur)] = Math.max(S.prog[K(S.cur)] || 0, st);
   S.best[K(S.cur)] = Math.max(S.best[K(S.cur)] || 0, total); save();
+  store('noc_walk_from', S.cur);
   submitCampaign();
   // Modo difícil sem erro: estrela de ouro (uma por fase) e XP extra.
   const gold = S.hard && S.err === 0, gl = store('noc_gold') || [], newGold = gold && !gl.includes(L.key || L.title);
@@ -253,6 +254,8 @@ function win() {
   onLevelWin(L, st); metric('win');
   // O chefe fecha a história; se houver fases depois dele (temporada 2), o botão segue para a próxima.
   const last = !!L.boss, more = S.cur < LEVELS.length - 1 && LEVELS[S.cur + 1].trail === L.trail;   // a seguinte, só dentro da mesma trilha
+  const nextL = more ? LEVELS[S.cur + 1] : null;
+  const isActEnd = !!(nextL && nextL.act !== L.act && nextL.trail === L.trail);
   let delay = 650;
   if (L.boss || L.miniboss) {
     delay = 3600; stopMusic();
@@ -282,12 +285,30 @@ function win() {
       ${xpHTML(xr)}
       <div class="learn"><b>${last ? 'RELATÓRIO FINAL' : 'O QUE VOCÊ DEFENDEU'}</b>${L.learn}</div>
       ${reviewHTML()}
+      <div class="phase-transit-strip">
+        <div class="pts-node done">
+          <span class="pts-icon">✓</span>
+          <span class="pts-txt">${num(S.cur)}. ${L.title}</span>
+        </div>
+        <div class="pts-line"><div class="pts-dot"></div></div>
+        <div class="pts-node next">
+          <span class="pts-icon">${more ? '➔' : '★'}</span>
+          <span class="pts-txt">${more ? `${num(S.cur + 1)}. ${nextL.title}` : tr('SETOR 100% LIMPO')}</span>
+        </div>
+      </div>
       ${last ? `<div class="dlg"><div class="av">${AV_ME}</div><div class="bubble me"><span class="who">VOCÊ</span>Turno encerrado. Pode ir dormir, Z3R0. Eu fico de olho.</div></div>` : ''}
       ${last ? '<button class="btn ghostb wideb" id="mShare">COMPARTILHAR RESULTADO</button>' : ''}
       <div class="row"><button class="btn ghostb" id="mMap">MAPA</button>${more ? `<button class="btn" id="mNext">${last ? 'TEMPORADA 2' : 'PRÓXIMA'}</button>` : `<button class="btn" id="mAgain">JOGAR DE NOVO</button>`}</div>`); addReport();
     $('mMap').onclick = () => { closeModal(); goMap(); };
     if (last) $('mShare').onclick = e => { const p = progress(); share(`${tr('Derrotei o Z3R0 no NOC: Última Linha de Defesa 🛡️')}\n★ ${p.stars}/${p.max} ${tr('estrelas')} · ${fmt(p.pts)} pts\n${tr('Você segura a rede?')} ${siteURL()}`, e.currentTarget); };
-    if (more) $('mNext').onclick = () => { closeModal(); brief(S.cur + 1); };
+    if (more) $('mNext').onclick = () => {
+      closeModal();
+      if (isActEnd) {
+        showActTransition(L.act, nextL.act, () => brief(S.cur + 1));
+      } else {
+        brief(S.cur + 1);
+      }
+    };
     else $('mAgain').onclick = () => { closeModal(); startLevel(S.cur, S.hard); };
   }, delay);
 }
@@ -296,6 +317,48 @@ function addReport() {
   const rows = $('mcard').querySelectorAll('.row'), r = rows[rows.length - 1]; if (!r) return;
   const b = reportBtn({ item: 'Fase inteira (aula, enunciado ou jogadas)' }, '⚑ REPORTAR ERRO NESTA FASE'); b.classList.add('repend');
   r.before(b);
+}
+
+export function showActTransition(prevActIdx, nextActIdx, onDone) {
+  const fromAct = ACTS[prevActIdx] || ['ATO ?', 'Setor Atual'];
+  const toAct = ACTS[nextActIdx] || ['ATO ?', 'Próximo Setor'];
+  sfx.win();
+  try { sfx.whoosh(); } catch (e) {}
+  cyberConfetti({ count: 60 });
+  modal(`
+    <div class="act-warp-modal">
+      <div class="tag">⚡ ${tr('TRANSIÇÃO DE ATO · SALTO DE SETOR')}</div>
+      <h2>${tr('Setor 100% Defendido!')}</h2>
+      
+      <div class="aw-vis">
+        <div class="aw-side">
+          <span class="aw-act">${fromAct[0]}</span>
+          <b>${fromAct[1]}</b>
+          <span class="aw-status done">✓ ${tr('CONCLUÍDO')}</span>
+        </div>
+        <div class="aw-pipe">
+          <div class="aw-pipe-packet">📦</div>
+        </div>
+        <div class="aw-side">
+          <span class="aw-act">${toAct[0]}</span>
+          <b>${toAct[1]}</b>
+          <span class="aw-status unlock">🔓 ${tr('DESBLOQUEADO')}</span>
+        </div>
+      </div>
+
+      <div class="learn">
+        <b>${tr('ENLACE METROPOLITANO ESTABELECIDO')}</b>
+        ${tr('Todos os incidentes deste setor foram neutralizados. A topologia foi expandida e novos sistemas estão sob monitoramento ativo.')}
+      </div>
+
+      <div class="row">
+        <button class="btn ghostb" id="warpMap">${tr('VER NO MAPA 3D')}</button>
+        <button class="btn" id="warpNext">${tr('ENTRAR NO PRÓXIMO ATO')} ➔</button>
+      </div>
+    </div>
+  `);
+  $('warpMap').onclick = () => { closeModal(); goMap(); };
+  $('warpNext').onclick = () => { closeModal(); if (onDone) onDone(); };
 }
 
 function fail(msg) {
@@ -314,6 +377,13 @@ export function initGame() {
   initScrollHints();
   flow.win = win; flow.fail = fail;
   $('mapList').addEventListener('click', e => {
+    const gw = e.target.closest('.rpg-act-gateway');
+    if (gw && gw.dataset.nextAct) {
+      au();
+      const targetRealm = $('mapList').querySelector(`.rpg-realm[data-act="${gw.dataset.nextAct}"]`);
+      if (targetRealm) targetRealm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     const vb = e.target.closest('.tv-btn');
     if (vb && vb.dataset.view) {
       au();
