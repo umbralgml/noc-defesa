@@ -23,12 +23,12 @@ function camera(dur) {
   const box = $('roomv'), scale = svg.getBoundingClientRect().height / 120, w = ROOM_W * scale;
   if (!box.clientWidth || !scale) return;   // mapa escondido: o ResizeObserver recalcula quando aparecer
   const off = Math.max(0, Math.min(w - box.clientWidth, x * scale - box.clientWidth / 2));
-  svg.style.transition = dur ? `transform ${dur}s linear` : 'none';
+  svg.style.transition = dur ? `transform ${dur}s cubic-bezier(0.22, 1, 0.36, 1)` : 'none';
   svg.style.transform = `translateX(${-off}px)`;
 }
 
 function place(nx, dur) {
-  rh.style.transition = dur ? `transform ${dur}s linear` : 'none';
+  rh.style.transition = dur ? `transform ${dur}s cubic-bezier(0.22, 1, 0.36, 1)` : 'none';
   rh.style.transform = `translate(${nx}px,106px)`;
   hero.style.transform = `scale(${dir},1)`;
   camera(dur);
@@ -44,7 +44,7 @@ function walk(nx, done) {
   if (dist < 3) { place(x, 0); if (done) done(); return; }
   hero.classList.remove('idle', 'type'); hero.classList.add('walk');
   place(x, dur);
-  stepT = setInterval(sfx.step, 260);
+  stepT = setInterval(sfx.step, 240);
   walkT = setTimeout(() => {
     clearInterval(stepT); hero.classList.remove('walk'); hero.classList.add('idle');
     if (done) done();

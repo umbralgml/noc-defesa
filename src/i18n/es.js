@@ -937,7 +937,15 @@ export const ES = {
     'Z3R0 NA REDE': 'Z3R0 EN LA RED',
     'MITIGAÇÃO ATIVA': 'MITIGACIÓN ACTIVA',
     'INTRUSÃO DETECTADA': 'INTRUSIÓN DETECTADA',
-    'TRÁFEGO ANÔMALO': 'TRÁFICO ANÓMALO'
+    'TRÁFEGO ANÔMALO': 'TRÁFICO ANÓMALO',
+    'MUNDO RPG 3D': 'MUNDO RPG 3D',
+    'LISTA CLÁSSICA': 'LISTA CLÁSICA',
+    'IR AO PLANTÃO': 'IR AL TURNO',
+    'SEU PLANTÃO': 'TU TURNO',
+    'Nenhum ato disponível para esta trilha ainda.': 'Ningún acto disponible para esta pista todavía.',
+    'incidentes neutralizados': 'incidentes neutralizados',
+    'Setor em construção': 'Sector en construcción',
+    '{n}/{n} incidentes neutralizados': '{n}/{n} incidentes neutralizados'
   },
   gloss: {
     'Access point': ['Access point', ['access point', 'ap', 'punto de acceso'], 'Equipo que lleva la red al Wi-Fi y conecta los dispositivos inalámbricos a la red cableada.'],
