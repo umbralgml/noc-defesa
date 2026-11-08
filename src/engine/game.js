@@ -99,14 +99,69 @@ export function renderMap() {
   }
 }
 
-// Confirma antes de apagar. "after" atualiza a tela que chamou.
+// Confirma antes de apagar. Permite escolher entre a trilha atual ou tudo. "after" atualiza a tela que chamou.
 export function askReset(after) {
+  const ct = curTrail();
+  const trail = TRAILS[ct];
+  const trailLevels = LEVELS.filter(L => L.trail === ct);
+  let trailStars = 0, trailPts = 0, trailDone = 0;
+  trailLevels.forEach(L => {
+    const k = L.key || L.title;
+    const st = S.prog[k] || 0;
+    trailStars += st;
+    trailPts += S.best[k] || 0;
+    if (st) trailDone++;
+  });
   const p = progress();
-  modal(`<div class="tag">RECOMEÇAR O PLANTÃO</div><h2>Zerar progresso?</h2>
-    <div class="learn">${p.done ? `Você vai perder <b style="display:inline;font:inherit;color:var(--warn)">${p.stars} estrelas</b>, ${fmt(p.pts)} pontos e ${p.done} de ${LEVELS.length} fases concluídas.` : 'Você ainda não concluiu nenhuma fase.'} Só a fase 1 fica liberada. Não dá para desfazer.</div>
-    <div class="row"><button class="btn ghostb" id="mNo">CANCELAR</button><button class="btn" id="mYes" style="background:linear-gradient(135deg,#ff4d6d,#d93655);color:#fff">ZERAR</button></div>`);
+
+  modal(`
+    <div class="reset-modal">
+      <div class="tag">${tr('GERENCIAR PROGRESSO')}</div>
+      <h2>${tr('Zerar Progresso')}</h2>
+      
+      <p class="learn">${tr('Escolha se deseja resetar apenas a trilha em que você está jogando ou limpar completamente todo o histórico do jogo.')}</p>
+
+      <div class="reset-choices">
+        <div class="reset-card">
+          <div class="reset-card-head">
+            <span>📍 ${tr('ESTA TRILHA')}: <b>${trail ? trail.name : ''}</b></span>
+            <span class="rch-tag">★ ${trailStars} · ${trailDone}/${trailLevels.length}</span>
+          </div>
+          <p>${tr('Zera apenas as fases e estrelas desta trilha. As demais trilhas continuam intactas.')}</p>
+          <button class="btn reset-btn-trail" id="mResetTrail" type="button">
+            🗑️ ${tr('ZERAR APENAS')} ${trail ? trail.name.toUpperCase() : ''}
+          </button>
+        </div>
+
+        <div class="reset-card">
+          <div class="reset-card-head">
+            <span>⚠️ ${tr('TODAS AS TRILHAS')}</span>
+            <span class="rch-tag">★ ${p.stars}/${p.max} · ${p.done} ${tr('fases')}</span>
+          </div>
+          <p>${tr('Limpa absolutamente todo o progresso de todas as trilhas. Não dá para desfazer.')}</p>
+          <button class="btn reset-btn-all" id="mResetAll" type="button">
+            💥 ${tr('ZERAR TUDO (TODAS AS TRILHAS)')}
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn ghostb" id="mNo">${tr('CANCELAR')}</button>
+      </div>
+    </div>
+  `);
+
   $('mNo').onclick = closeModal;
-  $('mYes').onclick = () => { resetProgress(); closeModal(); if (after) after(); };
+  $('mResetTrail').onclick = () => {
+    resetProgress(ct);
+    closeModal();
+    if (after) after();
+  };
+  $('mResetAll').onclick = () => {
+    resetProgress();
+    closeModal();
+    if (after) after();
+  };
 }
 
 // História do ato: aparece uma vez, antes da primeira fase do ato.
@@ -207,6 +262,7 @@ function finishIntro() {
   S.busy = false;
   if (L.boss || L.miniboss) speakRadio('Alerta crítico: Invasão do Z3R0 na rede.');
   else if (L.type === 'defense') speakRadio('Alerta de tráfego: configure o firewall.');
+  else if (Math.random() < 0.4) speakRadio('Bora pra cima! Turno ativo!');
   ENGINES[L.type](L);
   linkGloss($('stage').querySelector('.task'));
   startZ3r0(L);
@@ -264,14 +320,14 @@ function win() {
     const cap = $('capTxt'); if (cap) cap.textContent = L.boss ? 'C2 DESCONECTADO · Z3R0 OFFLINE' : 'ATAQUE CONTIDO · Z3R0 RECUOU';
     sfx.zap(); setTimeout(sfx.boom, 250); buzz([100, 50, 200]);
     cyberConfetti({ count: 70 });
-    speakRadio(L.boss ? 'Ameaça final neutralizada. Z3R0 desconectado.' : 'Ataque contido. Z3R0 recuou.');
+    speakRadio(L.boss ? 'Demais! Z3R0 neutralizado! Bom trabalho analista, siga em frente!' : 'Ataque contido! Bom trabalho analista, siga em frente!', { force: true });
     setTimeout(() => { const c = center(sc); for (let k = 0; k < 5; k++) setTimeout(() => burst(c.x + (k - 2) * 60, c.y - 20, ['#ff2e63', '#ffd166', '#00e0a8', '#4dd2ff', '#ff7ad9'][k], 18), k * 120); }, 700);
     setTimeout(() => { if (hero) hero.classList.add('cheer'); sfx.win(); }, 1300);
     setTimeout(() => music('menu'), 3000);
   } else {
     sfx.win(); buzz([40, 60, 40]);
     cyberConfetti({ count: 45 });
-    speakRadio('Incidente contido. Bom trabalho, analista.');
+    speakRadio('Bom trabalho analista, siga em frente!', { force: true });
     if (hero) { hero.classList.remove('type'); hero.classList.add('idle'); }
     const c = center($('scene')); for (let k = 0; k < 3; k++) setTimeout(() => burst(c.x + (k - 1) * 80, c.y, ['#00e0a8', '#ffd166', '#4dd2ff'][k], 16), k * 150);
   }

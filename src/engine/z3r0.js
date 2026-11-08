@@ -59,6 +59,7 @@ function startRush(L) {
   paint();
   rush.iv = setInterval(() => {
     if (!rush) return;
+    if (S.paused) return;
     if (!active()) { stopRush(); return; }
     rush.left--; paint(); if (rush.left <= 3) sfx.tick();
     // Falhar custa integridade, mas não conta como erro de jogada (não tira estrela).

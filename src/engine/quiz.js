@@ -39,6 +39,7 @@ function showQ() {
   if (L.time) {
     clearInterval(S.timer);
     S.timer = setInterval(() => {
+      if (S.paused) return; // Pausa o tempo enquanto minigames ou modais estão abertos
       left -= 100;
       const f = $('tFill'); if (f) { f.style.width = Math.max(0, left / (L.time * 10)) + '%'; f.style.background = left < 5000 ? '#ff4d6d' : ''; }
       if (left <= 3000 && left % 1000 === 0) sfx.tick();
