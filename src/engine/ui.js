@@ -104,6 +104,10 @@ export function damage(n, at) {
   const st = $('stage'); st.classList.remove('shk', 'overdrive'); void st.offsetWidth; st.classList.add('shk');
   if (at) floatTxt(at.x, at.y, n ? '-' + n + '%' : 'TREINO', n ? '#ff4d6d' : '#ffd166');
   toast(TAUNT[Math.random() * TAUNT.length | 0], false);
+  // Alerta motivacional de rádio quando erra
+  if (S.hp > 0 && (S.err === 1 || S.hp <= 40)) {
+    speakRadio(tr('Não desista!'));
+  }
   // Iniciante/básico: depois do 2º erro, a dica da fase aparece sozinha no painel.
   if ((S.err === 2 || (S.practice && S.err === 1)) && S.lv && S.lv.tip && diffOf(S.lv) <= 1) setTimeout(() => hint(S.lv.tip), 900);
   if (S.hp <= 0) { S.busy = true; clearInterval(S.timer); setTimeout(() => flow.fail('A integridade da rede chegou a zero. O Z3R0 assumiu o controle.'), 650); }
@@ -115,7 +119,7 @@ export function good(at, color) {
   sceneFx('okf', 350); heroState('happy', 500);
   if (at) { burst(at.x, at.y, color || '#00e0a8'); floatTxt(at.x, at.y - 10, '+' + pts, color || '#00e0a8'); }
   // Marcos de combo: faixa no centro, som especial e conquista no x5.
-  if (S.streak === 3 || S.streak === 5) { comboBanner(mult()); if (S.streak === 5) unlock('combo5'); }
+  if (S.streak === 3 || S.streak === 4 || S.streak === 5) { comboBanner(mult()); if (S.streak === 5) unlock('combo5'); }
   else if (Math.random() < .3) toast(PRAISE[Math.random() * PRAISE.length | 0], true);
   flow.good(at);
 }
@@ -132,8 +136,9 @@ function comboBanner(m) {
   if (m >= 3) {
     const st = $('stage');
     if (st) st.classList.add('overdrive');
-    if (m === 3) speakRadio(tr('Modo Overdrive ativado! Foco máximo na mitigação.'));
-    else if (m >= 5) speakRadio(tr('Defesa impenetrável! Combo máximo alcançado.'));
+    if (m === 3) speakRadio(tr('Incrível!'), { force: true });
+    else if (m === 4) speakRadio(tr('Continue assim!'), { force: true });
+    else if (m >= 5) speakRadio(tr('Excelente!'), { force: true });
   }
   if (m >= 4) cyberConfetti({ count: 28 });
 }

@@ -8,6 +8,7 @@ import { unlock } from './ach.js';
 import { cyberConfetti } from './particles.js';
 import { speakRadio } from './radio.js';
 import { t } from './i18n.js';
+import { S } from './state.js';
 
 const INCIDENTS = [
   {
@@ -106,6 +107,7 @@ export function startArcade() {
 
   clearInterval(timer);
   timer = setInterval(() => {
+    if (S.paused) return;
     timeLeft--;
     updateHUD();
     if (timeLeft <= 0 || sla <= 0) {

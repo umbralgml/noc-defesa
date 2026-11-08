@@ -10,7 +10,7 @@ export const diffOf = L => Math.max(0, DIFFS.indexOf((ACTS[L.act] || [])[2]));
 
 export const S = {
   prog: {}, best: {},       // estrelas e melhor pontuação por fase (chave = título)
-  cur: 0, hp: 100, err: 0, placed: 0, need: 0, busy: false,
+  cur: 0, hp: 100, err: 0, placed: 0, need: 0, busy: false, paused: false,
   lv: null,                 // fase em andamento (do mapa ou montada na hora, como o desafio diário)
   pairs: [], timer: null, intro: [], score: 0, streak: 0,   // streak = acertos seguidos; multiplicador = min(5, streak)
   miss: []                  // erros da fase atual, mostrados na revisão: { t, why }
@@ -22,7 +22,31 @@ try {
 } catch (e) {}
 
 export const save = () => { try { localStorage.setItem('noc_prog', JSON.stringify(S.prog)); localStorage.setItem('noc_best', JSON.stringify(S.best)); } catch (e) {} };
-export const resetProgress = () => { S.prog = {}; S.best = {}; save(); };
+export const resetProgress = (trailIdx) => {
+  if (trailIdx !== undefined && trailIdx !== null && trailIdx >= 0) {
+    const keysToRemove = [];
+    LEVELS.forEach((L, i) => {
+      if (L.trail === trailIdx) {
+        const k = K(i);
+        keysToRemove.push(k);
+        delete S.prog[k];
+        delete S.best[k];
+      }
+    });
+    try {
+      const gl = JSON.parse(localStorage.getItem('noc_gold') || '[]');
+      if (Array.isArray(gl)) {
+        localStorage.setItem('noc_gold', JSON.stringify(gl.filter(k => !keysToRemove.includes(k))));
+      }
+    } catch (e) {}
+    save();
+  } else {
+    S.prog = {};
+    S.best = {};
+    try { localStorage.removeItem('noc_gold'); } catch (e) {}
+    save();
+  }
+};
 
 // O progresso é indexado pelo TÍTULO da fase em português (L.key, igual em todo idioma). Renomear uma fase apaga o progresso dela.
 export const K = i => LEVELS[i].key || LEVELS[i].title;
