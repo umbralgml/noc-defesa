@@ -6,36 +6,44 @@ import { t } from './i18n.js';
 export const AV_ME = `<svg viewBox="0 0 64 64" width="100%" height="100%">
   <defs>
     <linearGradient id="avBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#081426"/><stop offset="1" stop-color="#050a14"/></linearGradient>
-    <radialGradient id="avGlow" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="rgba(0,224,168,.28)"/><stop offset="1" stop-color="rgba(0,224,168,0)"/></radialGradient>
-    <linearGradient id="avVisor" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(77,210,255,.45)"/><stop offset=".5" stop-color="rgba(0,224,168,.5)"/><stop offset="1" stop-color="rgba(77,210,255,.25)"/></linearGradient>
+    <radialGradient id="avGlow" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="rgba(0,224,168,.35)"/><stop offset="1" stop-color="rgba(0,224,168,0)"/></radialGradient>
+    <linearGradient id="avTorso3D" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00f0b8"/><stop offset="35%" stop-color="var(--hs,#00a884)"/><stop offset="80%" stop-color="var(--hs2,#008f70)"/><stop offset="100%" stop-color="#052820"/></linearGradient>
+    <linearGradient id="avVisor3D" x1="0" y1="0" x2="1" y2="0.6"><stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/><stop offset="25%" stop-color="#4dd2ff" stop-opacity=".85"/><stop offset="70%" stop-color="#00e0a8" stop-opacity=".75"/><stop offset="100%" stop-color="#072b42" stop-opacity=".95"/></linearGradient>
   </defs>
-  <circle cx="32" cy="32" r="31" fill="url(#avBg)" stroke="rgba(77,210,255,.3)" stroke-width="1.2"/>
+  <circle cx="32" cy="32" r="31" fill="url(#avBg)" stroke="rgba(77,210,255,.4)" stroke-width="1.2"/>
   <circle cx="32" cy="32" r="31" fill="url(#avGlow)"/>
-  <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(0,224,168,.18)" stroke-width=".8" stroke-dasharray="3 4"/>
+  <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(0,224,168,.25)" stroke-width=".8" stroke-dasharray="3 4"/>
   <path d="M32 2V5 M32 59V62 M2 32H5 M59 32H62" stroke="#00e0a8" stroke-width="1.2"/>
-  <path d="M10 64 C11 49 18 43 32 43 C46 43 53 49 54 64 Z" style="fill:var(--hs,#00a884)"/>
-  <path d="M22 64 C23 51 26 45 32 45 C38 45 41 51 42 64 Z" fill="#0d1b30"/>
-  <path d="M25 45 L32 53 L39 45" style="fill:var(--hs3,#0b6e57)"/>
-  <line x1="32" y1="52" x2="32" y2="64" stroke="#00e0a8" stroke-width="1.2"/>
-  <rect x="38" y="52" width="9" height="12" rx="1.5" fill="#f0f6fc" stroke="#0b1728" stroke-width=".8"/>
-  <rect x="40" y="54" width="5" height="1.8" rx=".5" fill="#00a884"/>
-  <rect x="40" y="57" width="5" height="4.5" rx=".5" fill="#1b2a44"/>
-  <rect x="28" y="37" width="8" height="8" rx="2" style="fill:var(--hk,#d9a77f)"/>
-  <path d="M28 41 C30 44 34 44 36 41" stroke="rgba(0,0,0,.25)" stroke-width="1.2" fill="none"/>
-  <path d="M20 27 C20 18 24 15 32 15 C40 15 44 18 44 27 C44 35 38 40 32 40 C26 40 20 35 20 27 Z" style="fill:var(--hk,#d9a77f)"/>
-  <path d="M18 24 C18 14 24 10 32 10 C40 10 46 14 46 23 C44 19 40 17 35 17 C28 17 24 20 21 25 C19 25 18 24 18 24 Z" style="fill:var(--hh,#2b1d14)"/>
-  <path d="M32 10 C36 10 42 12 44 17 C41 15 36 14 32 14 C27 14 22 16 20 20 C22 13 27 10 32 10 Z" fill="rgba(255,255,255,.15)"/>
-  <rect x="22" y="23" width="20" height="7.5" rx="2.5" fill="url(#avVisor)" stroke="#0e1e34" stroke-width="1.2"/>
-  <line x1="24" y1="26.5" x2="40" y2="26.5" stroke="#ffffff" stroke-width=".8" opacity=".7"/>
-  <circle cx="39" cy="26.5" r="1" fill="#ff2e63"/>
+  <!-- Torso tático 3D -->
+  <path d="M10 64 C11 48 18 42 32 42 C46 42 53 48 54 64 Z" fill="url(#avTorso3D)"/>
+  <path d="M11 64 C12 49 19 44 32 44 C45 44 52 49 53 64 Z" fill="none" stroke="rgba(255,255,255,.2)" stroke-width=".8"/>
+  <path d="M22 64 C23 50 26 44 32 44 C38 44 41 50 42 64 Z" fill="#0d1b30"/>
+  <path d="M24 44 L32 53 L40 44" style="fill:var(--hs3,#0b6e57)"/>
+  <line x1="32" y1="52" x2="32" y2="64" stroke="#00f0ff" stroke-width="1.2"/>
+  <!-- Crachá com chip holográfico -->
+  <rect x="37" y="51" width="10" height="13" rx="1.8" fill="#f0f6fc" stroke="#0b1728" stroke-width=".8"/>
+  <rect x="39" y="53" width="6" height="2" rx=".5" fill="#00a884"/>
+  <rect x="39" y="56" width="6" height="5" rx=".5" fill="#1b2a44"/>
+  <circle cx="44" cy="59" r=".8" fill="#00f0ff"/>
+  <!-- Cabeça e pescoço 3D -->
+  <rect x="28" y="36" width="8" height="9" rx="2" style="fill:var(--hk,#d9a77f)"/>
+  <path d="M28 41 C30 44 34 44 36 41" stroke="rgba(0,0,0,.3)" stroke-width="1.2" fill="none"/>
+  <path d="M20 27 C20 17 24 14 32 14 C40 14 44 17 44 27 C44 35 38 40 32 40 C26 40 20 35 20 27 Z" style="fill:var(--hk,#d9a77f)"/>
+  <path d="M18 24 C18 13 24 9 32 9 C40 9 46 13 46 23 C44 18 40 16 35 16 C28 16 24 19 21 24 C19 24 18 24 18 24 Z" style="fill:var(--hh,#2b1d14)"/>
+  <path d="M32 9 C36 9 42 11 44 16 C41 14 36 13 32 13 C27 13 22 15 20 19 C22 12 27 9 32 9 Z" fill="rgba(255,255,255,.2)"/>
+  <!-- Smart Visor 3D com curvatura e reflexo -->
+  <rect x="21" y="22" width="22" height="8.5" rx="3" fill="url(#avVisor3D)" stroke="#091526" stroke-width="1.2"/>
+  <path d="M22.5 24.5 Q32 23.5 41.5 24.5" stroke="#ffffff" stroke-width=".9" fill="none" opacity=".85"/>
+  <circle cx="40" cy="26" r="1.1" fill="#ff2e63"/>
   <path d="M29 34.5 Q32 36.5 35 34.5" stroke="#7a4a33" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <!-- Headset de comunicação tática -->
   <g class="hset">
-    <path d="M19 27 A13 13 0 0 1 45 27" fill="none" stroke="#182b45" stroke-width="2.6"/>
-    <rect x="16" y="24" width="5" height="9" rx="2.5" fill="#182b45" stroke="#00e0a8" stroke-width=".6"/>
-    <rect x="43" y="24" width="5" height="9" rx="2.5" fill="#182b45" stroke="#00e0a8" stroke-width=".6"/>
-    <path d="M18 32 C18 39 24 42 29 42" stroke="#182b45" stroke-width="2" fill="none"/>
-    <circle cx="30" cy="42" r="2.2" fill="#00e0a8"/>
-    <circle cx="30" cy="42" r="1" fill="#fff"/>
+    <path d="M18 27 A14 14 0 0 1 46 27" fill="none" stroke="#16273e" stroke-width="2.8"/>
+    <rect x="15" y="23" width="5.5" height="10" rx="2.5" fill="#16273e" stroke="#00e0a8" stroke-width=".7"/>
+    <rect x="43.5" y="23" width="5.5" height="10" rx="2.5" fill="#16273e" stroke="#00e0a8" stroke-width=".7"/>
+    <path d="M17 32 C17 40 23 43 29 43" stroke="#16273e" stroke-width="2.2" fill="none"/>
+    <circle cx="30" cy="43" r="2.4" fill="#00e0a8"/>
+    <circle cx="30" cy="43" r="1" fill="#fff"/>
   </g>
 </svg>`;
 export const AV_Z = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="32" r="32" fill="#2a0d18"/><path d="M8 64c0-22 9-42 24-46 15 4 24 24 24 46z" fill="#12050a"/><path d="M14 64c1-16 8-30 18-33 10 3 17 17 18 33z" fill="#1f0a12"/><ellipse cx="32" cy="35" rx="11" ry="13" fill="#e8e8ee"/><path d="M23 31l7 2.5-7 2.5z" fill="#ff2e63"/><path d="M41 31l-7 2.5 7 2.5z" fill="#ff2e63"/><path d="M26 42q6 4 12 0" stroke="#12050a" stroke-width="1.6" fill="none"/><path d="M28 44v2M32 45v2M36 44v2" stroke="#12050a" stroke-width="1.2"/></svg>`;
@@ -45,25 +53,79 @@ export const AV_CHEFE = `<svg viewBox="0 0 64 64" width="100%" height="100%"><ci
 // ---------- scenes ----------
 // Analista moderno: silhueta tática de operador, jaqueta cibernética com costuras e crachá, relógio-terminal holográfico e headset tático.
 const HERO = `<g class="hero" id="hero"><g class="bob">
-<ellipse cx="0" cy="1" rx="14" ry="2.6" fill="rgba(0,0,0,.55)"/><ellipse cx="0" cy="1" rx="8" ry="1.4" fill="rgba(0,224,168,.25)"/>
-<g class="legL"><path d="M-6.2 -22 h5.6 l-.4 19.5 h-4.6z" fill="#111c2e"/><path d="M-6.4 -14 h5.8 v2.2 h-5.8z" fill="#182b45"/><path d="M-7.6 -3 h7.8 q1.2 0 1.2 1.6 v1.6 h-9.2 q-.4-3.2 .2-3.2z" fill="#060c18"/><path d="M-7.2 .2 h8" stroke="var(--hs,#00a884)" stroke-width=".6" fill="none"/></g>
-<g class="legR"><path d="M.6 -22 h5.6 l-.2 19.5 h-4.8z" fill="#16253c"/><path d="M.6 -14 h5.8 v2.2 h-5.8z" fill="#1e3454"/><path d="M.4 -3 h7.8 q1.2 0 1.2 1.6 v1.6 h-9 q-.2-3.2 .2-3.2z" fill="#060c18"/><path d="M.8 .2 h8" stroke="var(--hs,#00a884)" stroke-width=".6" fill="none"/><path d="M1 -1.2 h7.6" stroke="#4dd2ff" stroke-width=".5" opacity=".7"/></g>
-<g class="armL"><rect x="-12.8" y="-43.5" width="4.8" height="18" rx="2.4" style="fill:var(--hs2,#008f70)"/><rect x="-13.4" y="-32" width="6" height="4.5" rx="1.2" fill="#081426" stroke="#4dd2ff" stroke-width=".5"/><line x1="-12.2" y1="-29.8" x2="-8.6" y2="-29.8" stroke="#00e0a8" stroke-width=".8"/><circle cx="-10.4" cy="-24.5" r="2.3" fill="#142236"/><circle cx="-10.4" cy="-24.5" r="1.4" style="fill:var(--hk,#d9a77f)"/></g>
-<path d="M-9.8 -44 Q-9.8 -47 -6.4 -47.2 H6.4 Q9.8 -47 9.8 -44 L10 -21.4 Q10 -19.4 7.8 -19.4 H-7.8 Q-9.8 -19.4 -9.8 -21.4Z" style="fill:var(--hs,#00a884)"/>
-<path d="M2.5 -47.2 H6.4 Q9.8 -47 9.8 -44 L10 -21.4 Q10 -19.4 7.8 -19.4 H2.5z" fill="rgba(0,0,0,.22)"/>
+<defs>
+  <linearGradient id="hTorso3D" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00f0b8"/><stop offset="30%" stop-color="var(--hs,#00a884)"/><stop offset="75%" stop-color="var(--hs2,#008f70)"/><stop offset="100%" stop-color="#052820"/></linearGradient>
+  <linearGradient id="hLeg3DL" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#243854"/><stop offset="35%" stop-color="#182940"/><stop offset="80%" stop-color="#121e30"/><stop offset="100%" stop-color="#09111c"/></linearGradient>
+  <linearGradient id="hLeg3DR" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1d2e47"/><stop offset="40%" stop-color="#142135"/><stop offset="85%" stop-color="#0f1929"/><stop offset="100%" stop-color="#070d16"/></linearGradient>
+  <linearGradient id="hBoot3D" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a3f5f"/><stop offset="45%" stop-color="#132033"/><stop offset="100%" stop-color="#050a12"/></linearGradient>
+  <linearGradient id="hVisor3D" x1="0" y1="0" x2="1" y2="0.6"><stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/><stop offset="25%" stop-color="#4dd2ff" stop-opacity=".85"/><stop offset="70%" stop-color="#00e0a8" stop-opacity=".75"/><stop offset="100%" stop-color="#072b42" stop-opacity=".95"/></linearGradient>
+</defs>
+<!-- Sombra projetada 3D em camadas -->
+<ellipse cx="0" cy="1.8" rx="16" ry="3.5" fill="rgba(0,0,0,.68)"/>
+<ellipse cx="0" cy="1.4" rx="10" ry="2" fill="rgba(0,240,255,.28)"/>
+<ellipse cx="0" cy="1" rx="6" ry="1.2" fill="rgba(0,0,0,.9)"/>
+<!-- Perna esquerda 3D -->
+<g class="legL">
+  <path d="M-6.2 -22 h5.6 l-.4 19.5 h-4.6z" fill="url(#hLeg3DL)"/>
+  <path d="M-6.6 -14 h5.8 v2.6 h-5.8z" fill="#203452" stroke="#2c4d7d" stroke-width=".5"/>
+  <path d="M-7.8 -3 h8 q1.2 0 1.2 1.8 v2 h-9.6 q-.4-3.5 .4-3.8z" fill="url(#hBoot3D)"/>
+  <path d="M-7.5 .5 h8.5" stroke="#00f0ff" stroke-width=".8" fill="none"/>
+</g>
+<!-- Perna direita 3D -->
+<g class="legR">
+  <path d="M.6 -22 h5.6 l-.2 19.5 h-4.8z" fill="url(#hLeg3DR)"/>
+  <path d="M.6 -14 h5.8 v2.6 h-5.8z" fill="#1b2d47" stroke="#25426b" stroke-width=".5"/>
+  <path d="M.4 -3 h8 q1.2 0 1.2 1.8 v2 h-9.4 q-.2-3.5 .2-3.8z" fill="url(#hBoot3D)"/>
+  <path d="M.8 .5 h8.5" stroke="#00f0ff" stroke-width=".8" fill="none"/>
+  <path d="M1 -1 h7.8" stroke="#4dd2ff" stroke-width=".5" opacity=".7"/>
+</g>
+<!-- Braço esquerdo e terminal holográfico de pulso 3D -->
+<g class="armL">
+  <rect x="-12.8" y="-43.5" width="4.8" height="18" rx="2.4" fill="url(#hTorso3D)"/>
+  <rect x="-13.4" y="-32" width="6" height="4.5" rx="1.2" fill="#081426" stroke="#4dd2ff" stroke-width=".6"/>
+  <!-- Mini tela holográfica flutuante -->
+  <g class="hologram-screen" transform="translate(-15.5,-35)">
+    <rect x="0" y="0" width="8" height="6.5" rx="1.2" fill="rgba(0,240,255,0.22)" stroke="#00f0ff" stroke-width=".6"/>
+    <line x1="1.2" y1="2" x2="6.8" y2="2" stroke="#ffffff" stroke-width=".6"/>
+    <line x1="1.2" y1="3.5" x2="5.5" y2="3.5" stroke="#00e0a8" stroke-width=".6"/>
+    <circle cx="6.5" cy="5" r=".6" fill="#ff2e63"/>
+  </g>
+  <circle cx="-10.4" cy="-24.5" r="2.3" fill="#142236"/>
+  <circle cx="-10.4" cy="-24.5" r="1.4" style="fill:var(--hk,#d9a77f)"/>
+</g>
+<!-- Torso e Armadura Tática 3D -->
+<path d="M-9.8 -44 Q-9.8 -47 -6.4 -47.2 H6.4 Q9.8 -47 9.8 -44 L10 -21.4 Q10 -19.4 7.8 -19.4 H-7.8 Q-9.8 -19.4 -9.8 -21.4Z" fill="url(#hTorso3D)"/>
+<path d="M2.5 -47.2 H6.4 Q9.8 -47 9.8 -44 L10 -21.4 Q10 -19.4 7.8 -19.4 H2.5z" fill="rgba(0,0,0,.26)"/>
 <path d="M-5 -47.2 L0 -40 L5 -47.2" style="fill:var(--hs3,#0b6e57)"/>
-<line x1="0" y1="-40" x2="0" y2="-21.4" stroke="rgba(0,0,0,.35)" stroke-width=".8"/>
-<line x1="0" y1="-38" x2="0" y2="-36" stroke="#00e0a8" stroke-width="1.2"/>
-<rect x="2.8" y="-38.5" width="4.8" height="6.2" rx="1" fill="#f0f6fc" stroke="#0d1b30" stroke-width=".5"/><rect x="3.4" y="-37.6" width="3.6" height="1.2" fill="#00a884"/><circle cx="6" cy="-34" r=".6" fill="#00e0a8"/>
-<g class="armR"><rect x="8" y="-43.5" width="4.8" height="18" rx="2.4" style="fill:var(--hs,#00a884)"/><circle cx="10.4" cy="-24.5" r="2.3" fill="#142236"/><circle cx="10.4" cy="-24.5" r="1.4" style="fill:var(--hk,#d9a77f)"/></g>
+<line x1="0" y1="-40" x2="0" y2="-21.4" stroke="rgba(0,0,0,.4)" stroke-width=".9"/>
+<line x1="0" y1="-38" x2="0" y2="-36" stroke="#00f0ff" stroke-width="1.3"/>
+<!-- Crachá com lanyard de segurança -->
+<rect x="2.8" y="-38.5" width="4.8" height="6.2" rx="1" fill="#f0f6fc" stroke="#0d1b30" stroke-width=".5"/>
+<rect x="3.4" y="-37.6" width="3.6" height="1.2" fill="#00a884"/>
+<circle cx="6" cy="-34" r=".6" fill="#00f0ff"/>
+<!-- Braço direito 3D -->
+<g class="armR">
+  <rect x="8" y="-43.5" width="4.8" height="18" rx="2.4" fill="url(#hTorso3D)"/>
+  <circle cx="10.4" cy="-24.5" r="2.3" fill="#142236"/>
+  <circle cx="10.4" cy="-24.5" r="1.4" style="fill:var(--hk,#d9a77f)"/>
+</g>
+<!-- Pescoço e Cabeça 3D -->
 <rect x="-2.5" y="-50.2" width="5" height="4.4" rx="1.2" style="fill:var(--hk,#d9a77f)"/>
 <path d="M-7.6 -56.5 C-7.6 -64.5 -2.4 -67 1.6 -66.2 C6.4 -65.4 9 -62 8 -56.5 C6 -51.5 3 -47 0 -47 C-4 -47 -7.6 -51.5 -7.6 -56.5 Z" style="fill:var(--hk,#d9a77f)"/>
 <path d="M-8.2 -56 C-8.6 -65 -2.4 -67.5 1.6 -66.8 C6.8 -66 9.4 -62.5 8.4 -57 C6.2 -60.8 1.6 -61.6 -2.4 -60.6 C-5.2 -60 -6.8 -58.4 -8.2 -56Z" style="fill:var(--hh,#2b1d14)"/>
-<path d="M0 -66.8 C3 -66.8 7 -64 7 -60 C5.5 -61.5 2.5 -62 0 -62 Z" fill="rgba(255,255,255,.16)"/>
-<rect x="1.2" y="-58.5" width="6.2" height="3.6" rx="1.5" fill="rgba(77,210,255,.3)" stroke="#0b172a" stroke-width=".8"/><line x1="1.8" y1="-56.7" x2="6.8" y2="-56.7" stroke="#00e0a8" stroke-width=".5"/>
-<g class="hset"><path d="M-8.8 -56 A9 9 0 0 1 8.6 -59.5" stroke="#14233a" stroke-width="2.2" fill="none"/>
-<rect x="-10.6" y="-59" width="4" height="7.2" rx="1.8" fill="#14233a" stroke="#00e0a8" stroke-width=".5"/>
-<path d="M-7.5 -53 C-6.5 -48.5 -1.2 -47.5 3.2 -48.5" stroke="#14233a" stroke-width="1.3" fill="none"/><circle cx="3.8" cy="-48.5" r="1.4" fill="#00e0a8"/><circle cx="3.8" cy="-48.5" r=".7" fill="#fff"/></g>
+<path d="M0 -66.8 C3 -66.8 7 -64 7 -60 C5.5 -61.5 2.5 -62 0 -62 Z" fill="rgba(255,255,255,.2)"/>
+<!-- Smart Visor 3D curvado com reflexo -->
+<rect x="1.2" y="-58.5" width="6.6" height="3.8" rx="1.6" fill="url(#hVisor3D)" stroke="#0b172a" stroke-width=".9"/>
+<path d="M1.6 -57.4 Q4 -58 6.6 -57.4" stroke="#ffffff" stroke-width=".7" opacity=".85" fill="none"/>
+<circle cx="6.5" cy="-56.6" r=".6" fill="#ff2e63"/>
+<!-- Headset tático com microfone boom -->
+<g class="hset">
+  <path d="M-8.8 -56 A9 9 0 0 1 8.6 -59.5" stroke="#14233a" stroke-width="2.4" fill="none"/>
+  <rect x="-10.6" y="-59" width="4" height="7.2" rx="1.8" fill="#14233a" stroke="#00e0a8" stroke-width=".6"/>
+  <path d="M-7.5 -53 C-6.5 -48.5 -1.2 -47.5 3.2 -48.5" stroke="#14233a" stroke-width="1.4" fill="none"/>
+  <circle cx="3.8" cy="-48.5" r="1.5" fill="#00e0a8"/>
+  <circle cx="3.8" cy="-48.5" r=".7" fill="#fff"/>
+</g>
 <g class="hcap"><path d="M-9.2 -58 C-9 -67.5 9 -67.5 9.2 -58 Z" style="fill:var(--hs,#00a884)"/><rect x="3.2" y="-59.8" width="9.6" height="2.6" rx="1.2" style="fill:var(--hs3,#0b6e57)"/><circle cx="-1" cy="-62" r="1.2" fill="#00e0a8"/></g>
 </g></g>`;
 const led = (x, y, c, d, cls = 'led') => `<circle class="${cls}" style="animation-delay:${d.toFixed(2)}s" cx="${x}" cy="${y}" r="1.3" fill="${c}"/>`;

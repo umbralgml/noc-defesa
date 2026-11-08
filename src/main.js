@@ -27,6 +27,7 @@ import { initDrop } from './engine/drop.js';
 import { initWire } from './engine/wire.js';
 import { applyPrefs } from './engine/prefs.js';
 import { openPerfil } from './engine/perfil.js';
+import { initSniffer } from './engine/sniffer.js';
 
 applyPrefs();
 initI18n();
@@ -66,7 +67,7 @@ function showProgress() {
   el.innerHTML = p.done ? `Seu plantão: <b>★ ${p.stars}/${p.max}</b> · ${p.done}/${p.max / 3} fases` : '';
 }
 
-initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy(); initStudy(); initArcade(); initReport();
+initGame(); initDrop(); initWire(); initDaily(); initPWA(); initRoom(); initZ3r0(); initTrain(); initAcademy(); initStudy(); initArcade(); initReport(); initSniffer();
 loadRankConfig();
 // Cargo e XP na tela inicial.
 function showRank() {
