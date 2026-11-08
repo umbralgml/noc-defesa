@@ -856,7 +856,15 @@ export const EN = {
     'Z3R0 NA REDE': 'Z3R0 ON NETWORK',
     'MITIGAÇÃO ATIVA': 'ACTIVE MITIGATION',
     'INTRUSÃO DETECTADA': 'INTRUSION DETECTED',
-    'TRÁFEGO ANÔMALO': 'ANOMALOUS TRAFFIC'
+    'TRÁFEGO ANÔMALO': 'ANOMALOUS TRAFFIC',
+    'MUNDO RPG 3D': '3D RPG WORLD',
+    'LISTA CLÁSSICA': 'CLASSIC LIST',
+    'IR AO PLANTÃO': 'GO TO SHIFT',
+    'SEU PLANTÃO': 'YOUR SHIFT',
+    'Nenhum ato disponível para esta trilha ainda.': 'No acts available for this track yet.',
+    'incidentes neutralizados': 'incidents neutralized',
+    'Setor em construção': 'Sector under construction',
+    '{n}/{n} incidentes neutralizados': '{n}/{n} incidents neutralized'
   },
   gloss: {
     'Access point': ['Access point', ['access point', 'ap'], 'Device that brings the network to Wi-Fi, connecting wireless devices to the wired network.'],

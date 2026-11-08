@@ -53,35 +53,81 @@ button{font-family:inherit;cursor:pointer}
 @keyframes glitch{0%,90%,100%{transform:none;opacity:1}92%{transform:translateX(3px);opacity:.6}94%{transform:translateX(-3px)}96%{opacity:.8}}
 .lamp{animation:lamp 4s infinite}
 @keyframes lamp{0%,100%{opacity:.55}50%{opacity:.8}}
-.hero{transition:transform 1.4s linear}
+.hero{transition:transform 1.4s cubic-bezier(0.22, 1, 0.36, 1)}
 .hero .bob{transform-box:fill-box;transform-origin:50% 100%}
-.hero .legL,.hero .legR,.hero .armL,.hero .armR{transform-box:fill-box;transform-origin:50% 8%}
-.hero.walk .legL{animation:swing .34s ease-in-out infinite alternate}
-.hero.walk .legR{animation:swing .34s ease-in-out infinite alternate-reverse}
-.hero.walk .armL{animation:swing .34s ease-in-out infinite alternate-reverse}
-.hero.walk .armR{animation:swing .34s ease-in-out infinite alternate}
-.hero.walk .bob{animation:bob .17s infinite alternate}
-.hero.type .armR{animation:typing .22s infinite alternate}
-.hero.type .armL{animation:typing .26s infinite alternate-reverse}
-.hero.idle .bob{animation:breathe 2.2s infinite}
-.hero.hit .bob{animation:hitk .45s}
-.hero.happy .bob{animation:jump .5s}
-@keyframes swing{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
-@keyframes bob{to{transform:translateY(-1.5px)}}
-@keyframes typing{from{transform:rotate(-72deg)}to{transform:rotate(-56deg)}}
-@keyframes breathe{50%{transform:scaleY(1.015)}}
-@keyframes hitk{20%{transform:translateX(-3px) rotate(-6deg)}50%{transform:translateX(3px) rotate(4deg)}80%{transform:translateX(-2px)}}
-@keyframes jump{40%{transform:translateY(-9px)}}
-
-.scene.defeat .glitch{transform-box:fill-box;transform-origin:50% 50%;animation:zdie 1.1s forwards}
-@keyframes zdie{0%{transform:none}15%{transform:translateX(5px) skewX(14deg)}30%{transform:translateX(-6px);opacity:.5}45%{transform:translateX(3px) skewX(-10deg);opacity:1}70%{transform:scaleY(.08);opacity:1}100%{transform:scale(0,0);opacity:0}}
-.scene .zdef{opacity:0}
-.scene.defeat .zdef{animation:zon .4s 1s forwards}
-@keyframes zon{to{opacity:1}}
-.scene.defeat .scrframe{stroke:#00e0a8;transition:stroke .3s 1s}
-.hero.cheer .bob{animation:jump .55s infinite}
-.hero.cheer .armL{transform:rotate(150deg)}
-.hero.cheer .armR{transform:rotate(-150deg)}
+.hero .legL,.hero .legR{transform-box:fill-box;transform-origin:50% 8%}
+.hero .armL,.hero .armR{transform-box:fill-box;transform-origin:50% 12%}
+.hero.walk .bob{animation:heroWalkBob .34s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite}
+.hero.walk .legL{animation:legWalkL .34s cubic-bezier(0.38, 0, 0.22, 1) infinite}
+.hero.walk .legR{animation:legWalkR .34s cubic-bezier(0.38, 0, 0.22, 1) infinite}
+.hero.walk .armL{animation:armWalkL .34s cubic-bezier(0.38, 0, 0.22, 1) infinite}
+.hero.walk .armR{animation:armWalkR .34s cubic-bezier(0.38, 0, 0.22, 1) infinite}
+@keyframes heroWalkBob{
+  0%{transform:translateY(0) rotate(1.5deg) scale(1,1)}
+  25%{transform:translateY(-3.8px) rotate(3.2deg) scale(0.98,1.02)}
+  50%{transform:translateY(0) rotate(1.5deg) scale(1.02,0.98)}
+  75%{transform:translateY(-3.8px) rotate(3.2deg) scale(0.98,1.02)}
+  100%{transform:translateY(0) rotate(1.5deg) scale(1,1)}
+}
+@keyframes legWalkL{
+  0%{transform:rotate(24deg) skewX(-3deg)}
+  25%{transform:rotate(8deg) skewX(2deg) scaleY(0.95)}
+  50%{transform:rotate(-22deg) skewX(5deg)}
+  75%{transform:rotate(-6deg) skewX(-2deg) scaleY(0.93)}
+  100%{transform:rotate(24deg) skewX(-3deg)}
+}
+@keyframes legWalkR{
+  0%{transform:rotate(-22deg) skewX(5deg)}
+  25%{transform:rotate(-6deg) skewX(-2deg) scaleY(0.93)}
+  50%{transform:rotate(24deg) skewX(-3deg)}
+  75%{transform:rotate(8deg) skewX(2deg) scaleY(0.95)}
+  100%{transform:rotate(-22deg) skewX(5deg)}
+}
+@keyframes armWalkL{
+  0%{transform:rotate(-32deg) rotateZ(2deg)}
+  50%{transform:rotate(32deg) rotateZ(-2deg)}
+  100%{transform:rotate(-32deg) rotateZ(2deg)}
+}
+@keyframes armWalkR{
+  0%{transform:rotate(32deg) rotateZ(-2deg)}
+  50%{transform:rotate(-32deg) rotateZ(2deg)}
+  100%{transform:rotate(32deg) rotateZ(-2deg)}
+}
+.hero.type .armR{animation:typingR .18s ease-in-out infinite alternate}
+.hero.type .armL{animation:typingL .22s ease-in-out infinite alternate}
+.hero.type .bob{animation:typeBob .36s ease-in-out infinite alternate}
+@keyframes typingR{from{transform:rotate(-76deg) translateX(1px)}to{transform:rotate(-50deg) translateX(-1px)}}
+@keyframes typingL{from{transform:rotate(-70deg)}to{transform:rotate(-46deg)}}
+@keyframes typeBob{from{transform:translateY(0) rotate(0.8deg)}to{transform:translateY(-1.2px) rotate(-0.8deg)}}
+.hero.idle .bob{animation:heroBreathe 2.4s ease-in-out infinite}
+.hero.idle .armL{animation:heroArmIdleL 2.4s ease-in-out infinite}
+.hero.idle .armR{animation:heroArmIdleR 2.4s ease-in-out infinite}
+@keyframes heroBreathe{
+  0%,100%{transform:translateY(0) scale(1,1)}
+  50%{transform:translateY(-2px) scale(1.018,1.022)}
+}
+@keyframes heroArmIdleL{0%,100%{transform:rotate(0deg)}50%{transform:rotate(2deg)}}
+@keyframes heroArmIdleR{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-2deg)}}
+.hero.hit .bob{animation:hitk .45s ease-out}
+.hero.happy .bob{animation:heroHappyJump .55s cubic-bezier(0.18,0.89,0.32,1.28)}
+.hero.happy .armL{animation:heroHappyArmL .55s ease-out}
+.hero.happy .armR{animation:heroHappyArmR .55s ease-out}
+@keyframes heroHappyJump{
+  0%{transform:translateY(0) scale(1.05,0.95)}
+  35%{transform:translateY(-14px) scale(0.96,1.06)}
+  65%{transform:translateY(-1px) scale(1.03,0.97)}
+  100%{transform:translateY(0) scale(1,1)}
+}
+@keyframes heroHappyArmL{0%{transform:rotate(0)}40%{transform:rotate(-135deg)}100%{transform:rotate(0)}}
+@keyframes heroHappyArmR{0%{transform:rotate(0)}40%{transform:rotate(135deg)}100%{transform:rotate(0)}}
+.hero.cheer .bob{animation:heroCheerJump .55s cubic-bezier(0.18,0.89,0.32,1.28) infinite}
+.hero.cheer .armL{transform:rotate(-140deg)}
+.hero.cheer .armR{transform:rotate(140deg)}
+@keyframes heroCheerJump{
+  0%,100%{transform:translateY(0) scale(1,1)}
+  45%{transform:translateY(-12px) scale(0.97,1.04)}
+  70%{transform:translateY(1px) scale(1.03,0.97)}
+}
 .sndbtn{flex:0 0 38px}
 .credit{margin-top:14px;font-size:11px;color:var(--muted)}
 .credit b{color:#c9d6ea;font-weight:600}
@@ -181,6 +227,216 @@ button{font-family:inherit;cursor:pointer}
 .node.boss .dot{border-color:var(--z);color:var(--z)}
 .node.boss .info{border-color:rgba(255,46,99,.4)}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,209,102,.5)}100%{box-shadow:0 0 0 12px rgba(255,209,102,0)}}
+
+/* ---------- 3d rpg world map & trail mode switcher ---------- */
+.trail-view-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 10px;
+  padding: 8px 12px;
+  background: rgba(11, 23, 48, 0.75);
+  border: 1px solid rgba(0, 224, 168, 0.28);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+.trail-view-sw {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(4, 9, 19, 0.6);
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(44, 61, 92, 0.5);
+}
+.tv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--muted);
+  font: 700 10.5px 'Orbitron', monospace;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.tv-btn:hover {
+  color: #fff;
+}
+.tv-btn.on {
+  background: linear-gradient(135deg, rgba(0, 224, 168, 0.25), rgba(77, 210, 255, 0.15));
+  border-color: rgba(0, 224, 168, 0.6);
+  color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 224, 168, 0.35);
+}
+.tv-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(255, 209, 102, 0.12);
+  border: 1px solid rgba(255, 209, 102, 0.45);
+  border-radius: 999px;
+  color: #ffd166;
+  font: 700 10px 'Orbitron', monospace;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.tv-jump:hover {
+  background: rgba(255, 209, 102, 0.28);
+  box-shadow: 0 0 14px rgba(255, 209, 102, 0.4);
+  transform: translateY(-1px);
+}
+
+.rpg-map-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 6px;
+  padding-bottom: 24px;
+}
+.rpg-realm {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 0%, rgba(13, 31, 60, 0.8), rgba(4, 9, 19, 0.95));
+  border: 1px solid rgba(44, 61, 92, 0.7);
+  border-radius: 20px;
+  padding: 16px 14px 24px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.rpg-realm::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 224, 168, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 224, 168, 0.035) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  opacity: 0.65;
+}
+.rpg-realm-banner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(44, 61, 92, 0.55);
+}
+.rpg-realm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rpg-realm-tag {
+  font: 800 10px 'Orbitron', monospace;
+  letter-spacing: 2px;
+  color: var(--acc);
+}
+.rpg-realm-title {
+  font: 800 15px 'Orbitron', monospace;
+  color: #fff;
+  letter-spacing: 0.5px;
+  margin: 3px 0 1px;
+}
+.rpg-realm-sub {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rpg-realm-svg {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: block;
+  overflow: visible;
+}
+
+/* Nós RPG e Animações 3D */
+.node.rpg-node {
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  outline: none;
+}
+.node.rpg-node:hover {
+  transform: translateY(-3px);
+}
+.node.rpg-node:hover .rpg-label rect {
+  fill: rgba(14, 30, 56, 0.98);
+  stroke: #00f0ff;
+}
+.node.rpg-node.lock {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.node.rpg-node.lock:hover {
+  transform: none;
+}
+.node.rpg-node:focus-visible ellipse:last-of-type {
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+/* Pulso de dados fluindo pelos dutos de fibra */
+.rpg-conduit-flow {
+  animation: conduitFlow 1.6s linear infinite;
+}
+@keyframes conduitFlow {
+  to { stroke-dashoffset: -24; }
+}
+
+/* Ondas de sonar no plantão atual */
+.rpg-beacon-wave {
+  fill: none;
+  stroke: #00f0ff;
+  stroke-width: 1.6;
+  opacity: 0.9;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rpgSonar 2s ease-out infinite;
+}
+.rpg-beacon-wave-2 {
+  fill: none;
+  stroke: #00e0a8;
+  stroke-width: 1.2;
+  opacity: 0.7;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rpgSonar 2s ease-out 0.8s infinite;
+}
+@keyframes rpgSonar {
+  0% { transform: scale(0.9); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Mini analista holográfico no mapa */
+.rpg-hero-token {
+  animation: rpgTokenBob 2.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6));
+}
+@keyframes rpgTokenBob {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(0, -3.5px); }
+}
+
+/* Tag indicadora "SEU PLANTÃO" */
+.rpg-pin-tag {
+  animation: rpgPinFloat 2.2s ease-in-out infinite;
+}
+@keyframes rpgPinFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(0, -2.5px); }
+}
 
 /* ---------- game ---------- */
 .top{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--line);background:#0a1222}

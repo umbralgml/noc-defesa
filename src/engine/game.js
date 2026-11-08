@@ -18,6 +18,7 @@ import { startZ3r0, stopZ3r0 } from './z3r0.js';
 import { addXP, xpHTML, rankOf } from './career.js';
 import { onLevelWin, unlock } from './ach.js';
 import { certModal } from './cert.js';
+import { worldMapHTML } from './worldmap.js';
 import { cardsHTML, initCards } from './study.js';
 import { metric } from './rank.js';
 import { cyberConfetti } from './particles.js';
@@ -39,24 +40,41 @@ function trailsHTML(ct) {
 
 export function renderMap() {
   const ct = curTrail();
+  const viewMode = store('noc_map_view') || 'map';
   let html = '', tot = 0, pts = 0, gold = store('noc_gold') || [], nextI = LEVELS.findIndex((L, i) => L.trail === ct && unlocked(i) && !S.prog[K(i)]);
   LEVELS.forEach((L, i) => { tot += S.prog[K(i)] || 0; pts += S.best[K(i)] || 0; });
-  ACTS.forEach((a, ai) => {
-    if (a[4] !== ct) return;
-    const done = LEVELS.every((L, i) => L.act !== ai || S.prog[K(i)]);
-    html += `<div class="acth"><span>${a[0]}</span>${a[5] ? '<i class="diff nivel">NIVELAMENTO</i>' : a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${tr(a[2].toUpperCase())}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div>`
-      + (a[5] ? `<div class="nivn">Para quem está começando. ${LEVELS.some(L => L.act > ai && L.trail === ct) ? 'Já trabalha com isso? O próximo ato já está liberado.' : 'O plantão desta trilha chega nos próximos lotes.'}</div>` : '') + '<div class="path">';
-    LEVELS.forEach((L, i) => {
-      if (L.act !== ai) return;
-      const st = S.prog[K(i)] || 0;
-      const lock = !unlocked(i), next = i === nextI;
-      const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
-      html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : num(i)}</span>
-        <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${L.tag}</small></span>
-        ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.key || L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
+
+  const viewToggleHTML = `
+    <div class="trail-view-bar">
+      <div class="trail-view-sw">
+        <button class="tv-btn${viewMode === 'map' ? ' on' : ''}" data-view="map" type="button"><span>🗺️</span> ${tr('MUNDO RPG 3D')}</button>
+        <button class="tv-btn${viewMode === 'list' ? ' on' : ''}" data-view="list" type="button"><span>📋</span> ${tr('LISTA CLÁSSICA')}</button>
+      </div>
+      ${viewMode === 'map' ? `<button class="tv-jump" id="tvJump" type="button"><span>🎯</span> ${tr('IR AO PLANTÃO')}</button>` : ''}
+    </div>
+  `;
+
+  if (viewMode === 'map') {
+    html = viewToggleHTML + worldMapHTML({ ct, LEVELS, ACTS, S, gold, nextI, DIFFS });
+  } else {
+    ACTS.forEach((a, ai) => {
+      if (a[4] !== ct) return;
+      const done = LEVELS.every((L, i) => L.act !== ai || S.prog[K(i)]);
+      html += `<div class="acth"><span>${a[0]}</span>${a[5] ? '<i class="diff nivel">NIVELAMENTO</i>' : a[2] ? `<i class="diff d-${DIFFS.indexOf(a[2])}">${tr(a[2].toUpperCase())}</i>` : ''}${done ? `<button class="certb" data-a="${ai}">📜 CERTIFICADO</button>` : ''}<b>${a[1]}</b></div>`
+        + (a[5] ? `<div class="nivn">Para quem está começando. ${LEVELS.some(L => L.act > ai && L.trail === ct) ? 'Já trabalha com isso? O próximo ato já está liberado.' : 'O plantão desta trilha chega nos próximos lotes.'}</div>` : '') + '<div class="path">';
+      LEVELS.forEach((L, i) => {
+        if (L.act !== ai) return;
+        const st = S.prog[K(i)] || 0;
+        const lock = !unlocked(i), next = i === nextI;
+        const cls = ['node', lock ? 'lock' : '', st ? 'done' : '', next ? 'next' : '', L.boss || L.miniboss ? 'boss' : ''].join(' ');
+        html += `<button class="${cls}" data-i="${i}"><span class="dot">${lock ? '×' : st ? '✓' : num(i)}</span>
+          <span class="info"><span class="tx"><b>${L.title}${next ? '<span class="tag">PRÓXIMO</span>' : L.novo && !st ? '<span class="tag nova">NOVA</span>' : ''}</b><small>${L.tag}</small></span>
+          ${lock ? '' : `<span class="res"><span class="st${gold.includes(L.key || L.title) ? ' gold' : ''}">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span>${S.best[K(i)] ? `<small>${fmt(S.best[K(i)])} pts</small>` : ''}</span>`}</span></button>`;
+      });
+      html += '</div>';
     });
-    html += '</div>';
-  });
+    html = viewToggleHTML + html;
+  }
   html += '<button class="mapReset" id="mapReset">ZERAR PROGRESSO</button>';
   // Trilhas no topo; desafio, arcade, treino, academia e sala de estudo num bloco compacto logo abaixo.
   $('mapList').innerHTML = trailsHTML(ct) + '<div class="hub"><div id="dailyBox"></div><div id="arcadeBox"></div><div id="trainBox"></div><div id="acadBox"></div><div id="studyBox"></div></div>' + html;
@@ -72,6 +90,13 @@ export function renderMap() {
   const p = profile(), r = rankOf();
   $('mapWho').textContent = p && p.name ? p.name.toUpperCase() : 'ANALISTA DE PLANTÃO';
   $('mapRank').textContent = `${r.name} · ${fmt(r.v)} XP`;
+
+  if (viewMode === 'map') {
+    requestAnimationFrame(() => {
+      const nextEl = $('mapList').querySelector('.node.next');
+      if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
 }
 
 // Confirma antes de apagar. "after" atualiza a tela que chamou.
@@ -289,6 +314,20 @@ export function initGame() {
   initScrollHints();
   flow.win = win; flow.fail = fail;
   $('mapList').addEventListener('click', e => {
+    const vb = e.target.closest('.tv-btn');
+    if (vb && vb.dataset.view) {
+      au();
+      store('noc_map_view', vb.dataset.view);
+      renderMap();
+      return;
+    }
+    const j = e.target.closest('#tvJump');
+    if (j) {
+      au();
+      const target = $('mapList').querySelector('.node.next');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     const c = e.target.closest('.certb'); if (c) { au(); certModal(+c.dataset.a); return; }
     const t = e.target.closest('.trail');
     if (t) { if (t.classList.contains('soon')) { buzz(30); return; } au(); store('noc_trail', TRAILS[+t.dataset.t].id); renderMap(); return; }
